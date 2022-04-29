@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+enum CoopRewardState {
+	Unlock = 0;
+	Lock = 1;
+	Taken = 2;
+}

@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+enum FriendOnlineState {
+	FREIEND_DISCONNECT = 0;
+	FRIEND_ONLINE = 1;
+}

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+enum FriendEnterHomeOption {
+	NEED_CONFIRM = 0;
+	REFUSE = 1;
+	DIRECT = 2;
+}
