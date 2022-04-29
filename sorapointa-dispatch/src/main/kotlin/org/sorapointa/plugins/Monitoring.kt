@@ -1,4 +1,4 @@
-package sorapointa.org.plugins
+package org.sorapointa.plugins
 
 import org.slf4j.event.*
 import io.ktor.server.request.*

@@ -1,4 +1,4 @@
-package sorapointa.org.plugins
+package org.sorapointa.plugins
 
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
