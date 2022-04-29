@@ -15,39 +15,26 @@ version = "0.1.0-Dev"
 
 dependencies {
     implementation("com.google.protobuf:protobuf-java:_")
-    protobuf(files("./proto/"))
-    testProtobuf(files("./proto/"))
 }
 
 
 protobuf {
-    protoc {
-        // The artifact spec for the Protobuf Compiler
-        artifact = "com.google.protobuf:protoc:_"
-    }
-    // generatedFilesBaseDir = "$projectDir/src/main/java/emu/grasscutter/net/proto/"
     generatedFilesBaseDir = "$projectDir/src/generated/"
 }
-
 
 sourceSets {
     main {
         proto {
-            // In addition to the default 'src/main/proto'
-            srcDir("src/generated")
+            srcDir("src/proto")
         }
         java {
-            srcDir("src/kotlin")
+            srcDir("src/generated")
         }
     }
 }
 
 idea {
     module {
-        sourceDirs.plusAssign(file("./proto/"))
+        sourceDirs.plus(file("src/proto"))
     }
 }
-//
-//processResources {
-//    dependsOn("generateProto")
-//}
