@@ -1,4 +1,5 @@
-import com.google.protobuf.gradle.*
+import com.google.protobuf.gradle.proto
+import com.google.protobuf.gradle.protobuf
 
 plugins {
     id("sorapointa-conventions")
@@ -25,7 +26,15 @@ protobuf {
 sourceSets {
     main {
         proto {
-            srcDir("src/proto")
+            setSrcDirs(setOf("src/proto"))
+        }
+        java {
+            srcDir("src/generated")
+        }
+    }
+    test {
+        proto {
+            setSrcDirs(setOf("src/proto"))
         }
         java {
             srcDir("src/generated")

@@ -14,10 +14,24 @@ dependencies {
     testImplementation(kotlin("test"))
     implementation("io.github.microutils:kotlin-logging-jvm:_")
     implementation("ch.qos.logback:logback-classic:_")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
 }
 
 repositories {
     mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            setSrcDirs(setOf("kotlin")) // No Java, and Kotlin Only
+        }
+    }
+    test {
+        java {
+            setSrcDirs(setOf("kotlin")) // No Java, and Kotlin Only
+        }
+    }
 }
 
 tasks.test {
