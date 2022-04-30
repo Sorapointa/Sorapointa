@@ -14,6 +14,7 @@ dependencies {
     testImplementation(kotlin("test"))
     implementation("io.github.microutils:kotlin-logging-jvm:_")
     implementation("ch.qos.logback:logback-classic:_")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
 }
 
 repositories {
@@ -25,6 +26,10 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+    kotlinOptions.apply {
+        jvmTarget = "17"
+        OptInAnnotations.list.forEach {
+            freeCompilerArgs = freeCompilerArgs + "-opt-in=$it"
+        }
+    }
 }
-
