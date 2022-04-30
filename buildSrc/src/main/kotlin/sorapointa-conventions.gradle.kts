@@ -21,6 +21,19 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    main {
+        java {
+            setSrcDirs(setOf("kotlin")) // No Java, and Kotlin Only
+        }
+    }
+    test {
+        java {
+            setSrcDirs(setOf("kotlin")) // No Java, and Kotlin Only
+        }
+    }
+}
+
 tasks.test {
     useJUnitPlatform()
 }
