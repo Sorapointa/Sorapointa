@@ -1,11 +1,12 @@
 package org.sorapointa
 
-import io.ktor.http.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import kotlin.test.*
+import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.sorapointa.plugins.configureRouting
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class ApplicationTest {
     @Test
@@ -15,7 +16,7 @@ class ApplicationTest {
         }
         client.get("/").apply {
             assertEquals(HttpStatusCode.OK, status)
-            assertEquals("Hello World!", bodyAsText())
+            assertEquals("Hello Sorapointa! The Dispatch Server has been successfully launched!", bodyAsText())
         }
     }
 }
