@@ -12,5 +12,6 @@ dependencies {
     implementation("io.ktor:ktor-server-call-logging-jvm:_")
     implementation("io.ktor:ktor-server-compression-jvm:_")
     implementation("io.ktor:ktor-server-netty-jvm:_")
+    implementation("io.ktor:ktor-network-tls-certificates:_")
     testImplementation("io.ktor:ktor-server-tests-jvm:_")
 }
