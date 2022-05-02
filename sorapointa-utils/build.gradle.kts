@@ -6,5 +6,6 @@ plugins {
 version = "0.1.0-Dev"
 
 dependencies {
+    implementation(project(":sorapointa-dataprovider"))
     implementation(KotlinX.serialization.json)
 }
