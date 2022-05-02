@@ -1,3 +1,5 @@
+package org.sorapointa
+
 import org.junit.jupiter.api.Test
 import org.sorapointa.utils.globalWorkDirectory
 import org.sorapointa.utils.resolveWorkDirectory

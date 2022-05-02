@@ -1,3 +1,5 @@
+package org.sorapointa
+
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.sorapointa.utils.replaceWithOrder
@@ -19,7 +21,7 @@ class StringTest {
 
         @Test
         fun `ignore extra args`() {
-            assertEquals("{0}", "{0}".replaceWithOrder("0", "1"))
+            assertEquals("0", "{0}".replaceWithOrder("0", "1"))
         }
 
         @Test

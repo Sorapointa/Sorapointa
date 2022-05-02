@@ -11,7 +11,7 @@ val globalWorkDirectory by lazy {
 }
 
 /**
- * resolve work dir
+ * Resolve work dir
  */
 fun resolveWorkDirectory(path: String) = File(globalWorkDirectory, path)
 

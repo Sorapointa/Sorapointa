@@ -9,7 +9,7 @@ import kotlin.io.path.pathString
 
 
 /**
- * create file and its parents
+ * Create file and its parents
  */
 suspend fun File.touch(): Boolean = withContext(Dispatchers.IO) {
     parentFile?.mkdirs()
