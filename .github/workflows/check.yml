@@ -1,0 +1,36 @@
+name: Gradle Check
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches:
+    - '*'
+
+jobs:
+
+  build:
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest] # macos-latest, windows-latest
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup protoc
+        uses: arduino/setup-protoc@v1.1.2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      - name: Check
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: check
+          gradle-version: 7.4
