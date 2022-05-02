@@ -36,9 +36,6 @@ sourceSets {
         proto {
             setSrcDirs(setOf("src/proto"))
         }
-        java {
-            srcDir("src/generated")
-        }
     }
 }
 
