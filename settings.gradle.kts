@@ -8,6 +8,7 @@ include("sorapointa-event")
 include("sorapointa-kcp")
 include("sorapointa-proto")
 include("sorapointa-utils")
+include("sorapointa-command")
 
 pluginManagement {
     repositories {
