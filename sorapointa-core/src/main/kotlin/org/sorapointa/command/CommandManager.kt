@@ -8,21 +8,18 @@ object CommandManager {
     private val cmdMap = mutableMapOf<String, SorapointaCommand>()
     private val aliasMap = mutableMapOf<String, SorapointaCommand>()
 
-    val cmdList: MutableSet<String>
-        get() {
-            return cmdMap.keys
-        }
+    val cmdList get() = cmdMap.values.toList()
 
     private val logger = mu.KotlinLogging.logger {}
 
     fun registerCommand(command: SorapointaCommand) {
         val name = command.commandName
 
-        cmdMap[name]?.also { logger.warn { "Command name $name conflict." } }
+        cmdMap[name]?.also { logger.warn { "Command name '$name' conflict." } }
             ?: also { cmdMap[name] = command }
 
         command.alias.forEach { alias ->
-            aliasMap[alias]?.also { logger.warn { "Alias name $alias conflict." } }
+            aliasMap[alias]?.also { logger.warn { "Alias name '$alias' conflict." } }
                 ?: also { aliasMap[alias] = command }
         }
     }
@@ -35,9 +32,11 @@ object CommandManager {
                 cmd.sender = sender
                 val result = cmd.main(args.subList(1, args.count()))
                 if (result is CommandResult.Error) {
-                    result.userMessage?.also { sender.sendMessage(it) }
-                    if (result.cause is PrintHelpMessage)
-                        sender.sendMessage("Alias: ${cmd.alias.contentToString()}")
+                    result.userMessage?.also {
+                        if (result.cause is PrintHelpMessage && cmd.alias.isNotEmpty())
+                            sender.sendMessage(it + "\n\nAlias: ${cmd.alias.contentToString()}")
+                        sender.sendMessage(it)
+                    }
                 }
             } else {
                 sender.sendMessage("No permission.")
