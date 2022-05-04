@@ -13,4 +13,14 @@ dependencies {
     implementation(project(":sorapointa-kcp"))
     implementation(project(":sorapointa-proto"))
     implementation(project(":sorapointa-utils"))
+    implementation("moe.sdl.yac:core:+")
 }
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor(0, "seconds")
+}
+
+repositories {
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+}
+
