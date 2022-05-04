@@ -19,7 +19,7 @@ private val logger = mu.KotlinLogging.logger { }
  * @see [ReadOnlyFilePersist]
  * @see [FilePersist]
  */
-abstract class AutoScanFilePersist<T : Any>(
+open class AutoScanFilePersist<T : Any>(
     override val location: File,
     default: T,
     private val scanInterval: Duration = 60.toDuration(DurationUnit.SECONDS),

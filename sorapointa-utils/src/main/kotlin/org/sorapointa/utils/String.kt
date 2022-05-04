@@ -1,14 +1,12 @@
 package org.sorapointa.utils
 
-import java.io.Serializable
-
 /**
  * Replace placeholder like {0} {1} ... {n} with parameter [args]
  * @param args list to replace
  * @receiver string like: 'string with parameter {0} and {1}'
  * @return replaced string
  */
-fun String.replaceWithOrder(vararg args: Serializable?): String {
+fun String.replaceWithOrder(vararg args: Any?): String {
     if (args.isEmpty() || isEmpty()) {
         return this
     }

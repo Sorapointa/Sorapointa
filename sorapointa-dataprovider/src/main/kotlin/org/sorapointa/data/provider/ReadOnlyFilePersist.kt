@@ -22,7 +22,7 @@ private val logger = mu.KotlinLogging.logger { }
  * @see SavableFilePersist
  */
 @Suppress("UNCHECKED_CAST")
-abstract class ReadOnlyFilePersist<T : Any>(
+open class ReadOnlyFilePersist<T : Any>(
     override val location: File,
     default: T
 ) : SavableFilePersist<T> {

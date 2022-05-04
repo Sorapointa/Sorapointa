@@ -20,7 +20,7 @@ private val logger = mu.KotlinLogging.logger { }
  * @see [ReadOnlyFilePersist]
  * @see [FilePersist]
  */
-abstract class AutoSaveFilePersist<T : Any>(
+open class AutoSaveFilePersist<T : Any>(
     override val location: File,
     default: T,
     private val saveInterval: Duration = 60.toDuration(DurationUnit.SECONDS),
