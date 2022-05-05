@@ -16,16 +16,15 @@ object HelpCommand : SorapointaCommand(
     ).int().default(1)
 
     override fun run() {
-        var msg = ""
         val cmdList = CommandManager.cmdList
         val pageList = cmdList.subList(
             (pageNum - 1) * PAGE_SIZE, pageNum * PAGE_SIZE
         )
 
-        msg += "===== Page $pageNum / ${cmdList.size / PAGE_SIZE} =====\n"
-        pageList.forEach { msg += it.getFormattedUsage() + "\n" }
-        msg += "Use 'command --help' to get more detail."
-
-        sender?.sendMessage(msg)
+        sender?.sendMessage(buildString {
+            append("===== Page $pageNum / ${cmdList.size / PAGE_SIZE} =====\n")
+            pageList.forEach { append("${it.getFormattedUsage()}\n") }
+            append("Use 'command --help' to get more detail.")
+        })
     }
 }

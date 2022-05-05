@@ -32,11 +32,11 @@ object CommandManager {
                 cmd.sender = sender
                 val result = cmd.main(args.subList(1, args.count()))
                 if (result is CommandResult.Error) {
-                    result.userMessage?.also {
+                    sender.sendMessage(buildString {
+                        append(result.userMessage)
                         if (result.cause is PrintHelpMessage && cmd.alias.isNotEmpty())
-                            sender.sendMessage(it + "\n\nAlias: ${cmd.alias.contentToString()}")
-                        sender.sendMessage(it)
-                    }
+                            append("$\n\nAlias: ${cmd.alias.contentToString()}")
+                    })
                 }
             } else {
                 sender.sendMessage("No permission.")
