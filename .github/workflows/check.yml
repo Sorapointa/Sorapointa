@@ -3,9 +3,17 @@ name: Gradle Check
 on:
   push:
     branches: [master]
+    paths:
+      - '**.kt'
+      - '**.kts'
+      - '**.proto'
   pull_request:
     branches:
-    - '*'
+      - '*'
+    paths:
+      - '**.kt'
+      - '**.kts'
+      - '**.proto'
 
 jobs:
 
