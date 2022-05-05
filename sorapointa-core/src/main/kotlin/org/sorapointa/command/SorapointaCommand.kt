@@ -4,8 +4,9 @@ import moe.sdl.yac.core.CliktCommand
 
 abstract class SorapointaCommand(
     name: String,
-    val alias: Array<String>,
-    val type: CommandSenderType,
-) : CliktCommand(name = name) {
+    help: String = "",
+    val alias: Array<String> = emptyArray(),
+    val type: CommandSenderType = CommandSenderType.ADMIN,
+) : CliktCommand(name = name, help = help) {
     var sender: CommandSender? = null
 }
