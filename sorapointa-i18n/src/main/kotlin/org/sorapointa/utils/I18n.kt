@@ -99,7 +99,7 @@ fun String.i18n(vararg args: Any?, locale: Locale? = null): String {
         I18nManager.supportedLanguages.byPriority(listOfNotNull(locale, globalLocale))
             ?: FALLBACK_LOCALE
     return I18nManager.languageMap[selected]?.strings
-        ?.get(this)?.replaceWithOrder(args) ?: run {
+        ?.get(this)?.replaceWithOrder(args = args) ?: run {
         logger.info { "Missing i18n value for key '$this', locale '$locale'" }
         this
     }
