@@ -111,7 +111,6 @@ object EventManager {
                     val destination = destinationChannel[priority]!!
                     eventScope.launch {
                         while (!destination.isClosedForSend) {
-                            println("eventReceived: $eventReceivedCount")
                             if (eventReceivedCount >= channels.size) {
                                 destination.close()
                                 destinationChannel[priority] = getInitChannel()
