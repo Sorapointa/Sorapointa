@@ -7,7 +7,6 @@ plugins {
     idea
 }
 
-
 repositories {
     maven("https://plugins.gradle.org/m2/")
 }
@@ -17,7 +16,6 @@ version = "0.1.0-Dev"
 dependencies {
     implementation("com.google.protobuf:protobuf-java:_")
 }
-
 
 protobuf {
     generatedFilesBaseDir = "$projectDir/src/generated/"

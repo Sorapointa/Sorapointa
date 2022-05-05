@@ -13,5 +13,4 @@ fun Application.configureHTTP() {
             minimumSize(1024) // condition
         }
     }
-
 }

@@ -1,0 +1,34 @@
+name: Ktlint Checker
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - .github/workflows/ktlint.yml
+      - '**.kt'
+      - '**.kts'
+  pull_request:
+    paths:
+      - .github/workflows/ktlint.yml
+      - '**.kt'
+      - '**.kts'
+
+jobs:
+  ktlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          curl -sSLO https://github.com/pinterest/ktlint/releases/download/0.45.2/ktlint && chmod a+x ktlint && sudo mv ktlint /usr/local/bin/
+      - name: run ktlint
+        run: |
+          ktlint "**/*.kt" \
+          "**/*.kts" \
+          "!**/generated/**" \ 
+          "!**/build/**" \
+          --reporter=checkstyle,output=build/ktlint-report.xml
+        continue-on-error: true
+      - uses: yutailang0119/action-ktlint@v3
+        with:
+          report-path: build/*.xml
+        continue-on-error: false
