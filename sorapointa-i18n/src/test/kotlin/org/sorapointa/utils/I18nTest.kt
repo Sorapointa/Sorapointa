@@ -16,6 +16,19 @@ class I18nTest {
     }
 
     @Test
+    fun `placeholder should be replaced`() = runBlocking {
+        I18nManager.registerLanguage(
+            LanguagePack(
+                Locale.ENGLISH,
+                strings = mapOf(
+                    "sora.test.placeholder" to "Test {0} {1}"
+                )
+            ),
+        )
+        assertEquals("Test 1 2", "sora.test.placeholder".i18n("1", "2", locale = Locale.ENGLISH))
+    }
+
+    @Test
     fun lookupString() {
         I18nManager.registerLanguage(
             LanguagePack(
