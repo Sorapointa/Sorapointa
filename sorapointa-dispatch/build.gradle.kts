@@ -6,6 +6,9 @@ plugins {
 version = "0.1.0-Dev"
 
 dependencies {
+    implementation(project(":sorapointa-dataprovider"))
+    implementation(project(":sorapointa-i18n"))
+    implementation(project(":sorapointa-event"))
     implementation("io.ktor:ktor-server-core-jvm:_")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:_")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:_")
