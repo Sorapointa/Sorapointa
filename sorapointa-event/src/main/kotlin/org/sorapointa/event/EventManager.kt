@@ -76,6 +76,9 @@ object EventManager {
                 listener(it)
             }
         }
+        listenerJob.invokeOnCompletion {
+            this.registeredListener.first { it.priority == priority }.channels.remove(channel)
+        }
         listeners.add(listenerJob)
     }
 
@@ -131,6 +134,9 @@ object EventManager {
             }
         }
         listeners.add(listenerJob)
+        listenerJob.invokeOnCompletion {
+            this.registeredBlockListener.first { it.priority == priority }.channels.remove(channel)
+        }
     }
 
     /**
@@ -174,7 +180,6 @@ object EventManager {
             registeredBlockListener.filter { it.priority == priority }.forEach { (priority, channels) ->
                 if (channels.size > 0) {
                     channels.forEach { channel ->
-                        delay(100)
                         channel.send(event)
                     }
                     var eventReceivedCount by atomic(0)
@@ -218,11 +223,7 @@ object EventManager {
         eventScope.cancel()
     }
 
-    fun closeAllListeners() {
-        listeners.forEach(Job::cancel)
-    }
-
-    private fun getInitChannel() = Channel<Event>()
+    private fun getInitChannel() = Channel<Event>(64)
 
 }
 

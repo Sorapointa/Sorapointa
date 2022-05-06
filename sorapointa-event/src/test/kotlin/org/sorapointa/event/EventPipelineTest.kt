@@ -1,6 +1,8 @@
 package org.sorapointa.event
 
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -20,7 +22,7 @@ class EventPipelineTest {
     fun init(): Unit = runBlocking {
         EventManager.init()
         EventManagerConfig.reload()
-        EventManagerConfig.data = EventManagerConfig.Data(300L)
+        EventManagerConfig.data = EventManagerConfig.Data(300L, 300L)
     }
 
     @Test
