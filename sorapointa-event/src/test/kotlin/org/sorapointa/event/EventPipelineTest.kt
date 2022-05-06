@@ -11,7 +11,7 @@ class EventPipelineTest {
 
     class TestEvent1: AbstractEvent()
     class TestEvent2: AbstractEvent()
-    class TestEvent3: AbstractCancelableEvent()
+    class TestEvent3: AbstractEvent(), CancelableEvent
 
     private val list = listOf<Event>(TestEvent1(), TestEvent2(), TestEvent3(), TestEvent1(), TestEvent2(), TestEvent3())
 
