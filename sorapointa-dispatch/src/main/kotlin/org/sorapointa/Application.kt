@@ -35,17 +35,17 @@ object DispatchServer {
             port = dispatchPort
             host = dispatchHost
         }
-        keyData?.also {
-            sslConnector(
-                keyStore = KeyStore.getInstance(keyData.keyStore),
-                keyAlias = keyData.keyAlias,
-                keyStorePassword = { keyData.keyStorePassword.toCharArray() },
-                privateKeyPassword = { keyData.privateKeyPassword.toCharArray() }) {
-                port = 8443
-                keyStorePath = File(keyData.keyStoreFilePath)
-            }
-
-        }
+//        keyData?.also {
+//            sslConnector(
+//                keyStore = KeyStore.getInstance(keyData.keyStore),
+//                keyAlias = keyData.keyAlias,
+//                keyStorePassword = { keyData.keyStorePassword.toCharArray() },
+//                privateKeyPassword = { keyData.privateKeyPassword.toCharArray() }) {
+//                port = 8443
+//                keyStorePath = File(keyData.keyStoreFilePath)
+//            }
+//
+//        }
 
     }
 
