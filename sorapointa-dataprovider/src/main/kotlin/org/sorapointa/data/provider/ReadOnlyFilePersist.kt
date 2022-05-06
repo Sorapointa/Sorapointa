@@ -54,8 +54,10 @@ open class ReadOnlyFilePersist<T : Any>(
 
     override suspend fun load(): T = mutex.withLock {
         val json = location.readTextBuffered()
-        val t = (prettyJson.decodeFromString(serializer, json) as? T
-            ?: error("Failed to cast Any? to ${clazz.qualifiedName}"))
+        val t = (
+            prettyJson.decodeFromString(serializer, json) as? T
+                ?: error("Failed to cast Any? to ${clazz.qualifiedName}")
+            )
         data = t
         return t.also {
             logger.debug { "Loaded data: $it" }
