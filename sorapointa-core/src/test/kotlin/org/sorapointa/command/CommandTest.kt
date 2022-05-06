@@ -28,7 +28,6 @@ class CommandTest {
                 I18nConfig.reload()
             }
         }
-
         CommandManager.registerCommand(TestCommand)
         CommandManager.registerCommand(HelpCommand)
         println("Test command: help")

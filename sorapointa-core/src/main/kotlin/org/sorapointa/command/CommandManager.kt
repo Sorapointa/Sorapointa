@@ -37,6 +37,7 @@ object CommandManager {
                         append(result.userMessage)
                         if (result.cause is PrintHelpMessage && cmd.alias.isNotEmpty())
                             append("sora.cmd.manager.alias".i18n(cmd.alias.contentToString()))
+
                     })
                 }
             } else {

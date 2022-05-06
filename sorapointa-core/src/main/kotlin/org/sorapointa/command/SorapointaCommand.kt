@@ -3,6 +3,7 @@ package org.sorapointa.command
 import moe.sdl.yac.core.CliktCommand
 import moe.sdl.yac.core.context
 
+
 abstract class SorapointaCommand(
     name: String,
     help: String = "",
@@ -12,6 +13,5 @@ abstract class SorapointaCommand(
     init {
         context { localization = CommandLocalization }
     }
-
     var sender: CommandSender? = null
 }
