@@ -13,5 +13,6 @@ dependencies {
     implementation("io.ktor:ktor-server-compression-jvm:_")
     implementation("io.ktor:ktor-server-netty-jvm:_")
     implementation("io.ktor:ktor-network-tls-certificates:_")
+    implementation("io.ktor:ktor-server-html-builder:_")
     testImplementation("io.ktor:ktor-server-tests-jvm:_")
 }
