@@ -1,8 +1,6 @@
-package org.sorapointa
+package org.sorapointa.utils
 
 import org.junit.jupiter.api.Test
-import org.sorapointa.utils.globalWorkDirectory
-import org.sorapointa.utils.resolveWorkDirectory
 
 class FilesTest {
     @Test

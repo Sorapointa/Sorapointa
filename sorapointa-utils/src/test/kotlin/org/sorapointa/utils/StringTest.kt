@@ -1,8 +1,7 @@
-package org.sorapointa
+package org.sorapointa.utils
 
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.sorapointa.utils.replaceWithOrder
 import kotlin.test.assertEquals
 
 class StringTest {
