@@ -25,19 +25,21 @@ sealed interface Event {
 }
 
 /**
- * Cancelable Event Interface, if you want to realize your own cancelable events,
- * please inherit `AbstractCancellableEvent`,
- * **DON'T implement** this interface, it's sealed interface.
+ * Cancelable Event Interface
+ * If you want to the event could be cancelled, you should implement this interface.
  *
  * @property [isCancelled], whether this event has been cancelled
  */
-sealed interface CancelableEvent : Event {
+interface CancelableEvent : Event {
 
     val isCancelled: Boolean
 
     /**
      * Cancel this event and the state of event
      * will return to the call site of `broadcastEvent()` method.
+     *
+     * You must make sure you are cancelling a cancellable event,
+     * otherwise, it would throw an exception
      *
      * @see [EventManager.broadcastEvent]
      */
@@ -46,21 +48,24 @@ sealed interface CancelableEvent : Event {
 }
 
 /**
- * `AbstractEvent` includes interception method,
- * which could intercept events broadcast to lower priority event listener.
+ * `AbstractEvent` includes interception and cancellation method,
+ * which could intercept the event broadcast to lower priority event listener,
+ * and also could cancel the event, the final cancellation result
+ * will return to the call site of `broadcastEvent()` method.
  *
  * @property [isIntercepted], whether this event has been intercepted
+ * @property [isCancelled], whether this event has been cancelled
  *
  * @see [EventManager.broadcastEvent]
  * @see [EventPriority]
  */
 abstract class AbstractEvent : Event {
 
-    override val isIntercepted: Boolean
-        get() = _isIntercepted
+    final override var isIntercepted by atomic(false)
+        private set
 
-    private var _isIntercepted by atomic(false)
-
+    var isCancelled: Boolean by atomic(false)
+        private set
 
     /**
      * Intercept and stop this event broadcasting
@@ -70,37 +75,21 @@ abstract class AbstractEvent : Event {
      * @see [EventPriority]
      */
     final override fun intercept() {
-        _isIntercepted = true
+        isIntercepted = true
     }
-
-}
-
-/**
- * `AbstractCancelableEvent` includes interception and cancellation method,
- * which could intercept the event broadcast to lower priority event listener,
- * and also could cancel the event, the final cancellation result
- * will return to the call site of `broadcastEvent()` method.
- *
- * @property [isIntercepted], whether this event has been intercepted
- *
- * @see [EventManager.broadcastEvent]
- * @see [EventPriority]
- */
-abstract class AbstractCancelableEvent : AbstractEvent(), CancelableEvent {
-
-    override val isCancelled: Boolean
-        get() = _isCancelled
-
-    private var _isCancelled by atomic(false)
 
     /**
      * Cancel this event and the state of event
      * will return to the call site of `broadcastEvent()` method.
      *
+     * You must make sure you are cancelling a cancellable event,
+     * otherwise, it would throw an exception
+     *
      * @see [EventManager.broadcastEvent]
      */
-    final override fun cancel() {
-        _isCancelled = true
+    fun cancel() {
+        require(this is CancelableEvent) { "Event could not be cancelled" }
+        isCancelled = true
     }
 
 }
