@@ -39,5 +39,10 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+    kotlinOptions.apply {
+        jvmTarget = "17"
+        OptInAnnotations.list.forEach {
+            freeCompilerArgs = freeCompilerArgs + "-opt-in=$it"
+        }
+    }
 }
