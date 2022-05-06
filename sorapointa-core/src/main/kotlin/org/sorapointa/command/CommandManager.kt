@@ -3,6 +3,7 @@ package org.sorapointa.command
 import moe.sdl.yac.core.CommandResult
 import moe.sdl.yac.core.PrintHelpMessage
 import moe.sdl.yac.core.parseToArgs
+import org.sorapointa.utils.i18n
 
 object CommandManager {
     private val cmdMap = mutableMapOf<String, SorapointaCommand>()
@@ -35,7 +36,7 @@ object CommandManager {
                     sender.sendMessage(buildString {
                         append(result.userMessage)
                         if (result.cause is PrintHelpMessage && cmd.alias.isNotEmpty())
-                            append("$\n\nAlias: ${cmd.alias.contentToString()}")
+                            append("sora.cmd.manager.alias".i18n(cmd.alias.contentToString()))
                     })
                 }
             } else {
