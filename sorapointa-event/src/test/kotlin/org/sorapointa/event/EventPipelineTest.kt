@@ -1,15 +1,10 @@
 package org.sorapointa.event
 
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.AfterEach
+import kotlinx.coroutines.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
-import kotlin.test.assertFails
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EventPipelineTest {
@@ -18,7 +13,7 @@ class EventPipelineTest {
     class TestEvent2: AbstractEvent()
     class TestEvent3: AbstractCancelableEvent()
 
-    val list = listOf<Event>(TestEvent1(), TestEvent2(), TestEvent3(), TestEvent1(), TestEvent2(), TestEvent3())
+    private val list = listOf<Event>(TestEvent1(), TestEvent2(), TestEvent3(), TestEvent1(), TestEvent2(), TestEvent3())
 
 
     @BeforeAll
@@ -28,47 +23,40 @@ class EventPipelineTest {
         EventManagerConfig.data = EventManagerConfig.Data(300L)
     }
 
-    @AfterEach
-    fun close(): Unit {
-
-    }
-
     @Test
     fun `listener register test`() = runBlocking {
-        EventManager.registerListener(EventPriority.LOW) {}
-        EventManager.registerListener {}
+        EventManager.registerEventListener(EventPriority.LOW) {}
+        EventManager.registerEventListener {}
     }
 
     @Test
     fun `event intercept test`() = runBlocking {
-        EventManager.registerListener(EventPriority.LOW) {
+        EventManager.registerEventListener(EventPriority.LOW) {
             error("unreachable code")
         }
-        EventManager.registerBlockListener {
+        EventManager.registerBlockEventListener {
             it.intercept()
         }
 
-        list.forEach { EventManager.callEvent(it) }
+        list.forEach { EventManager.broadcastEvent(it) }
 
     }
 
     @Test
     fun `event cancel test`() = runBlocking {
 
-        EventManager.registerBlockListener {
+        EventManager.registerBlockEventListener {
             if (it is CancelableEvent) {
                 it.cancel()
             }
         }
 
         list.forEach {
-            val status = EventManager.callEvent(it)
+            val status = EventManager.broadcastEvent(it)
             if (it is CancelableEvent) {
                 assertEquals(true, status)
             }
         }
     }
-
-
 
 }
