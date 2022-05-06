@@ -34,13 +34,25 @@ class CommandTest {
         CommandManager.invokeCommand(TestSender, "help")
         println("Test command: help 2")
         CommandManager.invokeCommand(TestSender, "help 2")
+        println("Test command: help 5")
+        CommandManager.invokeCommand(TestSender, "help 5")
         println("Test command: help --help")
         CommandManager.invokeCommand(TestSender, "help --help")
+        println("Test command with type=PLAYER: help")
+        CommandManager.invokeCommand(PlayerSender, "help")
         println("Test finish.")
     }
 }
 
 object TestSender : CommandSender() {
+    override fun sendMessage(msg: String) {
+        println(msg)
+    }
+}
+
+object PlayerSender : CommandSender(
+    CommandSenderType.PLAYER
+) {
     override fun sendMessage(msg: String) {
         println(msg)
     }
