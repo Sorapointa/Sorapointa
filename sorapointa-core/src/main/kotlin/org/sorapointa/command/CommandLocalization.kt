@@ -7,6 +7,7 @@ import moe.sdl.yac.parameters.groups.ChoiceGroup
 import moe.sdl.yac.parameters.groups.MutuallyExclusiveOptions
 import org.sorapointa.utils.i18n
 
+/** An object to let clikt use i18n */
 object CommandLocalization : Localization {
     /** [Abort] was thrown */
     override fun aborted() = "clikt.aborted".i18n()
