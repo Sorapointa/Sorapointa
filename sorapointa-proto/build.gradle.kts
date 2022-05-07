@@ -1,3 +1,7 @@
+import com.google.protobuf.gradle.builtins
+import com.google.protobuf.gradle.generateProtoTasks
+import com.google.protobuf.gradle.id
+import com.google.protobuf.gradle.ofSourceSet
 import com.google.protobuf.gradle.proto
 import com.google.protobuf.gradle.protobuf
 
@@ -14,11 +18,20 @@ repositories {
 version = "0.1.0-Dev"
 
 dependencies {
-    implementation("com.google.protobuf:protobuf-java:_")
+    api("com.google.protobuf:protobuf-java:_")
+    api("com.google.protobuf:protobuf-kotlin:_")
 }
 
 protobuf {
     generatedFilesBaseDir = "$projectDir/src/generated/"
+
+    generateProtoTasks {
+        ofSourceSet("main").forEach { task ->
+            task.builtins {
+                id("kotlin") {}
+            }
+        }
+    }
 }
 
 sourceSets {
@@ -28,11 +41,6 @@ sourceSets {
         }
         java {
             srcDir("src/generated")
-        }
-    }
-    test {
-        proto {
-            setSrcDirs(setOf("src/proto"))
         }
     }
 }
