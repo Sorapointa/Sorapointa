@@ -5,15 +5,14 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class AvatarPromoteDataItem(
-    @SerialName("AvatarPromoteId") val avatarPromoteId: Int,
-    @SerialName("PromoteAudio") val promoteAudio: String,
+data class WeaponPromoteDataItem(
+    @SerialName("WeaponPromoteId") val weaponPromoteId: Int,
     @SerialName("CostItems") val costItems: List<CostItem>,
-    @SerialName("UnlockMaxLevel") val unlockMaxLevel: Int,
     @SerialName("AddProps") val addProps: List<AddProp>,
+    @SerialName("UnlockMaxLevel") val unlockMaxLevel: Int,
     @SerialName("PromoteLevel") val promoteLevel: Int,
-    @SerialName("ScoinCost") val scoinCost: Int,
-    @SerialName("RequiredPlayerLevel") val requiredPlayerLevel: Int
+    @SerialName("RequiredPlayerLevel") val requiredPlayerLevel: Int,
+    @SerialName("CoinCost") val coinCost: Int
 ) {
     @Serializable
     data class CostItem(

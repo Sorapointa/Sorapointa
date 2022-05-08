@@ -1,12 +1,14 @@
 package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@kotlinx.serialization.Serializable
-data class ReliquarySetData(
+@Serializable
+data class ReliquarySetDataItem(
     @SerialName("SetId") val setId: Int,
-    @SerialName("SetNeedNum") val setNeedNum: List<Int>, // Array
+    @SerialName("SetIcon") val setIcon: String,
+    @SerialName("SetNeedNum") val setNeedNum: List<Int>,
     @SerialName("EquipAffixId") val equipAffixId: Int,
-    @SerialName("DisableFilter") val disableFilter: Int,
-    @SerialName("ContainsList") val containsList: List<Int>, // Array
+    @SerialName("ContainsList") val containsList: List<Int>,
+    @SerialName("DisableFilter") val disableFilter: Int
 )
