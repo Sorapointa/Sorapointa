@@ -1,11 +1,18 @@
 package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.SerialName
-import org.sorapointa.dataloader.common.ItemParamData
-import org.sorapointa.dataloader.common.ItemParamStringData
+import kotlinx.serialization.Serializable
 
-data class RewardPreviewData(
-    @SerialName("Id") val id: Int,
-    @SerialName("PreviewItems") val previewItems: List<ItemParamStringData>,
-    @SerialName("PreviewItemsArray") val previewItemsArray: List<ItemParamData>,
-)
+@Serializable
+data class RewardPreviewDataItem(
+    @SerialName("Desc") val desc: String,
+    @SerialName("PreviewItems") val previewItems: List<PreviewItem>,
+    @SerialName("Id") val id: Int
+) {
+    @Serializable
+    data class PreviewItem(
+        @SerialName("Id") val id: Int,
+        @SerialName("Count") val count: String
+    )
+}
+

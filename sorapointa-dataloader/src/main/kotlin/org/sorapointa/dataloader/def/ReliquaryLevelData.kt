@@ -1,19 +1,19 @@
 package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@kotlinx.serialization.Serializable
-data class ReliquaryLevelData(
-    val id: Int,
-    val propMap: Map<Int, Float>,
-    @SerialName("Rank") val rank: Int,
+@Serializable
+data class ReliquaryLevelDataItem(
     @SerialName("Level") val level: Int,
-    @SerialName("Exp") val exp: Int,
-    @SerialName("AddProps") val addProps: List<RelicLevelProperty>,
+    @SerialName("AddProps") val addProps: List<AddProp>,
+    @SerialName("Rank") val rank: Int,
+    @SerialName("Exp") val exp: Int
 ) {
-    @kotlinx.serialization.Serializable
-    data class RelicLevelProperty(
+    @Serializable
+    data class AddProp(
         @SerialName("PropType") val propType: String,
-        @SerialName("Value") val value: Float,
+        @SerialName("Value") val value: Double
     )
 }
+

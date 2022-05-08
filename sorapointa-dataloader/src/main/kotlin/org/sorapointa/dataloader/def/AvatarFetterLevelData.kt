@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AvatarFetterLevelData(
     @SerialName("FetterLevel") val fetterLevel: Int,
-    @SerialName("NeedExp") val needExp: Int,
+    @SerialName("NeedExp") val needExp: Int
 )

@@ -1,14 +1,14 @@
 package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.SerialName
-import org.sorapointa.dataloader.common.FightPropData
+import kotlinx.serialization.Serializable
 
-@kotlinx.serialization.Serializable
-data class ReliquaryMainPropData(
+
+@Serializable
+data class ReliquaryMainPropDataItem(
     @SerialName("Id") val id: Int,
     @SerialName("PropDepotId") val propDepotId: Int,
     @SerialName("PropType") val propType: String,
     @SerialName("AffixName") val affixName: String,
-    @SerialName("Weight") val weight: Int,
-    val fightProp: FightPropData.FightProperty
+    @SerialName("Weight") val weight: Int
 )

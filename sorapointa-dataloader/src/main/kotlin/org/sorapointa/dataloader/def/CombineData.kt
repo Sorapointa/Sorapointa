@@ -11,15 +11,21 @@ data class CombineData(
     @SerialName("CombineType") val combineType: Int,
     @SerialName("SubCombineType") val subCombineType: Int,
     @SerialName("ResultItemId") val resultItemId: Int,
+    @SerialName("ResultItemCount") val resultItemCount: Int,
     @SerialName("ScoinCost") val scoinCost: Int,
-    @SerialName("RandomItems") val randomItems: List<CombineItemPair>,
-    @SerialName("MaterialItems") val materialItems: List<CombineItemPair>,
-    @SerialName("EffectDescTextMapHash") val effectDescTextMapHash: Long,
-    @SerialName("RecipeType") val recipeType: String,
+    @SerialName("RandomItems") val randomItems: List<RandomItem>,
+    @SerialName("MaterialItems") val materialItems: List<MaterialItem>,
+    @SerialName("EffectDescTextMapHash") val effectDescTextMapHash: Int,
+    @SerialName("RecipeType") val recipeType: String
 ) {
     @Serializable
-    data class CombineItemPair(
+    data class RandomItem(
+        @SerialName("Count") val count: Int
+    )
+
+    @Serializable
+    data class MaterialItem(
         @SerialName("Id") val id: Int,
-        @SerialName("Count") val count: Int,
+        @SerialName("Count") val count: Int
     )
 }

@@ -1,9 +1,11 @@
 package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@kotlinx.serialization.Serializable
-data class WorldLevelData(
+
+@Serializable
+data class WorldLevelDataItem(
     @SerialName("Level") val level: Int,
-    @SerialName("MonsterLevel") val monsterLevel: Int,
+    @SerialName("MonsterLevel") val monsterLevel: Int
 )
