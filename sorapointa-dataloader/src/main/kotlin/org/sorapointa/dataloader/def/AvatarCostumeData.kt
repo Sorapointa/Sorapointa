@@ -5,12 +5,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AvatarCostumeData(
-//    @SerialName("OBACDKHOCAM") val oBACDKHOCAM: Int,
+    @SerialName("CostumeId") val costumeId: Int,
 //    @SerialName("PGFEJENILJP") val pGFEJENILJP: Int,
     @SerialName("NameTextMapHash") val nameTextMapHash: Long,
     @SerialName("DescTextMapHash") val descTextMapHash: Long,
     @SerialName("ItemId") val itemId: Int,
-//    @SerialName("BPAMNILGFPK") val bPAMNILGFPK: Int,
+    @SerialName("AvatarId") val avatarId: Int,
     @SerialName("JsonName") val jsonName: String,
 //    @SerialName("MIJFCCGEOFL") val mIJFCCGEOFL: Long,
 //    @SerialName("KCOMHBHHJJJ") val kCOMHBHHJJJ: Int,
