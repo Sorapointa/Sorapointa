@@ -3,7 +3,9 @@
   "strings": {
     "sora.cmd.manager.alias": "\n\nAlias: {0}",
     "sora.cmd.manager.no.permission": "No permission",
+    "sora.cmd.help.arg.pagenum.name": "PAGENUM",
     "sora.cmd.help.arg.pagenum.desc": "The page number of the help.",
+    "sora.cmd.help.arg.pagenum.exceed": "The page number exceeds the total number of pages.",
     "sora.cmd.help.msg.page": "===== Page {0} / {1} =====\n",
     "sora.cmd.help.msg.more": "Use \"command -h\" to get more detail.",
     "clikt.aborted": "Aborted!",
