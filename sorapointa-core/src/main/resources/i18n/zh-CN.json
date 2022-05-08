@@ -5,6 +5,7 @@
     "sora.cmd.manager.no.permission": "没有权限.",
     "sora.cmd.help.arg.pagenum.name": "页码",
     "sora.cmd.help.arg.pagenum.desc": "help 指令的页码.",
+    "sora.cmd.help.arg.pagenum.exceed": "页码超出总页数.",
     "sora.cmd.help.msg.page": "===== 第 {0} / {1} 页 =====\n",
     "sora.cmd.help.msg.more": "使用 \"具体命令 -h\" 来获得更多详情.",
     "clikt.aborted": "中断!",
