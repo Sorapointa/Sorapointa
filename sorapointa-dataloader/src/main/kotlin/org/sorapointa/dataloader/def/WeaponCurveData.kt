@@ -1,11 +1,19 @@
 package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.SerialName
-import org.sorapointa.dataloader.common.CurveInfo
+import kotlinx.serialization.Serializable
 
-@kotlinx.serialization.Serializable
-data class WeaponCurveData(
+
+@Serializable
+data class WeaponCurveDataItem(
     @SerialName("Level") val level: Int,
-    @SerialName("CurveInfos") val curveInfos: List<CurveInfo>, // Array
-    val curveInfoMap: Map<String, Float>,
-)
+    @SerialName("CurveInfos") val curveInfos: List<CurveInfo>
+) {
+    @Serializable
+    data class CurveInfo(
+        @SerialName("Type") val type: String,
+        @SerialName("Arith") val arith: String,
+        @SerialName("Value") val value: Double
+    )
+}
+

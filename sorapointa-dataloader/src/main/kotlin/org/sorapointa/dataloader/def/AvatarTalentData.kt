@@ -2,19 +2,26 @@ package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.sorapointa.dataloader.common.FightPropData
+
 
 @Serializable
 data class AvatarTalentData(
-    @SerialName("TalentId") val TalentId: Int,
-    @SerialName("PrevTalent") val PrevTalent: Int,
-    @SerialName("NameTextMapHash") val NameTextMapHash: Long,
-    @SerialName("Icon") val Icon: String,
-    @SerialName("MainCostItemId") val MainCostItemId: Int,
-    @SerialName("MainCostItemCount") val MainCostItemCount: Int,
-    @SerialName("OpenConfig") val OpenConfig: String,
-    @SerialName("AddProps") val AddProps: List<FightPropData>, // Array
-    @SerialName("ParamList") val ParamList: List<Float>, // Array
-)
+    @SerialName("TalentId") val talentId: Int,
+    @SerialName("NameTextMapHash") val nameTextMapHash: Long,
+    @SerialName("DescTextMapHash") val descTextMapHash: Long,
+    @SerialName("Icon") val icon: String,
+    @SerialName("PrevTalent") val prevTalent: Int,
+    @SerialName("MainCostItemId") val mainCostItemId: Int,
+    @SerialName("MainCostItemCount") val mainCostItemCount: Int,
+    @SerialName("OpenConfig") val openConfig: String,
+    @SerialName("AddProps") val addProps: List<AddProp>,
+    @SerialName("ParamList") val paramList: List<Double>
+) {
+    @Serializable
+    data class AddProp(
+        @SerialName("PropType") val propType: String,
+        @SerialName("Value") val value: Double
+    )
+}
 
 

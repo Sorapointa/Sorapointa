@@ -6,14 +6,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DailyDungeonData(
     @SerialName("Id") val id: Int,
-    // Array
     @SerialName("Monday") val monday: List<Int>,
     @SerialName("Tuesday") val tuesday: List<Int>,
     @SerialName("Wednesday") val wednesday: List<Int>,
     @SerialName("Thursday") val thursday: List<Int>,
     @SerialName("Friday") val friday: List<Int>,
     @SerialName("Saturday") val saturday: List<Int>,
-    @SerialName("Sunday") val sunday: List<Int>,
-    // End
-    @SerialName("Map") val map: Map<Int, List<Int>>, // Array
+    @SerialName("Sunday") val sunday: List<Int>
 )

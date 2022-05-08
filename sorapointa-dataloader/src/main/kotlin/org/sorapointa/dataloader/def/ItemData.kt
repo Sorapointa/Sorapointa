@@ -1,6 +1,6 @@
 package org.sorapointa.dataloader.def
 
-// TODO: 2022/5/8 Maybe has a bug.
+// TODO: 2022/5/8 Maybe has a bug. And maybe merge from many json.
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.sorapointa.dataloader.common.FightPropData

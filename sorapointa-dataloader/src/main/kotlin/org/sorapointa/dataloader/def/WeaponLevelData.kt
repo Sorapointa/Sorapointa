@@ -1,9 +1,12 @@
 package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@kotlinx.serialization.Serializable
-data class WeaponLevelData(
+
+@Serializable
+data class WeaponLevelDataItem(
     @SerialName("Level") val level: Int,
-    @SerialName("RequiredExps") val requiredExps: List<Int>, // Array
+    @SerialName("RequiredExps") val requiredExps: List<Int>
 )
+

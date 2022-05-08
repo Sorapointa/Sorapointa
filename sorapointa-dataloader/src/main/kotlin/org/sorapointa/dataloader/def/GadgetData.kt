@@ -3,18 +3,19 @@ package org.sorapointa.dataloader.def
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 data class GadgetData(
-    @SerialName("Id") val id: Int,
-    @SerialName("Type") val type: EntityType,
-    @SerialName("JsonName") val jsonName: String,
-    @SerialName("IsInteractive") val isInteractive: Boolean,
-    @SerialName("Tags") val tags: List<String>, // Array
-    @SerialName("ItemJsonName") val itemJsonName: String,
-    @SerialName("InteeIconName") val inteeIconName: String,
-    @SerialName("NameTextMapHash") val nameTextMapHash: Long,
     @SerialName("CampID") val campID: Int,
-    @SerialName("LodPatternName") val lodPatternName: String,
-) {
-    enum class EntityType
-}
+    @SerialName("Id") val id: Int,
+    @SerialName("InteeIconName") val inteeIconName: String,
+    @SerialName("InteractNameTextMapHash") val interactNameTextMapHash: Int,
+    @SerialName("ItemJsonName") val itemJsonName: String,
+    @SerialName("JsonName") val jsonName: String,
+    @SerialName("LODPatternName") val lODPatternName: String,
+    @SerialName("NameTextMapHash") val nameTextMapHash: Long,
+    @SerialName("PrefabPathHashPre") val prefabPathHashPre: Int,
+    @SerialName("PrefabPathHashSuffix") val prefabPathHashSuffix: Int,
+    @SerialName("Tags") val tags: List<String>,
+    @SerialName("Type") val type: String
+)
