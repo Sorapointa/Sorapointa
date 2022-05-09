@@ -33,10 +33,12 @@ object HelpCommand : SorapointaCommand(
             (pageNum - 1) * PAGE_SIZE, pageNum * PAGE_SIZE
         )
         // Build the message and send to the sender
-        sender?.sendMessage(buildString {
-            append("sora.cmd.help.msg.page".i18n(pageNum, totalPages))
-            pageItems.forEach { append("${it.getFormattedUsage()}\n") }
-            append("sora.cmd.help.msg.more".i18n())
-        })
+        sender?.sendMessage(
+            buildString {
+                append("sora.cmd.help.msg.page".i18n(pageNum, totalPages))
+                pageItems.forEach { append("${it.getFormattedUsage()}\n") }
+                append("sora.cmd.help.msg.more".i18n())
+            }
+        )
     }
 }
