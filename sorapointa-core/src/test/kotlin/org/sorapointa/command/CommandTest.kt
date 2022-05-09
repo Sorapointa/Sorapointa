@@ -27,7 +27,7 @@ class CommandTest {
         )?.also {
             runBlocking {
                 I18nManager.registerLanguage(File(it.toURI()))
-                I18nConfig.reload()
+                I18nConfig.init()
             }
         }
         // Register commands.
