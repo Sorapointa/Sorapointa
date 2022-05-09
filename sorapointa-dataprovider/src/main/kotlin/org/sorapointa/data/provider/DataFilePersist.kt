@@ -6,12 +6,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
-import org.sorapointa.data.provider.DatabaseConfig.mutex
-import org.sorapointa.utils.absPath
-import org.sorapointa.utils.prettyJson
-import org.sorapointa.utils.readTextBuffered
-import org.sorapointa.utils.touch
-import org.sorapointa.utils.writeTextBuffered
+import org.sorapointa.utils.*
 import java.io.File
 import kotlin.reflect.full.createType
 
@@ -79,7 +74,8 @@ open class DataFilePersist<T : Any>(
                     )
                 data = t
                 t.also {
-                    logger.debug { "Loaded data: $it" }
+                    logger.debug { "Loaded data: ${it::class.qualifiedName}" }
+                    logger.trace { "Data content $it" }
                 }
             }
         }

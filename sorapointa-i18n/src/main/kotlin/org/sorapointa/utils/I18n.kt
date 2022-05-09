@@ -1,11 +1,19 @@
 package org.sorapointa.utils
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import org.sorapointa.data.provider.DataFilePersist
 import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.CoroutineContext
 
 private val logger = mu.KotlinLogging.logger { }
 
@@ -46,6 +54,33 @@ object I18nManager {
                 else -> throw it
             }
         }
+    }
+
+    // ends with .lang.json
+    private val languageFileRegex by lazy {
+        Regex("""^.+\.lang\.json$""", RegexOption.IGNORE_CASE)
+    }
+
+    /**
+     * @param directory languages dir to register up
+     * @param match regex for matching entire filename and extension
+     * @param depth directory walk depth
+     * @throws [IllegalStateException] when [directory] is empty or not exists
+     */
+    suspend fun registerLanguagesDirectory(
+        directory: File,
+        match: Regex = languageFileRegex,
+        depth: Int = 1,
+        context: CoroutineContext = Dispatchers.IO
+    ) = withContext(context) {
+        check(directory.exists()) { "Directory doesn't exist: ${directory.absPath}" }
+        check(directory.isDirectory) { "File not a directory: ${directory.absPath}" }
+        directory.walk().maxDepth(depth).asFlow()
+            .filter(File::isFile)
+            .filter { match.matches(it.name) }
+            .map {
+                launch { registerLanguage(it) }
+            }.collect(::joinAll)
     }
 }
 
