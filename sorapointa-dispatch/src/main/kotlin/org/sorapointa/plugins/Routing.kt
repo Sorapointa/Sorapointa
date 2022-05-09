@@ -14,6 +14,7 @@ import org.sorapointa.util.getAndPost
 
 private val logger = KotlinLogging.logger {}
 
+/* ktlint-disable max-line-length */
 fun Application.configureRouting() {
 
     routing {
@@ -130,3 +131,4 @@ fun Application.configureRouting() {
         }
     }
 }
+/* ktlint-enable max-line-length */

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import mu.KotlinLogging
-import org.sorapointa.data.provider.ReadOnlyFilePersist
+import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.utils.configDirectory
 import java.io.File
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -239,7 +239,7 @@ object EventManager {
     private fun getInitChannel() = Channel<Event>(64)
 }
 
-object EventManagerConfig : ReadOnlyFilePersist<EventManagerConfig.Data>(
+object EventManagerConfig : DataFilePersist<EventManagerConfig.Data>(
     File(configDirectory, "eventManagerConfig.json"), Data()
 ) {
 

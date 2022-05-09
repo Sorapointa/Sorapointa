@@ -19,7 +19,7 @@ class EventPipelineTest {
     @BeforeAll
     fun init(): Unit = runBlocking {
         EventManager.init()
-        EventManagerConfig.reload()
+        EventManagerConfig.init()
 //        EventManagerConfig.data = EventManagerConfig.Data(300L, 300L)
     }
 
@@ -90,7 +90,9 @@ class EventPipelineTest {
 
         val parentJob = Job()
         val parentScope = CoroutineScope(CoroutineName("TestParentScope")) +
-            CoroutineExceptionHandler { _, e -> println("Caught Exception on Test Parent Scope: ${e.stackTraceToString()}") } + parentJob
+            CoroutineExceptionHandler { _, e ->
+                println("Caught Exception on Test Parent Scope: ${e.stackTraceToString()}")
+            } + parentJob
 
         EventManager.init(parentScope)
 
