@@ -11,13 +11,11 @@ import org.sorapointa.plugins.configureHTTP
 import org.sorapointa.plugins.configureMonitoring
 import org.sorapointa.plugins.configureRouting
 import org.sorapointa.plugins.configureSerialization
-import java.io.File
-import java.security.KeyStore
 
-//private val logger = KotlinLogging.logger {}
+// private val logger = KotlinLogging.logger {}
 
 fun main(): Unit = runBlocking {
-    val environment =  DispatchServer.getEnvironment(8080, "0.0.0.0", KeyProvider.getKey())
+    val environment = DispatchServer.getEnvironment(8080, "0.0.0.0", KeyProvider.getKey())
     environment.setupApplication()
     launch(Dispatchers.IO) {
         embeddedServer(Netty, environment = environment).start(wait = true)
@@ -26,9 +24,10 @@ fun main(): Unit = runBlocking {
 
 object DispatchServer {
 
-    fun getEnvironment(dispatchPort: Int,
-                       dispatchHost: String,
-                       keyData: KeyProvider.KeyData?
+    fun getEnvironment(
+        dispatchPort: Int,
+        dispatchHost: String,
+        keyData: KeyProvider.KeyData?
     ) = applicationEngineEnvironment {
         log = LoggerFactory.getLogger("ktor.application")
         connector {
@@ -46,7 +45,6 @@ object DispatchServer {
 //            }
 //
 //        }
-
     }
 
     fun ApplicationEngineEnvironment.setupApplication() {
@@ -67,4 +65,3 @@ object DispatchServer {
         }.start()
     }
 }
-

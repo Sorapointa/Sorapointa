@@ -21,7 +21,6 @@ sealed interface Event {
      * @see [EventPriority]
      */
     fun intercept()
-
 }
 
 /**
@@ -44,7 +43,6 @@ interface CancelableEvent : Event {
      * @see [EventManager.broadcastEvent]
      */
     fun cancel()
-
 }
 
 /**
@@ -91,7 +89,6 @@ abstract class AbstractEvent : Event {
         require(this is CancelableEvent) { "Event could not be cancelled" }
         isCancelled = true
     }
-
 }
 
 /**
@@ -104,4 +101,3 @@ abstract class AbstractEvent : Event {
 enum class EventPriority {
     HIGHEST, HIGH, NORMAL, LOW, LOWEST
 }
-

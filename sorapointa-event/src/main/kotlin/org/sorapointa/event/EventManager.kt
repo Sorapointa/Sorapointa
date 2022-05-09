@@ -4,14 +4,14 @@ import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import mu.KotlinLogging
 import org.sorapointa.data.provider.ReadOnlyFilePersist
 import org.sorapointa.utils.configDirectory
 import java.io.File
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
-
 
 private val logger = KotlinLogging.logger {}
 
@@ -22,21 +22,23 @@ private val logger = KotlinLogging.logger {}
  */
 object EventManager {
 
+    private val parentJob = SupervisorJob()
     private val eventExceptionHandler =
         CoroutineExceptionHandler { _, e -> logger.error(e) { "Caught Exception on EventManager" } }
-    private val eventScope = CoroutineScope(eventExceptionHandler) + CoroutineName("EventManager") + SupervisorJob()
+    private val eventContext = eventExceptionHandler + Dispatchers.Default + CoroutineName("EventManager") + parentJob
+    private var eventScope = CoroutineScope(eventContext)
 
     private val registeredListener = ConcurrentLinkedQueue<PriorityEntry>()
-    private val registeredBlockListener = ConcurrentLinkedQueue<PriorityEntry>()
-    private val destinationChannel = ConcurrentHashMap<EventPriority, Channel<Event>>()
+    private val registeredBlockListener = ConcurrentLinkedQueue<PriorityBlockEntry>()
+//    private val destinationChannel = ConcurrentHashMap<EventPriority, Channel<Event>>()
 
-    private val listeners = ConcurrentLinkedQueue<Job>()
+//    private val listeners = ConcurrentLinkedQueue<Job>()
 
-    private val BLOCK_LISTENER_TIMEOUT
+    private val blockListenerTimeout
         get() = EventManagerConfig.data.blockListenerTimeout
 
-    private val DESTINATION_FLOW_TIMEOUT
-        get() = EventManagerConfig.data.destinationFlowTimeout
+    private val waitingAllBlockListenersTimeout
+        get() = EventManagerConfig.data.waitingAllBlockListenersTimeout
 
     /**
      * Get original event flow from broadcasting
@@ -71,15 +73,13 @@ object EventManager {
         val channel = getInitChannel()
         registeredListener.first { it.priority == priority }.channels.add(channel)
 
-        val listenerJob = eventScope.launch {
+        eventScope.launch(eventContext) {
             channel.receiveAsFlow().collect {
                 listener(it)
             }
-        }
-        listenerJob.invokeOnCompletion {
+        }.invokeOnCompletion {
             this.registeredListener.first { it.priority == priority }.channels.remove(channel)
         }
-        listeners.add(listenerJob)
     }
 
     /**
@@ -117,26 +117,7 @@ object EventManager {
         priority: EventPriority = EventPriority.NORMAL,
         listener: suspend (Event) -> Unit
     ) {
-        val channel = getInitChannel()
-        registeredBlockListener.first { it.priority == priority }.channels.add(channel)
-        val listenerJob = eventScope.launch {
-            channel.receiveAsFlow().collect {
-                val destination = destinationChannel[priority]!!
-                try {
-                    withTimeout(BLOCK_LISTENER_TIMEOUT) {
-                        listener(it)
-                        destination.send(it)
-                    }
-                } catch (e: TimeoutCancellationException) {
-                    destination.send(it)
-                    logger.error(e) { "Event ${it::class.qualifiedName} has timed out after $BLOCK_LISTENER_TIMEOUT ms" }
-                }
-            }
-        }
-        listeners.add(listenerJob)
-        listenerJob.invokeOnCompletion {
-            this.registeredBlockListener.first { it.priority == priority }.channels.remove(channel)
-        }
+        registeredBlockListener.first { it.priority == priority }.listeners.add(listener)
     }
 
     /**
@@ -167,64 +148,95 @@ object EventManager {
      * @param event, the event will be broadcasted
      * @return [Boolean], that represents the cancel state of this event
      */
-    @OptIn(ExperimentalCoroutinesApi::class)
+
     suspend fun broadcastEvent(event: Event): Boolean {
         var isCancelled by atomic(false)
         var isIntercepted by atomic(false)
+        val eventName = event::class.simpleName
+        logger.debug { "Try to broadcast event $eventName" }
         registeredListener.forEach { (priority, channels) ->
-            eventScope.launch {
+            eventScope.launch(eventContext) {
                 channels.forEach { channel ->
                     channel.send(event)
                 }
             }
-            registeredBlockListener.filter { it.priority == priority }.forEach { (priority, channels) ->
-                if (channels.size > 0) {
-                    channels.forEach { channel ->
-                        channel.send(event)
-                    }
-                    var eventReceivedCount by atomic(0)
-                    val destination = destinationChannel[priority]!!
-                    eventScope.launch {
-                        while (!destination.isClosedForSend && isActive) {
-                            if (eventReceivedCount >= channels.size) {
-                                destination.close()
-                                destinationChannel[priority] = getInitChannel()
+            val blockListeners = registeredBlockListener.first { it.priority == priority }.listeners
+            if (blockListeners.size > 0) {
+                withTimeout(waitingAllBlockListenersTimeout) {
+                    blockListeners.asFlow().map { listener ->
+                        eventScope.launch(eventContext) {
+                            withTimeout(blockListenerTimeout) {
+                                listener(event)
                             }
+                            isIntercepted = event.isIntercepted
+                            if (event is CancelableEvent) isCancelled = event.isCancelled
                         }
-                    }
-                    withTimeout(DESTINATION_FLOW_TIMEOUT) {
-                        destination.receiveAsFlow().collect {
-                            isCancelled = isCancelled || (it is CancelableEvent && it.isCancelled)
-                            if (it.isIntercepted) {
-                                isIntercepted = true
-                            }
-                            eventReceivedCount++
-                        }
+                    }.collect {
+                        it.join()
                     }
                 }
-                if (isIntercepted) return isCancelled
+//                blockListeners.forEach { channel ->
+//                    channel.send(event)
+//                }
+//                var eventReceivedCount by atomic(0)
+//                val destination = destinationChannel[priority]!!
+//                val closeFlow = {
+//                    destination.close()
+//                    destinationChannel[priority] = getInitChannel()
+//                }
+//                eventScope.launch {
+//                    while (!destination.isClosedForSend && isActive) {
+//                        if (eventReceivedCount >= blockListeners.size) {
+//                            closeFlow()
+//                        }
+//                    }
+//                }.invokeOnCompletion {
+//                    if (eventReceivedCount < blockListeners.size) {
+//                        closeFlow()
+//                        logger.debug(it) { "Destination doesn't receive expected count of events, force closed flow." }
+//                    }
+//                }
+//                withTimeout(DESTINATION_FLOW_TIMEOUT) {
+//                    destination.receiveAsFlow().collect {
+//                        isCancelled = isCancelled || (it is CancelableEvent && it.isCancelled)
+//                        if (it.isIntercepted) {
+//                            isIntercepted = true
+//                        }
+//                        eventReceivedCount++
+//                    }
+//                }
+            }
+            if (isIntercepted) {
+                logger.debug { "Event $eventName has been intercepted" }
+                return isCancelled
             }
         }
+        logger.debug { "Broadcasted event $eventName, cancel state: $isCancelled" }
         return isCancelled
     }
 
     /**
      * Initialize the queue of listener in priority order, and destination channel
      */
-    fun init() {
+    fun init(parentScope: CoroutineScope = eventScope) {
+        eventScope = parentScope
+        initAllListeners()
+    }
+
+    fun initAllListeners() {
+        registeredListener.clear()
+        registeredBlockListener.clear()
         EventPriority.values().forEach {
             registeredListener.add(PriorityEntry(it, ConcurrentLinkedQueue()))
-            registeredBlockListener.add(PriorityEntry(it, ConcurrentLinkedQueue()))
-            destinationChannel[it] = getInitChannel()
+            registeredBlockListener.add(PriorityBlockEntry(it, ConcurrentLinkedQueue()))
         }
     }
 
-    fun closeAll() {
-        eventScope.cancel()
+    fun cancelAll() {
+        parentJob.cancel()
     }
 
     private fun getInitChannel() = Channel<Event>(64)
-
 }
 
 object EventManagerConfig : ReadOnlyFilePersist<EventManagerConfig.Data>(
@@ -233,13 +245,17 @@ object EventManagerConfig : ReadOnlyFilePersist<EventManagerConfig.Data>(
 
     @kotlinx.serialization.Serializable
     data class Data(
-        val destinationFlowTimeout: Long = 1000 * 30L,
-        val blockListenerTimeout: Long = 1000 * 30L
+        val blockListenerTimeout: Long = 1000 * 30L,
+        val waitingAllBlockListenersTimeout: Long = 3 * blockListenerTimeout
     )
-
 }
 
 internal data class PriorityEntry(
     val priority: EventPriority,
     val channels: ConcurrentLinkedQueue<Channel<Event>>
+)
+
+internal data class PriorityBlockEntry(
+    val priority: EventPriority,
+    val listeners: ConcurrentLinkedQueue<suspend (Event) -> Unit>
 )

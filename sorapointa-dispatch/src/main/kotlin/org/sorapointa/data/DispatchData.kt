@@ -40,7 +40,6 @@ data class ComboTokenResponseData(
 
         @Serializable
         data class LoginGuestData(val guest: Boolean = false)
-
     }
 }
 
@@ -52,14 +51,14 @@ data class LoginAccountRequestData(
 )
 
 @Serializable
-data class LoginResultData (
+data class LoginResultData(
     val message: String,
     @SerialName("retcode") val returnCode: Int,
     val data: VerifyData
 ) {
 
     @Serializable
-    data class VerifyData (
+    data class VerifyData(
         val account: VerifyAccountData,
         @SerialName("device_grant_required") val deviceGrantRequired: Boolean,
         @SerialName("realname_operation") val realNameOperation: String,
@@ -68,7 +67,7 @@ data class LoginResultData (
     )
 
     @Serializable
-    data class VerifyAccountData (
+    data class VerifyAccountData(
         val uid: String,
         val name: String,
         val email: String,
@@ -98,9 +97,8 @@ data class LoginTokenRequestData(
     val token: String
 )
 
-
 //
-//class RegionData(prq: QueryCurrRegionHttpRsp, b64: String) {
+// class RegionData(prq: QueryCurrRegionHttpRsp, b64: String) {
 //    val parsedRegionQuery: QueryCurrRegionHttpRsp
 //    val Base64: String
 //
@@ -108,4 +106,4 @@ data class LoginTokenRequestData(
 //        parsedRegionQuery = prq
 //        Base64 = b64
 //    }
-//}
+// }
