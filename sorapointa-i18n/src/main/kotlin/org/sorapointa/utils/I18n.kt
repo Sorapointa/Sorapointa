@@ -139,3 +139,15 @@ fun String.i18n(vararg args: Any?, locale: Locale? = null): String {
         this
     }
 }
+
+/**
+ * An object with locale value
+ *
+ * @property locale the locale object holds
+ */
+interface LocaleAble {
+    val locale: Locale?
+}
+
+fun String.i18n(vararg args: Any?, locale: LocaleAble?): String =
+    i18n(args = args, locale = locale?.locale)
