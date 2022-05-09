@@ -1,4 +1,4 @@
-package org.sorapointa.data
+package org.sorapointa.dispatch.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

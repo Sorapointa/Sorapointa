@@ -1,4 +1,4 @@
-package org.sorapointa.plugins
+package org.sorapointa.dispatch.plugins
 
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -10,7 +10,7 @@ import kotlinx.html.h1
 import kotlinx.html.head
 import kotlinx.html.title
 import mu.KotlinLogging
-import org.sorapointa.util.getAndPost
+import org.sorapointa.dispatch.util.getAndPost
 
 private val logger = KotlinLogging.logger {}
 

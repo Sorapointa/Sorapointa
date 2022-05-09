@@ -1,14 +1,14 @@
-package org.sorapointa
+package org.sorapointa.dispatch
 
 import io.ktor.network.tls.extensions.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
-import org.sorapointa.util.KeyType
-import org.sorapointa.util.buildKeyStore
-import org.sorapointa.util.saveCertToFile
-import org.sorapointa.util.saveToFile
+import org.sorapointa.dispatch.util.KeyType
+import org.sorapointa.dispatch.util.buildKeyStore
+import org.sorapointa.dispatch.util.saveCertToFile
+import org.sorapointa.dispatch.util.saveToFile
 import java.io.File
 import java.security.KeyStore
 import java.util.*
@@ -43,7 +43,7 @@ object KeyProvider {
                     password = privateKeyPassword
                     daysValid = expiredDays
                     hosts = listOf("localhost", "*.mihoyo.com", "*.yuanshen.com", "*.hoyoverse.com")
-                    keyType = KeyType.CA
+                    keyType = KeyType.Server
                 }
             }
             generatedKeyStore.saveToFile(keyStoreFile, keyStorePassword)

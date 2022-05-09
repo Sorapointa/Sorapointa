@@ -1,4 +1,4 @@
-package org.sorapointa.util
+package org.sorapointa.dispatch.util
 
 import io.ktor.network.tls.*
 import io.ktor.utils.io.core.*

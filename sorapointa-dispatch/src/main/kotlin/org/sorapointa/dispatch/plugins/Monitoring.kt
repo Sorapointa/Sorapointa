@@ -1,4 +1,4 @@
-package org.sorapointa.plugins
+package org.sorapointa.dispatch.plugins
 
 import io.ktor.server.application.*
 import io.ktor.server.plugins.callloging.*

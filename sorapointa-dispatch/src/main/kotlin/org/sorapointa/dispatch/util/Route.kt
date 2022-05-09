@@ -1,4 +1,4 @@
-package org.sorapointa.util
+package org.sorapointa.dispatch.util
 
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
