@@ -41,7 +41,7 @@ interface FilePersist<T : Any> {
      *
      * Some subclasses can automatically save data, for example [AutoSaveFilePersist]
      */
-    suspend fun save(data: T)
+    suspend fun save(saveData: T = data!!)
 }
 
 internal fun KClass<*>.isSerializable() =

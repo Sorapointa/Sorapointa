@@ -7,15 +7,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.sorapointa.DispatchServer.setupApplication
+import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.plugins.configureHTTP
 import org.sorapointa.plugins.configureMonitoring
 import org.sorapointa.plugins.configureRouting
 import org.sorapointa.plugins.configureSerialization
+import org.sorapointa.utils.absPath
+import org.sorapointa.utils.configDirectory
+import java.io.File
 
 // private val logger = KotlinLogging.logger {}
 
 fun main(): Unit = runBlocking {
-    val environment = DispatchServer.getEnvironment(8080, "0.0.0.0", KeyProvider.getKey())
+    DispatchConfig.init()
+    val environment = DispatchServer.getEnvironment()
     environment.setupApplication()
     launch(Dispatchers.IO) {
         embeddedServer(Netty, environment = environment).start(wait = true)
@@ -24,27 +29,26 @@ fun main(): Unit = runBlocking {
 
 object DispatchServer {
 
-    fun getEnvironment(
-        dispatchPort: Int,
-        dispatchHost: String,
-        keyData: KeyProvider.KeyData?
-    ) = applicationEngineEnvironment {
+    fun getEnvironment() = applicationEngineEnvironment {
+        val dispatchConfig = DispatchConfig.data
         log = LoggerFactory.getLogger("ktor.application")
-        connector {
-            port = dispatchPort
-            host = dispatchHost
+        if (dispatchConfig.useSSL) {
+            sslConnector(
+                keyStore = KeyProvider.getCerts(),
+                keyAlias = dispatchConfig.keyAlias,
+                keyStorePassword = { dispatchConfig.keyStorePassword.toCharArray() },
+                privateKeyPassword = { dispatchConfig.privateKeyPassword.toCharArray() }
+            ) {
+                host = dispatchConfig.host
+                port = dispatchConfig.port
+                keyStorePath = File(dispatchConfig.keyStoreFilePath)
+            }
+        } else {
+            connector {
+                host = dispatchConfig.host
+                port = dispatchConfig.port
+            }
         }
-//        keyData?.also {
-//            sslConnector(
-//                keyStore = KeyStore.getInstance(keyData.keyStore),
-//                keyAlias = keyData.keyAlias,
-//                keyStorePassword = { keyData.keyStorePassword.toCharArray() },
-//                privateKeyPassword = { keyData.privateKeyPassword.toCharArray() }) {
-//                port = 8443
-//                keyStorePath = File(keyData.keyStoreFilePath)
-//            }
-//
-//        }
     }
 
     fun ApplicationEngineEnvironment.setupApplication() {
@@ -64,4 +68,21 @@ object DispatchServer {
             configureHTTP()
         }.start()
     }
+}
+
+object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
+    File(configDirectory, "dispatchConfig.json"), Data()
+) {
+
+    @kotlinx.serialization.Serializable
+    data class Data(
+        var host: String = "0.0.0.0",
+        var port: Int = 443,
+        var useSSL: Boolean = true,
+        var keyStoreFilePath: String = File(configDirectory, KeyProvider.DEFAULT_CERT_NAME).absPath,
+        var keyStore: String = "JKS",
+        var keyAlias: String = KeyProvider.DEFAULT_ALIAS,
+        var keyStorePassword: String = KeyProvider.DEFAULT_KEY_STORE_PASSWORD,
+        var privateKeyPassword: String = KeyProvider.DEFAULT_CERT_PASSWORD
+    )
 }

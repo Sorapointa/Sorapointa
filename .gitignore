@@ -34,3 +34,8 @@ bin/
 
 ### Proto ###
 generated/
+
+### Config ###
+/config/*.json
+/config/*.jks
+/config/*.cert

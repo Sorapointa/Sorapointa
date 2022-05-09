@@ -6,7 +6,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
-import org.sorapointa.data.provider.DatabaseConfig.mutex
 import org.sorapointa.utils.absPath
 import org.sorapointa.utils.prettyJson
 import org.sorapointa.utils.readTextBuffered
@@ -57,11 +56,11 @@ open class DataFilePersist<T : Any>(
             load()
         }
 
-    override suspend fun save(data: T) = mutex.withLock {
+    override suspend fun save(saveData: T) = mutex.withLock {
         withContext(dataFilePersistContext) {
-            logger.debug { "Saving data $data" }
+            logger.debug { "Saving data $saveData" }
             file.touch()
-            file.writeTextBuffered(prettyJson.encodeToString(serializer, data))
+            file.writeTextBuffered(prettyJson.encodeToString(serializer, saveData))
         }
     }
 

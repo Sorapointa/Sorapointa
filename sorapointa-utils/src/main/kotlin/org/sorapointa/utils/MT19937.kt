@@ -5,7 +5,7 @@ package org.sorapointa.utils
  * @property seed random seed
  * Author: HolographicHat
  */
-
+/* ktlint-disable max-line-length */
 class MT19937 private constructor(seed: ULong) {
 
     private var mti = 312
