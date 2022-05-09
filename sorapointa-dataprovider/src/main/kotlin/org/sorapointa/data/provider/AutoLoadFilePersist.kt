@@ -37,6 +37,4 @@ open class AutoLoadFilePersist<T : Any>(
     }
 
     private fun launchScanJob() = scanJob
-
-
 }

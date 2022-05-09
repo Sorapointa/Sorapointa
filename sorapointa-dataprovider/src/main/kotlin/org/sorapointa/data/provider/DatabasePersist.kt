@@ -28,7 +28,6 @@ object DatabaseManager {
         }
 }
 
-
 /**
  * @param C collections type
  * @param databaseName which database you'll use
@@ -59,5 +58,4 @@ internal object DatabaseConfig : DataFilePersist<DatabaseConfig.Data>(
         val databaseConnectionString: String = "mongodb://localhost",
         val defaultDatabaseName: String = DEFAULT_DATABASE_NAME
     )
-
 }

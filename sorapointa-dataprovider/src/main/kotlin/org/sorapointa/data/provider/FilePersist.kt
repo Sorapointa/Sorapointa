@@ -22,7 +22,6 @@ interface FilePersist<T : Any> {
 
     val scope: CoroutineScope
 
-
     /**
      * Initialize file persist
      * Must be called at program start
@@ -43,9 +42,7 @@ interface FilePersist<T : Any> {
      * Some subclasses can automatically save data, for example [AutoSaveFilePersist]
      */
     suspend fun save(data: T)
-
 }
-
 
 internal fun KClass<*>.isSerializable() =
     hasAnnotation<Serializable>() || hasAnnotation<Contextual>()

@@ -41,5 +41,4 @@ open class AutoSaveFilePersist<T : Any>(
     }
 
     private fun launchSaveJob() = saveJob
-
 }

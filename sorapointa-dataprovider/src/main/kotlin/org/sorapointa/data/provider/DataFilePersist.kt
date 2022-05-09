@@ -32,7 +32,8 @@ open class DataFilePersist<T : Any>(
 
     protected val dataFilePersistExceptionHandler =
         CoroutineExceptionHandler { _, e -> logger.error(e) { "Caught Exception on DataFilePersist" } }
-    protected val dataFilePersistContext = dataFilePersistExceptionHandler + Dispatchers.IO + CoroutineName("DataFilePersist")
+    protected val dataFilePersistContext = dataFilePersistExceptionHandler +
+        Dispatchers.IO + CoroutineName("DataFilePersist")
 
     protected val clazz = default::class
 
@@ -46,7 +47,7 @@ open class DataFilePersist<T : Any>(
         clazz.requireSerializable()
     }
 
-    override suspend fun init() : Unit =
+    override suspend fun init(): Unit =
         withContext(dataFilePersistContext) {
             load()
         }
@@ -55,7 +56,6 @@ open class DataFilePersist<T : Any>(
         withContext(dataFilePersistContext) {
             load()
         }
-
 
     override suspend fun save(data: T) = mutex.withLock {
         withContext(dataFilePersistContext) {
