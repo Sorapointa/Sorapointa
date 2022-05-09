@@ -2,7 +2,7 @@ package org.sorapointa.utils
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
-import org.sorapointa.data.provider.ReadOnlyFilePersist
+import org.sorapointa.data.provider.DataFilePersist
 import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -31,7 +31,7 @@ object I18nManager {
     suspend fun registerLanguage(languageFile: File) {
         runCatching {
             if (!languageFile.exists()) throw NoSuchFileException(languageFile)
-            val langPack = ReadOnlyFilePersist(languageFile, LanguagePack.EMPTY).reload()
+            val langPack = DataFilePersist(languageFile, LanguagePack.EMPTY).apply { init() }.data
             if (langPack == LanguagePack.EMPTY) {
                 logger.error { "Failed to load language pack ${languageFile.absPath}" }
                 return@runCatching
@@ -70,7 +70,7 @@ data class LanguagePack(
     }
 }
 
-object I18nConfig : ReadOnlyFilePersist<I18nConfig.Config>(
+object I18nConfig : DataFilePersist<I18nConfig.Config>(
     File(configDirectory, "i18n.json"),
     Config()
 ) {

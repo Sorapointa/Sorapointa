@@ -20,8 +20,8 @@ class FileProviderTest {
 
         val file = File("./tmp/read-only-provider-test.json")
         file.apply { if (exists()) delete() }
-        val config = object : ReadOnlyFilePersist<TestConfig>(file, TestConfig()) {}
-        config.reload()
+        val config = DataFilePersist(file, TestConfig())
+        config.init()
         println(config.data)
     }
 
@@ -35,12 +35,8 @@ class FileProviderTest {
 
         val file = File("./tmp/auto-save-provider-test.json")
         file.apply { if (exists()) delete() }
-        val config = object : AutoSaveFilePersist<TestConfig>(
-            file,
-            TestConfig(),
-            5.toDuration(DurationUnit.SECONDS),
-        ) {}
-        config.reload()
+        val config = AutoSaveFilePersist(file, TestConfig(), 5.toDuration(DurationUnit.SECONDS))
+        config.init()
         println(config.data)
         config.data = config.data.apply {
             test = "2222"
@@ -51,21 +47,17 @@ class FileProviderTest {
     }
 
     @Test
-    fun autoScanTest() = runBlocking {
+    fun autoLoadTest() = runBlocking {
         @kotlinx.serialization.Serializable
-        data class AutoScanData(
+        data class AutoLoadData(
             var foo: Long = 1,
             var bar: Int = 1,
         )
 
         val file = File("./tmp/auto-save-provider-test.json")
         file.apply { if (exists()) delete() }
-        val config = object : AutoScanFilePersist<AutoScanData>(
-            file,
-            AutoScanData(),
-            5.toDuration(DurationUnit.SECONDS),
-        ) {}
-        config.reload()
+        val config = AutoLoadFilePersist(file, AutoLoadData(), 5.toDuration(DurationUnit.SECONDS))
+        config.init()
         println(config.data)
         val writeJson = """
             {
@@ -75,6 +67,6 @@ class FileProviderTest {
         """
         file.writeText(writeJson.trimIndent())
         delay(10_000)
-        assertEquals(config.data, prettyJson.decodeFromString(AutoScanData.serializer(), writeJson))
+        assertEquals(config.data, prettyJson.decodeFromString(AutoLoadData.serializer(), writeJson))
     }
 }
