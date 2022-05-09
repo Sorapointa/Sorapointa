@@ -15,8 +15,6 @@ repositories {
     maven("https://plugins.gradle.org/m2/")
 }
 
-version = "0.1.0-Dev"
-
 dependencies {
     api("com.google.protobuf:protobuf-java:_")
     api("com.google.protobuf:protobuf-kotlin:_")

@@ -3,8 +3,6 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-version = "0.1.0-Dev"
-
 dependencies {
     implementation(project(":sorapointa-dataprovider"))
     implementation(project(":sorapointa-i18n"))

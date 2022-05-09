@@ -3,8 +3,6 @@ plugins {
     application
 }
 
-version = "0.1.0-Dev"
-
 dependencies {
     implementation(project(":sorapointa-dataprovider"))
     implementation(project(":sorapointa-dispatch"))
@@ -18,8 +16,4 @@ dependencies {
 
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor(0, "seconds")
-}
-
-repositories {
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }

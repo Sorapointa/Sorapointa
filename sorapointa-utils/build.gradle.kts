@@ -3,7 +3,10 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-version = "0.1.0-Dev"
+allprojects {
+    group = "org.sorapointa"
+    version = "0.1.0-DEV"
+}
 
 dependencies {
     implementation(KotlinX.serialization.json)
