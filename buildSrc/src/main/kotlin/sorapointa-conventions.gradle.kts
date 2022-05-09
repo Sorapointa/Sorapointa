@@ -6,6 +6,7 @@ plugins {
 
 repositories {
     mavenCentral()
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 group = "org.sorapointa"
@@ -15,10 +16,6 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:_")
     implementation("ch.qos.logback:logback-classic:_")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
-}
-
-repositories {
-    mavenCentral()
 }
 
 sourceSets {
