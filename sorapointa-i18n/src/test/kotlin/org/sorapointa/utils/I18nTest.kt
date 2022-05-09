@@ -12,7 +12,7 @@ class I18nTest {
     @BeforeEach
     fun reloadI18nConfig(): Unit = runBlocking {
         I18nManager.languageMap.clear()
-        I18nConfig.reload()
+        I18nConfig.init()
     }
 
     @Test

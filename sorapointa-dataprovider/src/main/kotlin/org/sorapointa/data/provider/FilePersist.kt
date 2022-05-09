@@ -1,5 +1,6 @@
 package org.sorapointa.data.provider
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.io.File
@@ -9,32 +10,29 @@ import kotlin.reflect.full.hasAnnotation
 /**
  * Local file data persist storage
  * @property data must be annotated with @[Serializable]
- * @property location where you store the data
- * @see SavableFilePersist
+ * @property file where you store the data
+ * @property scope coroutine will launch from this scope,
+ * keep it same as caller side to make sure the structured concurrency has been followed
  */
 interface FilePersist<T : Any> {
+
     val data: T?
 
-    val location: File
+    val file: File
+
+    val scope: CoroutineScope
 
     /**
-     * Reload data to memory
-     *
-     * Must be invoked at program start
+     * Initialize file persist
+     * Must be called at program start
      */
-    suspend fun reload(): T
+    suspend fun init()
 
     /**
-     * load data, assign value to [data], then return it
+     * Load data from disk storage,
+     * assign value to [data], then return it
      */
     suspend fun load(): T
-}
-
-/**
- * Savable file persist
- * @see FilePersist
- */
-interface SavableFilePersist<T : Any> : FilePersist<T> {
 
     /**
      * Save data to disk
