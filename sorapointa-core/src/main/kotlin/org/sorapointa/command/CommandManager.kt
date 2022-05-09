@@ -57,13 +57,14 @@ object CommandManager {
             val result = cmd.main(args.subList(1, args.count()))
             // Handle errors.
             if (result !is CommandResult.Error) return@also
-            sender.sendMessage(buildString {
-                append(result.userMessage)
-                // Add alias to the help.
-                if (result.cause is PrintHelpMessage && cmd.alias.isNotEmpty())
-                    append("sora.cmd.manager.alias".i18n(cmd.alias.contentToString()))
-
-            })
+            sender.sendMessage(
+                buildString {
+                    append(result.userMessage)
+                    // Add alias to the help.
+                    if (result.cause is PrintHelpMessage && cmd.alias.isNotEmpty())
+                        append("sora.cmd.manager.alias".i18n(cmd.alias.contentToString()))
+                }
+            )
         }
     }
 }

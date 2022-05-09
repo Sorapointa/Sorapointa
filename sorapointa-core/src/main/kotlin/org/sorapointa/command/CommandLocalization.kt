@@ -89,12 +89,12 @@ object CommandLocalization : Localization {
      */
     override fun mutexGroupException(name: String, others: List<String>): String {
         return "clikt.mutex.group.exception".i18n(
-            name, others.joinToString(
+            name,
+            others.joinToString(
                 "clikt.mutex.group.exception.separator".i18n()
             )
         )
     }
-
 
     /** Message for [FileNotFound] */
     override fun fileNotFound(filename: String) = "clikt.file.not.found".i18n(filename)
