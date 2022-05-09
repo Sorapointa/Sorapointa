@@ -8,5 +8,4 @@ fun Application.configureHTTP() {
         gzip()
         deflate()
     }
-
 }

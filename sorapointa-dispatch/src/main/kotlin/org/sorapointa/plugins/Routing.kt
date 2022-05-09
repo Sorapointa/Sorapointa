@@ -14,7 +14,6 @@ import org.sorapointa.util.getAndPost
 
 private val logger = KotlinLogging.logger {}
 
-
 fun Application.configureRouting() {
 
     routing {

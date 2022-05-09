@@ -32,7 +32,6 @@ object KeyProvider {
         return KeyData().apply(builder)
     }
 
-
     fun getKey(keyPath: String = defaultCertPath): KeyData {
         val keyStoreFile = File(keyPath)
         return buildKeyData {
@@ -66,18 +65,12 @@ object KeyProvider {
     private fun <T> T.waitInputOrDefault(): String {
         return Scanner(System.`in`).nextLine()?.takeIf { it != "" } ?: this.toString()
     }
-
 }
-
 
 class Test {
 
-
     operator fun String.times(str: Any) {
-
     }
-
-
 }
 
 /*
