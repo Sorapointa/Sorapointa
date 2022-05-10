@@ -22,10 +22,10 @@ private val logger = KotlinLogging.logger {}
  */
 object EventManager {
 
-    private val parentJob = SupervisorJob()
+    private var parentJob = SupervisorJob()
     private val eventExceptionHandler =
         CoroutineExceptionHandler { _, e -> logger.error(e) { "Caught Exception on EventManager" } }
-    private val eventContext = eventExceptionHandler + Dispatchers.Default + CoroutineName("EventManager") + parentJob
+    private var eventContext = eventExceptionHandler + Dispatchers.Default + CoroutineName("EventManager") + parentJob
     private var eventScope = CoroutineScope(eventContext)
 
     private val registeredListener = ConcurrentLinkedQueue<PriorityEntry>()
@@ -220,6 +220,8 @@ object EventManager {
      */
     fun init(parentScope: CoroutineScope = eventScope) {
         eventScope = parentScope
+        parentJob = SupervisorJob(parentScope.coroutineContext[Job])
+        eventContext += parentJob
         initAllListeners()
     }
 
