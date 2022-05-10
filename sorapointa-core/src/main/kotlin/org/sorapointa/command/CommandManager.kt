@@ -1,70 +1,83 @@
 package org.sorapointa.command
 
-import moe.sdl.yac.core.CommandResult
+import kotlinx.coroutines.*
+import moe.sdl.yac.core.CommandResult.Error
+import moe.sdl.yac.core.CommandResult.Success
 import moe.sdl.yac.core.PrintHelpMessage
 import moe.sdl.yac.core.parseToArgs
 import org.sorapointa.utils.i18n
+import java.util.concurrent.ConcurrentHashMap
 
-/** An object to manage the commands. */
+private val logger = mu.KotlinLogging.logger {}
+
+data class CommandNode(
+    val entry: Command.Entry,
+    val creator: (sender: CommandSender) -> Command,
+)
+
 object CommandManager {
-    // A map to save the registered commands with name.
-    private val cmdMap = mutableMapOf<String, SorapointaCommand>()
+    private val cmdMap: MutableMap<String, CommandNode> = ConcurrentHashMap()
 
     // A map to save the registered commands with alias.
-    private val aliasMap = mutableMapOf<String, SorapointaCommand>()
+    private val aliasMap: MutableMap<String, CommandNode> = ConcurrentHashMap()
 
-    // Used to get the command list.
-    val cmdList get() = cmdMap.values.toList()
+    val commandEntries: List<Command.Entry> get() = cmdMap.entries.map { it.value.entry }
 
-    // Just the logger.
-    private val logger = mu.KotlinLogging.logger {}
+    private val commandExceptionHandler =
+        CoroutineExceptionHandler { _, e -> logger.error(e) { "Caught Exception on CommandManager" } }
+    private val commandContext = commandExceptionHandler + Dispatchers.Default + CoroutineName("CommandManager")
 
-    /** A function to register a command.
-     *  @param command The object extends SorapointaCommand.
-     */
-    fun registerCommand(command: SorapointaCommand) {
-        val name = command.commandName
+    fun registerCommand(entry: Command.Entry, creator: (CommandSender) -> Command) {
+        registerCommand(CommandNode(entry, creator))
+    }
 
-        cmdMap[name]?.also { logger.warn { "Command name '$name' conflict." } }
-            ?: also { cmdMap[name] = command }
+    fun registerCommand(commandNode: CommandNode) {
+        val name = commandNode.entry.name
+        val alias = commandNode.entry.alias
 
-        command.alias.forEach { alias ->
-            aliasMap[alias]?.also { logger.warn { "Alias name '$alias' conflict." } }
-                ?: also { aliasMap[alias] = command }
+        if (cmdMap[name] == null) {
+            cmdMap[name] = commandNode
+        } else logger.warn { "Command name '$name' conflict." }
+
+        alias.forEach {
+            if (aliasMap[it] == null) {
+                aliasMap[it] = commandNode
+            } else logger.warn { "Alias name '$alias' conflict." }
         }
     }
 
-    /** A function to invoke a command which registered.
-     *  @param sender The sender of the command.
-     *  @param rawMsg The original message of the execution command.
-     */
-    fun invokeCommand(sender: CommandSender, rawMsg: String) {
-        // Get the command name from rawMsg.
-        val args = rawMsg.parseToArgs()
-        val name = args[0]
-        // Get the command by the name.
-        (cmdMap[name] ?: aliasMap[name])?.also { cmd ->
-            // Check the type (i.e. permissions)
-            if (sender.type < cmd.type) {
-                sender.sendMessage(
-                    "clikt.usage.error".i18n("sora.cmd.manager.no.permission".i18n())
-                )
-                return@also
-            }
-            // Set the sender.
-            cmd.sender = sender
-            // Invoke the command.
-            val result = cmd.main(args.subList(1, args.count()))
-            // Handle errors.
-            if (result !is CommandResult.Error) return@also
-            sender.sendMessage(
-                buildString {
-                    append(result.userMessage)
-                    // Add alias to the help.
-                    if (result.cause is PrintHelpMessage && cmd.alias.isNotEmpty())
-                        append("sora.cmd.manager.alias".i18n(cmd.alias.contentToString()))
-                }
-            )
+    fun registerCommands(collection: Collection<CommandNode>): Unit =
+        collection.forEach { registerCommand(it) }
+
+    fun invokeCommand(sender: CommandSender, rawMsg: String, scope: CoroutineScope =
+        CoroutineScope(commandContext)) = scope.launch(commandContext) {
+        if (rawMsg.isEmpty()) {
+            sender.sendMessage("sora.cmd.manager.invoke.empty".i18n(locale = sender))
+            return@launch
         }
+
+        val args = rawMsg.parseToArgs()
+        val mainCommand = args[0]
+
+        val cmd = cmdMap[mainCommand] ?: aliasMap[mainCommand] ?: run {
+            sender.sendMessage("sora.cmd.manager.invoke.error".i18n(mainCommand, locale = sender))
+            return@launch
+        }
+
+        when (val result = cmd.creator(sender).main(args.drop(1))) {
+            is Error -> {
+                val msg = buildString {
+                    append(result.userMessage)
+                    if (result.cause is PrintHelpMessage && cmd.entry.alias.isNotEmpty()) {
+                        append("sora.cmd.manager.alias".i18n(cmd.entry.alias.joinToString(), locale = sender))
+                    }
+                }
+                sender.sendMessage(msg)
+            }
+            is Success -> {
+                // pass
+            }
+        }
+
     }
 }

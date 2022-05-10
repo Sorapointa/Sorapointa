@@ -6,11 +6,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
-import org.sorapointa.utils.absPath
-import org.sorapointa.utils.prettyJson
-import org.sorapointa.utils.readTextBuffered
-import org.sorapointa.utils.touch
-import org.sorapointa.utils.writeTextBuffered
+import org.sorapointa.utils.*
 import java.io.File
 import kotlin.reflect.full.createType
 
@@ -74,11 +70,12 @@ open class DataFilePersist<T : Any>(
                 val json = file.readTextBuffered()
                 val t = (
                     prettyJson.decodeFromString(serializer, json) as? T
-                        ?: error("Failed to cast Any? to ${clazz.qualifiedName}")
+                        ?: error("Failed to cast Any? to ${clazz.qualifiedOrSimple}")
                     )
                 data = t
                 t.also {
-                    logger.debug { "Loaded data: $it" }
+                    logger.debug { "Loaded data: ${it::class.qualifiedOrSimple}" }
+                    logger.trace { "Data content $it" }
                 }
             }
         }

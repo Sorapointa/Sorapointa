@@ -35,6 +35,9 @@ bin/
 ### Proto ###
 generated/
 
+### Tmp ###
+**/tmp
+
 ### Config ###
 /config/*.json
 /config/*.jks
