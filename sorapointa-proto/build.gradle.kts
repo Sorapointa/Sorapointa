@@ -11,10 +11,6 @@ plugins {
     idea
 }
 
-repositories {
-    maven("https://plugins.gradle.org/m2/")
-}
-
 dependencies {
     api("com.google.protobuf:protobuf-java:_")
     api("com.google.protobuf:protobuf-kotlin:_")
