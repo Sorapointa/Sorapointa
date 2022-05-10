@@ -34,3 +34,6 @@ bin/
 
 ### Proto ###
 generated/
+
+### Tmp ###
+**/tmp

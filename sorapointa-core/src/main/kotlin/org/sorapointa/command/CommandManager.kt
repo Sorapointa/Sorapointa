@@ -1,5 +1,6 @@
 package org.sorapointa.command
 
+import kotlinx.coroutines.*
 import moe.sdl.yac.core.CommandResult.Error
 import moe.sdl.yac.core.CommandResult.Success
 import moe.sdl.yac.core.PrintHelpMessage
@@ -21,6 +22,10 @@ object CommandManager {
     private val aliasMap: MutableMap<String, CommandNode> = ConcurrentHashMap()
 
     val commandEntries: List<Command.Entry> get() = cmdMap.entries.map { it.value.entry }
+
+    private val commandExceptionHandler =
+        CoroutineExceptionHandler { _, e -> logger.error(e) { "Caught Exception on CommandManager" } }
+    private val commandContext = commandExceptionHandler + Dispatchers.Default + CoroutineName("CommandManager")
 
     fun registerCommand(entry: Command.Entry, creator: (CommandSender) -> Command) {
         registerCommand(CommandNode(entry, creator))
@@ -44,10 +49,11 @@ object CommandManager {
     fun registerCommands(collection: Collection<CommandNode>): Unit =
         collection.forEach { registerCommand(it) }
 
-    fun invokeCommand(sender: CommandSender, rawMsg: String) {
+    fun invokeCommand(sender: CommandSender, rawMsg: String, scope: CoroutineScope =
+        CoroutineScope(commandContext)) = scope.launch(commandContext) {
         if (rawMsg.isEmpty()) {
             sender.sendMessage("sora.cmd.manager.invoke.empty".i18n(locale = sender))
-            return
+            return@launch
         }
 
         val args = rawMsg.parseToArgs()
@@ -55,7 +61,7 @@ object CommandManager {
 
         val cmd = cmdMap[mainCommand] ?: aliasMap[mainCommand] ?: run {
             sender.sendMessage("sora.cmd.manager.invoke.error".i18n(mainCommand, locale = sender))
-            return
+            return@launch
         }
 
         when (val result = cmd.creator(sender).main(args.drop(1))) {
@@ -72,5 +78,6 @@ object CommandManager {
                 // pass
             }
         }
+
     }
 }

@@ -16,7 +16,7 @@ dependencies {
     implementation(project(":sorapointa-kcp"))
     implementation(project(":sorapointa-proto"))
     implementation(project(":sorapointa-utils"))
-    implementation("moe.sdl.yac:core:+")
+    implementation("moe.sdl.yac:core:_")
 }
 
 configurations.all {

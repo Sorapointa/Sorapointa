@@ -70,11 +70,11 @@ open class DataFilePersist<T : Any>(
                 val json = file.readTextBuffered()
                 val t = (
                     prettyJson.decodeFromString(serializer, json) as? T
-                        ?: error("Failed to cast Any? to ${clazz.qualifiedName}")
+                        ?: error("Failed to cast Any? to ${clazz.qualifiedOrSimple}")
                     )
                 data = t
                 t.also {
-                    logger.debug { "Loaded data: ${it::class.qualifiedName}" }
+                    logger.debug { "Loaded data: ${it::class.qualifiedOrSimple}" }
                     logger.trace { "Data content $it" }
                 }
             }

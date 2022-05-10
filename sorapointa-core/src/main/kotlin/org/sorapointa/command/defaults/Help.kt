@@ -31,7 +31,7 @@ class Help(override val sender: CommandSender) : Command(Help) {
         it.coerceIn(1..50)
     }.default(10)
 
-    override fun run() {
+    override suspend fun run() {
         val cmdList = CommandManager.commandEntries
         // Take out the page items from command list.
         val pageItems = cmdList.chunked(pageSize)

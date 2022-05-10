@@ -36,7 +36,7 @@ class HelpTest {
     )
 
     class TestCommand(override val sender: CommandSender, private val entry: Entry) : Command(entry) {
-        override fun run() {
+        override suspend fun run() {
             println("${entry.name} run!")
         }
     }
