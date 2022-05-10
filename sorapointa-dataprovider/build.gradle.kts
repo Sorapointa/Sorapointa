@@ -9,5 +9,5 @@ dependencies {
 
     implementation(KotlinX.serialization.json)
     implementation("org.jetbrains.kotlinx:atomicfu:_")
-    implementation("org.litote.kmongo:kmongo-coroutine-serialization:_")
+    api("org.litote.kmongo:kmongo-coroutine-serialization:_")
 }

@@ -4,5 +4,6 @@ plugins {
 }
 
 dependencies {
-    implementation(KotlinX.serialization.json)
+    api(KotlinX.serialization.json)
+    api(KotlinX.datetime)
 }

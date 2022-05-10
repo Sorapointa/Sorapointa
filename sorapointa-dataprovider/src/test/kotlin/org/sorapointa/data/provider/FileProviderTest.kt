@@ -11,6 +11,10 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 class FileProviderTest {
+    init {
+        initTestDataProvider()
+    }
+
     @Test
     fun readOnlyTest() = runBlocking {
         @kotlinx.serialization.Serializable
