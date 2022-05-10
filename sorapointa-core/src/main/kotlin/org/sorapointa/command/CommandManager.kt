@@ -22,8 +22,8 @@ object CommandManager {
 
     val commandEntries: List<Command.Entry> get() = cmdMap.entries.map { it.value.entry }
 
-    fun registerCommand(entry: Command.Entry, creator: () -> Command) {
-        registerCommand(entry, creator)
+    fun registerCommand(entry: Command.Entry, creator: (CommandSender) -> Command) {
+        registerCommand(CommandNode(entry, creator))
     }
 
     fun registerCommand(commandNode: CommandNode) {
