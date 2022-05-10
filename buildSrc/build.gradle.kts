@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     `kotlin-dsl`
 }
@@ -29,4 +31,15 @@ sourceSets {
             setSrcDirs(setOf("kotlin"))
         }
     }
+}
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions.apply {
+        jvmTarget = "17"
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }

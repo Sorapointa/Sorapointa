@@ -1,8 +1,9 @@
-group = "org.sorapointa"
-version = "0.1.0-Dev"
-
 plugins {
     kotlin("plugin.serialization") apply false
+}
+
+if (JavaVersion.current() != JavaVersion.VERSION_17) {
+    throw GradleException("Sorapointa requires JDK 17 to build and develop, current version: ${JavaVersion.current()}")
 }
 
 subprojects {
@@ -10,6 +11,10 @@ subprojects {
         mavenCentral()
     }
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+}
+
+subprojects.apply {
+    configureLogbackCopy()
 }
 
 allprojects {

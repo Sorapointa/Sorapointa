@@ -3,8 +3,6 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":sorapointa-utils"))
-
     implementation("org.jetbrains.kotlin:kotlin-reflect:_")
 
     implementation(KotlinX.serialization.json)

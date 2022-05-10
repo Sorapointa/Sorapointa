@@ -42,3 +42,12 @@ generated/
 /config/*.json
 /config/*.jks
 /config/*.cert
+
+### Logs ###
+**/logs/*
+*.log
+
+**/src/main/resources/logback.xml
+**/src/test/resources/logback-test.xml
+!sorapointa-core/src/main/resources/logback.xml
+!sorapointa-core/src/test/resources/logback-test.xml

@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
+    java
 }
 
 repositories {
@@ -17,6 +18,11 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:_")
     implementation("ch.qos.logback:logback-classic:_")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
+
+    if (project.name != "sorapointa-utils") {
+        implementation(project(":sorapointa-utils"))
+        testImplementation(project(":sorapointa-utils", "test"))
+    }
 }
 
 sourceSets {
@@ -43,6 +49,11 @@ tasks.withType<KotlinCompile> {
             freeCompilerArgs = freeCompilerArgs + "-opt-in=$it"
         }
     }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 configurations {
