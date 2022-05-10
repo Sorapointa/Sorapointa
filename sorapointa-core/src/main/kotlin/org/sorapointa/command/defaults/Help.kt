@@ -58,5 +58,4 @@ class Help(override val sender: CommandSender) : Command(Help) {
             }
         )
     }
-
 }

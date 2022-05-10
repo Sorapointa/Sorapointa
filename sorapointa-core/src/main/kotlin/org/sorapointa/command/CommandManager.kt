@@ -49,8 +49,12 @@ object CommandManager {
     fun registerCommands(collection: Collection<CommandNode>): Unit =
         collection.forEach { registerCommand(it) }
 
-    fun invokeCommand(sender: CommandSender, rawMsg: String, scope: CoroutineScope =
-        CoroutineScope(commandContext)) = scope.launch(commandContext) {
+    fun invokeCommand(
+        sender: CommandSender,
+        rawMsg: String,
+        scope: CoroutineScope =
+            CoroutineScope(commandContext)
+    ) = scope.launch(commandContext) {
         if (rawMsg.isEmpty()) {
             sender.sendMessage("sora.cmd.manager.invoke.empty".i18n(locale = sender))
             return@launch
@@ -78,6 +82,5 @@ object CommandManager {
                 // pass
             }
         }
-
     }
 }
