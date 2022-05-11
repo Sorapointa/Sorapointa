@@ -42,6 +42,7 @@ generated/
 /config/*.json
 /config/*.jks
 /config/*.cert
+resources/
 
 ### Logs ###
 **/logs/*
