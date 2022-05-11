@@ -36,8 +36,12 @@
 
 可参考：[Git 使用规范流程](https://www.ruanyifeng.com/blog/2015/08/git-use-process.html)
 
-### 单元测试(建议)
+## 单元测试(建议)
 
 尽量写单测保证代码可靠性。
 
 同时如果你的代码使得单测失败，是无法通过 code review 的。
+
+## 其他…
+
+请查看 [docs](docs) 

@@ -37,8 +37,12 @@ For reviewers:
 - Never merge if you can rebase
 - Squash if there are a lot of commits
 
-### Unit Test (Recommended)
+## Unit Test (Recommended)
 
 Please write unit tests to ensure the reliability of the code.
 
 If your code fails the unit test, you will not pass code review.
+
+## More...
+
+See [docs](docs)
