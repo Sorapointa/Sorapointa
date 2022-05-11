@@ -9,6 +9,7 @@ import org.sorapointa.dispatch.util.KeyType
 import org.sorapointa.dispatch.util.buildKeyStore
 import org.sorapointa.dispatch.util.saveCertToFile
 import org.sorapointa.dispatch.util.saveToFile
+import org.sorapointa.utils.isJUnitTest
 import java.io.File
 import java.security.KeyStore
 import java.util.*
@@ -25,7 +26,7 @@ object KeyProvider {
 
     fun getCerts(): KeyStore = runBlocking {
         val dispatchConfig = DispatchConfig.data
-        val keyStoreFile = File(dispatchConfig.keyStoreFilePath)
+        val keyStoreFile = File(dispatchConfig.certificationConfig.keyStoreFilePath)
         if (!keyStoreFile.exists()) {
             logger.info { "Input alias for certification or set default $DEFAULT_ALIAS" }
             val alias: String = DEFAULT_ALIAS.waitInputOrDefault()
@@ -50,15 +51,15 @@ object KeyProvider {
             generatedKeyStore.saveCertToFile(
                 File(keyStoreFile.parentFile, keyStoreFile.nameWithoutExtension + ".cert"), alias
             )
-            dispatchConfig.keyStore = "JKS"
-            dispatchConfig.keyAlias = alias
-            dispatchConfig.keyStorePassword = keyStorePassword
-            dispatchConfig.privateKeyPassword = privateKeyPassword
+            dispatchConfig.certificationConfig.keyStore = "JKS"
+            dispatchConfig.certificationConfig.keyAlias = alias
+            dispatchConfig.certificationConfig.keyStorePassword = keyStorePassword
+            dispatchConfig.certificationConfig.privateKeyPassword = privateKeyPassword
             DispatchConfig.save()
             return@runBlocking generatedKeyStore
         } else {
             withContext(Dispatchers.IO) {
-                fromCertFile(keyStoreFile, dispatchConfig.keyStorePassword)
+                fromCertFile(keyStoreFile, dispatchConfig.certificationConfig.keyStorePassword)
             }
         }
     }
@@ -70,6 +71,7 @@ object KeyProvider {
     }
 
     private fun <T> T.waitInputOrDefault(): String {
-        return Scanner(System.`in`).nextLine()?.takeIf { it != "" } ?: this.toString()
+        return if (!isJUnitTest()) Scanner(System.`in`).nextLine()?.takeIf { it != "" }
+            ?: this.toString() else this.toString()
     }
 }

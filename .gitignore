@@ -38,14 +38,11 @@ generated/
 ### Tmp ###
 **/tmp
 
-### Config ###
-/config/*.json
-/config/*.jks
-/config/*.cert
-
 ### Logs ###
 **/logs/*
 *.log
+
+/resources/
 
 **/src/main/resources/logback.xml
 **/src/test/resources/logback-test.xml

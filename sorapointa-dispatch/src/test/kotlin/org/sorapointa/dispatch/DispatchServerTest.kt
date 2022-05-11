@@ -1,5 +1,8 @@
 package org.sorapointa.dispatch
 
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -8,7 +11,7 @@ import org.sorapointa.dispatch.plugins.configureRouting
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ApplicationTest {
+class DispatchServerTest {
     @Test
     fun testRoot() = testApplication {
         application {

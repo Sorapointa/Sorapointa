@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 
 private val logger = KotlinLogging.logger {}
 
+/* ktlint-disable max-line-length */
 class LogTest {
     @Test
     fun log() {
@@ -24,3 +25,4 @@ class LogTest {
         logger.trace(IllegalArgumentException()) { "Donec dignissim sem non ipsum suscipit, sit amet fermentum nunc iaculis." }
     }
 }
+/* ktlint-enable max-line-length */

@@ -7,9 +7,9 @@ plugins {
 }
 
 dependencies {
-    implementation(KotlinX.serialization.json)
+    api(KotlinX.serialization.json)
+    api(KotlinX.datetime)
 }
-
 
 fun BuildConfigSourceSet.string(name: String, value: String) = buildConfigField("String", name, "\"$value\"")
 fun BuildConfigSourceSet.stringNullable(name: String, value: String?) =
