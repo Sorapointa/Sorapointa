@@ -94,7 +94,7 @@ class EventPipelineTest {
                 println("Caught Exception on Test Parent Scope: ${e.stackTraceToString()}")
             } + parentJob
 
-        EventManager.init(parentScope)
+        EventManager.init(parentScope.coroutineContext)
 
         var runCount by atomic(0)
 

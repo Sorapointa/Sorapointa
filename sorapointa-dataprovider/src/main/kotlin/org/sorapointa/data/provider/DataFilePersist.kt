@@ -22,13 +22,9 @@ private val logger = mu.KotlinLogging.logger { }
 open class DataFilePersist<T : Any>(
     final override val file: File,
     default: T,
-    final override val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    final override val scope: CoroutineScope =
+        ModuleScope(logger, "DataFilePersist", dispatcher = Dispatchers.IO)
 ) : FilePersist<T> {
-
-    protected val dataFilePersistExceptionHandler =
-        CoroutineExceptionHandler { _, e -> logger.error(e) { "Caught Exception on DataFilePersist" } }
-    protected val dataFilePersistContext = dataFilePersistExceptionHandler +
-        Dispatchers.IO + CoroutineName("DataFilePersist")
 
     protected val clazz = default::class
 
@@ -43,17 +39,17 @@ open class DataFilePersist<T : Any>(
     }
 
     override suspend fun init(): Unit =
-        withContext(dataFilePersistContext) {
+        withContext(scope.coroutineContext) {
             load()
         }
 
     suspend fun initAndLoad(): T =
-        withContext(dataFilePersistContext) {
+        withContext(scope.coroutineContext) {
             load()
         }
 
     override suspend fun save(saveData: T) = mutex.withLock {
-        withContext(dataFilePersistContext) {
+        withContext(scope.coroutineContext) {
             logger.debug { "Saving data $saveData" }
             file.touch()
             file.writeTextBuffered(prettyJson.encodeToString(serializer, saveData))
@@ -61,7 +57,7 @@ open class DataFilePersist<T : Any>(
     }
 
     override suspend fun load(): T {
-        return withContext(dataFilePersistContext) {
+        return withContext(scope.coroutineContext) {
             if (!file.exists()) {
                 logger.debug { " ${file.absPath} does not exist, creating new default config..." }
                 save(data)

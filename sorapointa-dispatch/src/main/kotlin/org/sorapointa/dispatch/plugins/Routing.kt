@@ -216,6 +216,7 @@ internal suspend inline fun <reified T, reified E : Event> ApplicationCall.forwa
 
 internal suspend inline fun <reified T> ApplicationCall.forwardCall(domain: String): T {
     val url = "https://$domain${this.request.uri}"
+    logger.debug { "Forwarding request from ${this.request.uri} to $url" }
     val idUrl = url + this.request.queryParameters.formUrlEncode()
     return if (!forwardCache.containsKey(idUrl)) {
         val call = this
@@ -230,6 +231,7 @@ internal suspend inline fun <reified T> ApplicationCall.forwardCall(domain: Stri
             }
         }.body()
         forwardCache[idUrl] = result as Any
+        logger.debug { "Forwarding result of $url is $result" }
         result
     } else {
         forwardCache[idUrl]!! as T

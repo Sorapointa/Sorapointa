@@ -31,7 +31,7 @@ open class AutoSaveFilePersist<T : Any>(
     }
 
     private val saveJob: Job by lazy {
-        scope.launch(dataFilePersistContext) {
+        scope.launch {
             logger.debug { "Launching Auto Save Job... Interval $saveInterval" }
             while (isActive) {
                 delay(saveInterval)
