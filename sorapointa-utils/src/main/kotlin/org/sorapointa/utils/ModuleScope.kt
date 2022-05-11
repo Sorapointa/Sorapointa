@@ -18,7 +18,6 @@ open class ModuleScope(
 
     override val coroutineContext: CoroutineContext =
         parentContext + parentJob + CoroutineName(moduleName) + exceptionHandler + dispatcher
-
 }
 
 open class ParentScope(
@@ -39,8 +38,5 @@ open class ParentScope(
     }
 
     open fun onClosed() {
-
     }
-
 }
-

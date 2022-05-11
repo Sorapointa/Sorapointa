@@ -34,7 +34,5 @@ class ScopeTest {
         }
 
         assertEquals(3, parentScope.parentJob.children.toList().size)
-
     }
-
 }
