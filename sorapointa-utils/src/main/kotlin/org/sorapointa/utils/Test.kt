@@ -9,7 +9,7 @@ private val logger = mu.KotlinLogging.logger { }
 internal val isCI by lazy {
     val ci = System.getenv("CI") != null
     ci.also {
-        logger.info { "Sorapointa run in CI" }
+        if (ci) logger.info { "Sorapointa run in CI" }
     }
 }
 

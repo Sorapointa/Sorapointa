@@ -9,6 +9,10 @@ import org.sorapointa.utils.runTest
 import kotlin.test.assertEquals
 
 class DatabaseProviderTest {
+    init {
+        initTestDataProvider()
+    }
+
     @Serializable
     data class TestData(
         @SerialName("_id") val id: Long,
