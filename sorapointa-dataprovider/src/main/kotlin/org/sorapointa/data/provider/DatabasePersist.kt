@@ -60,5 +60,5 @@ internal object DatabaseConfig : DataFilePersist<DatabaseConfig.Data>(
     )
 }
 
-suspend fun <T: Any> CoroutineCollection<T>.findOneOrInsertDefault(id: Any, default: T)
-    = findOneById(id) ?: default.also { insertOne(it) }
+suspend fun <T : Any> CoroutineCollection<T>.findOneOrInsertDefault(id: Any, default: T) =
+    findOneById(id) ?: default.also { insertOne(it) }
