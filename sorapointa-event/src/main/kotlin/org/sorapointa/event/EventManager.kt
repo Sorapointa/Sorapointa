@@ -9,9 +9,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import mu.KotlinLogging
 import org.sorapointa.data.provider.DataFilePersist
+import org.sorapointa.utils.ModuleScope
 import org.sorapointa.utils.configDirectory
 import java.io.File
 import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 private val logger = KotlinLogging.logger {}
 
@@ -22,11 +25,7 @@ private val logger = KotlinLogging.logger {}
  */
 object EventManager {
 
-    private var parentJob = SupervisorJob()
-    private val eventExceptionHandler =
-        CoroutineExceptionHandler { _, e -> logger.error(e) { "Caught Exception on EventManager" } }
-    private var eventContext = eventExceptionHandler + Dispatchers.Default + CoroutineName("EventManager") + parentJob
-    private var eventScope = CoroutineScope(eventContext)
+    private var eventScope = ModuleScope(logger, "EventManager")
 
     private val registeredListener = ConcurrentLinkedQueue<PriorityEntry>()
     private val registeredBlockListener = ConcurrentLinkedQueue<PriorityBlockEntry>()
@@ -73,7 +72,7 @@ object EventManager {
         val channel = getInitChannel()
         registeredListener.first { it.priority == priority }.channels.add(channel)
 
-        eventScope.launch(eventContext) {
+        eventScope.launch {
             channel.receiveAsFlow().collect {
                 listener(it)
             }
@@ -155,7 +154,7 @@ object EventManager {
         val eventName = event::class.simpleName
         logger.debug { "Try to broadcast event $eventName" }
         registeredListener.forEach { (priority, channels) ->
-            eventScope.launch(eventContext) {
+            eventScope.launch {
                 channels.forEach { channel ->
                     channel.send(event)
                 }
@@ -164,7 +163,7 @@ object EventManager {
             if (blockListeners.size > 0) {
                 withTimeout(waitingAllBlockListenersTimeout) {
                     blockListeners.asFlow().map { listener ->
-                        eventScope.launch(eventContext) {
+                        eventScope.launch {
                             withTimeout(blockListenerTimeout) {
                                 listener(event)
                             }
@@ -255,10 +254,8 @@ object EventManager {
     /**
      * Initialize the queue of listener in priority order, and destination channel
      */
-    fun init(parentScope: CoroutineScope = eventScope) {
-        eventScope = parentScope
-        parentJob = SupervisorJob(parentScope.coroutineContext[Job])
-        eventContext += parentJob
+    fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
+        eventScope = ModuleScope(logger, "EventManager", parentContext)
         initAllListeners()
     }
 
@@ -272,7 +269,7 @@ object EventManager {
     }
 
     fun cancelAll() {
-        parentJob.cancel()
+        eventScope.parentJob.cancel()
     }
 
     private fun getInitChannel() = Channel<Event>(64)

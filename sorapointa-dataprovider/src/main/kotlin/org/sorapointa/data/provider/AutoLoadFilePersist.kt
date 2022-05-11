@@ -27,7 +27,7 @@ open class AutoLoadFilePersist<T : Any>(
     }
 
     private val scanJob: Job by lazy {
-        scope.launch(dataFilePersistContext) {
+        scope.launch {
             logger.debug { "Launching Auto Load Job... Interval $scanInterval" }
             while (isActive) {
                 delay(scanInterval)

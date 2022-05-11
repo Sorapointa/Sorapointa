@@ -12,6 +12,7 @@ import mu.KotlinLogging
 import org.sorapointa.utils.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.KClass
 
 private val logger = KotlinLogging.logger {}
@@ -19,19 +20,10 @@ private val logger = KotlinLogging.logger {}
 object ResourceHolder {
     private val dataMap = ConcurrentHashMap<String, DataLoader<Any>>()
 
-    private var parentJob = SupervisorJob()
-    private val eventExceptionHandler =
-        CoroutineExceptionHandler { _, e ->
-            logger.error(e) { "Caught Exception on ResourceLoader" }
-        }
-    private var context =
-        eventExceptionHandler + Dispatchers.Default + CoroutineName("ResourceLoader") + parentJob
-    private var scope = CoroutineScope(context)
+    private var scope = ModuleScope(logger, "ResourceLoader")
 
-    fun init(parentScope: CoroutineScope = scope) {
-        scope = parentScope
-        parentJob = SupervisorJob(parentScope.coroutineContext[Job])
-        context += parentJob
+    fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
+        scope = ModuleScope(logger, "ResourceLoader", parentContext)
     }
 
     /**
@@ -41,7 +33,7 @@ object ResourceHolder {
      */
     suspend fun loadAll(stream: Boolean = false) {
         dataMap.asSequence().asFlow().map { (k, v) ->
-            scope.launch(context) {
+            scope.launch {
                 val loaded = if (stream) v.loadFromStream() else v.load()
                 finalizeData(k, loaded)
             }
@@ -71,7 +63,7 @@ inline fun <reified T : Any> DataLoader(
     path: String,
     context: CoroutineContext = Dispatchers.IO,
 ): DataLoader<T> =
-    DataLoader<T>(path, T::class, serializer(), context).apply {
+    DataLoader(path, T::class, serializer(), context).apply {
         init()
     }
 

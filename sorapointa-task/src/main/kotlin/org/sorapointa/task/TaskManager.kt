@@ -7,30 +7,26 @@ import org.litote.kmongo.eq
 import org.litote.kmongo.setValue
 import org.sorapointa.data.provider.DatabasePersist
 import org.sorapointa.data.provider.findOneOrInsertDefault
+import org.sorapointa.utils.ModuleScope
 import org.sorapointa.utils.now
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Duration
 
 private val logger = KotlinLogging.logger {}
 
 object TaskManager {
-    private val eventExceptionHandler =
-        CoroutineExceptionHandler { _, e -> logger.error(e) { "Caught Exception on TaskManager" } }
-    private var parentJob = SupervisorJob()
-    private var eventContext = eventExceptionHandler + Dispatchers.Default + CoroutineName("TaskManager") + parentJob
-    private var eventScope = CoroutineScope(eventContext)
+    private var scope = ModuleScope(logger, "TaskManager")
 
     private val cronJobMap: MutableMap<String, Job> = ConcurrentHashMap()
 
-    fun init(parentScope: CoroutineScope = eventScope) {
-        eventScope = parentScope
-        parentJob = SupervisorJob(parentScope.coroutineContext[Job])
-        eventContext += parentJob
+    fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
+        scope = ModuleScope(logger, "TaskManager", parentContext)
     }
 
     fun close() {
-        eventScope.cancel("Closing")
+        scope.cancel("Closing")
     }
 
     internal val tasks = DatabasePersist<CronTask>("tasks").data
@@ -38,8 +34,7 @@ object TaskManager {
     fun registerTask(
         delay: Duration,
         task: suspend () -> Unit,
-        context: CoroutineContext = eventContext,
-    ): Job = eventScope.launch(context) {
+    ): Job = scope.launch {
         while (isActive) {
             task()
             delay(delay)
@@ -49,8 +44,7 @@ object TaskManager {
     fun registerTask(
         delayMillis: Long,
         task: suspend () -> Unit,
-        context: CoroutineContext = eventContext,
-    ): Job = eventScope.launch(context) {
+    ): Job = scope.launch {
         while (isActive) {
             task()
             delay(delayMillis)
@@ -74,7 +68,7 @@ object TaskManager {
             return null
         }
 
-        return eventScope.launch(eventContext) {
+        return scope.launch {
             val default by lazy { CronTask(id, cron.wrap()) }
 
             val found = tasks.findOneOrInsertDefault(id, default)

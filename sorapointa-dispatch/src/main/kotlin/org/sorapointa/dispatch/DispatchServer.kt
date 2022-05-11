@@ -42,7 +42,7 @@ object DispatchServer {
 
     internal val client by lazy {
         HttpClient(CIO) {
-            install(Logging)
+//            install(Logging)
             install(ContentNegotiation) {
                 json(prettyJson)
             }
