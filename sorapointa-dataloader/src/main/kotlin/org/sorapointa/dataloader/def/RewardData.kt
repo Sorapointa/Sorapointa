@@ -3,9 +3,8 @@ package org.sorapointa.dataloader.def
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
 @Serializable
-data class RewardDataItem(
+data class RewardData(
     @SerialName("RewardId") val rewardId: Int,
     @SerialName("RewardItemList") val rewardItemList: List<RewardItem>,
     @SerialName("Scoin") val scoin: Int,

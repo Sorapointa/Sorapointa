@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ReliquarySetDataItem(
+data class ReliquarySetData(
     @SerialName("SetId") val setId: Int,
     @SerialName("SetIcon") val setIcon: String,
     @SerialName("SetNeedNum") val setNeedNum: List<Int>,

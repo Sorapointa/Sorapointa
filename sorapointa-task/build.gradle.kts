@@ -6,7 +6,6 @@ plugins {
 
 dependencies {
     implementation(project(":sorapointa-dataprovider"))
-    implementation(project(":sorapointa-utils"))
 
     implementation(KotlinX.coroutines.core)
     implementation(KotlinX.serialization.core)

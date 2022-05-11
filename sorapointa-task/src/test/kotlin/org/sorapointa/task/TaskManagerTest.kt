@@ -55,7 +55,6 @@ class TaskManagerTest {
         assertEquals("* * * * *", tasks.findOneById("test1")?.cron?.cron?.asString())
     }
 
-
     @Test
     fun `high volume test`() = runTest(TestOption.SKIP_CI) {
         val acc = atomic(0)

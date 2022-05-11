@@ -3,7 +3,6 @@ package org.sorapointa.dataloader.def
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
 @Serializable
 data class AvatarTalentData(
     @SerialName("TalentId") val talentId: Int,
@@ -23,5 +22,3 @@ data class AvatarTalentData(
         @SerialName("Value") val value: Double
     )
 }
-
-

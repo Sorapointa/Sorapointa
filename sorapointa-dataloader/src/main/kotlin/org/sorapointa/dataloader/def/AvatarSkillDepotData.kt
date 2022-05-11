@@ -3,9 +3,8 @@ package org.sorapointa.dataloader.def
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
 @Serializable
-data class AvatarSkillDepotDataItem(
+data class AvatarSkillDepotData(
     @SerialName("Id") val id: Int,
     @SerialName("EnergySkill") val energySkill: Int,
     @SerialName("Skills") val skills: List<Int>,

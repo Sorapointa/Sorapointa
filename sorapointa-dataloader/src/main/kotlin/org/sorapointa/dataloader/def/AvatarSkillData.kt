@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AvatarSkillDataItem(
+data class AvatarSkillData(
     @SerialName("Id") val id: Int,
     @SerialName("NameTextMapHash") val nameTextMapHash: Long,
     @SerialName("AbilityName") val abilityName: String,

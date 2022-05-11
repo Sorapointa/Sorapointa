@@ -3,9 +3,8 @@ package org.sorapointa.dataloader.def
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
 @Serializable
-data class MaterialDataItem(
+data class MaterialData(
     @SerialName("InteractionTitleTextMapHash") val interactionTitleTextMapHash: Long,
     @SerialName("NoFirstGetHint") val noFirstGetHint: Boolean,
     @SerialName("UseParam") val useParam: List<String>,

@@ -3,9 +3,8 @@ package org.sorapointa.dataloader.def
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
 @Serializable
-data class AvatarDataItem(
+data class AvatarData(
     @SerialName("BodyType") val bodyType: String,
     @SerialName("ScriptDataPathHashSuffix") val scriptDataPathHashSuffix: Long,
     @SerialName("ScriptDataPathHashPre") val scriptDataPathHashPre: Int,

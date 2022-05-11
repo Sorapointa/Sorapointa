@@ -3,9 +3,8 @@ package org.sorapointa.dataloader.def
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
 @Serializable
-data class WeaponCurveDataItem(
+data class WeaponCurveData(
     @SerialName("Level") val level: Int,
     @SerialName("CurveInfos") val curveInfos: List<CurveInfo>
 ) {
@@ -16,4 +15,3 @@ data class WeaponCurveDataItem(
         @SerialName("Value") val value: Double
     )
 }
-

@@ -3,9 +3,8 @@ package org.sorapointa.dataloader.def
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
 @Serializable
-data class WeaponPromoteDataItem(
+data class WeaponPromoteData(
     @SerialName("WeaponPromoteId") val weaponPromoteId: Int,
     @SerialName("CostItems") val costItems: List<CostItem>,
     @SerialName("AddProps") val addProps: List<AddProp>,

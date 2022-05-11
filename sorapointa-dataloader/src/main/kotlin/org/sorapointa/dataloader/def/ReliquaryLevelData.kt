@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ReliquaryLevelDataItem(
+data class ReliquaryLevelData(
     @SerialName("Level") val level: Int,
     @SerialName("AddProps") val addProps: List<AddProp>,
     @SerialName("Rank") val rank: Int,
@@ -16,4 +16,3 @@ data class ReliquaryLevelDataItem(
         @SerialName("Value") val value: Double
     )
 }
-

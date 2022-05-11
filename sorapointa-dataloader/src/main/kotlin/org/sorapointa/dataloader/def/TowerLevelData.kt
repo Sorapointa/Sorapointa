@@ -3,9 +3,8 @@ package org.sorapointa.dataloader.def
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
 @Serializable
-data class TowerLevelDataItem(
+data class TowerLevelData(
     @SerialName("ID") val iD: Int,
     @SerialName("LevelId") val levelId: Int,
     @SerialName("LevelIndex") val levelIndex: Int,
@@ -23,4 +22,3 @@ data class TowerLevelDataItem(
         @SerialName("ArgumentList") val argumentList: List<Int>
     )
 }
-

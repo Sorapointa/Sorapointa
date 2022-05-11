@@ -42,6 +42,8 @@ generated/
 **/logs/*
 *.log
 
+/resources/
+
 **/src/main/resources/logback.xml
 **/src/test/resources/logback-test.xml
 !sorapointa-core/src/main/resources/logback.xml

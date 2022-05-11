@@ -11,7 +11,6 @@ dependencies {
     api(KotlinX.datetime)
 }
 
-
 fun BuildConfigSourceSet.string(name: String, value: String) = buildConfigField("String", name, "\"$value\"")
 fun BuildConfigSourceSet.stringNullable(name: String, value: String?) =
     buildConfigField("String?", name, value?.let { "\"$value\"" } ?: "null")

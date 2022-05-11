@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RewardPreviewDataItem(
+data class RewardPreviewData(
     @SerialName("Desc") val desc: String,
     @SerialName("PreviewItems") val previewItems: List<PreviewItem>,
     @SerialName("Id") val id: Int
@@ -15,4 +15,3 @@ data class RewardPreviewDataItem(
         @SerialName("Count") val count: String
     )
 }
-

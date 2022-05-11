@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class WeaponDataItem(
+data class WeaponData(
     @SerialName("WeaponType") val weaponType: String,
     @SerialName("RankLevel") val rankLevel: Int,
     @SerialName("WeaponBaseExp") val weaponBaseExp: Int,

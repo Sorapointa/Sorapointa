@@ -82,20 +82,17 @@ inline fun <reified T : Any> DataLoader(
  */
 class DataLoader<T : Any> @SorapointaInternal constructor(
     path: String,
-    clazz: KClass<T>,
+    private val clazz: KClass<T>,
     private val serializer: DeserializationStrategy<T>,
     private val context: CoroutineContext = Dispatchers.IO,
 ) {
     private val file = resolveResourceDirectory(path)
 
-    init {
+    fun init() {
         if (!file.exists()) throw NoSuchFileException(
             file = file,
             reason = "Failed to load data for class ${clazz.qualifiedOrSimple}"
         )
-    }
-
-    fun init() {
         ResourceHolder.registerData(this.uncheckedCast())
     }
 

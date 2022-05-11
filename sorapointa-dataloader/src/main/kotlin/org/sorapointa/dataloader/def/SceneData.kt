@@ -3,9 +3,8 @@ package org.sorapointa.dataloader.def
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
 @Serializable
-data class SceneDataItem(
+data class SceneData(
     @SerialName("Id") val id: Int,
     @SerialName("Type") val type: String,
     @SerialName("ScriptData") val scriptData: String,
@@ -19,4 +18,3 @@ data class SceneDataItem(
 //    @SerialName("IGEIMMEHIDG") val iGEIMMEHIDG: Boolean,
 //    @SerialName("OGPODEBAOKA") val oGPODEBAOKA: Boolean
 )
-

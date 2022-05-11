@@ -1,11 +1,10 @@
 package org.sorapointa.dataloader.def
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ReliquaryDataItem(
+data class ReliquaryData(
     @SerialName("EquipType") val equipType: String,
     @SerialName("ShowPic") val showPic: String,
     @SerialName("RankLevel") val rankLevel: Int,

@@ -3,9 +3,8 @@ package org.sorapointa.dataloader.def
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
 @Serializable
-data class ShopGoodsDataItem(
+data class ShopGoodsData(
     @SerialName("GoodsId") val goodsId: Int,
     @SerialName("SubTagNameTextMapHash") val subTagNameTextMapHash: Long,
     @SerialName("ShopType") val shopType: Int,
@@ -42,4 +41,3 @@ data class ShopGoodsDataItem(
         @SerialName("Count") val count: Int
     )
 }
-
