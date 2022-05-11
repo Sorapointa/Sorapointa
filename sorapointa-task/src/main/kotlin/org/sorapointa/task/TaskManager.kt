@@ -6,6 +6,7 @@ import mu.KotlinLogging
 import org.litote.kmongo.eq
 import org.litote.kmongo.setValue
 import org.sorapointa.data.provider.DatabasePersist
+import org.sorapointa.data.provider.findOneOrInsertDefault
 import org.sorapointa.utils.now
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
@@ -76,7 +77,7 @@ object TaskManager {
         return eventScope.launch(eventContext) {
             val default by lazy { CronTask(id, cron.wrap()) }
 
-            val found = tasks.findOneById(id) ?: default.also { tasks.insertOne(it) }
+            val found = tasks.findOneOrInsertDefault(id, default)
 
             if (found.cron.cron != cron) {
                 tasks.findOneAndReplace(CronTask::id eq id, default)
