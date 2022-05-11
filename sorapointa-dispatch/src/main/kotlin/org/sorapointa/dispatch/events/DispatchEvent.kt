@@ -7,10 +7,9 @@ import org.sorapointa.event.CancelableEvent
 import org.sorapointa.proto.QueryCurrRegionHttpRspOuterClass.QueryCurrRegionHttpRsp
 import org.sorapointa.proto.QueryRegionListHttpRspOuterClass.QueryRegionListHttpRsp
 
-abstract class DispatchEvent: AbstractEvent() {
+abstract class DispatchEvent : AbstractEvent() {
 
     abstract val call: ApplicationCall
-
 }
 
 class GetAgreementDataEvent(
@@ -52,4 +51,3 @@ class QueryCurrRegionEvent(
     override val call: ApplicationCall,
     var queryCurrRegionHttpRsp: QueryCurrRegionHttpRsp
 ) : DispatchEvent(), CancelableEvent
-

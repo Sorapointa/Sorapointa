@@ -71,6 +71,7 @@ object KeyProvider {
     }
 
     private fun <T> T.waitInputOrDefault(): String {
-        return if (!isJUnitTest()) Scanner(System.`in`).nextLine()?.takeIf { it != "" } ?: this.toString() else this.toString()
+        return if (!isJUnitTest()) Scanner(System.`in`).nextLine()?.takeIf { it != "" }
+            ?: this.toString() else this.toString()
     }
 }

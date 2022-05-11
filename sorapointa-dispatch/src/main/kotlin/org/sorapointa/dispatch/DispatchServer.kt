@@ -31,7 +31,6 @@ import org.sorapointa.utils.*
 import java.io.File
 import kotlin.text.toCharArray
 
-
 internal fun main(): Unit = runBlocking {
     DispatchServer.startDispatch()
 }
@@ -135,7 +134,6 @@ object DispatchServer {
 //            .clearRegionList()
 //            .addAllRegionList(serverList)
 //            .build()
-
         }
     }
 
@@ -146,42 +144,44 @@ object DispatchServer {
 
     suspend fun getQueryCurrRegionHttpRsp(call: ApplicationCall): QueryCurrRegionHttpRsp {
 
-        val queryCurrRegionHttpRsp = QueryCurrRegionHttpRsp.parseFrom(call.forwardCall<String>(QUERY_CURR_DOMAIN).decodeBase64Bytes())
+        val queryCurrRegionHttpRsp = QueryCurrRegionHttpRsp.parseFrom(
+            call.forwardCall<String>(QUERY_CURR_DOMAIN).decodeBase64Bytes()
+        )
 
         val dispatchSeed = File(configDirectory, "dispatchSeed.bin").readBytes()
         val dispatchKey = File(configDirectory, "dispatchKey.bin").readBytes()
 
         return queryCurrRegionHttpRsp.toBuilder()
-            .setRegionInfo(queryCurrRegionHttpRsp.regionInfo.toBuilder()
-                .setGateserverIp(gateServerIp)
-                .setGateserverPort(gateServerPort)
-                .setSecretKey(ByteString.copyFrom(dispatchSeed))
-                .build()
+            .setRegionInfo(
+                queryCurrRegionHttpRsp.regionInfo.toBuilder()
+                    .setGateserverIp(gateServerIp)
+                    .setGateserverPort(gateServerPort)
+                    .setSecretKey(ByteString.copyFrom(dispatchSeed))
+                    .build()
             )
             .setClientSecretKey(ByteString.copyFrom(dispatchSeed))
-            .setRegionCustomConfigEncrypted(ByteString.copyFrom(
-                networkJson.encodeToString(
-                   ClientCustomConfig(
-                       codeSwitch = listOf(15, 2410, 2324, 21),
-                       coverSwitch = listOf(8, 40),
-                       perfReportEnable = false,
-                       homeDotPattern = true,
-                       homeItemFilter = 20,
-                       reportNetDelayConfig = ClientCustomConfig.ReportNetDelayConfigData(
-                           openGateServer = true
-                       )
-                   )
-                ).toByteArray().xor(dispatchKey)
-            )).build()
+            .setRegionCustomConfigEncrypted(
+                ByteString.copyFrom(
+                    networkJson.encodeToString(
+                        ClientCustomConfig(
+                            codeSwitch = listOf(15, 2410, 2324, 21),
+                            coverSwitch = listOf(8, 40),
+                            perfReportEnable = false,
+                            homeDotPattern = true,
+                            homeItemFilter = 20,
+                            reportNetDelayConfig = ClientCustomConfig.ReportNetDelayConfigData(
+                                openGateServer = true
+                            )
+                        )
+                    ).toByteArray().xor(dispatchKey)
+                )
+            ).build()
 
 //        val binFile = File(configDirectory, "query_cur_region.bin")
 //        val queryCurrRegionHttpRsp = QueryCurrRegionHttpRsp.parseFrom(binFile.readBytes())
 //
 //        return queryCurrRegionHttpRsp
-
-
     }
-
 }
 
 object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
@@ -194,7 +194,8 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
         var publicDispatchHost: String = "localhost",
         var port: Int = 443,
         var servers: ArrayList<Server> = arrayListOf(Server()),
-        var forwardCommonRequest: Boolean = true, // If false, dispatch server will use default config hardcoded in Sorapointa
+        var forwardCommonRequest: Boolean = true,
+        // If false, dispatch server will use default config hardcoded in Sorapointa
         var useSSL: Boolean = true,
         var certificationConfig: Certification = Certification()
     )

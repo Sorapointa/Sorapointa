@@ -3,7 +3,6 @@ package org.sorapointa.dispatch.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
 @Serializable
 data class RegionListClientCustomConfig(
     @SerialName("sdkenv") val sdkEnvironment: Int,
@@ -40,7 +39,6 @@ data class ClientCustomConfig(
     data class MtrConfigData(
         val isOpen: Boolean? = null
     )
-
 }
 
 @Serializable
@@ -104,7 +102,6 @@ data class MdkShieldLoadConfigData(
             @SerialName("token_type") val tokenType: String,
             @SerialName("game_token_expires_in") val gameTokenExpiresIn: Int
         )
-
     }
 }
 
@@ -150,7 +147,6 @@ data class CompareProtocolVersionData(
             @SerialName("teenager_proto") val teenagerProto: String,
             @SerialName("third_proto") val thirdProto: String
         )
-
     }
 }
 

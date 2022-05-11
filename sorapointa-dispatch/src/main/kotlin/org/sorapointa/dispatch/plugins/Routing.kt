@@ -15,12 +15,12 @@ import org.sorapointa.dispatch.data.*
 import org.sorapointa.dispatch.events.*
 import org.sorapointa.dispatch.util.getAndPost
 import org.sorapointa.event.Event
-import org.sorapointa.event.EventManager
 import org.sorapointa.event.EventManager.broadcastEvent
 import java.util.concurrent.ConcurrentHashMap
 
 private val logger = KotlinLogging.logger {}
 
+/* ktlint-disable max-line-length */
 internal fun Application.configureRouting() {
 
     routing {
@@ -61,7 +61,8 @@ internal fun Application.configureNeedHandlerRouting() {
         route("/hk4e_{region}") {
             route("/combo/granter/api") {
                 get("/getConfig") {
-                    call.forwardCallWithAll(DOMAIN_SDK_STATIC,
+                    call.forwardCallWithAll(
+                        DOMAIN_SDK_STATIC,
                         ComboConfigData(
                             returnCode = 0,
                             message = "OK",
@@ -73,11 +74,13 @@ internal fun Application.configureNeedHandlerRouting() {
                                 pushAliasType = 1,
                                 enableAnnouncePicPopup = true,
                                 disableYsdkGuard = true
-                            )))
-                    { GetComboConfigDataEvent(call, it) }?.also { call.respond(it.comboConfigData) }
+                            )
+                        )
+                    ) { GetComboConfigDataEvent(call, it) }?.also { call.respond(it.comboConfigData) }
                 }
                 post("/compareProtocolVersion") {
-                    call.forwardCallWithAll(DOMAIN_HK4E_SDK,
+                    call.forwardCallWithAll(
+                        DOMAIN_HK4E_SDK,
                         CompareProtocolVersionData(
                             returnCode = 0,
                             message = "OK",
@@ -97,14 +100,14 @@ internal fun Application.configureNeedHandlerRouting() {
                                 )
                             )
                         )
-                    )
-                    { GetCompareProtocolVersionDataEvent(call, it) }
+                    ) { GetCompareProtocolVersionDataEvent(call, it) }
                         ?.also { call.respond(it.compareProtocolVersionData) }
                 }
             }
             route("/mdk") {
                 get("/shield/api/loadConfig") {
-                    call.forwardCallWithAll(DOMAIN_SDK_STATIC,
+                    call.forwardCallWithAll(
+                        DOMAIN_SDK_STATIC,
                         MdkShieldLoadConfigData(
                             returnCode = 0,
                             message = "OK",
@@ -126,15 +129,16 @@ internal fun Application.configureNeedHandlerRouting() {
                                 thirdPartyLoginConfigs = mapOf(),
                                 enablePsBindAccount = false
                             )
-                        ))
-                    { GetMdkShieldLoadConfigDataEvent(call, it) }?.also { call.respond(it.mdkShieldLoadConfigData) }
+                        )
+                    ) { GetMdkShieldLoadConfigDataEvent(call, it) }?.also { call.respond(it.mdkShieldLoadConfigData) }
                 }
                 getAndPost("/shopwindow/shopwindow/listPriceTier") {
                     // TODO: sniffing some packets and replace the hardcode
                     call.respondText { """{"retcode":0,"message":"OK","data":{"suggest_currency":"USD","tiers":[]}}""" }
                 }
                 get("/agreement/api/getAgreementInfos") {
-                    call.forwardCallWithAll(DOMAIN_HK4E_OS_VERSE,
+                    call.forwardCallWithAll(
+                        DOMAIN_HK4E_OS_VERSE,
                         AgreementData(
                             returnCode = 0,
                             message = "OK",
@@ -149,7 +153,8 @@ internal fun Application.configureNeedHandlerRouting() {
         }
 
         get("/combo/box/api/config/sdk/combo") {
-            call.forwardCallWithAll(DOMAIN_SDK_STATIC,
+            call.forwardCallWithAll(
+                DOMAIN_SDK_STATIC,
                 ComboData(
                     returnCode = 0,
                     message = "OK",
@@ -157,14 +162,12 @@ internal fun Application.configureNeedHandlerRouting() {
                         values = mapOf("modify_real_name_other_verify" to "true")
                     )
                 )
-            )
-            { GetComboDataEvent(call, it) }?.also { call.respond(it.comboData) }
+            ) { GetComboDataEvent(call, it) }?.also { call.respond(it.comboData) }
         }
 
         get("/admin/mi18n/plat_oversea/m{id}/m{id0}*") {
             if (call.parameters["id"] == call.parameters["id0"]) {
-                call.forwardCallWithAll(DOMAIN_WEB_STATIC, PlatMVersionData(version = 65))
-                { GetPlatMVersionDataEvent(call, it) }?.also { call.respond(it.platMVersionData) }
+                call.forwardCallWithAll(DOMAIN_WEB_STATIC, PlatMVersionData(version = 65)) { GetPlatMVersionDataEvent(call, it) }?.also { call.respond(it.platMVersionData) }
             }
         }
 
@@ -233,7 +236,6 @@ internal suspend inline fun <reified T> ApplicationCall.forwardCall(domain: Stri
     }
 }
 
-
 internal fun Application.configureThirdPartyAuth() {
     routing {
         route("/sorapointa_auth") {
@@ -250,15 +252,13 @@ internal fun Application.configureThirdPartyAuth() {
     }
 }
 
-
-/* ktlint-disable max-line-length */
 internal fun Application.configureHardCodeRouting() {
     routing {
         post("/account/risky/api/check") {
             call.respondText { """{"retcode":0,"message":"OK","data":{"id":"none","action":"ACTION_NONE","geetest":null}}""" }
         }
 
-        post("/data_abtest_api/config/experiment/list") {// AB Test ?? Not sure now
+        post("/data_abtest_api/config/experiment/list") { // AB Test ?? Not sure now
             call.respondText { """{"retcode":0,"success":true,"message":"","data":[{"code":1000,"type":2,"config_id":"14","period_id":"6036_99","version":"1","configs":{"cardType":"old"}}]}""" }
         }
 
@@ -287,6 +287,5 @@ internal fun Application.configureHardCodeRouting() {
         }
     }
 }
-
 
 /* ktlint-enable max-line-length */
