@@ -23,7 +23,7 @@ EventManager.registerEventListener { event ->
     // do something..
 }
 
-// ---
+// --- Method Signature ---
 
 /**
  * Register a parallel listener
@@ -47,7 +47,7 @@ EventManager.registerListener<SomeEvent> { event ->
     // do something..
 }
 
-// ---
+// --- Method Signature ---
 
 /**
  * Register a parallel listener
@@ -77,7 +77,7 @@ EventManager.registerBlockEventListener { event ->
     // do something..
 }
 
-// ---
+// --- Method Signature ---
 
 /**
  * Register a block listener
@@ -101,7 +101,7 @@ EventManager.registerBlockListener<SomeEvent> { event ->
     // do something..
 }
 
-// ---
+// --- Method Signature ---
 
 /**
  * Register a block listener
@@ -129,7 +129,7 @@ EventManager.getEventFlow()
         // do something...
     }
 
-// ---
+// --- Method Signature ---
 
 /**
  * Get original event flow from broadcasting
@@ -155,7 +155,28 @@ if (!isCancelled) {
     // do something else...
 }
 
-// ---
+// --- Quick Way ---
+
+someEvent.broadcast() // if `someEvent` is not `Cancellable`
+
+someEvent.broadcastEvent { event ->
+    // if this event has NOT been cancelled
+}
+
+someEvent.broadcastEventIfCancelled { event ->
+  // if this event has been cancelled
+}
+
+someEvent.broadcastEvent(
+  { event ->
+    // if this event has been cancelled
+  },
+  { event ->
+  // if this event has NOT been cancelled 
+  }
+)
+
+// --- Method Signature ---
 
 /**
  * Broadcast event, and return the cancel state of this event
@@ -163,7 +184,6 @@ if (!isCancelled) {
  * @param event, the event will be broadcasted
  * @return [Boolean], that represents the cancel state of this event
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 suspend fun broadcastEvent(event: Event): Boolean
 ```
 
