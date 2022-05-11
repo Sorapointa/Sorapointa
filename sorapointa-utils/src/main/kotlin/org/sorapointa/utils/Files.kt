@@ -28,7 +28,11 @@ private val testDir by lazy {
  */
 fun resolveWorkDirectory(path: String) = File(globalWorkDirectory, path)
 
+fun resolveResourceDirectory(path: String) = File(resourceDirectory, path)
+
 // Add all file you need here, like:
 val configDirectory by lazy { resolveWorkDirectory("./config") }
 
 val languagesDirectory by lazy { resolveWorkDirectory("./langs") }
+
+val resourceDirectory by lazy { resolveWorkDirectory("./resources") }

@@ -9,7 +9,7 @@ data class AvatarCostumeData(
 //    @SerialName("PGFEJENILJP") val pGFEJENILJP: Int,
     @SerialName("NameTextMapHash") val nameTextMapHash: Long,
     @SerialName("DescTextMapHash") val descTextMapHash: Long,
-    @SerialName("ItemId") val itemId: Int,
+    @SerialName("ItemId") val itemId: Int? = null,
     @SerialName("AvatarId") val avatarId: Int,
     @SerialName("JsonName") val jsonName: String,
 //    @SerialName("MIJFCCGEOFL") val mIJFCCGEOFL: Long,
@@ -26,8 +26,7 @@ data class AvatarCostumeData(
 //    @SerialName("GIJBECPECPK") val gIJBECPECPK: Long,
 //    @SerialName("HGGOICMOECA") val hGGOICMOECA: Int,
 //    @SerialName("JEGDGCKPKPK") val jEGDGCKPKPK: Boolean,
-    @SerialName("Hide") val hide: Boolean,
-    @SerialName("IsDefault") val isDefault: Boolean,
+    @SerialName("Hide") val hide: Boolean? = null,
+    @SerialName("IsDefault") val isDefault: Boolean? = null,
 //    @SerialName("GNPEIFNDGKP") val gNPEIFNDGKP: Boolean
 )
-
