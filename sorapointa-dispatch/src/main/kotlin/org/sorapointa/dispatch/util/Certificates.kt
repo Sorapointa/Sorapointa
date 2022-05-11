@@ -25,7 +25,7 @@ enum class KeyType {
  *
  *  If [file] is set, all certificates are stored in a JKS keystore in [file] with [password].
  */
-fun KeyStore.trustStore(file: File? = null, password: CharArray): KeyStore {
+internal fun KeyStore.trustStore(file: File? = null, password: CharArray): KeyStore {
     val trustStore = KeyStore.getInstance("JKS")!!
     trustStore.load(null, null)
     aliases().toList().forEach { alias ->
@@ -39,11 +39,11 @@ fun KeyStore.trustStore(file: File? = null, password: CharArray): KeyStore {
     return trustStore
 }
 
-val KeyStore.trustManagers: List<TrustManager>
+internal val KeyStore.trustManagers: List<TrustManager>
     get() = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
         .apply { init(this@trustManagers) }.trustManagers.toList()
 
-data class Counterparty(
+internal data class Counterparty(
     val country: String = "",
     val organization: String = "",
     val organizationUnit: String = "",

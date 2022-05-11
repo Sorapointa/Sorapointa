@@ -10,7 +10,7 @@ import io.ktor.util.pipeline.*
  * @see [body]
  */
 @Suppress("NOTHING_TO_INLINE")
-inline fun Route.getAndPost(path: String, noinline body: PipelineInterceptor<Unit, ApplicationCall>) {
+internal inline fun Route.getAndPost(path: String, noinline body: PipelineInterceptor<Unit, ApplicationCall>) {
     get(path, body)
     post(path, body)
 }

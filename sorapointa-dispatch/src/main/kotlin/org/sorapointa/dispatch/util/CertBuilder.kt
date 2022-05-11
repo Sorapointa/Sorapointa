@@ -46,7 +46,7 @@ class CertificateBuilder internal constructor() {
      */
     var keySizeInBits: Int = 1024
 
-    var counterparty = Counterparty(
+    private val counterparty = Counterparty(
         country = "US",
         organization = "Sorapointa",
         organizationUnit = "GI",
@@ -99,7 +99,7 @@ class KeyStoreBuilder internal constructor() {
      * Generate a certificate and append to the key store.
      * If there is a certificate with the same [alias] then it will be replaced
      */
-    fun certificate(alias: String, block: CertificateBuilder.() -> Unit) {
+    internal fun certificate(alias: String, block: CertificateBuilder.() -> Unit) {
         certificates[alias] = CertificateBuilder().apply(block).build()
     }
 
@@ -120,12 +120,12 @@ class KeyStoreBuilder internal constructor() {
 /**
  * Create a keystore and configure it in [block] function
  */
-fun buildKeyStore(block: KeyStoreBuilder.() -> Unit): KeyStore = KeyStoreBuilder().apply(block).build()
+internal fun buildKeyStore(block: KeyStoreBuilder.() -> Unit): KeyStore = KeyStoreBuilder().apply(block).build()
 
 /**
  * Save [KeyStore] to [output] file with the specified [password]
  */
-fun KeyStore.saveToFile(output: File, password: String) {
+internal fun KeyStore.saveToFile(output: File, password: String) {
     output.parentFile?.mkdirs()
 
     output.outputStream().use {
@@ -133,7 +133,7 @@ fun KeyStore.saveToFile(output: File, password: String) {
     }
 }
 
-fun KeyStore.saveCertToFile(output: File, alias: String) {
+internal fun KeyStore.saveCertToFile(output: File, alias: String) {
     output.parentFile?.mkdirs()
     val certBegin = "-----BEGIN CERTIFICATE-----\n"
     val endCert = "-----END CERTIFICATE-----"

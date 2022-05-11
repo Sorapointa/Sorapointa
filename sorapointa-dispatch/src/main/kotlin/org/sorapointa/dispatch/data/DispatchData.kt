@@ -4,6 +4,153 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+data class RegionListClientCustomConfig(
+    @SerialName("sdkenv") val sdkEnvironment: Int,
+    @SerialName("showexception") val showException: Boolean,
+    val loadPatch: Boolean,
+    val regionConfig: String,
+    val regionDispatchType: Int,
+    val videoKey: Long,
+    val downloadMode: Int
+)
+
+/**
+ * Client Custom Config
+ * @see [CodeSwitchData]
+ * @see [CoverSwitchData]
+ */
+@Serializable
+data class ClientCustomConfig(
+    val codeSwitch: List<Int>? = null,
+    val coverSwitch: List<Int>? = null,
+    @SerialName("perf_report_enable") val perfReportEnable: Boolean? = null,
+    @SerialName("perf_report_record_url") val perfReportRecordUrl: String? = null,
+    @SerialName("perf_report_config_url") val perfReportConfigUrl: String? = null,
+    val homeDotPattern: Boolean? = null,
+    val homeItemFilter: Int? = null,
+    val reportNetDelayConfig: ReportNetDelayConfigData? = null
+) {
+    @Serializable
+    data class ReportNetDelayConfigData(
+        @SerialName("openGateserver") val openGateServer: Boolean? = null
+    )
+
+    @Serializable
+    data class MtrConfigData(
+        val isOpen: Boolean? = null
+    )
+}
+
+@Serializable
+class AgreementData(
+    @SerialName("retcode") val returnCode: Int,
+    val message: String,
+    val data: Data? = null
+) {
+    @Serializable
+    data class Data(
+        @SerialName("marketing_agreements") val marketingAgreements: ArrayList<String>,
+    )
+}
+
+@Serializable
+class ComboConfigData(
+    @SerialName("retcode") val returnCode: Int,
+    val message: String,
+    val data: Data? = null
+) {
+    @Serializable
+    data class Data(
+        val protocol: Boolean,
+        @SerialName("qr_enabled") val qrEnabled: Boolean,
+        @SerialName("log_level") val logLevel: String,
+        @SerialName("announce_url") val announceUrl: String,
+        @SerialName("push_alias_type") val pushAliasType: Int,
+        @SerialName("disable_ysdk_guard") val disableYsdkGuard: Boolean,
+        @SerialName("enable_announce_pic_popup") val enableAnnouncePicPopup: Boolean,
+    )
+}
+
+@Serializable
+data class MdkShieldLoadConfigData(
+    @SerialName("retcode") val returnCode: Int,
+    val message: String,
+    val data: Data? = null
+) {
+    @Serializable
+    data class Data(
+        val client: String,
+        @SerialName("disable_mmt") val disableMmt: Boolean,
+        @SerialName("disable_regist") val disableRegist: Boolean,
+        @SerialName("enable_email_captcha") val enableEmailCaptcha: Boolean,
+        @SerialName("enable_ps_bind_account") val enablePsBindAccount: Boolean,
+        @SerialName("game_key") val gameKey: String,
+        val guest: Boolean,
+        val id: Int,
+        val identity: String,
+        @SerialName("ignore_versions") val ignoreVersions: String,
+        val name: String,
+        val scene: String,
+        @SerialName("server_guest") val serverGuest: Boolean,
+        @SerialName("thirdparty") val thirdParty: ArrayList<String>,
+        @SerialName("thirdparty_ignore") val thirdPartyIgnore: Map<String, String>,
+        @SerialName("thirdparty_login_configs") val thirdPartyLoginConfigs: Map<String, ThirdPartyLoginConfigsData>
+    ) {
+
+        @Serializable
+        data class ThirdPartyLoginConfigsData(
+            @SerialName("token_type") val tokenType: String,
+            @SerialName("game_token_expires_in") val gameTokenExpiresIn: Int
+        )
+    }
+}
+
+@Serializable
+data class PlatMVersionData(
+    val version: Int
+)
+
+@Serializable
+data class ComboData(
+    @SerialName("retcode") val returnCode: Int,
+    val message: String,
+    val data: Data? = null
+) {
+    @Serializable
+    data class Data(
+        @SerialName("vals") val values: Map<String, String>,
+    )
+}
+
+@Serializable
+data class CompareProtocolVersionData(
+    @SerialName("retcode") val returnCode: Int,
+    val message: String,
+    val data: Data? = null
+) {
+    @Serializable
+    data class Data(
+        val modified: Boolean,
+        val protocol: Protocol? = null
+    ) {
+
+        @Serializable
+        data class Protocol(
+            @SerialName("app_id") val appId: Int,
+            @SerialName("create_time") val createTime: Int,
+            val id: Int,
+            val language: String,
+            val major: Int,
+            val minimum: Int,
+            @SerialName("user_proto") val userProto: String,
+            @SerialName("priv_proto") val privProto: String,
+            @SerialName("teenager_proto") val teenagerProto: String,
+            @SerialName("third_proto") val thirdProto: String
+        )
+    }
+}
+
+@Serializable
 data class ComboTokenRequestData(
     @SerialName("app_id") val appId: Int,
     @SerialName("channel_id") val channelId: Int,
@@ -96,14 +243,3 @@ data class LoginTokenRequestData(
     val uid: String,
     val token: String
 )
-
-//
-// class RegionData(prq: QueryCurrRegionHttpRsp, b64: String) {
-//    val parsedRegionQuery: QueryCurrRegionHttpRsp
-//    val Base64: String
-//
-//    init {
-//        parsedRegionQuery = prq
-//        Base64 = b64
-//    }
-// }

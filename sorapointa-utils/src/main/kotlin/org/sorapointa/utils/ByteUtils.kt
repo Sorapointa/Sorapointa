@@ -28,8 +28,9 @@ fun Long.toByteArray(littleEndian: Boolean = true) = ByteArray(8).also { a ->
 
 fun ULong.toByteArray() = toLong().toByteArray()
 
-fun xor(data: ByteArray, key: ByteArray) {
-    for (i in data.indices) {
-        data[i] = (data[i].toInt() xor key[i % key.size].toInt()).toByte()
+fun ByteArray.xor(key: ByteArray): ByteArray {
+    for (i in this.indices) {
+        this[i] = (this[i].toInt() xor key[i % key.size].toInt()).toByte()
     }
+    return this
 }

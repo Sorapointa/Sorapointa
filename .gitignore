@@ -38,12 +38,6 @@ generated/
 ### Tmp ###
 **/tmp
 
-### Config ###
-/config/*.json
-/config/*.jks
-/config/*.cert
-resources/
-
 ### Logs ###
 **/logs/*
 *.log
