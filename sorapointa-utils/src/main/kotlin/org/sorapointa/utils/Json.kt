@@ -12,3 +12,12 @@ val prettyJson = Json {
     encodeDefaults = true
     coerceInputValues = true
 }
+
+/**
+ * For network or storage purpose, strict but ignore unknown key
+ */
+val networkJson = Json {
+    ignoreUnknownKeys = true
+    encodeDefaults = true
+    coerceInputValues = true
+}
