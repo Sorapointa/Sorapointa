@@ -40,5 +40,6 @@ jobs:
       - name: Check
         uses: gradle/gradle-build-action@v2
         with:
+          key: ${{ runner.os }}-2022-05-13
           arguments: check
           gradle-version: 7.4
