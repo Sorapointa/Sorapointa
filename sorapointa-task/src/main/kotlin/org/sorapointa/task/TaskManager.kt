@@ -21,6 +21,11 @@ object TaskManager {
 
     private val cronJobMap: MutableMap<String, Job> = ConcurrentHashMap()
 
+    /**
+     * Init task manager scope for structured concurrency
+     *
+     * This method **IS NOT** thread-safe
+     */
     fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
         scope = ModuleScope(logger, "TaskManager", parentContext)
     }
@@ -31,6 +36,13 @@ object TaskManager {
 
     internal val tasks = DatabasePersist<CronTask>("tasks").data
 
+    /**
+     * Register a task
+     *
+     * This method **IS NOT** thread-safe for **same id**
+     *
+     * @return If this job has been registered already, it would return null
+     */
     fun registerTask(
         delay: Duration,
         task: suspend () -> Unit,
@@ -41,6 +53,13 @@ object TaskManager {
         }
     }
 
+    /**
+     * Register a task
+     *
+     * This method **IS NOT** thread-safe for **same id**
+     *
+     * @return If this job has been registered already, it would return null
+     */
     fun registerTask(
         delayMillis: Long,
         task: suspend () -> Unit,
@@ -51,18 +70,31 @@ object TaskManager {
         }
     }
 
+    /**
+     * Register a task
+     *
+     * This method **IS NOT** thread-safe for **same id**
+     *
+     * @return If this job has been registered already, it would return null
+     */
     fun registerTask(
         id: String,
         cron: String,
         task: suspend () -> Unit,
     ): Job? = registerTask(id, parseCron(cron), task)
 
+    /**
+     * Register a task
+     *
+     * This method **IS NOT** thread-safe for **same id**
+     *
+     * @return If this job has been registered already, it would return null
+     */
     fun registerTask(
         id: String,
         cron: Cron,
         task: suspend () -> Unit,
     ): Job? {
-        // if not null, cancel job store in map
         if (cronJobMap[id] != null) {
             logger.warn { "Conflicted cron task id '$id', return null..." }
             return null

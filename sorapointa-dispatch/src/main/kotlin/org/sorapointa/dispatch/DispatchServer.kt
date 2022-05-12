@@ -190,30 +190,30 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
 
     @kotlinx.serialization.Serializable
     data class Data(
-        var host: String = "0.0.0.0",
-        var publicDispatchHost: String = "localhost",
-        var port: Int = 443,
-        var servers: ArrayList<Server> = arrayListOf(Server()),
-        var forwardCommonRequest: Boolean = true,
+        val host: String = "0.0.0.0",
+        val publicDispatchHost: String = "localhost",
+        val port: Int = 443,
+        val servers: ArrayList<Server> = arrayListOf(Server()),
+        val forwardCommonRequest: Boolean = true,
         // If false, dispatch server will use default config hardcoded in Sorapointa
-        var useSSL: Boolean = true,
+        val useSSL: Boolean = true,
         var certificationConfig: Certification = Certification()
     )
 
     @kotlinx.serialization.Serializable
     data class Certification(
-        var keyStoreFilePath: String = File(configDirectory, KeyProvider.DEFAULT_CERT_NAME).absPath,
-        var keyStore: String = "JKS",
-        var keyAlias: String = KeyProvider.DEFAULT_ALIAS,
-        var keyStorePassword: String = KeyProvider.DEFAULT_KEY_STORE_PASSWORD,
-        var privateKeyPassword: String = KeyProvider.DEFAULT_CERT_PASSWORD
+        val keyStoreFilePath: String = File(configDirectory, KeyProvider.DEFAULT_CERT_NAME).absPath,
+        val keyStore: String = "JKS",
+        val keyAlias: String = KeyProvider.DEFAULT_ALIAS,
+        val keyStorePassword: String = KeyProvider.DEFAULT_KEY_STORE_PASSWORD,
+        val privateKeyPassword: String = KeyProvider.DEFAULT_CERT_PASSWORD
     )
 
     @kotlinx.serialization.Serializable
     data class Server(
-        var serverName: String = "sorapointa_01",
-        var title: String = "Sorapointa",
-        var serverType: String = "DEV_PUBLIC",
-        var dispatchDomain: String = "localhost",
+        val serverName: String = "sorapointa_01",
+        val title: String = "Sorapointa",
+        val serverType: String = "DEV_PUBLIC",
+        val dispatchDomain: String = "localhost",
     )
 }

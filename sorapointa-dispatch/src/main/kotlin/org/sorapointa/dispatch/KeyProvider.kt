@@ -51,10 +51,12 @@ object KeyProvider {
             generatedKeyStore.saveCertToFile(
                 File(keyStoreFile.parentFile, keyStoreFile.nameWithoutExtension + ".cert"), alias
             )
-            dispatchConfig.certificationConfig.keyStore = "JKS"
-            dispatchConfig.certificationConfig.keyAlias = alias
-            dispatchConfig.certificationConfig.keyStorePassword = keyStorePassword
-            dispatchConfig.certificationConfig.privateKeyPassword = privateKeyPassword
+            dispatchConfig.certificationConfig = DispatchConfig.Certification(
+                keyStore = "JKS",
+                keyAlias = alias,
+                keyStorePassword = keyStorePassword,
+                privateKeyPassword = privateKeyPassword
+            )
             DispatchConfig.save()
             return@runBlocking generatedKeyStore
         } else {

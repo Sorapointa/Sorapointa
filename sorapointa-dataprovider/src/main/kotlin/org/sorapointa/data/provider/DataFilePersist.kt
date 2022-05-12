@@ -1,6 +1,7 @@
 package org.sorapointa.data.provider
 
 import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.update
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -32,11 +33,17 @@ open class DataFilePersist<T : Any>(
 
     protected val mutex = Mutex()
 
-    final override var data: T by atomic(default)
+    @SorapointaInternal val _data = atomic(default)
+
+    @OptIn(SorapointaInternal::class)
+    final override val data: T by _data
 
     init {
         clazz.requireSerializable()
     }
+
+    @OptIn(SorapointaInternal::class)
+    inline fun updateData(update: (T) -> T) = _data.update(update)
 
     override suspend fun init(): Unit =
         withContext(scope.coroutineContext) {
@@ -68,7 +75,7 @@ open class DataFilePersist<T : Any>(
                     prettyJson.decodeFromString(serializer, json) as? T
                         ?: error("Failed to cast Any? to ${clazz.qualifiedOrSimple}")
                     )
-                data = t
+                updateData { t }
                 t.also {
                     logger.debug { "Loaded data: ${it::class.qualifiedOrSimple}" }
                     logger.trace { "Data content $it" }

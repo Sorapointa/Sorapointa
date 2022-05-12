@@ -40,14 +40,14 @@ object CommandManager {
         val name = commandNode.entry.name
         val alias = commandNode.entry.alias
 
-        if (cmdMap[name] == null) {
-            cmdMap[name] = commandNode
-        } else logger.warn { "Command name '$name' conflict." }
+        cmdMap.putIfAbsent(name, commandNode)?.also {
+            logger.warn { "Command name '$name' conflict." }
+        }
 
         alias.forEach {
-            if (aliasMap[it] == null) {
-                aliasMap[it] = commandNode
-            } else logger.warn { "Alias name '$alias' conflict." }
+            aliasMap.putIfAbsent(it, commandNode)?.also {
+                logger.warn { "Alias name '$alias' conflict." }
+            }
         }
     }
 

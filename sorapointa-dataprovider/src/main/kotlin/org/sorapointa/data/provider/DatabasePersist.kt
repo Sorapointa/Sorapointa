@@ -23,7 +23,7 @@ object DatabaseManager {
     private val databaseMap = ConcurrentHashMap<String, CoroutineDatabase>()
 
     fun getDatabase(name: String): CoroutineDatabase =
-        databaseMap.getOrPut(name) {
+        databaseMap.computeIfAbsent(name) {
             mongoClient.getDatabase(name)
         }
 }

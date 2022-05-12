@@ -64,25 +64,33 @@ class EventPipelineTest {
         EventManager.registerEventListener(EventPriority.LOW) {
             error("unreachable code")
         }
+
+        var counter by atomic(0)
+
         EventManager.registerBlockEventListener {
             it.intercept()
+            counter++
         }
 
         EventManager.registerBlockEventListener(EventPriority.HIGHEST) {
             if (it is CancelableEvent) {
                 it.cancel()
+                counter++
             }
         }
 
-        (0..100).toList().map {
+        (1..100).toList().map {
             launch {
                 repeat(10) {
                     val event = TestEvent3()
                     val status = EventManager.broadcastEvent(event)
+                    counter++
                     assertEquals(true, status)
                 }
             }
         }.joinAll()
+
+        assertEquals(3 * 100 * 10, counter)
     }
 
     @Test

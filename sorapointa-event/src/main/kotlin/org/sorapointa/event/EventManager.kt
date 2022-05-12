@@ -174,36 +174,6 @@ object EventManager {
                         it.join()
                     }
                 }
-//                blockListeners.forEach { channel ->
-//                    channel.send(event)
-//                }
-//                var eventReceivedCount by atomic(0)
-//                val destination = destinationChannel[priority]!!
-//                val closeFlow = {
-//                    destination.close()
-//                    destinationChannel[priority] = getInitChannel()
-//                }
-//                eventScope.launch {
-//                    while (!destination.isClosedForSend && isActive) {
-//                        if (eventReceivedCount >= blockListeners.size) {
-//                            closeFlow()
-//                        }
-//                    }
-//                }.invokeOnCompletion {
-//                    if (eventReceivedCount < blockListeners.size) {
-//                        closeFlow()
-//                        logger.debug(it) { "Destination doesn't receive expected count of events, force closed flow." }
-//                    }
-//                }
-//                withTimeout(DESTINATION_FLOW_TIMEOUT) {
-//                    destination.receiveAsFlow().collect {
-//                        isCancelled = isCancelled || (it is CancelableEvent && it.isCancelled)
-//                        if (it.isIntercepted) {
-//                            isIntercepted = true
-//                        }
-//                        eventReceivedCount++
-//                    }
-//                }
             }
             if (isIntercepted) {
                 logger.debug { "Event $eventName has been intercepted" }
@@ -252,13 +222,21 @@ object EventManager {
     }
 
     /**
-     * Initialize the queue of listener in priority order, and destination channel
+     * Initialize the queue of listener in priority order
+     * and coroutine context for structured concurrency
+     *
+     * This method **IS NOT** thread-safe
      */
     fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
         eventScope = ModuleScope(logger, "EventManager", parentContext)
         initAllListeners()
     }
 
+    /**
+     * Initialize the queue of listener in priority order
+     *
+     * This method **IS NOT** thread-safe
+     */
     fun initAllListeners() {
         registeredListener.clear()
         registeredBlockListener.clear()

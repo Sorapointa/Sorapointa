@@ -58,7 +58,7 @@ class I18nTest {
     fun `fallback to global`() {
         val testGlobal = Locale.ITALIAN
 
-        I18nConfig.data = I18nConfig.Config(testGlobal)
+        I18nConfig.updateData { I18nConfig.Config(testGlobal) }
         I18nManager.registerLanguage(
             LanguagePack(
                 testGlobal,
@@ -75,7 +75,7 @@ class I18nTest {
     fun `fallback to default`() {
         val testGlobal = Locale.ITALIAN
 
-        I18nConfig.data = I18nConfig.Config(testGlobal)
+        I18nConfig.updateData { I18nConfig.Config(testGlobal) }
         I18nManager.registerLanguage(
             LanguagePack(
                 DEFAULT_LOCALE,

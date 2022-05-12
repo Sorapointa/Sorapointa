@@ -218,7 +218,7 @@ internal suspend inline fun <reified T> ApplicationCall.forwardCall(domain: Stri
     val url = "https://$domain${this.request.uri}"
     logger.debug { "Forwarding request from ${this.request.uri} to $url" }
     val idUrl = url + this.request.queryParameters.formUrlEncode()
-    return if (!forwardCache.containsKey(idUrl)) {
+    return forwardCache.getOrPut(idUrl) {
         val call = this
         val result: T = DispatchServer.client.request {
             url(url)
@@ -230,12 +230,9 @@ internal suspend inline fun <reified T> ApplicationCall.forwardCall(domain: Stri
                 if (s.contains(matchHeaders)) header(s, strings)
             }
         }.body()
-        forwardCache[idUrl] = result as Any
         logger.debug { "Forwarding result of $url is $result" }
         result
-    } else {
-        forwardCache[idUrl]!! as T
-    }
+    } as T
 }
 
 internal fun Application.configureThirdPartyAuth() {

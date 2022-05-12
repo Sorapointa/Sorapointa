@@ -38,7 +38,7 @@ class FileProviderTest {
         val config = AutoSaveFilePersist(file, TestConfig(), 5.toDuration(DurationUnit.SECONDS))
         config.init()
         println(config.data)
-        config.data = config.data.apply {
+        config.data.apply {
             test = "2222"
             foo = 1111
         }
