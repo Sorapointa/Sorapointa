@@ -2,7 +2,7 @@ name: Gradle Check
 
 on:
   push:
-    branches: [master]
+    branches: [ master ]
     paths:
       - '**.kt'
       - '**.kts'
@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest] # macos-latest, windows-latest
+        os: [ ubuntu-latest ] # macos-latest, windows-latest
 
     runs-on: ${{ matrix.os }}
 
@@ -41,4 +41,4 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: check
-          gradle-version: 7.4
+          gradle-version: 7.4.2

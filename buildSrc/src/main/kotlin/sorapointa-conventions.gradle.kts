@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
+    id("com.github.gmazzo.buildconfig")
     java
 }
 
@@ -39,6 +40,7 @@ sourceSets {
 }
 
 tasks.test {
+    dependsOn("generateTestBuildConfig")
     useJUnitPlatform()
 }
 
@@ -61,7 +63,7 @@ configurations {
 }
 
 tasks.register<Jar>("testArchive") {
-    archiveBaseName.set("ProjectA-test")
+    archiveBaseName.set("${project.name}-test")
     from(project.the<SourceSetContainer>()["test"].output)
 }
 

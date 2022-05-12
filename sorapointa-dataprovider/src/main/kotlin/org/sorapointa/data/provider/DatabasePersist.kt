@@ -1,64 +1,61 @@
 package org.sorapointa.data.provider
 
-import com.mongodb.ConnectionString
-import org.litote.kmongo.coroutine.CoroutineCollection
-import org.litote.kmongo.coroutine.CoroutineDatabase
-import org.litote.kmongo.coroutine.coroutine
-import org.litote.kmongo.reactivestreams.KMongo
-import org.sorapointa.utils.configDirectory
-import java.io.File
-import java.util.concurrent.ConcurrentHashMap
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
+import mu.KotlinLogging
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.transactions.TransactionManager
+import org.jetbrains.exposed.sql.transactions.transaction
 
-const val DEFAULT_DATABASE_NAME = "sorapointa"
+private val logger = KotlinLogging.logger {}
+
 object DatabaseManager {
+    val database: Database
+        get() = databaseInstance ?: error("Database instance is not prepared")
 
-    val connectionString
-        get() = ConnectionString(DatabaseConfig.data.databaseConnectionString)
+    private var databaseInstance: Database? = null
 
-    val defaultDatabaseName
-        get() = DatabaseConfig.data.defaultDatabaseName
+    /**
+     * load database, should be invoked before any table operations
+     *
+     * use config [DatabaseConfig]
+     */
+    fun loadDatabase(): Database {
+        val dbConfig = DatabaseConfig.data
+        val config = HikariConfig().apply {
+            jdbcUrl = dbConfig.connectionString
+            driverClassName = dbConfig.type.driverPath
+            username = dbConfig.user
+            password = dbConfig.password
+            maximumPoolSize = dbConfig.maxPoolSize
+            if (dbConfig.type == DatabaseType.SQLITE && dbConfig.maxPoolSize > 1) {
+                logger.warn { "You're using SQLite now but maxPoolSize is > 1," }
+                logger.warn { "it'll cause the dead lock of SQLite file," }
+                logger.warn { "and it doesn't support multi-connection operation." }
+            }
 
-    internal val mongoClient = KMongo.createClient(connectionString).coroutine
-
-    private val databaseMap = ConcurrentHashMap<String, CoroutineDatabase>()
-
-    fun getDatabase(name: String): CoroutineDatabase =
-        databaseMap.computeIfAbsent(name) {
-            mongoClient.getDatabase(name)
+            val processors = Runtime.getRuntime().availableProcessors()
+            if (dbConfig.maxPoolSize >= processors + 2) {
+                logger.warn { "Your core thread number is $processors but but maxPoolSize is ${dbConfig.maxPoolSize}" }
+                logger.warn { "Connection pool size question is not how big but rather how small!!!" }
+                logger.warn { "More information: https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing" }
+            }
         }
+        val dataSource = HikariDataSource(config)
+        val db = Database.connect(dataSource)
+        TransactionManager.manager.defaultIsolationLevel = dbConfig.isolationLevel
+        databaseInstance = db
+        return db
+    }
+
+    /**
+     * load tables and add missing schema for compatible
+     *
+     * should be invoked before table use
+     */
+    fun <T : Table> loadTables(vararg table: T) = transaction(database) {
+        SchemaUtils.createMissingTablesAndColumns(*table)
+    }
 }
-
-/**
- * @param C collections type
- * @param databaseName which database you'll use
- * @param collectionName optional, specify the collection name
- */
-@Suppress("FunctionName")
-inline fun <reified C : Any> DatabasePersist(
-    collectionName: String,
-    databaseName: String = DatabaseManager.defaultDatabaseName
-): DatabasePersist<C> {
-    val database = DatabaseManager.getDatabase(databaseName)
-    return DatabasePersist(
-        database = database,
-        data = database.getCollection(collectionName)
-    )
-}
-
-class DatabasePersist<C : Any>(
-    val database: CoroutineDatabase,
-    val data: CoroutineCollection<C>
-)
-
-internal object DatabaseConfig : DataFilePersist<DatabaseConfig.Data>(
-    File(configDirectory, "databaseConfig.json"), Data()
-) {
-    @kotlinx.serialization.Serializable
-    data class Data(
-        val databaseConnectionString: String = "mongodb://localhost",
-        val defaultDatabaseName: String = DEFAULT_DATABASE_NAME
-    )
-}
-
-suspend fun <T : Any> CoroutineCollection<T>.findOneOrInsertDefault(id: Any, default: T) =
-    findOneById(id) ?: default.also { insertOne(it) }

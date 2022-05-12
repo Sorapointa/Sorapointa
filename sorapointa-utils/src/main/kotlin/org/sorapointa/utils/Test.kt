@@ -3,15 +3,9 @@ package org.sorapointa.utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.annotations.TestOnly
+import org.sorapointa.config.IS_CI
 
-private val logger = mu.KotlinLogging.logger { }
-
-val isCI by lazy {
-    val ci = System.getenv("CI") != null
-    ci.also {
-        if (ci) logger.info { "Sorapointa run in CI" }
-    }
-}
+const val isCI = IS_CI
 
 enum class TestOption {
     SKIP_CI,
