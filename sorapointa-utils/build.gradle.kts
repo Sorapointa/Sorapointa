@@ -1,6 +1,5 @@
 plugins {
-    id("sorapointa-conventions")
-    id("com.github.gmazzo.buildconfig")
+    `sorapointa-conventions`
     kotlin("plugin.serialization")
 }
 
@@ -31,8 +30,4 @@ buildConfig {
     sourceSets["test"].apply {
         string("TEST_DIR", rootProject.rootDir.absolutePath.replace("\\", "/"))
     }
-}
-
-tasks.test {
-    dependsOn("generateTestBuildConfig")
 }

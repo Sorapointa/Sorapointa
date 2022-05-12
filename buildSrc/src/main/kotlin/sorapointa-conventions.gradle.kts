@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
+    id("com.github.gmazzo.buildconfig")
     java
 }
 
@@ -61,10 +62,14 @@ configurations {
 }
 
 tasks.register<Jar>("testArchive") {
-    archiveBaseName.set("ProjectA-test")
+    archiveBaseName.set("${project.name}-test")
     from(project.the<SourceSetContainer>()["test"].output)
 }
 
 artifacts {
     add("test", tasks["testArchive"])
+}
+
+tasks.test {
+    dependsOn("generateTestBuildConfig")
 }

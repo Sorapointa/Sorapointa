@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
 plugins {
     id("sorapointa-conventions")
-    id("com.github.gmazzo.buildconfig")
 }
 
 val props = getRootProjectLocalProps()
