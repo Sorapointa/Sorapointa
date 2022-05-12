@@ -9,7 +9,6 @@ import com.cronutils.parser.CronParser
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toKotlinInstant
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -65,15 +64,6 @@ fun Cron.lastExecutionTime(time: Instant = now()): Instant? {
     return executionTime.lastExecution(time.toZonedUtc()).unwrap()
         ?.toInstant()?.toKotlinInstant()
 }
-
-@JvmInline
-@Serializable
-value class CronWrapper(
-    @Serializable(CronSerializer::class)
-    val cron: Cron,
-)
-
-fun Cron.wrap() = CronWrapper(this)
 
 object CronSerializer : KSerializer<Cron> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Cron", PrimitiveKind.STRING)

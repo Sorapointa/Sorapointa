@@ -3,10 +3,7 @@ package org.sorapointa.task
 import com.cronutils.model.Cron
 import kotlinx.coroutines.*
 import mu.KotlinLogging
-import org.litote.kmongo.eq
-import org.litote.kmongo.setValue
-import org.sorapointa.data.provider.DatabasePersist
-import org.sorapointa.data.provider.findOneOrInsertDefault
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.sorapointa.utils.ModuleScope
 import org.sorapointa.utils.now
 import java.util.concurrent.ConcurrentHashMap
@@ -33,8 +30,6 @@ object TaskManager {
     fun close() {
         scope.cancel("Closing")
     }
-
-    internal val tasks = DatabasePersist<CronTask>("tasks").data
 
     /**
      * Register a task
@@ -101,17 +96,17 @@ object TaskManager {
         }
 
         return scope.launch {
-            val default by lazy { CronTask(id, cron.wrap()) }
-
-            val found = tasks.findOneOrInsertDefault(id, default)
-
-            if (found.cron.cron != cron) {
-                tasks.findOneAndReplace(CronTask::id eq id, default)
+            transaction {
+                val found = CronTask.findById(id) ?: CronTask.new(id) { this.cron = cron }
+                found.cron = cron
             }
 
             while (isActive) {
                 val beforeTime = now()
-                val taskData = tasks.findOneById(id) ?: error("Failed to get task data for id $id")
+                val taskData = transaction {
+                    CronTask.findById(id) ?: error("Failed to get task data for id $id")
+                }
+
                 delay(taskData.nextExecution(beforeTime) - beforeTime)
 
                 listOf(
@@ -119,9 +114,9 @@ object TaskManager {
                         task()
                     },
                     launch {
-                        tasks.findOneAndUpdate(
-                            CronTask::id eq id, setValue(CronTask::lastExecution, now())
-                        )
+                        transaction {
+                            taskData.lastExecution = now()
+                        }
                     }
                 ).joinAll()
             }
