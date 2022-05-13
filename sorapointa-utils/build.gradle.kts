@@ -28,6 +28,10 @@ buildConfig {
     boolean("IS_CI", isCI)
 
     sourceSets["test"].apply {
+        packageName("$group.config")
+        className("TestConfig")
+        useKotlinOutput { topLevelConstants = false }
+        useKotlinOutput()
         string("TEST_DIR", rootProject.rootDir.absolutePath.replace("\\", "/"))
     }
 }

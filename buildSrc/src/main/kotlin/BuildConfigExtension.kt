@@ -8,4 +8,8 @@ fun BuildConfigSourceSet.long(name: String, value: Long) = buildConfigField("lon
 fun BuildConfigSourceSet.longNullable(name: String, value: Long?) =
     buildConfigField("Long?", name, value?.let { "$value" } ?: "null")
 
+fun BuildConfigSourceSet.int(name: String, value: Int) = buildConfigField("int", name, value.toString())
+fun BuildConfigSourceSet.intNullable(name: String, value: Int?) =
+    buildConfigField("int", name, value?.let { "$value" } ?: "null")
+
 fun BuildConfigSourceSet.boolean(name: String, value: Boolean) = buildConfigField("boolean", name, value.toString())

@@ -43,19 +43,10 @@ fun BuildConfigSourceSet.dbType(name: String, value: String) =
 
 buildConfig {
     packageName("$group.config")
-    useKotlinOutput { topLevelConstants = true }
-    dbType("DEFAULT_DATABASE_TYPE", (defaultDatabaseType ?: databaseCompileList?.firstOrNull() ?: "SQLITE").toString())
-
-    sourceSets["test"].apply {
-        val provider: String = props["database.test.provider"] ?: "SQLITE"
-        val file = File(rootProject.projectDir, "tmp/test.db").apply {
-            parentFile?.mkdirs()
-        }
-        val connection: String = props["database.test.connection"]
-            ?: "jdbc:sqlite:${file.absolutePath}"
-
-        dbType("TEST_DATABASE_PROVIDER", provider)
-
-        string("TEST_CONNECTION", connection)
-    }
+    className("DbMeta")
+    useKotlinOutput()
+    dbType(
+        name = "DEFAULT_DATABASE_TYPE",
+        value = (defaultDatabaseType ?: databaseCompileList?.firstOrNull() ?: "SQLITE").toString()
+    )
 }

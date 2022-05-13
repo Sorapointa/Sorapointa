@@ -2,7 +2,7 @@ package org.sorapointa.data.provider
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.sorapointa.config.DEFAULT_DATABASE_TYPE
+import org.sorapointa.config.DbMeta
 import org.sorapointa.utils.absPath
 import org.sorapointa.utils.configDirectory
 import org.sorapointa.utils.resolveWorkDirectory
@@ -38,7 +38,7 @@ object DatabaseConfig : DataFilePersist<DatabaseConfig.Data>(
 ) {
     @Serializable
     data class Data(
-        val type: DatabaseType = DEFAULT_DATABASE_TYPE,
+        val type: DatabaseType = DbMeta.DEFAULT_DATABASE_TYPE,
         val connectionString: String = type.defaultConnectionString,
         val user: String = "",
         val password: String = "",
@@ -46,6 +46,7 @@ object DatabaseConfig : DataFilePersist<DatabaseConfig.Data>(
         @SerialName("isolationLevel")
         internal val _isolationLevel: String = type.defaultIsolationLevel,
     ) {
+        /* ktlint-disable max-line-length */
         val isolationLevel: Int
             get() = when (_isolationLevel) {
                 "NONE" -> TRANSACTION_NONE
@@ -53,7 +54,8 @@ object DatabaseConfig : DataFilePersist<DatabaseConfig.Data>(
                 "READ_COMMITTED" -> TRANSACTION_READ_COMMITTED
                 "REPEATABLE_READ" -> TRANSACTION_REPEATABLE_READ
                 "SERIALIZABLE" -> TRANSACTION_SERIALIZABLE
-                else -> error("No such field '$_isolationLevel', 'SERIALIZABLE' is default value")
+                else -> error("No such field '$_isolationLevel', '${type.defaultIsolationLevel}' is default value for $type")
             }
+        /* ktlint-enable max-line-length */
     }
 }

@@ -17,7 +17,7 @@ val globalWorkDirectory by lazy {
 
 private val testDir by lazy {
     runCatching {
-        Class.forName("org.sorapointa.config.TestBuildConfigKt")
+        Class.forName("org.sorapointa.config.TestConfig")
             .getDeclaredField("TEST_DIR")
             .get(null) as String
     }.getOrNull()
