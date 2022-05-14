@@ -1,5 +1,7 @@
 # Kotlin AtomicFU Guideline
 
+[简体中文](kotlin-atomicfu.zh-CN.md)
+
 ## Setup
 
 ```kotlin
@@ -42,7 +44,7 @@ Should be:
 ```kotlin
 val atomicInt = atomic(123)
 atomicInt.compareAndSet(expect = 1, update = 1000)
-// 或... 使用高阶函数
+// or... using high-order function
 atomicInt.getAndUpdate { if (it == 1) 1000 else it }
 ```
 

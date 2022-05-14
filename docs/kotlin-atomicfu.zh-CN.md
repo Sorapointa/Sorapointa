@@ -1,5 +1,7 @@
 # Kotlin AtomicFU 使用指南
 
+[English](kotlin-atomicfu.md)
+
 ## Setup
 
 ```kotlin
