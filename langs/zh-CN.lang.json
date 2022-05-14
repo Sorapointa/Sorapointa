@@ -11,7 +11,7 @@
     "sora.cmd.help.arg.pagenum.exceed": "页码超出总页数.",
     "sora.cmd.help.opt.pagesize.desc": "每页的大小",
     "sora.cmd.help.msg.page": "===== 第 {0} / {1} 页 =====\n",
-    "sora.cmd.help.msg.more": "使用 \"具体命令 -h\" 来获得更多详情.",
+    "sora.cmd.help.msg.more": "使用 \"<命令> -h\" 来获得更多详情.",
     "sora.cmd.help.msg.emptydesc": "暂无简介",
     "sora.cmd.quit.desc": "退出 Sorapointa 程序",
     "clikt.aborted": "中断!",

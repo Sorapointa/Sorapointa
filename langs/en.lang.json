@@ -11,7 +11,7 @@
     "sora.cmd.help.arg.pagenum.exceed": "The page number exceeds the total number of pages.",
     "sora.cmd.help.opt.pagesize.desc": "Page size",
     "sora.cmd.help.msg.page": "===== Page {0} / {1} =====\n",
-    "sora.cmd.help.msg.more": "Use \"command -h\" to get more detail.",
+    "sora.cmd.help.msg.more": "Use \"<command> -h\" for more details",
     "sora.cmd.help.msg.emptydesc": "No description available",
     "sora.cmd.quit.desc": "Quit Sorapointa program",
     "clikt.aborted": "Aborted!",
