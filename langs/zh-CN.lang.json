@@ -75,6 +75,11 @@
     "clikt.title.commands": "命令:",
     "clikt.help.tag.default": "默认",
     "clikt.help.tag.required": "必须的",
-    "clikt.help.option.message": "显示帮助"
+    "clikt.help.option.message": "显示帮助",
+    "dispatch.login.error.split": "请使用 `#` 在用户名输入框中分割您的帐号和密码",
+    "dispatch.login.error.password": "用户名或密码错误",
+    "dispatch.login.error.user.notfound": "找不到用户",
+    "dispatch.login.error.token": "调度服务器认证失败",
+    "dispatch.login.error.sign": "Combo 签名错误"
   }
 }

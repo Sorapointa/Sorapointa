@@ -9,16 +9,6 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import org.sorapointa.utils.now
 
-// @Serializable
-// data class CronTask(
-//    @SerialName("_id")
-//    val id: String,
-//    val cron: CronWrapper,
-//    val lastExecution: Instant? = null,
-// ) {
-
-// }
-
 object CronTasks : IdTable<String>("cron_tasks") {
     override val id = varchar("id", 128).entityId()
 

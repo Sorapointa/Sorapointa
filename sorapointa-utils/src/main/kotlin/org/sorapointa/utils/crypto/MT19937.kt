@@ -1,4 +1,6 @@
-package org.sorapointa.utils
+package org.sorapointa.utils.crypto
+
+import org.sorapointa.utils.toByteArray
 
 /**
  * MT19937 Mersenne Twister Random Generator
