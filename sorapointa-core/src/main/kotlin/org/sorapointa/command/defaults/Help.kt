@@ -12,7 +12,7 @@ import org.sorapointa.command.CommandManager
 import org.sorapointa.command.CommandSender
 import org.sorapointa.utils.i18n
 
-class Help(override val sender: CommandSender) : Command(Help) {
+class Help(private val sender: CommandSender) : Command(sender, Help) {
     companion object : Entry(
         name = "help",
         help = "",
@@ -50,7 +50,7 @@ class Help(override val sender: CommandSender) : Command(Help) {
                     append(it.name.padEnd(maxLen, ' '))
                     append(" >> ")
                     if (it.help.isNotBlank()) {
-                        append(it.help)
+                        append(it.help.i18n())
                     } else append("sora.cmd.help.msg.emptydesc".i18n(locale = sender))
                     appendLine()
                 }

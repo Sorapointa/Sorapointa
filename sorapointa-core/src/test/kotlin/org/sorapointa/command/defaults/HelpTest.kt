@@ -35,7 +35,7 @@ class HelpTest {
         help = "abcdefghijklmnopqrstuvwxyz".toList().shuffled().subList(0, (0..5).random()).joinToString("")
     )
 
-    class TestCommand(override val sender: CommandSender, private val entry: Entry) : Command(entry) {
+    class TestCommand(sender: CommandSender, private val entry: Entry) : Command(sender, entry) {
         override suspend fun run() {
             println("${entry.name} run!")
         }
