@@ -13,7 +13,7 @@ If you must share mutable data,
 use a thread-safe data structure such as Atomic, 
 Sorapointa has already used the AtomicFU framework.
 
-About AtmoicFU，please refers to [AtomicFU Guideline](docs/kotlin-atomicfu.md)
+About AtmoicFU，please refers to [AtomicFU Guideline](kotlin-atomicfu.md)
 
 But for collections, 
 we usually use `ConcurrentHashMap` or some similar thread-safe data structures
@@ -49,7 +49,7 @@ Refers to [Shared Mutable State](https://kotlinlang.org/docs/shared-mutable-stat
 For every object, if any properties is variable
 and will be access by multiple threads, you have to use Atomic.
 You cannot leak the atomic reference to public,
-and must use the provided udpate functions.
+and must use the provided update functions.
 
 If there are any methods in the object that use Atomic objects,
 ensure that every operation accesses it
