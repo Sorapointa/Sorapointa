@@ -1,6 +1,7 @@
 {
   "locale": "zh-CN",
   "strings": {
+    "": "",
     "sora.cmd.manager.alias": "\n\n别名: {0}",
     "sora.cmd.manager.no.permission": "没有权限.",
     "sora.cmd.manager.invoke.empty": "未输入命令",
@@ -12,6 +13,7 @@
     "sora.cmd.help.msg.page": "===== 第 {0} / {1} 页 =====\n",
     "sora.cmd.help.msg.more": "使用 \"具体命令 -h\" 来获得更多详情.",
     "sora.cmd.help.msg.emptydesc": "暂无简介",
+    "sora.cmd.quit.desc": "退出 Sorapointa 程序",
     "clikt.aborted": "中断!",
     "clikt.usage.error": "错误: {0}",
     "clikt.bad.parameter": "无效值",
