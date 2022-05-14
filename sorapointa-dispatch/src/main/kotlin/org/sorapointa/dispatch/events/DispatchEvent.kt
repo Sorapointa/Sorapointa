@@ -19,7 +19,7 @@ abstract class DispatchDataEvent<T> : DispatchEvent() {
 
 class CreateAccountEvent(
     val username: String
-): AbstractEvent()
+) : AbstractEvent()
 
 class ComboTokenResponseEvent(
     override val call: ApplicationCall,
