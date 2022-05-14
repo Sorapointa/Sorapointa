@@ -1,47 +1,89 @@
-# 贡献指南
+# Contributing Guideline
 
-[English](CONTRIBUTING.en.md)
+[简体中文](CONTRIBUTING.zh-CN.md)
 
-## 代码风格
+## Code Style
 
-- Kotlin 官方代码风格 - [中文站参考](https://www.kotlincn.net/docs/reference/coding-conventions.html)
-- 缩进 4 空格
-- 可以使用 `*` 导入
+- [Kotlin Official Code Style](https://kotlinlang.org/docs/coding-conventions.html)
+- Indent is 4 spaces, the `.editorconfig` in our project will help your IDE to automatically set it
+- Star import is allowed
+- We require **all PRs to pass the `ktlint` check** before they merge into the active branch
+- We recommended you to format your code using `Ktlint` before committing. 
+You can install [Ktlint](https://ktlint.github.io/) first then run `format.sh` in project root path.
 
-建议在 commit 前使用 `Ktlint` 格式化代码。可安装 Ktlint 后运行根目录 `format.sh`。
+## Git
 
-## Git 规范
+### Branch
 
-### Commit 规范
+- **Active branch** refers to the `dev`, the development branch
+- All commits or changes that want to merge into the **active branch**
+will be required to submit PR and pass all CI check.
 
-- commit 消息用英语
-- 短消息格式满足：`类型(作用域): 消息`，例如 `feat(network): impl KCP protocol`
-  - `类型` 字段无论用缩写或全称都可行。
-- 用 `#issue 编号` 提及相关的 issue，便于跟踪
+### Push
 
-  可以使用 IDEA Git Message 插件自动生成
+- If you want to submit your commits or changes into **active branch**,
+you **must submit those through PR** and **pass all CI check**.
+
+### Merge Branch
+
+- Please **don't** pull any upstream updates when you open a new branch (or fork), 
+which are used for submitting your changes or commits, 
+except those updates are required for your changes or commits.
+Even though, you need to update your branch following [this rule](#incompatible-changes-and-sync-upstream-updates)
+- You must turn on the `rebase` option to pull upstream updates
+  - It shouldn't occur any conflicts, except you had pulled upstream updates after your committed your own code.
+- Merge PR with different methods determined by different situations
+  - If the PR contains big changes, we often merge it into active branch with `merge` or `squash`
+  - If the PR contains small changes, we often merge it into active branch with `rebase`
+
+### Incompatible Changes and Sync Upstream Updates
+
+- Please **don't** pull any upstream updates when you open a new branch (or fork), 
+but if these updates are necessary for you, please follow this process.
+  - Create a new branch `xxx_update` from the current latest upstream branch to the local
+  - Merge your commits into the `xxx_update` branch 
+  through `rebase`(if there are no conflicts) or `cherrypick`
+  - Resolve all conflicts and fix all compatibility errors
+  - Submit PR to make `xxx_update` merge into active branch
+- When you have made any incompatibility changes,
+please follow the same process as above and make a new branch, like `xxx_premerge`, 
+with all incompatibility issues fixed
+  - Note: If there are other PRs or branches that are also affected by your incompatible update, 
+  set the merge target of the other PRs to `xxx_premerge`, which is equivalent to a staging branch
+  - When all affected PRs or branches have been merged into `xxx_premerge` 
+  and all compatibility issues have been fixed, 
+  submit a PR to make it merge into the active branch
+
+### Commit
+
+- Write commit messages in English
+- Short message template: `type(scope): message`. For example, `feat(network): impl KCP protocol`
+  - For `type` field, abbreviated and qualified name are both acceptable.
+- Use `#issue_number` to mention related issue for easy tracking
+
+  You can use IDEA Git Message Plugin to generate messages automatically.
 
   [![](https://user-images.githubusercontent.com/25319400/165979933-7481d332-9171-4ee1-8d37-078187f152a0.png)](https://plugins.jetbrains.com/plugin/13477-git-commit-message-helper)
 
-  另可参考：[Commit Message 和 Change Log 编写指南](https://www.ruanyifeng.com/blog/2016/01/commit_message_change_log.html)
+  For reference: [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 
-### Push 规范
 
-所有涉及代码的 commit 都应该交 PR。
+## Unit Test (Recommended)
 
-有 write 权限的可在主分支另开 branch，无则 fork 即可。
+Please write unit tests to ensure the reliability of the code.
 
-- 在能 rebase 的时候绝不要用 merge
-- commit 过多时考虑 squash
+If your code fails the unit test, you will not pass code review.
 
-可参考：[Git 使用规范流程](https://www.ruanyifeng.com/blog/2015/08/git-use-process.html)
 
-## 单元测试(建议)
+## Concurrent Safety
 
-尽量写单测保证代码可靠性。
+Please check [Kotlin AtomicFU Guideline](docs/kotlin-atomicfu.md) and [Concurrent Safety](docs/concurrency.md)
 
-同时如果你的代码使得单测失败，是无法通过 code review 的。
+## Database Operation Safety
 
-## 其他…
+Please check [Database Operation Safety](docs/database.md)
 
-请查看 [docs](docs) 
+
+## More...
+
+See [docs](docs)

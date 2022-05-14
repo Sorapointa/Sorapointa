@@ -1,30 +1,32 @@
-# Event Module
+# 事件模块
 
-## Included Config
+## 事件模块包括的配置
 
-Following config must be load at program start, like `EventManagerConfig.reload()`:
+以下配置必须在程序启动时加载，如 `EventManagerConfig.reload()`:
 
 - `EventManagerConfig`
 
-## Initialize
+## 初始化
 
-- `EventManager.init()` should be called at program start to initialize the queue of listener in priority order, and destination channel
+- `EventManager.init()` should be called at program start to 
+initialize the queue of listener in priority order, 
+and set its parent scope to ensure structured concurrency.
 
-## Usage
+## 用法
 
-### Register Listener
+### 注册监听器
 
-All registered listeners will be called **in parallel**.
-Setting `cancel` or `interrupt` in this type of listener is meaningless.
+所有通过 `registerEventListener` 方法注册的监听器都会被并发平行调用，
+在这种监听器中设置 `cancel` 或者 `interrupt`，是无意义的。
 
-- Listen to all type of events 
+- 监听所有事件
 
 ```kotlin
 EventManager.registerEventListener { event ->
     // do something..
 }
 
-// --- Method Signature ---
+// --- 方法签名 ---
 
 /**
  * Register a parallel listener
@@ -41,14 +43,14 @@ fun registerEventListener(
 )
 ```
 
-- Listen to specific type of events
+- 监听特殊的一类事件
 
 ```kotlin
 EventManager.registerListener<SomeEvent> { event ->
     // do something..
 }
 
-// --- Method Signature ---
+// --- 方法签名 ---
 
 /**
  * Register a parallel listener
@@ -67,19 +69,19 @@ inline fun <reified T : Event> registerListener(
 )
 ```
 
-### Register Block Listener
+### 注册阻塞监听器
 
-All registered listeners will be called **in serial**.
-It is only effective to set `cancel` or `interrupt` in this type of listener.
+所有通过 `registerBlockEventListener` 方法注册的监听器都会被串行阻塞调用，
+在这种监听器中设置 `cancel` 或者 `interrupt` 才是有效的。
 
-- Listen to all type of events
+- 监听所有事件
 
 ```kotlin
 EventManager.registerBlockEventListener { event ->
     // do something..
 }
 
-// --- Method Signature ---
+// --- 方法签名 ---
 
 /**
  * Register a block listener
@@ -96,14 +98,14 @@ fun registerBlockEventListener(
 )
 ```
 
-- Listen to specific type of events
+- 监听特殊的一类事件
 
 ```kotlin
 EventManager.registerBlockListener<SomeEvent> { event ->
     // do something..
 }
 
-// --- Method Signature ---
+// --- 方法签名 ---
 
 /**
  * Register a block listener
@@ -122,7 +124,7 @@ inline fun <reified T : Event> registerBlockListener(
 )
 ```
 
-### Get Event Flow
+### 获取事件流
 
 ```kotlin
 
@@ -131,7 +133,7 @@ EventManager.getEventFlow()
         // do something...
     }
 
-// --- Method Signature ---
+// --- 方法签名 ---
 
 /**
  * Get original event flow from broadcasting
@@ -147,7 +149,7 @@ fun getEventFlow(
 ): Flow<Event>
 ```
 
-### Broadcast Event
+### 广播事件
 
 ```kotlin
 val isCancelled = EventManager.broadcastEvent(someEvent)
@@ -157,7 +159,7 @@ if (!isCancelled) {
     // do something else...
 }
 
-// --- Quick Way ---
+// --- 更方便的拓展方法 ---
 
 someEvent.broadcast() // if `someEvent` is not `Cancellable`
 
@@ -178,7 +180,7 @@ someEvent.broadcastEvent(
   }
 )
 
-// --- Method Signature ---
+// --- 方法签名 ---
 
 /**
  * Broadcast event, and return the cancel state of this event
@@ -189,7 +191,7 @@ someEvent.broadcastEvent(
 suspend fun broadcastEvent(event: Event): Boolean
 ```
 
-## Broadcast Path
+## 事件的广播路径
 
 ![Snipaste_2022-05-06_15-46-22](https://user-images.githubusercontent.com/25319400/167162147-a9302a06-8aa6-4d60-a568-147dcb9c7586.png)
 

@@ -1,4 +1,6 @@
-# Kotlin AtomicFU 使用指南
+# Kotlin AtomicFU Guideline
+
+[简体中文](kotlin-atomicfu.zh-CN.md)
 
 ## Setup
 
@@ -8,25 +10,28 @@ dependencies {
 }
 ```
 
-## 用法
+## Usage
 
 ```kotlin
 val atomicInt = atomic(123)
-atomicInt.value // 读
-atomicInt.value = 1234 // 写
+atomicInt.value // read
+atomicInt.value = 1234 // write
 ```
 
-必须确保所有的操作都是原子的。亦即只能通过 `atomicfu` 已经提供的方法操作。
+Must ensure all operations are atomic. You can only operate value with provided methods.
 
-如果只需要读/写操作，可以使用代理：
+If you only need read and write operation, use kotlin delegation:
 
 ```kotlin
 var delegatedAtomic by atomic(1231)
-delegatedAtomic // 读
-delegatedAtomic = 123 // 写
+delegatedAtomic // read
+delegatedAtomic = 123 // write
 ```
 
-**但切记只能通过 `atomicfu` 已经提供的方法操作，原子性需要小心维护，以下的写法是完全错误的：**
+**BUT, please use the methods `atomicfu` provided only. Atomicity requires careful maintenance. The snippet below
+is completely wrong:**
+
+**Multiple atomic methods cannot be combined, combining atomic methods will lose atomicity**
 
 ```kotlin
 var delegatedAtomic by atomic(123)
@@ -34,40 +39,42 @@ var delegatedAtomic by atomic(123)
 if (delegatedAtomic == 1) delegatedAtomic = 1000
 ```
 
-正确的写法：
+Should be:
 
 ```kotlin
 val atomicInt = atomic(123)
 atomicInt.compareAndSet(expect = 1, update = 1000)
-// 或... 使用高阶函数
+// or... using high-order function
 atomicInt.getAndUpdate { if (it == 1) 1000 else it }
 ```
 
-无需加锁的函数式写法：
+Idiomatic lock-free methods:
 
 ```kotlin
 fun push(v: Value) = top.update { cur -> Node(v, cur) }
 fun pop(): Value? = top.getAndUpdate { cur -> cur?.next }?.value
 ```
 
-`Int` 和 `Long` 也有 `getAndIncrement`, `incrementAndGet`, `getAndAdd`, `addAndGet` 方法，以及对 `+=` `-=` 的操作符重载。
+Int and Long atomics provide all the usual `getAndIncrement`, `incrementAndGet`, `getAndAdd`, `addAndGet`, etc. They can
+be also atomically modified via `+=` and `-=` operators.
 
-## 注意事项
+## Notice
 
-### 避免使用未提供的操作
+### Avoid using unprovided API
 
-再次强调，原子性并不凭空产生。你需要使用已经提供的原子性 API。
+Notice again, atomicity needs careful maintenance. You must use provided API.
 
-- 不要使用局部变量存储 atomic 变量的引用
-- 不要使用复杂的表达式，任何有分支的语句都会造成问题，需要时请使用诸如 `atomicValue.update` 的方法。
+- Do not read references on atomic variables into local variables
+- Do not introduce complex data flow in parameters to atomic variable operations, please use function
+  like `atomicValue.update` instead
 
-### 隐藏内部实现
+### Hide internal implementation
 
-如你所见，维护线程安全并不容易，所以不要向外泄漏引用。
+As you can see, it's hard to maintenance thread-safe, so do not leak reference to other modules.
 
-需要向外公开API时，请像这样：
+Use the following convention if you need to expose the value of atomic property to the public:
 
 ```kotlin
-private val _foo = atomic(100) // 内部原子变量，以 _ 开头
-public var foo: Int by _foo    // 公开代理属性 (val/var)
+private val _foo = atomic(100) // private atomic, starts with underscore
+public var foo: Int by _foo    // public delegated property (val/var)
 ```

@@ -19,9 +19,14 @@ fun registerLanguage(languagePack: LanguagePack)
 
 // Register language pack from file
 suspend fun registerLanguage(languageFile: File)
-```
 
-Core can load file from resource
+// Register language pack from directory
+suspend fun registerLanguagesDirectory(
+  directory: File,
+  match: Regex = languageFileRegex,
+  depth: Int = 1,
+)
+```
 
 ### Render
 
@@ -39,7 +44,7 @@ Use in code:
 "samples.hello".i18n()
 ```
 
-Add key and value to language pack json:
+Add key and value to language pack JSON:
 
 ```json
 {
@@ -58,7 +63,7 @@ Code:
 "samples.hello.var".i18n(time, name)
 ```
 
-Json:
+JSON:
 
 ```json
 {
