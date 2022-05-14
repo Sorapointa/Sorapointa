@@ -75,6 +75,13 @@
     "clikt.title.commands": "Commands:",
     "clikt.help.tag.default": "default",
     "clikt.help.tag.required": "required",
-    "clikt.help.option.message": "Show this message and exit"
+    "clikt.help.option.message": "Show this message and exit",
+    "dispatch.login.error.split": "Please use `#` to split your username and password in the username input field",
+    "dispatch.login.error.length.name": "Input name length should be 3-16 characters",
+    "dispatch.login.error.length.password": "Input password length should be 8-32 characters",
+    "dispatch.login.error.password": "Username or password is incorrect",
+    "dispatch.login.error.user.notfound": "User not found",
+    "dispatch.login.error.token": "Dispatch token exchange failed",
+    "dispatch.login.error.sign": "Combo sign is incorrect"
   }
 }

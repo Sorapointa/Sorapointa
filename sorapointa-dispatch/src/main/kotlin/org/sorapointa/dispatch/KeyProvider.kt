@@ -1,6 +1,7 @@
 package org.sorapointa.dispatch
 
 import io.ktor.network.tls.extensions.*
+import io.ktor.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -13,6 +14,7 @@ import org.sorapointa.utils.isJUnitTest
 import java.io.File
 import java.security.KeyStore
 import java.util.*
+import kotlin.text.toCharArray
 
 private val logger = KotlinLogging.logger {}
 
@@ -24,9 +26,13 @@ object KeyProvider {
     const val DEFAULT_KEY_STORE_PASSWORD = "sorapointa-dispatch"
     const val DEFAULT_EXPIRED_DAYS = 365 * 10L // 10 Years
 
+    private val ANIME_URL_1 = "Ki5taWhveW8uY29t".decodeBase64String()
+    private val ANIME_URL_2 = "Ki55dWFuc2hlbi5jb20=".decodeBase64String()
+    private val ANIME_URL_3 = "Ki5ob3lvdmVyc2UuY29t".decodeBase64String()
+
     fun getCerts(): KeyStore = runBlocking {
         val dispatchConfig = DispatchConfig.data
-        val keyStoreFile = File(dispatchConfig.certificationConfig.keyStoreFilePath)
+        val keyStoreFile = File(dispatchConfig.certification.keyStoreFilePath)
         if (!keyStoreFile.exists()) {
             logger.info { "Input alias for certification or set default $DEFAULT_ALIAS" }
             val alias: String = DEFAULT_ALIAS.waitInputOrDefault()
@@ -43,7 +49,7 @@ object KeyProvider {
                     keySizeInBits = 2048
                     password = privateKeyPassword
                     daysValid = expiredDays
-                    hosts = listOf("localhost", "*.mihoyo.com", "*.yuanshen.com", "*.hoyoverse.com")
+                    hosts = listOf("localhost", ANIME_URL_1, ANIME_URL_2, ANIME_URL_3)
                     keyType = KeyType.Server
                 }
             }
@@ -51,7 +57,7 @@ object KeyProvider {
             generatedKeyStore.saveCertToFile(
                 File(keyStoreFile.parentFile, keyStoreFile.nameWithoutExtension + ".cert"), alias
             )
-            dispatchConfig.certificationConfig = DispatchConfig.Certification(
+            dispatchConfig.certification = DispatchConfig.Certification(
                 keyStore = "JKS",
                 keyAlias = alias,
                 keyStorePassword = keyStorePassword,
@@ -61,7 +67,7 @@ object KeyProvider {
             return@runBlocking generatedKeyStore
         } else {
             withContext(Dispatchers.IO) {
-                fromCertFile(keyStoreFile, dispatchConfig.certificationConfig.keyStorePassword)
+                fromCertFile(keyStoreFile, dispatchConfig.certification.keyStorePassword)
             }
         }
     }
