@@ -77,7 +77,7 @@ If your code fails the unit test, you will not pass code review.
 
 ## Concurrent Safety
 
-Please check [Kotlin AtomicFU Guideline](docs/kotlin-atomicfu.md) 以及 [Concurrent Safety](docs/concurrency.md)
+Please check [Kotlin AtomicFU Guideline](docs/kotlin-atomicfu.md) and [Concurrent Safety](docs/concurrency.md)
 
 ## Database Operation Safety
 
