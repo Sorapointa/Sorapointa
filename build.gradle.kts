@@ -1,5 +1,6 @@
 plugins {
     kotlin("plugin.serialization") apply false
+    id("org.jetbrains.kotlinx.binary-compatibility-validator")
 }
 
 if (JavaVersion.current() != JavaVersion.VERSION_17) {

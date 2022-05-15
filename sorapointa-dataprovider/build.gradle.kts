@@ -21,7 +21,7 @@ dependencies {
     api("org.jetbrains.exposed:exposed-dao:_")
     api("org.jetbrains.exposed:exposed-jdbc:_")
     api("org.jetbrains.exposed:exposed-kotlin-datetime:_")
-    implementation("com.zaxxer:HikariCP:3.4.2")
+    implementation("com.zaxxer:HikariCP:_")
 
     val databaseCompileList =
         databaseCompileList?.split(',')
