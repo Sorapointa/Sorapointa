@@ -29,9 +29,6 @@ object EventManager {
 
     private val registeredListener = ConcurrentLinkedQueue<PriorityEntry>()
     private val registeredBlockListener = ConcurrentLinkedQueue<PriorityBlockEntry>()
-//    private val destinationChannel = ConcurrentHashMap<EventPriority, Channel<Event>>()
-
-//    private val listeners = ConcurrentLinkedQueue<Job>()
 
     private val blockListenerTimeout
         get() = EventManagerConfig.data.blockListenerTimeout
@@ -185,43 +182,6 @@ object EventManager {
     }
 
     /**
-     * Broadcast event in a quick way
-     * @param ifNotCancel lambda block with the action if broadcasted event has **NOT** been cancelled
-     */
-    suspend inline fun <T : Event> T.broadcastEvent(ifNotCancel: (T) -> Unit) {
-        val isCancelled = broadcastEvent(this)
-        if (!isCancelled) ifNotCancel(this)
-    }
-
-    /**
-     * Broadcast event in a quick way
-     * @param ifCancelled lambda block with the action if broadcasted event has been cancelled
-     */
-    suspend inline fun <T : Event> T.broadcastEventIfCancelled(ifCancelled: (T) -> Unit) {
-        val isCancelled = broadcastEvent(this)
-        if (isCancelled) ifCancelled(this)
-    }
-
-    /**
-     * Broadcast event in a quick way
-     * @param ifNotCancel lambda block with the action if broadcasted event has **NOT** been cancelled
-     */
-    suspend inline fun <T : Event> T.broadcastEvent(
-        ifNotCancel: (T) -> Unit,
-        ifCancelled: (T) -> Unit
-    ) {
-        val isCancelled = broadcastEvent(this)
-        if (!isCancelled) ifNotCancel(this) else ifCancelled(this)
-    }
-
-    /**
-     * Broadcast event in quick way
-     */
-    suspend inline fun <T : Event> T.broadcast() {
-        broadcastEvent(this)
-    }
-
-    /**
      * Initialize the queue of listener in priority order
      * and coroutine context for structured concurrency
      *
@@ -252,6 +212,44 @@ object EventManager {
 
     private fun getInitChannel() = Channel<Event>(64)
 }
+
+/**
+ * Broadcast event in a quick way
+ * @param ifNotCancel lambda block with the action if broadcasted event has **NOT** been cancelled
+ */
+suspend inline fun <T : Event> T.broadcastEvent(ifNotCancel: (T) -> Unit) {
+    val isCancelled = EventManager.broadcastEvent(this)
+    if (!isCancelled) ifNotCancel(this)
+}
+
+/**
+ * Broadcast event in a quick way
+ * @param ifCancelled lambda block with the action if broadcasted event has been cancelled
+ */
+suspend inline fun <T : Event> T.broadcastEventIfCancelled(ifCancelled: (T) -> Unit) {
+    val isCancelled = EventManager.broadcastEvent(this)
+    if (isCancelled) ifCancelled(this)
+}
+
+/**
+ * Broadcast event in a quick way
+ * @param ifNotCancel lambda block with the action if broadcasted event has **NOT** been cancelled
+ */
+suspend inline fun <T : Event> T.broadcastEvent(
+    ifNotCancel: (T) -> Unit,
+    ifCancelled: (T) -> Unit
+) {
+    val isCancelled = EventManager.broadcastEvent(this)
+    if (!isCancelled) ifNotCancel(this) else ifCancelled(this)
+}
+
+/**
+ * Broadcast event in quick way
+ */
+suspend inline fun <T : Event> T.broadcast() {
+    EventManager.broadcastEvent(this)
+}
+
 
 object EventManagerConfig : DataFilePersist<EventManagerConfig.Data>(
     File(configDirectory, "eventManagerConfig.json"), Data()
