@@ -15,7 +15,8 @@ import org.sorapointa.dispatch.DispatchServer
 import org.sorapointa.dispatch.data.*
 import org.sorapointa.dispatch.events.*
 import org.sorapointa.dispatch.util.getAndPost
-import org.sorapointa.event.EventManager.broadcastEvent
+import org.sorapointa.event.broadcastEvent
+import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.i18n
 import java.util.concurrent.ConcurrentHashMap
 
@@ -354,6 +355,7 @@ internal suspend inline fun <reified T : Any> ApplicationCall.forwardCallWithAll
     }
 }
 
+@OptIn(SorapointaInternal::class)
 internal suspend inline fun <reified T> ApplicationCall.forwardCall(domain: String): T {
     val url = "https://$domain${this.request.uri}"
     logger.debug { "Forwarding request from ${this.request.uri} to $url" }
