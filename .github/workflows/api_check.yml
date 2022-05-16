@@ -1,0 +1,40 @@
+name: API Check
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - '**.kt'
+      - '**.kts'
+      - '**.proto'
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - '**.kt'
+      - '**.kts'
+      - '**.proto'
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup protoc
+        uses: arduino/setup-protoc@v1.1.2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      - name: Check
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: apiCheck
+          gradle-version: 7.4.2
