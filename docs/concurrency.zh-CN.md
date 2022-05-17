@@ -47,7 +47,7 @@ if (!map.containsKey(123)) {
 ## 对于线程安全的要求
 
 对能简单修复的线程安全问题尽量予以修复，比如 使用 `atomic` 代理，
-使用 `ConcurrencyHashMap` 以及其内置的其他原子方法，
+使用 `ConcurrentHashMap` 以及其内置的其他原子方法，
 如果内置的所有原子方法已经不足以满足你的需求，可以尝试使用简单的 `Mutex`
 
 但是在使用 `Mutex` 或更复杂的线程安全机制前， 
@@ -64,5 +64,13 @@ if (!map.containsKey(123)) {
 在 Sorapointa 中，我们使用了 `ModuleScope` 以确保正确建立协程之间的任务结构
 
 你可以参照 `TaskManager`，`EventManager` 等，写出合作式的代码
+
+通常情况下，请不要实现 `CoroutineScope` 接口以实现结构化并发，也不要往 `launch` 方法中添加上下文。
+具体原因可以参考，[Kotlin CoroutineScope 文档](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/)，
+[为什么你不应该实现 CoroutineScope 接口](https://proandroiddev.com/why-your-class-probably-shouldnt-implement-coroutinescope-eb34f722e510)，
+[结构化并发周年庆 - Roman Elizarov](https://elizarov.medium.com/structured-concurrency-anniversary-f2cc748b2401)，
+[CoroutineScope 的 Legacy Convention](https://maxkim.eu/things-every-kotlin-developer-should-know-about-coroutines-part-2-coroutinescope)
+
+简而言之，这是一种过时了的方法。
 
 了解更多，关于 [结构化并发](https://kotlinlang.org/docs/composing-suspending-functions.html#structured-concurrency-with-async)
