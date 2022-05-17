@@ -1,10 +1,13 @@
 package org.sorapointa.dispatch
 
 import com.google.protobuf.ByteString
+import com.google.protobuf.kotlin.toByteString
 import com.password4j.types.Argon2
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -36,6 +39,7 @@ import org.sorapointa.utils.encoding.hex
 import java.io.File
 import kotlin.text.toCharArray
 
+@OptIn(SorapointaInternal::class)
 internal fun main(): Unit = runBlocking {
     DispatchServer.startDispatch(isIndependent = true)
 }
@@ -83,6 +87,7 @@ object DispatchServer {
         }
     }
 
+    @SorapointaInternal
     suspend fun startDispatch(isIndependent: Boolean = false) {
         DispatchConfig.init()
         if (isIndependent) {
@@ -98,6 +103,7 @@ object DispatchServer {
     }
 
     // TODO: inline as a member variable and store it in memory
+    @SorapointaInternal
     suspend fun getQueryRegionListHttpRsp(): QueryRegionListHttpRsp {
         val serverList = DispatchConfig.data.servers.map {
             regionSimpleInfo {
@@ -116,40 +122,31 @@ object DispatchServer {
                 regionList.addAll(serverList)
                 clientSecretKey = ByteString.copyFrom(dispatchSeed)
                 enableLoginPc = true
-                clientCustomConfigEncrypted = ByteString.copyFrom(
-                    networkJson.encodeToString(
-                        RegionListClientCustomConfig(
-                            sdkEnvironment = 2u,
-                            showException = false,
-                            loadPatch = false,
-                            regionConfig = "",
-                            regionDispatchType = 0u,
-                            videoKey = 5578228838233776,
-                            downloadMode = 0u
-                        )
-                    ).toByteArray().xor(dispatchKey)
-                )
+                clientCustomConfigEncrypted = networkJson.encodeToString(
+                    // TODO: Extract to be the event and config
+                    RegionListClientCustomConfig(
+                        sdkEnvironment = 2u,
+                        showException = false,
+                        loadPatch = false,
+                        regionConfig = "",
+                        regionDispatchType = 0u,
+                        videoKey = 5578228838233776,
+                        downloadMode = 0u
+                    )
+                ).toByteArray().xor(dispatchKey).toByteString()
             }
 
-//        val binFile = File(configDirectory, "query_region_list.bin")
-//        val queryRegionListHttpRsp = QueryRegionListHttpRsp.parseFrom(binFile.readBytes())
-//
-//        return queryRegionListHttpRsp.toBuilder()
-//            .clearRegionList()
-//            .addAllRegionList(serverList)
-//            .build()
         }
     }
 
-    /* ktlint-disable max-line-length */
-//    private val OFFICIAL_QUERY_CURR_URL = "aHR0cHM6Ly9jbmdmZGlzcGF0Y2gueXVhbnNoZW4uY29tL3F1ZXJ5X2N1cl9yZWdpb24/dmVyc2lvbj1DTlJFTFdpbjIuNi4wJmxhbmc9MiZwbGF0Zm9ybT0zJmJpbmFyeT0xJnRpbWU9NTkwJmNoYW5uZWxfaWQ9MSZzdWJfY2hhbm5lbF9pZD0xJmFjY291bnRfdHlwZT0xJmRpc3BhdGNoU2VlZD0yMjdmYTQ3ZGE4Y2U3ZGNh".decodeBase64String()
     private val QUERY_CURR_DOMAIN = "Y25nZmRpc3BhdGNoLnl1YW5zaGVuLmNvbQ==".decodeBase64String()
-    /* ktlint-enable max-line-length */
 
+    @SorapointaInternal
     suspend fun getQueryCurrRegionHttpRsp(call: ApplicationCall): QueryCurrRegionHttpRsp {
 
         val queryCurrRegionHttpRsp = QueryCurrRegionHttpRsp.parseFrom(
-            call.forwardCall<String>(QUERY_CURR_DOMAIN).decodeBase64Bytes()
+            (if (DispatchConfig.data.forwardQueryCurrRegion) call.forwardCall(QUERY_CURR_DOMAIN)
+            else client.get(DispatchConfig.data.queryCurrRegionHardcode).bodyAsText()).decodeBase64Bytes()
         )
 
         val dispatchSeed = File(configDirectory, "dispatchSeed.bin").readBytes()
@@ -165,20 +162,19 @@ object DispatchServer {
             )
             .setClientSecretKey(ByteString.copyFrom(dispatchSeed))
             .setRegionCustomConfigEncrypted(
-                ByteString.copyFrom(
-                    networkJson.encodeToString(
-                        ClientCustomConfig(
-                            codeSwitch = listOf(15u, 2410u, 2324u, 21u),
-                            coverSwitch = listOf(8u, 40u),
-                            perfReportEnable = false,
-                            homeDotPattern = true,
-                            homeItemFilter = 20u,
-                            reportNetDelayConfig = ClientCustomConfig.ReportNetDelayConfigData(
-                                openGateServer = true
-                            )
+                networkJson.encodeToString(
+                    // TODO: Extract to be the event and config
+                    ClientCustomConfig(
+                        codeSwitch = listOf(15u, 2410u, 2324u, 21u),
+                        coverSwitch = listOf(8u, 40u),
+                        perfReportEnable = false,
+                        homeDotPattern = true,
+                        homeItemFilter = 20u,
+                        reportNetDelayConfig = ClientCustomConfig.ReportNetDelayConfigData(
+                            openGateServer = true
                         )
-                    ).toByteArray().xor(dispatchKey)
-                )
+                    )
+                ).toByteArray().xor(dispatchKey).toByteString()
             ).build()
 
 //        val binFile = File(configDirectory, "query_cur_region.bin")
@@ -192,15 +188,22 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
     File(configDirectory, "dispatchConfig.json"), Data()
 ) {
 
+    /* ktlint-disable max-line-length */
+    private val QUERY_CURR_HARDCODE_DEFAULT = "aHR0cHM6Ly9jbmdmZGlzcGF0Y2gueXVhbnNoZW4uY29tL3F1ZXJ5X2N1cl9yZWdpb24/dmVyc2lvbj1DTlJFTFdpbjIuNi4wJmxhbmc9MiZwbGF0Zm9ybT0zJmJpbmFyeT0xJnRpbWU9MzcyJmNoYW5uZWxfaWQ9MSZzdWJfY2hhbm5lbF9pZD0xJmFjY291bnRfdHlwZT0xJmRpc3BhdGNoU2VlZD0yMjdmYTQ3ZGE4Y2U3ZGNh".decodeBase64String()
+    /* ktlint-enable max-line-length */
+
     @kotlinx.serialization.Serializable
     data class Data(
         val host: String = "0.0.0.0",
         val port: Int = 443,
+        // TODO: Extract to multiple setting
         val gateServerIp: String = "localhost",
         val gateServerPort: Int = 22101,
         val servers: ArrayList<Server> = arrayListOf(Server()),
         val forwardCommonRequest: Boolean = true,
         // If false, dispatch server will use default config hardcoded in Sorapointa
+        val forwardQueryCurrRegion: Boolean = true,
+        val queryCurrRegionHardcode: String = QUERY_CURR_HARDCODE_DEFAULT,
         val password: Argon2PasswordSetting = Argon2PasswordSetting(),
         val useSSL: Boolean = true,
         var certification: Certification = Certification()
