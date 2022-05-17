@@ -5,13 +5,19 @@ plugins {
 
 dependencies {
     // Project submodules
+    implementation(project(":sorapointa-dataloader"))
     implementation(project(":sorapointa-dataprovider"))
     implementation(project(":sorapointa-dispatch"))
     implementation(project(":sorapointa-event"))
     implementation(project(":sorapointa-i18n"))
-    implementation(project(":sorapointa-kcp"))
     implementation(project(":sorapointa-proto"))
+    implementation(project(":sorapointa-task"))
+    implementation(project(":sorapointa-utils"))
 
+    // network
+    implementation("io.netty:netty-handler:_")
+    implementation("io.ktor:ktor-utils:_")
+    implementation("io.jpower.kcp:kcp-netty:_")
     // Command
     implementation("moe.sdl.yac:core:_")
     // Console
