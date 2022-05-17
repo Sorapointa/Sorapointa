@@ -1,9 +1,6 @@
 package org.sorapointa
 
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import moe.sdl.yac.core.CliktCommand
 import moe.sdl.yac.core.CommandResult
 import moe.sdl.yac.parameters.options.check
@@ -16,12 +13,13 @@ import org.jline.reader.UserInterruptException
 import org.sorapointa.command.CommandManager
 import org.sorapointa.command.ConsoleCommandSender
 import org.sorapointa.command.defaults.defaultsCommand
-import org.sorapointa.config.BUILD_BRANCH
-import org.sorapointa.config.COMMIT_HASH
-import org.sorapointa.config.VERSION
+import org.sorapointa.config.*
 import org.sorapointa.config.registeredConfig
+import org.sorapointa.config.registeredDatabaseTable
 import org.sorapointa.console.Console
 import org.sorapointa.console.JLineRedirector
+import org.sorapointa.data.provider.DataFilePersist
+import org.sorapointa.data.provider.DatabaseManager
 import org.sorapointa.utils.*
 import java.io.File
 import java.io.OutputStream
@@ -31,7 +29,6 @@ import kotlin.system.exitProcess
 private val logger = KotlinLogging.logger {}
 
 class Sorapointa : CliktCommand(name = "sorapointa") {
-    private val scope = ParentScope(logger, "Sorapointa")
 
     private val workingDirectory by option("-D", "--working-directory", help = "Set working directory")
         .convert { File(it) }
@@ -59,6 +56,9 @@ class Sorapointa : CliktCommand(name = "sorapointa") {
         logger.info { "Loading sorapointa configs..." }
         setupRegisteredConfigs()
 
+        logger.info { "Loading sorapointa database..." }
+        setupDatabase()
+
         logger.info { "Loading languages..." }
         loadLanguages()
 
@@ -82,6 +82,12 @@ class Sorapointa : CliktCommand(name = "sorapointa") {
             registeredConfig.map {
                 launch { it.init() }
             }.joinAll()
+        }
+
+    private fun setupDatabase(): Job =
+        scope.launch {
+            DatabaseManager.loadDatabase()
+            DatabaseManager.loadTables(registeredDatabaseTable)
         }
 
     private fun setupDefaultsCommand() {
@@ -112,6 +118,28 @@ class Sorapointa : CliktCommand(name = "sorapointa") {
             }
         }
     }
+
+    companion object {
+
+        private val scope = ModuleScope(logger, "Sorapointa")
+
+        internal fun closeAll() {
+            scope.dispose()
+            scope.cancel()
+        }
+    }
+
+}
+
+object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
+    File(configDirectory, "dispatchConfig.json"), Data()
+) {
+
+    @kotlinx.serialization.Serializable
+    data class Data(
+        val idleTimeout: Long = 30
+    )
+
 }
 
 suspend fun main(args: Array<String>) {
