@@ -20,7 +20,7 @@ internal data class CertificateInfo(val certificate: Certificate, val keys: KeyP
 /**
  * Builder for certificate
  */
-class CertificateBuilder internal constructor() {
+internal class CertificateBuilder {
     /**
      * Certificate hash algorithm (required)
      */
@@ -92,7 +92,7 @@ class CertificateBuilder internal constructor() {
 /**
  * Builder for key store
  */
-class KeyStoreBuilder internal constructor() {
+internal class KeyStoreBuilder internal constructor() {
     private val certificates = mutableMapOf<String, CertificateInfo>()
 
     /**

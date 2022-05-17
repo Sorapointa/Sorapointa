@@ -8,9 +8,7 @@ import org.sorapointa.dispatch.data.AccountTable
 import org.sorapointa.event.EventManagerConfig
 import org.sorapointa.task.CronTasks
 import org.sorapointa.utils.I18nConfig
-import org.sorapointa.utils.SorapointaInternal
 
-@OptIn(SorapointaInternal::class)
 internal val registeredConfig: List<DataFilePersist<*>> = listOf(
     SorapointaConfig,
     I18nConfig,

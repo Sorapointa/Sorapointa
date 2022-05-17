@@ -44,6 +44,7 @@ private val DOMAIN_WEB_STATIC = "d2Vic3RhdGljLm1paG95by5jb20=".decodeBase64Strin
 private val ANNOUNCE_URL =
     "aHR0cHM6Ly93ZWJzdGF0aWMubWlob3lvLmNvbS9oazRlL2Fubm91bmNlbWVudC9pbmRleC5odG1s".decodeBase64String()
 
+@OptIn(SorapointaInternal::class)
 internal fun Application.configureNeedHandlerRouting() {
     routing {
         get("/query_region_list") {
@@ -340,6 +341,7 @@ internal suspend inline fun <reified T : Any> DispatchDataEvent<T>.respond() {
     }
 }
 
+@OptIn(SorapointaInternal::class)
 internal suspend inline fun <reified T : Any> ApplicationCall.forwardCallWithAll(
     domain: String,
     defaultData: T,
