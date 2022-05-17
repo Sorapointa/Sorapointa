@@ -18,19 +18,6 @@ open class ModuleScope(
 
     override val coroutineContext: CoroutineContext =
         parentContext + parentJob + CoroutineName(moduleName) + exceptionHandler + dispatcher
-}
-
-open class ParentScope(
-    private val logger: KLogger,
-    private val moduleName: String,
-    dispatcher: CoroutineDispatcher = Dispatchers.Default,
-    eventExceptionHandler: CoroutineExceptionHandler =
-        CoroutineExceptionHandler { _, e -> logger.error(e) { "Caught Exception on $moduleName" } },
-) : CoroutineScope {
-
-    val parentJob = SupervisorJob()
-    override val coroutineContext: CoroutineContext =
-        eventExceptionHandler + CoroutineName(moduleName) + dispatcher + parentJob
 
     fun dispose() {
         parentJob.cancel()
@@ -38,5 +25,7 @@ open class ParentScope(
     }
 
     open fun onClosed() {
+
     }
+
 }
