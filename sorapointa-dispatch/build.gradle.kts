@@ -1,6 +1,7 @@
 plugins {
     id("sorapointa-conventions")
     kotlin("plugin.serialization")
+    application
 }
 
 dependencies {
@@ -30,4 +31,9 @@ dependencies {
     testImplementation("io.ktor:ktor-server-tests-jvm:_")
     testImplementation(project(":sorapointa-dataprovider", "test"))
     testImplementation("org.jetbrains.kotlinx:atomicfu:_")
+}
+
+application {
+    applicationName = "sorapointa-dispatch"
+    mainClass.set("org.sorapointa.dispatch.DispatchServer")
 }

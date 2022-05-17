@@ -6,10 +6,10 @@ include("sorapointa-dataprovider")
 include("sorapointa-dispatch")
 include("sorapointa-event")
 include("sorapointa-i18n")
-include("sorapointa-kcp")
 include("sorapointa-proto")
 include("sorapointa-task")
 include("sorapointa-utils")
+include("sorapointa-dataloader")
 
 pluginManagement {
     repositories {
