@@ -164,8 +164,8 @@ object EventManager {
                             withTimeout(blockListenerTimeout) {
                                 listener(event)
                             }
-                            isIntercepted = event.isIntercepted
-                            if (event is CancelableEvent) isCancelled = event.isCancelled
+                            isIntercepted = event.isIntercepted || isIntercepted
+                            if (event is CancelableEvent) isCancelled = event.isCancelled || isCancelled
                         }
                     }.collect {
                         it.join()
