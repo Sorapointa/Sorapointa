@@ -12,7 +12,7 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.sorapointa.dispatch.DispatchConfig
 import org.sorapointa.dispatch.events.CreateAccountEvent
-import org.sorapointa.event.EventManager.broadcast
+import org.sorapointa.event.broadcast
 import org.sorapointa.utils.crypto.randomByteArray
 import org.sorapointa.utils.encoding.hex
 
