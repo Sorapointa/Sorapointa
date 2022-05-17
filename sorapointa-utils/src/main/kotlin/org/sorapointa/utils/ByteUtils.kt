@@ -2,9 +2,9 @@
 
 package org.sorapointa.utils
 
-/**
- * Author: HolographicHat
- */
+import java.io.Closeable
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 fun Int.toByteArray(littleEndian: Boolean = true) = ByteArray(4).also { a ->
     a[0] = shr(if (littleEndian) 0 else 24).toByte()
@@ -27,13 +27,6 @@ fun Long.toByteArray(littleEndian: Boolean = true) = ByteArray(8).also { a ->
 }
 
 fun ULong.toByteArray() = toLong().toByteArray()
-
-fun ByteArray.xor(key: ByteArray): ByteArray {
-    for (i in this.indices) {
-        this[i] = (this[i].toInt() xor key[i % key.size].toInt()).toByte()
-    }
-    return this
-}
 
 fun UByteArray.xor(key: UByteArray): UByteArray {
     for (i in this.indices) {
@@ -59,3 +52,17 @@ fun UByteArray.splitToULongArray() =
     chunked(8) {
         it.toUByteArray().entireToULong()
     }.toULongArray()
+
+inline fun <C : Closeable, R> C.withUse(block: C.() -> R): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+    return use(block)
+}
+
+inline fun <I : Closeable, O : Closeable, R> I.withOut(output: O, block: I.(output: O) -> R): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+    return use { output.use { block(this, output) } }
+}
