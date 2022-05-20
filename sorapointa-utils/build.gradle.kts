@@ -6,6 +6,7 @@ plugins {
 dependencies {
     api(KotlinX.serialization.json)
     api(KotlinX.datetime)
+    implementation("io.ktor:ktor-utils:_")
 }
 
 val commitHash by lazy {

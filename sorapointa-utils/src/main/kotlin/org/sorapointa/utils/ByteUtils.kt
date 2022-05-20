@@ -34,3 +34,28 @@ fun ByteArray.xor(key: ByteArray): ByteArray {
     }
     return this
 }
+
+fun UByteArray.xor(key: UByteArray): UByteArray {
+    for (i in this.indices) {
+        this[i] = this[i] xor key[i % key.size]
+    }
+    return this
+}
+
+fun UByteArray.entireToULong(): ULong {
+    require(this.size == 8) { "Size must be 8" }
+    val uints = this.map { it.toULong() }
+    return ((uints[7] and 0xFFuL) shl 56) or
+        ((uints[6] and 0xFFuL) shl 48) or
+        ((uints[5] and 0xFFuL) shl 40) or
+        ((uints[4] and 0xFFuL) shl 32) or
+        ((uints[3] and 0xFFuL) shl 24) or
+        ((uints[2] and 0xFFuL) shl 16) or
+        ((uints[1] and 0xFFuL) shl 8) or
+        (uints[0] and 0xFFuL)
+}
+
+fun UByteArray.splitToULongArray() =
+    chunked(8) {
+        it.toUByteArray().entireToULong()
+    }.toULongArray()

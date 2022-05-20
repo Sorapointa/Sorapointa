@@ -8,7 +8,7 @@ import org.sorapointa.utils.toByteArray
  * Author: HolographicHat
  */
 /* ktlint-disable max-line-length */
-class MT19937 private constructor(seed: ULong) {
+class MT19937 internal constructor(seed: ULong) {
 
     private var mti = 312
     private val mt = Array<ULong>(624) { 0U }
