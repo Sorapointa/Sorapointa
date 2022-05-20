@@ -15,7 +15,13 @@ repositories {
 group = "org.sorapointa"
 
 dependencies {
-    testImplementation(kotlin("test"))
+    constraints {
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    }
+
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+
     implementation("io.github.microutils:kotlin-logging-jvm:_")
     implementation("ch.qos.logback:logback-classic:_")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
@@ -24,6 +30,8 @@ dependencies {
         implementation(project(":sorapointa-utils"))
         testImplementation(project(":sorapointa-utils", "test"))
     }
+
+    testImplementation(kotlin("test"))
 }
 
 sourceSets {

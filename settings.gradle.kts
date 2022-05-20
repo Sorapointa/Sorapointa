@@ -1,6 +1,7 @@
 rootProject.name = "Sorapointa"
 
 include("sorapointa-core")
+include("sorapointa-dataloader")
 include("sorapointa-dataprovider")
 include("sorapointa-dispatch")
 include("sorapointa-event")
@@ -20,4 +21,3 @@ pluginManagement {
 plugins {
     id("de.fayard.refreshVersions") version "0.40.1"
 }
-include("sorapointa-dataloader")
