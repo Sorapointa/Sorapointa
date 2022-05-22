@@ -11,11 +11,11 @@ import kotlin.coroutines.CoroutineContext
  * Data Loader for test, skip ci
  */
 @OptIn(SorapointaInternal::class)
-@Suppress("FunctionName")
+@Suppress( "TestFunctionName")
 inline fun <reified T : Any> TestDataLoader(
     path: String,
     context: CoroutineContext = Dispatchers.IO,
 ): DataLoader<T> =
-    DataLoader<T>(path, T::class, serializer(), context).apply {
+    DataLoader(path, T::class, serializer(), context).apply {
         if (!isCI) init()
     }

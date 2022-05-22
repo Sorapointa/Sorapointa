@@ -51,7 +51,7 @@ class AccountTest {
 
 ```kotlin
 @TestInstance(Lifecycle.PER_CLASS)
-class DatabaseTest() {
+class DatabaseTest {
   @BeforeAll
   fun initDatabase() {
     // 初始化
@@ -67,7 +67,7 @@ class DatabaseTest() {
 2.
 
 ```kotlin
-class DatabaseTest() {
+class DatabaseTest {
   companion object {
     @BeforeAll
     @JvmStatic

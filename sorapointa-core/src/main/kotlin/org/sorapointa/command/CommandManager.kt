@@ -32,10 +32,12 @@ object CommandManager {
         commandScope = ModuleScope(logger, "CommandManager", parentContext)
     }
 
+    @Suppress("unused")
     fun registerCommand(entry: Command.Entry, creator: (CommandSender) -> Command) {
         registerCommand(CommandNode(entry, creator))
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun registerCommand(commandNode: CommandNode) {
         val name = commandNode.entry.name
         val alias = commandNode.entry.alias

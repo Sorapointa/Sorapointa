@@ -27,6 +27,7 @@ object TaskManager {
         scope = ModuleScope(logger, "TaskManager", parentContext)
     }
 
+    @Suppress("MemberVisibilityCanBePrivate", "unused")
     fun close() {
         scope.cancel("Closing")
     }
@@ -38,6 +39,7 @@ object TaskManager {
      *
      * @return If this job has been registered already, it would return null
      */
+    @Suppress("MemberVisibilityCanBePrivate", "unused")
     fun registerTask(
         delay: Duration,
         task: suspend () -> Unit,
@@ -55,6 +57,7 @@ object TaskManager {
      *
      * @return If this job has been registered already, it would return null
      */
+    @Suppress("MemberVisibilityCanBePrivate", "unused")
     fun registerTask(
         delayMillis: Long,
         task: suspend () -> Unit,
@@ -85,6 +88,7 @@ object TaskManager {
      *
      * @return If this job has been registered already, it would return null
      */
+    @Suppress("MemberVisibilityCanBePrivate")
     fun registerTask(
         id: String,
         cron: Cron,

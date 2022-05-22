@@ -1,3 +1,5 @@
+@file:Suppress("GradlePackageUpdate")
+
 plugins {
     id("sorapointa-conventions")
 }

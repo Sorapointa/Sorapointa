@@ -3,7 +3,6 @@ package org.sorapointa.dispatch
 import io.ktor.util.*
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import mu.KotlinLogging
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -20,8 +19,6 @@ import org.sorapointa.utils.crypto.randomByteArray
 import org.sorapointa.utils.encoding.hex
 import org.sorapointa.utils.runTest
 import kotlin.test.assertEquals
-
-private val logger = KotlinLogging.logger {}
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AccountTest {

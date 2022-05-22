@@ -24,7 +24,7 @@ object KeyProvider {
     const val DEFAULT_ALIAS = "sorapointa-dispatch-cert"
     const val DEFAULT_CERT_PASSWORD = "sorapointa-dispatch-private"
     const val DEFAULT_KEY_STORE_PASSWORD = "sorapointa-dispatch"
-    const val DEFAULT_EXPIRED_DAYS = 365 * 10L // 10 Years
+    private const val DEFAULT_EXPIRED_DAYS = 365 * 10L // 10 Years
 
     private val ANIME_URL_1 = "Ki5taWhveW8uY29t".decodeBase64String()
     private val ANIME_URL_2 = "Ki55dWFuc2hlbi5jb20=".decodeBase64String()

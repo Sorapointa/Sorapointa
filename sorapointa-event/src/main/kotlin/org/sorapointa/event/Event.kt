@@ -62,6 +62,7 @@ abstract class AbstractEvent : Event {
     final override var isIntercepted by atomic(false)
         private set
 
+    @Suppress("MemberVisibilityCanBePrivate")
     var isCancelled: Boolean by atomic(false)
         private set
 

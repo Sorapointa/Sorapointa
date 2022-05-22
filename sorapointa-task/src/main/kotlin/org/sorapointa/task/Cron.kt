@@ -8,13 +8,6 @@ import com.cronutils.model.time.ExecutionTime
 import com.cronutils.parser.CronParser
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toKotlinInstant
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import org.sorapointa.utils.now
 import org.sorapointa.utils.toZonedUtc
 import org.sorapointa.utils.unwrap
@@ -41,6 +34,7 @@ fun parseCron(cron: String): Cron = parser.parse(cron)
 /**
  * Variety of [parseCron], return null when failed to parse
  */
+@Suppress("unused")
 fun parseCronOrNull(cron: String): Cron? = runCatching {
     parseCron(cron)
 }.onFailure {
@@ -59,20 +53,9 @@ fun Cron.nextExecutionTime(time: Instant = now()): Instant? {
 /**
  * Last execution time from [time] of [Cron] expression
  */
+@Suppress("unused")
 fun Cron.lastExecutionTime(time: Instant = now()): Instant? {
     val executionTime = ExecutionTime.forCron(this)
     return executionTime.lastExecution(time.toZonedUtc()).unwrap()
         ?.toInstant()?.toKotlinInstant()
-}
-
-object CronSerializer : KSerializer<Cron> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Cron", PrimitiveKind.STRING)
-
-    override fun deserialize(decoder: Decoder): Cron {
-        val cron = decoder.decodeString()
-        return runCatching { parseCron(cron) }
-            .getOrElse { throw SerializationException("Failed to parse cron expression $cron", it) }
-    }
-
-    override fun serialize(encoder: Encoder, value: Cron) = encoder.encodeString(value.asString())
 }

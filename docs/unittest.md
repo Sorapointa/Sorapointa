@@ -52,7 +52,7 @@ Following method is frequently used:
 
 ```kotlin
 @TestInstance(Lifecycle.PER_CLASS)
-class DatabaseTest() {
+class DatabaseTest {
   @BeforeAll
   fun initDatabase() {
     // do init
@@ -68,7 +68,7 @@ class DatabaseTest() {
 2.
 
 ```kotlin
-class DatabaseTest() {
+class DatabaseTest {
   companion object {
     @BeforeAll
     @JvmStatic
@@ -90,7 +90,7 @@ Both 1 and 2 are correct. The function annotated by `@BeforeAll` will be invoked
 
 ## Test Dependency
 
-If a dependency is test only, add it in `build.gradle.kts` in this way:
+If a dependency is test-only, add it in `build.gradle.kts` in this way:
 
 ```kotlin
 dependencies {
@@ -109,7 +109,7 @@ dependencies {
 
 ### Functions
 
-- `runTest` provide a suspend block, and SKIP_OPTIONs
+- `runTest` provide a suspendable block, and SKIP_OPTIONs
 
 ```kotlin
 // SKIP_CI: skip test if run in CI

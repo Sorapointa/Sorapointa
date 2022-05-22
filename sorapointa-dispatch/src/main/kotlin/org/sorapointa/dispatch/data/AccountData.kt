@@ -31,7 +31,7 @@ object AccountTable : IdTable<UInt>("account_table") {
     override val primaryKey: PrimaryKey = PrimaryKey(id)
 }
 
-@Suppress("RedundantSuspendModifier")
+@Suppress("RedundantSuspendModifier", "MemberVisibilityCanBePrivate", "unused")
 class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
 
     companion object : EntityClass<UInt, Account>(AccountTable) {
@@ -100,20 +100,28 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
     }
 
     suspend fun getDispatchTokenOrGenerate(): String {
-        val token = randomByteArray(32).encodeBase64()
-        dispatchToken = token
-        return token
+        // TODO: Expire after a while
+        return dispatchToken ?: run {
+            val token = randomByteArray(32).encodeBase64()
+            dispatchToken = token
+            token
+        }
     }
 
     suspend fun getComboTokenOrGenerate(): String {
-        val token = randomByteArray(20).hex
-        comboToken = token
-        return token
+        // TODO: Expire after a while
+        return comboToken ?: run {
+            val token = randomByteArray(20).hex
+            comboToken = token
+            token
+        }
     }
 
     suspend fun getComboIdOrGenerate(): UInt {
-        val cid = (0..Int.MAX_VALUE).random().toUInt()
-        comboId = cid
-        return cid
+        return comboId ?: run {
+            val cid = (0..Int.MAX_VALUE).random().toUInt()
+            comboId = cid
+            cid
+        }
     }
 }
