@@ -1,8 +1,6 @@
 package org.sorapointa.dataloader
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -32,12 +30,12 @@ object ResourceHolder {
      * @see [DataLoader.loadFromStream]
      */
     suspend fun loadAll(stream: Boolean = false) {
-        dataMap.asSequence().asFlow().map { (k, v) ->
+        dataMap.map { (k, v) ->
             scope.launch {
                 val loaded = if (stream) v.loadFromStream() else v.load()
                 finalizeData(k, loaded)
             }
-        }.collect { it.join() }
+        }.joinAll()
     }
 
     internal fun registerData(dataLoader: DataLoader<Any>) {
