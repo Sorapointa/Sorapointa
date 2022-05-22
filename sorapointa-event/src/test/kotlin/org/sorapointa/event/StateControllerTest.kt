@@ -21,7 +21,6 @@ class StateControllerTest {
         fun foobar(): String
 
         enum class State {
-            NONE,
             START,
             DOING,
             END
@@ -29,9 +28,19 @@ class StateControllerTest {
 
     }
 
-    class SomeClassWithStateImpl : SomeClassWithState {
+    interface SomeClassWithSomeDifferentState : WithState<SomeClassWithSomeDifferentState.State> {
 
-        override val state: SomeClassWithState.State = SomeClassWithState.State.NONE
+        fun barfoo(): String
+
+        enum class State {
+            HAPPY,
+            BAD,
+            CRY
+        }
+
+    }
+
+    class SomeClassWithStateImpl {
 
         var count by atomic(0)
 
@@ -42,8 +51,42 @@ class StateControllerTest {
             Start(), Doing(), End(),
         )
 
-        override fun foobar(): String {
+        val stateController2 = StateController(
+            scope = ModuleScope(logger, "TestScopeWithState2"),
+            parentStateClass = this,
+            Happy(), Bad(), Cry()
+        )
+
+        fun foobar(): String {
             return stateController.getState().foobar()
+        }
+
+        fun barfoo(): String {
+            return stateController2.getState().barfoo()
+        }
+
+        inner class Happy: SomeClassWithSomeDifferentState {
+
+            override val state: SomeClassWithSomeDifferentState.State = SomeClassWithSomeDifferentState.State.HAPPY
+
+            override fun barfoo(): String = "Happy"
+
+        }
+
+        inner class Bad: SomeClassWithSomeDifferentState {
+
+            override val state: SomeClassWithSomeDifferentState.State = SomeClassWithSomeDifferentState.State.BAD
+
+            override fun barfoo(): String = "Bad"
+
+        }
+
+        inner class Cry: SomeClassWithSomeDifferentState {
+
+            override val state: SomeClassWithSomeDifferentState.State = SomeClassWithSomeDifferentState.State.CRY
+
+            override fun barfoo(): String = "Cry"
+
         }
 
 
@@ -115,6 +158,7 @@ class StateControllerTest {
 
         sc.stateController.block {
             throw NullPointerException()
+            // throw
         }
 
 
@@ -125,6 +169,13 @@ class StateControllerTest {
         assertEquals("End!", sc.foobar())
         sc.stateController.setState(SomeClassWithState.State.START) // Fail, will be intercepted
         assertEquals("End!", sc.foobar())
+
+        assertEquals("Happy", sc.barfoo())
+        sc.stateController2.setState(SomeClassWithSomeDifferentState.State.BAD)
+        assertEquals("Bad", sc.barfoo())
+        sc.stateController2.setState(SomeClassWithSomeDifferentState.State.CRY)
+        assertEquals("Cry", sc.barfoo())
+
 
 
     }
