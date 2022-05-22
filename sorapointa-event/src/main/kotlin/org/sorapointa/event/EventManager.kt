@@ -1,3 +1,5 @@
+@file:Suppress( "unused")
+
 package org.sorapointa.event
 
 import kotlinx.atomicfu.atomic
@@ -79,28 +81,6 @@ object EventManager {
     }
 
     /**
-     * Register a parallel listener
-     * All registered listeners will be called in parallel.
-     *
-     * You could NOT CANCEL or INTERCEPT any event in parallel listener.
-     *
-     * Generic type [T] is what event would you listen.
-     *
-     * @param priority, optional, set the priority of this listener
-     * @param listener, lambda block of your listener with the specific event of parameter
-     */
-    inline fun <reified T : Event> registerListener(
-        priority: EventPriority = EventPriority.NORMAL,
-        crossinline listener: suspend (T) -> Unit
-    ) {
-        registerEventListener(priority) {
-            if (it is T) {
-                listener(it)
-            }
-        }
-    }
-
-    /**
      * Register a block listener
      * All registered block listeners will be called in serial.
      *
@@ -116,27 +96,6 @@ object EventManager {
         registeredBlockListener.first { it.priority == priority }.listeners.add(listener)
     }
 
-    /**
-     * Register a block listener
-     * All registered block listeners will be called in serial.
-     *
-     * You could cancel or intercept listened event in serial listener.
-     *
-     * Generic type [T] is what event would you listen.
-     *
-     * @param priority, optional, set the priority of this listener
-     * @param listener, lambda block of your listener with the specific event of parameter
-     */
-    inline fun <reified T : Event> registerBlockListener(
-        priority: EventPriority = EventPriority.NORMAL,
-        crossinline listener: suspend (T) -> Unit
-    ) {
-        registerBlockEventListener(priority) {
-            if (it is T) {
-                listener(it)
-            }
-        }
-    }
 
     /**
      * Broadcast event, and return the cancel state of this event
@@ -213,31 +172,93 @@ object EventManager {
     private fun getInitChannel() = Channel<Event>(64)
 }
 
+
+/**
+ * Register a parallel listener
+ * All registered listeners will be called in parallel.
+ *
+ * You could NOT CANCEL or INTERCEPT any event in parallel listener.
+ *
+ * Generic type [T] is what event would you listen.
+ *
+ * Use `inline` with `listener` would lose precise stacktrace for exception
+ *
+ * @param priority, optional, set the priority of this listener
+ * @param listener, lambda block of your listener with the specific event of parameter
+ */
+inline fun <reified T : Event> registerListener(
+    priority: EventPriority = EventPriority.NORMAL,
+    noinline listener: suspend (T) -> Unit
+) {
+    EventManager.registerEventListener(priority) {
+        if (it is T) {
+            listener(it)
+        }
+    }
+}
+
+/**
+ * Register a block listener
+ * All registered block listeners will be called in serial.
+ *
+ * You could cancel or intercept listened event in serial listener.
+ *
+ * Generic type [T] is what event would you listen.
+ *
+ * Use `inline` with `listener` would lose precise stacktrace for exception
+ *
+ * @param priority, optional, set the priority of this listener
+ * @param listener, lambda block of your listener with the specific event of parameter
+ */
+inline fun <reified T : Event> registerBlockListener(
+    priority: EventPriority = EventPriority.NORMAL,
+    noinline listener: suspend (T) -> Unit
+) {
+    EventManager.registerBlockEventListener(priority) {
+        if (it is T) {
+            listener(it)
+        }
+    }
+}
+
 /**
  * Broadcast event in a quick way
+ *
+ * Use `inline` would lose precise stacktrace for exception
+ *
  * @param ifNotCancel lambda block with the action if broadcasted event has **NOT** been cancelled
  */
-suspend inline fun <T : Event> T.broadcastEvent(ifNotCancel: (T) -> Unit) {
+suspend inline fun <T : Event> T.broadcastEvent(
+    noinline ifNotCancel: suspend (T) -> Unit
+) {
     val isCancelled = EventManager.broadcastEvent(this)
     if (!isCancelled) ifNotCancel(this)
 }
 
 /**
  * Broadcast event in a quick way
+ *
+ * Use `inline` for lambda function would lose precise stacktrace for exception
+ *
  * @param ifCancelled lambda block with the action if broadcasted event has been cancelled
  */
-suspend inline fun <T : Event> T.broadcastEventIfCancelled(ifCancelled: (T) -> Unit) {
+suspend inline fun <T : Event> T.broadcastEventIfCancelled(
+    noinline ifCancelled: suspend (T) -> Unit
+) {
     val isCancelled = EventManager.broadcastEvent(this)
     if (isCancelled) ifCancelled(this)
 }
 
 /**
  * Broadcast event in a quick way
+ *
+ * Use `inline` for lambda function would lose precise stacktrace for exception
+ *
  * @param ifNotCancel lambda block with the action if broadcasted event has **NOT** been cancelled
  */
 suspend inline fun <T : Event> T.broadcastEvent(
-    ifNotCancel: (T) -> Unit,
-    ifCancelled: (T) -> Unit
+    noinline ifNotCancel: suspend (T) -> Unit,
+    noinline ifCancelled: suspend (T) -> Unit
 ) {
     val isCancelled = EventManager.broadcastEvent(this)
     if (!isCancelled) ifNotCancel(this) else ifCancelled(this)

@@ -1,3 +1,5 @@
+@file:Suppress( "unused")
+
 package org.sorapointa.event
 
 import org.sorapointa.utils.ModuleScope
@@ -25,7 +27,7 @@ interface WithState<out T: Enum<*>> {
 
 }
 
-class StateController<TState : Enum<*>, TInterfaceWithState: WithState<TState>, TClassWithState: TInterfaceWithState> (
+class StateController<TState : Enum<*>, TInterfaceWithState: WithState<TState>, TClassWithState> (
     private var scope: ModuleScope,
     private var parentStateClass: TClassWithState,
     vararg stateInstances: TInterfaceWithState
@@ -114,21 +116,24 @@ class StateController<TState : Enum<*>, TInterfaceWithState: WithState<TState>, 
 }
 
 
-inline fun <TState : Enum<*>, TInterfaceWithState: WithState<TState>, TClassWithState: TInterfaceWithState>
+@Suppress("NOTHING_TO_INLINE")
+inline fun <TState : Enum<*>, TInterfaceWithState: WithState<TState>, TClassWithState>
     StateController<TState, TInterfaceWithState, TClassWithState>.observe(
     listenerState: StateController.ListenerState = StateController.ListenerState.BEFORE_UPDATE,
-    crossinline observer: suspend TClassWithState.() -> Unit
+    noinline observer: suspend TClassWithState.() -> Unit
 ) = observeStateChange(listenerState) { _, _ -> this.observer() }
 
-inline fun <TState : Enum<*>, TInterfaceWithState: WithState<TState>, TClassWithState: TInterfaceWithState>
+@Suppress("NOTHING_TO_INLINE")
+inline fun <TState : Enum<*>, TInterfaceWithState: WithState<TState>, TClassWithState>
     StateController<TState, TInterfaceWithState, TClassWithState>.intercept(
     listenerState: StateController.ListenerState = StateController.ListenerState.BEFORE_UPDATE,
-    crossinline interceptor: suspend TClassWithState.() -> Boolean
+    noinline interceptor: suspend TClassWithState.() -> Boolean
 ) = interceptStateChange(listenerState) { _, _ -> this.interceptor() }
 
-inline fun <TState : Enum<*>, TInterfaceWithState: WithState<TState>, TClassWithState: TInterfaceWithState>
+@Suppress("NOTHING_TO_INLINE")
+inline fun <TState : Enum<*>, TInterfaceWithState: WithState<TState>, TClassWithState>
     StateController<TState, TInterfaceWithState, TClassWithState>.block(
     listenerState: StateController.ListenerState = StateController.ListenerState.BEFORE_UPDATE,
-    crossinline interceptor: suspend TClassWithState.() -> Unit
+    noinline interceptor: suspend TClassWithState.() -> Unit
 ) = interceptStateChange(listenerState) { _, _ -> this.interceptor(); false }
 
