@@ -5,6 +5,7 @@ import kotlinx.coroutines.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -79,7 +80,7 @@ class EventPipelineTest {
             }
         }
 
-        (1..100).toList().map {
+        (1..1000).toList().map {
             launch {
                 repeat(10) {
                     val event = TestEvent3()
@@ -90,7 +91,7 @@ class EventPipelineTest {
             }
         }.joinAll()
 
-        assertEquals(3 * 100 * 10, counter)
+        assertEquals(3 * 1000 * 10, counter)
     }
 
     @Test
@@ -139,4 +140,34 @@ class EventPipelineTest {
 
         delay(300)
     }
+
+    @Test
+    fun `next event test`(): Unit = runBlocking {
+
+        val e1 = async { nextEvent<TestEvent2> { it.isCancelled } }
+        val e2 = async { nextEvent<TestEvent3> { it.isCancelled } }
+
+        val job = launch {
+            e2.await()
+            assertThrows<TimeoutCancellationException> {
+                runBlocking {
+                    e1.await()
+                }
+            }
+        }
+
+        EventManager.registerBlockEventListener(EventPriority.HIGH) {
+            if (it is CancelableEvent) {
+                it.cancel()
+            }
+        }
+
+        delay(500)
+
+        EventManager.broadcastEvent(TestEvent3())
+
+        job.join()
+
+    }
+
 }
