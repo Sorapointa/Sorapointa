@@ -19,7 +19,7 @@ private val logger = mu.KotlinLogging.logger { }
  * @param default the default value
  * @see FilePersist
  */
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "MemberVisibilityCanBePrivate")
 open class DataFilePersist<T : Any>(
     final override val file: File,
     default: T,
@@ -33,6 +33,7 @@ open class DataFilePersist<T : Any>(
 
     protected val mutex = Mutex()
 
+    @Suppress("PropertyName")
     @SorapointaInternal val _data = atomic(default)
 
     @OptIn(SorapointaInternal::class)

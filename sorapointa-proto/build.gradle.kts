@@ -1,3 +1,5 @@
+@file:Suppress("GradlePackageUpdate")
+
 import com.google.protobuf.gradle.builtins
 import com.google.protobuf.gradle.generateProtoTasks
 import com.google.protobuf.gradle.id
@@ -14,6 +16,7 @@ plugins {
 dependencies {
     api("com.google.protobuf:protobuf-java:_")
     api("com.google.protobuf:protobuf-kotlin:_")
+    api("io.ktor:ktor-utils:_")
 }
 
 protobuf {

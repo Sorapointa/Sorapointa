@@ -223,7 +223,7 @@ internal fun Application.configureNeedHandlerRouting() {
                                     call,
                                     LoginResultData(-201, "dispatch.login.error.split".i18n())
                                 ).respond()
-                                return@post
+                                return@broadcastEvent
                             }
                             val name = split[0]
                             val pwd = split[1]
@@ -232,14 +232,14 @@ internal fun Application.configureNeedHandlerRouting() {
                                     call,
                                     LoginResultData(-201, "dispatch.login.error.length.name".i18n())
                                 ).respond()
-                                return@post
+                                return@broadcastEvent
                             }
                             if (pwd.length !in 8..32) {
                                 LoginAccountResponseEvent(
                                     call,
                                     LoginResultData(-201, "dispatch.login.error.length.password".i18n())
                                 ).respond()
-                                return@post
+                                return@broadcastEvent
                             }
                             newSuspendedTransaction {
                                 val account = Account.findOrCreate(name, pwd)
@@ -341,7 +341,6 @@ internal suspend inline fun <reified T : Any> DispatchDataEvent<T>.respond() {
     }
 }
 
-@OptIn(SorapointaInternal::class)
 internal suspend inline fun <reified T : Any> ApplicationCall.forwardCallWithAll(
     domain: String,
     defaultData: T,
@@ -357,7 +356,6 @@ internal suspend inline fun <reified T : Any> ApplicationCall.forwardCallWithAll
     }
 }
 
-@OptIn(SorapointaInternal::class)
 internal suspend inline fun <reified T> ApplicationCall.forwardCall(domain: String): T {
     val url = "https://$domain${this.request.uri}"
     logger.debug { "Forwarding request from ${this.request.uri} to $url" }

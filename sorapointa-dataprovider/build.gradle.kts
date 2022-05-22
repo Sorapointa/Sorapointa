@@ -1,3 +1,5 @@
+@file:Suppress("GradlePackageUpdate")
+
 import com.github.gmazzo.gradle.plugins.BuildConfigSourceSet
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 

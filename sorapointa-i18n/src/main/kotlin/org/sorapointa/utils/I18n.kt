@@ -36,6 +36,7 @@ object I18nManager {
      * Register language pack from file
      * @param languageFile the file store [LanguagePack]
      */
+    @Suppress("MemberVisibilityCanBePrivate")
     suspend fun registerLanguage(languageFile: File) {
         runCatching {
             if (!languageFile.exists()) throw NoSuchFileException(languageFile)

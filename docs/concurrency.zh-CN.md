@@ -8,7 +8,7 @@ Sorapointa 项目大量使用了协程与多线程技术，请时刻注意检查
 
 如果一定要共享可修改数据，请使用线程安全的数据结构 ，如 Atomic，Sorapointa 使用了 AtomicFU 框架封装了 Java 的原子方法
 
-关于 AtmoicFU，参考 [AtomicFU 指南](docs/kotlin-atomicfu.zh-CN.md)
+关于 AtmoicFU，参考 [AtomicFU 指南](/docs/kotlin-atomicfu.zh-CN.md)
 
 但是对于集合，我们一般使用 `ConcurrentHashMap` 或同样类似的线程安全的数据结构
 

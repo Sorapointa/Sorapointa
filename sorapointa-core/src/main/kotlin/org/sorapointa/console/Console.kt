@@ -5,6 +5,7 @@ import org.jline.reader.impl.history.DefaultHistory
 import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
 
+@Suppress("MemberVisibilityCanBePrivate")
 internal object Console {
     private val terminal: Terminal = TerminalBuilder.builder()
         .name("Sorapointa")

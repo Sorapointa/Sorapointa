@@ -215,10 +215,10 @@ object CommandLocalization : Localization {
     /** The title for the usage section of help output */
     override fun usageTitle(): String = "clikt.title.usage".i18n()
 
-    /** The title for the options section of help output */
+    /** The title for the options' section of help output */
     override fun optionsTitle(): String = "clikt.title.options".i18n()
 
-    /** The title for the arguments section of help output */
+    /** The title for the arguments' section of help output */
     override fun argumentsTitle(): String = "clikt.title.arguments".i18n()
 
     /** The title for the subcommands section of help output */

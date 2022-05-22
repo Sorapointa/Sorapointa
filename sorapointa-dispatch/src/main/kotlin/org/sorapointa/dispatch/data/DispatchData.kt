@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package org.sorapointa.dispatch.data
 
 import kotlinx.serialization.SerialName

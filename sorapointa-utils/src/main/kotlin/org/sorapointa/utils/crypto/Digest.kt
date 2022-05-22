@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package org.sorapointa.utils.crypto
 
 import mu.KotlinLogging

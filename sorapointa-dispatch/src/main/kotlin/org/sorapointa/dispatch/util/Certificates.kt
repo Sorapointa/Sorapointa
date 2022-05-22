@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package org.sorapointa.dispatch.util
 
 import io.ktor.network.tls.*

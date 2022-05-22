@@ -48,7 +48,7 @@ CommandManager.registerCommand(command)
 ```
 
 The first parameter of `CommandNode` is `CommandEntry`, the companion object we declared before.
-The second parameter is a high-order function, used to construct an command instance.
+The second parameter is a high-order function, used to construct a command instance.
 
 Register a list of commands:
 

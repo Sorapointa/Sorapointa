@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 
 class StringTest {
     @Nested
-    inner class ReplaceWithOrder() {
+    inner class ReplaceWithOrder {
         @Test
         fun `index start from 0`() {
             assertEquals("0 1 2", "{0} {1} {2}".replaceWithOrder("0", "1", "2"))

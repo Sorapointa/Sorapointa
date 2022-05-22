@@ -30,7 +30,7 @@ class HelpTest {
         )
     }
 
-    fun generateEntry() = Command.Entry(
+    private fun generateEntry() = Command.Entry(
         "abcdefghijklmnopqrstuvwxyz".toList().shuffled().subList(0, (4..10).random()).joinToString(""),
         help = "abcdefghijklmnopqrstuvwxyz".toList().shuffled().subList(0, (0..5).random()).joinToString("")
     )

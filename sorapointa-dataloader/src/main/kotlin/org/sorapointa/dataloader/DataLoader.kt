@@ -45,6 +45,7 @@ object ResourceHolder {
         logger.trace { "Data loader registered: path ${dataLoader.path}" }
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     internal fun finalizeData(path: String, loaded: Any) {
         dataMap[path]?.apply {
             data = loaded

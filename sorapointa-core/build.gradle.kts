@@ -1,3 +1,5 @@
+@file:Suppress("GradlePackageUpdate")
+
 plugins {
     id("sorapointa-conventions")
     application
@@ -16,7 +18,6 @@ dependencies {
 
     // network
     implementation("io.netty:netty-handler:_")
-    implementation("io.ktor:ktor-utils:_")
     implementation("io.jpower.kcp:kcp-netty:_")
     // Command
     implementation("moe.sdl.yac:core:_")

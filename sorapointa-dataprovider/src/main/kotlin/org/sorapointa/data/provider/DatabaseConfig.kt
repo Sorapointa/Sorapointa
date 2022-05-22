@@ -9,6 +9,7 @@ import org.sorapointa.utils.resolveWorkDirectory
 import java.io.File
 import java.sql.Connection.*
 
+
 enum class DatabaseType {
     SQLITE {
         override val defaultConnectionString: String by lazy {

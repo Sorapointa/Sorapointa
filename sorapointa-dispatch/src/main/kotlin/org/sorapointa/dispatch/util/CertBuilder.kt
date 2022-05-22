@@ -20,6 +20,7 @@ internal data class CertificateInfo(val certificate: Certificate, val keys: KeyP
 /**
  * Builder for certificate
  */
+@Suppress("MemberVisibilityCanBePrivate")
 internal class CertificateBuilder {
     /**
      * Certificate hash algorithm (required)
