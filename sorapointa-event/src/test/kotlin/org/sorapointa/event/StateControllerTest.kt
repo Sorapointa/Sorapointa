@@ -42,7 +42,7 @@ class StateControllerTest {
 
     class SomeClassWithStateImpl {
 
-        var count by atomic(0)
+        val count = atomic(0)
 
 
         val stateController = StateController(
@@ -99,7 +99,7 @@ class StateControllerTest {
             }
 
             override suspend fun endState() {
-                count++
+                count.getAndIncrement()
                 println("Start!")
             }
 
@@ -114,12 +114,12 @@ class StateControllerTest {
             }
 
             override suspend fun startState() {
-                count++
+                count.getAndIncrement()
                 println("Doing!")
             }
 
             override suspend fun endState() {
-                count++
+                count.getAndIncrement()
                 println("Done!")
             }
 
@@ -134,7 +134,7 @@ class StateControllerTest {
             }
 
             override suspend fun startState() {
-                count++
+                count.getAndIncrement()
                 println("End!")
             }
 
@@ -149,11 +149,11 @@ class StateControllerTest {
         val sc = SomeClassWithStateImpl()
 
         sc.stateController.observeStateChange(StateController.ListenerState.AFTER_UPDATE) { before, after ->
-            println("Count: $count, before: $before, after: $after")
+            println("Count: ${count.value}, before: $before, after: $after")
         }
 
         sc.stateController.intercept(StateController.ListenerState.BEFORE_UPDATE) {
-            count >= 4
+            count.value >= 4
         }
 
         sc.stateController.block {
@@ -197,7 +197,7 @@ class StateControllerTest {
             }
         }.joinAll()
 
-        assertEquals(testCount * 4 + 1, sc.count)
+        assertEquals(testCount * 4 + 1, sc.count.value)
 
         val sc2 = SomeClassWithStateImpl()
         sc2.stateController.block {
