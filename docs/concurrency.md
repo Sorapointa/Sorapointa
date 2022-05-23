@@ -89,7 +89,7 @@ and the program will not crash with errors.
 In Kotlin Coroutine, some types of lock (such as Mutex) that is thread-bind,
 would easily cause the deadlock issue.
 
-We highly recommend you to use `withReentrantLock` method in `sorapointa-utils` module,
+We highly recommend you to use `withReentrantLock` method located in `sorapointa-utils` module,
 to keep the mutex lock consistentency in the coroutine context.
 
 Please refer to [Phantom of the Coroutine](https://elizarov.medium.com/phantom-of-the-coroutine-afc63b03a131)
