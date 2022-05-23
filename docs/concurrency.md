@@ -70,6 +70,7 @@ such as using the atomic delegation, ConcurrentHashMap
 and other built-in atomic objects.
 If all built-in atomic methods are no longer enough for your needs,
 try using the simple Mutex.
+(Please follow the guideline for properly using the Mutex)
 
 But before using Mutex or more complex thread-safe mechanism,
 first think about whether I can accept the risk of problems occurring
@@ -82,6 +83,17 @@ Acceptable cost means that
 the resulting data changes are acceptable,
 the resulting performance loss is acceptable,
 and the program will not crash with errors.
+
+## Lock
+
+In Kotlin Coroutine, some types of lock (such as Mutex) that is thread-bind,
+would easily cause the deadlock issue.
+
+We highly recommend you to use `withReentrantLock` method in `sorapointa-utils` module,
+to keep the mutex lock consistentency in the coroutine context.
+
+Please refer to [Phantom of the Coroutine](https://elizarov.medium.com/phantom-of-the-coroutine-afc63b03a131)
+
 
 ## Structured Concurrency
 

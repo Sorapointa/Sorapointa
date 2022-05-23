@@ -49,6 +49,7 @@ if (!map.containsKey(123)) {
 对能简单修复的线程安全问题尽量予以修复，比如 使用 `atomic` 代理，
 使用 `ConcurrentHashMap` 以及其内置的其他原子方法，
 如果内置的所有原子方法已经不足以满足你的需求，可以尝试使用简单的 `Mutex`
+（请遵循指导在协程下正确使用 `Mutex`）
 
 但是在使用 `Mutex` 或更复杂的线程安全机制前， 
 首先思考，我是否能接受发生问题的风险（如原石操作是很敏感的，
@@ -56,6 +57,13 @@ if (!map.containsKey(123)) {
 这个成本是可以承受的）
 
 成本可接受指的是，造成的数据变更可接受，造成的性能损耗可接受，程序不会报错崩溃
+
+## 关于锁
+
+在 Kotlin 协程中，与线程绑定的锁会容易造成死锁问题（比如 `Mutex`），
+建议使用 `sorapointa-utils` 模块中拓展的 `withReentrantLock` 方法，以确保锁的上下文一致性。
+
+可以参考，[Phantom of the Coroutine](https://elizarov.medium.com/phantom-of-the-coroutine-afc63b03a131)
 
 ## 结构化并发
 
