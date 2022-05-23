@@ -4,7 +4,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import org.junit.jupiter.api.Test
 
-class Locks {
+class LocksTest {
 
     private val mutex = Mutex()
 
