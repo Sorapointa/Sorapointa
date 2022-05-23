@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
+import java.lang.management.ManagementFactory
+import java.lang.management.RuntimeMXBean
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -66,17 +68,17 @@ class EventPipelineTest {
             error("unreachable code")
         }
 
-        var counter by atomic(0)
+        val counter = atomic(0)
 
         EventManager.registerBlockEventListener {
             it.intercept()
-            counter++
+            counter.getAndIncrement()
         }
 
         EventManager.registerBlockEventListener(EventPriority.HIGHEST) {
             if (it is CancelableEvent) {
                 it.cancel()
-                counter++
+                counter.getAndIncrement()
             }
         }
 
@@ -85,13 +87,13 @@ class EventPipelineTest {
                 repeat(10) {
                     val event = TestEvent3()
                     val status = EventManager.broadcastEvent(event)
-                    counter++
+                    counter.getAndIncrement()
                     assertEquals(true, status)
                 }
             }
         }.joinAll()
 
-        assertEquals(3 * 1000 * 10, counter)
+        assertEquals(3 * 1000 * 100, counter.value)
     }
 
     @Test
@@ -102,6 +104,11 @@ class EventPipelineTest {
             CoroutineExceptionHandler { _, e ->
                 println("Caught Exception on Test Parent Scope: ${e.stackTraceToString()}")
             } + parentJob
+
+        val bean: RuntimeMXBean = ManagementFactory.getRuntimeMXBean()
+        val aList: List<String> = bean.inputArguments
+
+        aList.forEach(::println)
 
         EventManager.init(parentScope.coroutineContext)
 
@@ -114,7 +121,7 @@ class EventPipelineTest {
 
         EventManager.registerEventListener(EventPriority.LOWEST) {
             delay(500)
-            runCount++
+            runCount += 1
         }
 
         EventManager.registerBlockEventListener {
@@ -124,12 +131,12 @@ class EventPipelineTest {
 
         EventManager.registerBlockEventListener(EventPriority.LOWEST) {
             delay(500)
-            runCount++
+            runCount += 1
         }
 
         parentScope.launch {
             delay(500)
-            runCount++
+            runCount += 1
         }
 
         EventManager.broadcastEvent(TestEvent1())

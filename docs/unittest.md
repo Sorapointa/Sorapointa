@@ -126,3 +126,7 @@ runTest(TestOption.SKIP_CI) {
   assertEquals(10000, 10000)
 }
 ```
+
+### High Volume Test
+
+- Do not run high volume test in the IDE's `Debug` mode, which will cause `OutOfMemory` and deadlocks for unknown reasons
