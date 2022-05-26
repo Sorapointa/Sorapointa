@@ -217,7 +217,7 @@ internal fun Application.configureNeedHandlerRouting() {
                         val loginAccountRequestData = call.receive<LoginAccountRequestData>()
                         LoginAccountRequestEvent(call, loginAccountRequestData).broadcastEvent {
                             // TODO: Introduce a better solution for account system
-                            val split = it.data.account.split("#")
+                            val split = it.data.account.split(":")
                             if (split.size != 2) {
                                 LoginAccountResponseEvent(
                                     call,
