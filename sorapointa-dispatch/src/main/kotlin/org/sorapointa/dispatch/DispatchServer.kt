@@ -184,13 +184,13 @@ object DispatchServer {
     }
 }
 
+/* ktlint-disable max-line-length */
+private val QUERY_CURR_HARDCODE_DEFAULT = "aHR0cHM6Ly9jbmdmZGlzcGF0Y2gueXVhbnNoZW4uY29tL3F1ZXJ5X2N1cl9yZWdpb24/dmVyc2lvbj1DTlJFTFdpbjIuNi4wJmxhbmc9MiZwbGF0Zm9ybT0zJmJpbmFyeT0xJnRpbWU9MzcyJmNoYW5uZWxfaWQ9MSZzdWJfY2hhbm5lbF9pZD0xJmFjY291bnRfdHlwZT0xJmRpc3BhdGNoU2VlZD0yMjdmYTQ3ZGE4Y2U3ZGNh".decodeBase64String()
+/* ktlint-enable max-line-length */
+
 object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
     File(configDirectory, "dispatchConfig.json"), Data()
 ) {
-
-    /* ktlint-disable max-line-length */
-    private val QUERY_CURR_HARDCODE_DEFAULT = "aHR0cHM6Ly9jbmdmZGlzcGF0Y2gueXVhbnNoZW4uY29tL3F1ZXJ5X2N1cl9yZWdpb24/dmVyc2lvbj1DTlJFTFdpbjIuNi4wJmxhbmc9MiZwbGF0Zm9ybT0zJmJpbmFyeT0xJnRpbWU9MzcyJmNoYW5uZWxfaWQ9MSZzdWJfY2hhbm5lbF9pZD0xJmFjY291bnRfdHlwZT0xJmRpc3BhdGNoU2VlZD0yMjdmYTQ3ZGE4Y2U3ZGNh".decodeBase64String()
-    /* ktlint-enable max-line-length */
 
     @kotlinx.serialization.Serializable
     data class Data(
