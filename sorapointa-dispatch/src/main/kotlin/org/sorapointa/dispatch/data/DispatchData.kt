@@ -9,6 +9,12 @@ import org.sorapointa.utils.crypto.sha256sign
 import org.sorapointa.utils.networkJson
 
 @Serializable
+data class QueryCurRegionData(
+    val content: String,
+    val sign: String = "sorapointa don't need to sign"
+)
+
+@Serializable
 data class RegionListClientCustomConfig(
     @SerialName("sdkenv") val sdkEnvironment: UShort,
     @SerialName("showexception") val showException: Boolean,

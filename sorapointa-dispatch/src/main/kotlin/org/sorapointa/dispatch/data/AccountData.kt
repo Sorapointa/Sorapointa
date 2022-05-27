@@ -3,6 +3,7 @@ package org.sorapointa.dispatch.data
 import com.password4j.Argon2Function
 import com.password4j.Password
 import io.ktor.util.*
+import kotlinx.datetime.Instant
 import mu.KotlinLogging
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
@@ -10,6 +11,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import org.sorapointa.dispatch.DispatchConfig
 import org.sorapointa.dispatch.events.CreateAccountEvent
 import org.sorapointa.event.broadcast
@@ -24,8 +26,10 @@ object AccountTable : IdTable<UInt>("account_table") {
     val password: Column<String> = varchar("password", 255)
     val email: Column<String?> = varchar("email", 255).uniqueIndex().nullable()
     val comboToken: Column<String?> = varchar("combo_token", 40).nullable()
+    val comboTokenGenerationTime: Column<Instant?> = timestamp("combo_token_generation_time").nullable()
     val comboId: Column<UInt?> = uinteger("combo_id").nullable()
     val dispatchToken: Column<String?> = varchar("dispatch_token", 32).nullable()
+    val dispatchTokenGenerationTime: Column<Instant?> = timestamp("dispatch_token_generation_time").nullable()
     val permissionLevel: Column<UShort> = ushort("permission_level").default(0u)
 
     override val primaryKey: PrimaryKey = PrimaryKey(id)
@@ -82,11 +86,13 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
 
     val userId by AccountTable.id
     var userName by AccountTable.userName
-    var password by AccountTable.password
+    private var password by AccountTable.password
     var email by AccountTable.email
-    var comboToken by AccountTable.comboToken
-    var comboId by AccountTable.comboId
-    var dispatchToken by AccountTable.dispatchToken
+    private var comboToken by AccountTable.comboToken
+    private var comboTokenGenerationTime by AccountTable.comboTokenGenerationTime
+    private var comboId by AccountTable.comboId
+    private var dispatchToken by AccountTable.dispatchToken
+    private var dispatchTokenGenerationTime by AccountTable.dispatchTokenGenerationTime
     var permissionLevel by AccountTable.permissionLevel
 
     suspend fun checkPassword(inputPassword: String): Boolean {
@@ -99,29 +105,42 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
         password = hashPassword(inputPassword, generateSalt())
     }
 
-    suspend fun getDispatchTokenOrGenerate(): String {
-        // TODO: Expire after a while
-        return dispatchToken ?: run {
-            val token = randomByteArray(32).encodeBase64()
-            dispatchToken = token
-            token
-        }
+    internal suspend fun generateDipatchToken(): String {
+        val token = randomByteArray(32).encodeBase64()
+        dispatchToken = token
+        dispatchTokenGenerationTime = now()
+        return token
     }
 
-    suspend fun getComboTokenOrGenerate(): String {
-        // TODO: Expire after a while
-        return comboToken ?: run {
-            val token = randomByteArray(20).hex
-            comboToken = token
-            token
-        }
+    internal suspend fun generateComboToken(): String {
+        val token = randomByteArray(20).hex
+        comboToken = token
+        comboTokenGenerationTime = now()
+        return token
     }
 
-    suspend fun getComboIdOrGenerate(): UInt {
-        return comboId ?: run {
-            val cid = (0..Int.MAX_VALUE).random().toUInt()
-            comboId = cid
-            cid
+    internal suspend fun getComboIdOrGenerate(): UInt =
+        comboId ?: Random.nextInt(0, Int.MAX_VALUE).toUInt().also {
+            comboId = it
         }
+
+    internal suspend fun getComboToken(): String? {
+        if (checkComboTokenExpire()) return null
+        return comboToken
     }
+
+    internal suspend fun getDispatchToken(): String? {
+        if (checkDispatchTokenExpire()) return null
+        return dispatchToken
+    }
+
+    private suspend fun checkComboTokenExpire(): Boolean =
+        comboTokenGenerationTime?.let {
+            now() - it > DispatchConfig.data.comboTokenExpiredTime
+        } ?: true
+
+    private suspend fun checkDispatchTokenExpire(): Boolean =
+        dispatchTokenGenerationTime?.let {
+            now() - it > DispatchConfig.data.dispatchTokenExpiredTime
+        } ?: true
 }

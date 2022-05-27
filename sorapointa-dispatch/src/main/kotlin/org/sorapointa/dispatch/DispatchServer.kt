@@ -16,6 +16,7 @@ import io.ktor.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.encodeToString
 import org.slf4j.LoggerFactory
 import org.sorapointa.data.provider.DataFilePersist
@@ -29,6 +30,7 @@ import org.sorapointa.dispatch.plugins.configureHTTP
 import org.sorapointa.dispatch.plugins.configureMonitoring
 import org.sorapointa.dispatch.plugins.configureRouting
 import org.sorapointa.dispatch.plugins.configureSerialization
+import org.sorapointa.dispatch.util.KeyProvider
 import org.sorapointa.proto.QueryCurrRegionHttpRspOuterClass.QueryCurrRegionHttpRsp
 import org.sorapointa.proto.QueryRegionListHttpRspOuterClass.QueryRegionListHttpRsp
 import org.sorapointa.proto.queryRegionListHttpRsp
@@ -38,6 +40,7 @@ import org.sorapointa.utils.crypto.randomByteArray
 import org.sorapointa.utils.encoding.hex
 import java.io.File
 import kotlin.text.toCharArray
+import kotlin.time.Duration
 
 @OptIn(SorapointaInternal::class)
 internal fun main(): Unit = runBlocking {
@@ -204,10 +207,21 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
         // If false, dispatch server will use default config hardcoded in Sorapointa
         val forwardQueryCurrRegion: Boolean = true,
         val queryCurrRegionHardcode: String = QUERY_CURR_HARDCODE_DEFAULT,
+        @SerialName("comboExpiredExpiredTime")
+        private val _comboTokenExpiredTime: String = "3d",
+        @SerialName("dispatchTokenExpiredTime")
+        private val _dispatchTokenExpiredTime: String = "3d",
+        @SerialName("v2.8responseFormat") val v28: Boolean = false,
         val password: Argon2PasswordSetting = Argon2PasswordSetting(),
         val useSSL: Boolean = true,
         var certification: Certification = Certification()
-    )
+    ) {
+        val comboTokenExpiredTime: Duration
+            get() = Duration.parse(_comboTokenExpiredTime)
+
+        val dispatchTokenExpiredTime: Duration
+            get() = Duration.parse(_dispatchTokenExpiredTime)
+    }
 
     @kotlinx.serialization.Serializable
     data class Argon2PasswordSetting(

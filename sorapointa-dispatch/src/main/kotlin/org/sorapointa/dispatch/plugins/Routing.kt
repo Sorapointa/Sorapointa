@@ -22,7 +22,257 @@ import java.util.concurrent.ConcurrentHashMap
 
 private val logger = KotlinLogging.logger {}
 
-/* ktlint-disable max-line-length */
+@OptIn(SorapointaInternal::class)
+internal suspend fun ApplicationCall.handleQueryRegionList() {
+    logger.info { "Client ${request.local.host} has queried region list" }
+    val packet = DispatchServer.getQueryRegionListHttpRsp()
+    QueryRegionListEvent(this, packet).broadcastEvent {
+        respondText(it.data.toByteArray().encodeBase64())
+    }
+}
+
+@OptIn(SorapointaInternal::class)
+internal suspend fun ApplicationCall.handleQueryCurRegion() {
+    logger.info { "Client ${request.local.host} has queried current region" }
+    val packet = DispatchServer.getQueryCurrRegionHttpRsp(this)
+    QueryCurrRegionEvent(this, packet).broadcastEvent {
+        // We don't need to sign if client has been hooked
+        // And we would not to implement this sign algorithm,
+        // because it's related with injecting new RSA key,
+        // but that is uncessary for now.
+        val data = it.data.toByteArray().encodeBase64()
+        if (DispatchConfig.data.v28) {
+            respond(QueryCurRegionData(data))
+        } else {
+            respondText(data)
+        }
+    }
+}
+
+internal suspend fun ApplicationCall.handleLogin() {
+    val loginAccountRequestData = receive<LoginAccountRequestData>()
+
+    val returnErrorMsg: suspend (String) -> Unit = { msg ->
+        LoginAccountResponseEvent(this,
+            LoginResultData(-201, msg.i18n())
+        ).respond()
+    }
+
+    LoginAccountRequestEvent(this, loginAccountRequestData).broadcastEvent {
+        // TODO: Introduce a better solution for account system
+        val split = it.data.account.split(":")
+        if (split.size != 2) {
+            returnErrorMsg("dispatch.login.error.split")
+            return@broadcastEvent
+        }
+        val name = split[0]
+        val pwd = split[1]
+        if (name.length !in 3..16) {
+            returnErrorMsg("dispatch.login.error.length.name")
+            return@broadcastEvent
+        }
+        if (pwd.length !in 8..32) {
+            returnErrorMsg("dispatch.login.errqor.length.password")
+            return@broadcastEvent
+        }
+        newSuspendedTransaction {
+            val account = Account.findOrCreate(name, pwd)
+            if (!account.checkPassword(pwd)) {
+                returnErrorMsg("dispatch.login.error.password")
+                return@newSuspendedTransaction
+            }
+            val token = account.generateDipatchToken()
+            LoginAccountResponseEvent(
+                this@handleLogin,
+                LoginResultData(
+                    returnCode = 0, message = "OK",
+                    LoginResultData.VerifyData(
+                        LoginResultData.VerifyAccountData(
+                            uid = account.userId.value,
+                            token = token,
+                            email = account.email ?: name
+                        )
+                    )
+                )
+            ).respond()
+        }
+    }
+}
+
+internal suspend fun ApplicationCall.handleComboLogin() {
+    val comboTokenRequestData = receive<ComboTokenRequestData>()
+
+    val returnErrorMsg: suspend (String) -> Unit = { msg ->
+        ComboTokenResponseEvent(this,
+            ComboTokenResponseData(-201, msg.i18n())
+        ).respond()
+    }
+
+    //TODO: hardcode warning
+    if (!comboTokenRequestData.signCheck(parameters["region"] == "hk4e_cn")) {
+        returnErrorMsg("dispatch.login.error.sign")
+        return
+    }
+
+    newSuspendedTransaction {
+        val account = Account.findById(comboTokenRequestData.data.uid)
+        if (account == null) {
+            returnErrorMsg("dispatch.login.error.user.notfound")
+            return@newSuspendedTransaction
+        }
+        if (account.getDispatchToken() != comboTokenRequestData.data.token) {
+            returnErrorMsg("dispatch.login.error.token")
+            return@newSuspendedTransaction
+        }
+        val comboId = account.getComboIdOrGenerate()
+        val comboToken = account.generateComboToken()
+        ComboTokenResponseEvent(
+            this@handleComboLogin,
+            ComboTokenResponseData(returnCode = 0, message = "OK",
+                ComboTokenResponseData.LoginData(
+                    accountType = 1u,
+                    comboId = comboId,
+                    comboToken = comboToken,
+                    data = ComboTokenResponseData.LoginData.LoginGuestData(guest = false),
+                    heartbeat = false,
+                    openId = comboTokenRequestData.data.uid,
+                )
+            )
+        ).respond()
+    }
+}
+
+internal suspend fun ApplicationCall.handleVerify() {
+    val verifyData = receive<VerifyTokenRequestData>()
+
+    val returnErrorMsg: suspend (String) -> Unit = { msg ->
+        LoginAccountResponseEvent(
+            this@handleVerify,
+            LoginResultData(-201, msg.i18n())
+        ).respond()
+    }
+
+    newSuspendedTransaction {
+        val account = Account.findById(verifyData.uid)
+        if (account == null) {
+            returnErrorMsg("dispatch.login.error.user.notfound")
+            return@newSuspendedTransaction
+        }
+        if (account.getDispatchToken() != verifyData.token) {
+            returnErrorMsg("dispatch.login.error.token")
+            return@newSuspendedTransaction
+        }
+        val token = account.generateDipatchToken()
+        LoginAccountResponseEvent(
+            this@handleVerify,
+            LoginResultData(
+                returnCode = 0, message = "OK",
+                LoginResultData.VerifyData(
+                    LoginResultData.VerifyAccountData(
+                        uid = account.userId.value,
+                        token = token,
+                        email = account.email
+                    )
+                )
+            )
+        ).respond()
+    }
+}
+
+internal suspend fun ApplicationCall.handleLoadConfig() {
+    forwardCallWithAll(
+        DOMAIN_SDK_STATIC,
+        MdkShieldLoadConfigData(
+            returnCode = 0, message = "OK",
+            data = MdkShieldLoadConfigData.Data(
+                id = 6u,
+                gameKey = "sora",
+                client = "PC",
+                identity = "I_IDENTITY",
+                guest = false,
+                ignoreVersions = "",
+                scene = "S_ACCOUNT",
+                name = "Sorapointa",
+                disableRegist = false,
+                enableEmailCaptcha = true,
+                thirdParty = arrayListOf(),
+                disableMmt = true,
+                serverGuest = false,
+                thirdPartyIgnore = mapOf(),
+                thirdPartyLoginConfigs = mapOf(),
+                enablePsBindAccount = false
+            )
+        )
+    ) { GetMdkShieldLoadConfigDataEvent(this, it) }
+}
+
+internal suspend fun ApplicationCall.handleGetConfig() {
+    forwardCallWithAll(
+        DOMAIN_SDK_STATIC,
+        ComboConfigData(
+            returnCode = 0, message = "OK",
+            data = ComboConfigData.Data(
+                protocol = false,
+                qrEnabled = false,
+                logLevel = "INFO",
+                announceUrl = ANNOUNCE_URL.decodeBase64String(),
+                pushAliasType = 1u,
+                enableAnnouncePicPopup = true,
+                disableYsdkGuard = true
+            )
+        )
+    ) { GetComboConfigDataEvent(this, it) }
+}
+
+internal suspend fun ApplicationCall.handleGetCompareProtocolVersion() {
+    forwardCallWithAll(
+        DOMAIN_HK4E_SDK,
+        CompareProtocolVersionData(
+            returnCode = 0, message = "OK",
+            data = CompareProtocolVersionData.Data(
+                modified = true,
+                protocol = CompareProtocolVersionData.Data.Protocol(
+                    id = 0u,
+                    appId = 4u,
+                    language = "en",
+                    userProto = "",
+                    privProto = "",
+                    major = 26u,
+                    minimum = 2u,
+                    createTime = 0u,
+                    teenagerProto = "",
+                    thirdProto = ""
+                )
+            )
+        )
+    ) { GetCompareProtocolVersionDataEvent(this, it) }
+}
+
+internal suspend fun ApplicationCall.handleGetAgreementInfos() {
+    forwardCallWithAll(
+        DOMAIN_HK4E_OS_VERSION,
+        AgreementData(
+            returnCode = 0, message = "OK",
+            data = AgreementData.Data(
+                marketingAgreements = arrayListOf()
+            )
+        )
+    ) // TODO: not sure so far
+    { GetAgreementDataEvent(this, it) }
+}
+
+internal suspend fun ApplicationCall.handleGetComboData() {
+    forwardCallWithAll(
+        DOMAIN_SDK_STATIC,
+        ComboData(
+            returnCode = 0, message = "OK",
+            data = ComboData.Data(
+                values = mapOf("modify_real_name_other_verify" to "true")
+            )
+        )
+    ) { GetComboDataEvent(this, it) }
+}
+
 internal fun Application.configureRouting() {
 
     routing {
@@ -39,264 +289,63 @@ internal fun Application.configureRouting() {
 
 private val DOMAIN_SDK_STATIC = "c2RrLXN0YXRpYy5taWhveW8uY29t".decodeBase64String()
 private val DOMAIN_HK4E_SDK = "aGs0ZS1zZGsubWlob3lvLmNvbQ==".decodeBase64String()
-private val DOMAIN_HK4E_OS_VERSE = "aGs0ZS1zZGstb3MuaG95b3ZlcnNlLmNvbQ==".decodeBase64String()
+private val DOMAIN_HK4E_OS_VERSION = "aGs0ZS1zZGstb3MuaG95b3ZlcnNlLmNvbQ==".decodeBase64String()
 private val DOMAIN_WEB_STATIC = "d2Vic3RhdGljLm1paG95by5jb20=".decodeBase64String()
 private val ANNOUNCE_URL =
     "aHR0cHM6Ly93ZWJzdGF0aWMubWlob3lvLmNvbS9oazRlL2Fubm91bmNlbWVudC9pbmRleC5odG1s".decodeBase64String()
 
-@OptIn(SorapointaInternal::class)
 internal fun Application.configureNeedHandlerRouting() {
     routing {
         get("/query_region_list") {
-            logger.info { "Client ${call.request.local.host} has queried region list" }
-            val packet = DispatchServer.getQueryRegionListHttpRsp()
-            QueryRegionListEvent(call, packet).broadcastEvent { call.respondText(it.data.toByteArray().encodeBase64()) }
+            call.handleQueryRegionList()
         }
 
         get("/query_cur_region") {
-            logger.info { "Client ${call.request.local.host} has queried current region" }
-            val packet = DispatchServer.getQueryCurrRegionHttpRsp(call)
-            QueryCurrRegionEvent(call, packet).broadcastEvent {
-                call.respondText(it.data.toByteArray().encodeBase64())
-            }
+            call.handleQueryCurRegion()
         }
 
         route("/hk4e_{region}") {
             route("/combo/granter") {
                 route("/login/v2") {
                     post("/login") {
-                        val comboTokenRequestData = call.receive<ComboTokenRequestData>()
-                        if (!comboTokenRequestData.signCheck(call.parameters["region"] == "hk4e_cn")) {
-                            ComboTokenResponseEvent(
-                                call,
-                                ComboTokenResponseData(-201, "dispatch.login.error.sign".i18n())
-                            ).respond()
-                            return@post
-                        }
-                        newSuspendedTransaction {
-                            val account = Account.findById(comboTokenRequestData.data.uid)
-                            if (account == null) {
-                                LoginAccountResponseEvent(
-                                    call,
-                                    LoginResultData(-201, "dispatch.login.error.user.notfound".i18n())
-                                ).respond()
-                                return@newSuspendedTransaction
-                            }
-                            if (account.dispatchToken != comboTokenRequestData.data.token) {
-                                ComboTokenResponseEvent(
-                                    call,
-                                    ComboTokenResponseData(-201, "dispatch.login.error.token".i18n())
-                                ).respond()
-                                return@newSuspendedTransaction
-                            }
-                            val comboId = account.getComboIdOrGenerate()
-                            val comboToken = account.getComboTokenOrGenerate()
-                            ComboTokenResponseEvent(
-                                call,
-                                ComboTokenResponseData(
-                                    returnCode = 0, message = "OK",
-                                    ComboTokenResponseData.LoginData(
-                                        accountType = 1u,
-                                        comboId = comboId,
-                                        comboToken = comboToken,
-                                        data = ComboTokenResponseData.LoginData.LoginGuestData(guest = false),
-                                        heartbeat = false,
-                                        openId = comboTokenRequestData.data.uid,
-                                    )
-                                )
-                            ).respond()
-                        }
+                        call.handleComboLogin()
                     }
                 }
                 route("/api") {
                     get("/getConfig") {
-                        call.forwardCallWithAll(
-                            DOMAIN_SDK_STATIC,
-                            ComboConfigData(
-                                returnCode = 0, message = "OK",
-                                data = ComboConfigData.Data(
-                                    protocol = false,
-                                    qrEnabled = false,
-                                    logLevel = "INFO",
-                                    announceUrl = ANNOUNCE_URL.decodeBase64String(),
-                                    pushAliasType = 1u,
-                                    enableAnnouncePicPopup = true,
-                                    disableYsdkGuard = true
-                                )
-                            )
-                        ) { GetComboConfigDataEvent(call, it) }
+                        call.handleGetConfig()
                     }
                     post("/compareProtocolVersion") {
-                        call.forwardCallWithAll(
-                            DOMAIN_HK4E_SDK,
-                            CompareProtocolVersionData(
-                                returnCode = 0, message = "OK",
-                                data = CompareProtocolVersionData.Data(
-                                    modified = true,
-                                    protocol = CompareProtocolVersionData.Data.Protocol(
-                                        id = 0u,
-                                        appId = 4u,
-                                        language = "en",
-                                        userProto = "",
-                                        privProto = "",
-                                        major = 26u,
-                                        minimum = 2u,
-                                        createTime = 0u,
-                                        teenagerProto = "",
-                                        thirdProto = ""
-                                    )
-                                )
-                            )
-                        ) { GetCompareProtocolVersionDataEvent(call, it) }
+                        call.handleGetCompareProtocolVersion()
                     }
                 }
             }
             route("/mdk") {
                 route("/shield/api") {
                     post("/verify") {
-                        val verifyData = call.receive<VerifyTokenRequestData>()
-                        newSuspendedTransaction {
-                            val account = Account.findById(verifyData.uid)
-                            if (account == null) {
-                                LoginAccountResponseEvent(
-                                    call,
-                                    LoginResultData(-201, "dispatch.login.error.user.notfound".i18n())
-                                ).respond()
-                                return@newSuspendedTransaction
-                            }
-                            if (account.dispatchToken != verifyData.token) {
-                                LoginAccountResponseEvent(
-                                    call,
-                                    LoginResultData(-201, "dispatch.login.error.token".i18n())
-                                ).respond()
-                                return@newSuspendedTransaction
-                            }
-                            val token = account.getDispatchTokenOrGenerate()
-                            LoginAccountResponseEvent(
-                                call,
-                                LoginResultData(
-                                    returnCode = 0, message = "OK",
-                                    LoginResultData.VerifyData(
-                                        LoginResultData.VerifyAccountData(
-                                            uid = account.userId.value,
-                                            token = token,
-                                            email = account.email
-                                        )
-                                    )
-                                )
-                            ).respond()
-                        }
+                        call.handleVerify()
                     }
                     get("/loadConfig") {
-                        call.forwardCallWithAll(
-                            DOMAIN_SDK_STATIC,
-                            MdkShieldLoadConfigData(
-                                returnCode = 0, message = "OK",
-                                data = MdkShieldLoadConfigData.Data(
-                                    id = 6u,
-                                    gameKey = "sora",
-                                    client = "PC",
-                                    identity = "I_IDENTITY",
-                                    guest = false,
-                                    ignoreVersions = "",
-                                    scene = "S_ACCOUNT",
-                                    name = "Sorapointa",
-                                    disableRegist = false,
-                                    enableEmailCaptcha = true,
-                                    thirdParty = arrayListOf(),
-                                    disableMmt = true,
-                                    serverGuest = false,
-                                    thirdPartyIgnore = mapOf(),
-                                    thirdPartyLoginConfigs = mapOf(),
-                                    enablePsBindAccount = false
-                                )
-                            )
-                        ) { GetMdkShieldLoadConfigDataEvent(call, it) }
+                        call.handleLoadConfig()
                     }
                     post("/login") {
-                        val loginAccountRequestData = call.receive<LoginAccountRequestData>()
-                        LoginAccountRequestEvent(call, loginAccountRequestData).broadcastEvent {
-                            // TODO: Introduce a better solution for account system
-                            val split = it.data.account.split(":")
-                            if (split.size != 2) {
-                                LoginAccountResponseEvent(
-                                    call,
-                                    LoginResultData(-201, "dispatch.login.error.split".i18n())
-                                ).respond()
-                                return@broadcastEvent
-                            }
-                            val name = split[0]
-                            val pwd = split[1]
-                            if (name.length !in 3..16) {
-                                LoginAccountResponseEvent(
-                                    call,
-                                    LoginResultData(-201, "dispatch.login.error.length.name".i18n())
-                                ).respond()
-                                return@broadcastEvent
-                            }
-                            if (pwd.length !in 8..32) {
-                                LoginAccountResponseEvent(
-                                    call,
-                                    LoginResultData(-201, "dispatch.login.error.length.password".i18n())
-                                ).respond()
-                                return@broadcastEvent
-                            }
-                            newSuspendedTransaction {
-                                val account = Account.findOrCreate(name, pwd)
-                                if (!account.checkPassword(pwd)) {
-                                    LoginAccountResponseEvent(
-                                        call,
-                                        LoginResultData(-201, "dispatch.login.error.password".i18n())
-                                    ).respond()
-                                    return@newSuspendedTransaction
-                                }
-                                val token = account.getDispatchTokenOrGenerate()
-                                LoginAccountResponseEvent(
-                                    call,
-                                    LoginResultData(
-                                        returnCode = 0, message = "OK",
-                                        LoginResultData.VerifyData(
-                                            LoginResultData.VerifyAccountData(
-                                                uid = account.userId.value,
-                                                token = token,
-                                                email = account.email ?: name
-                                            )
-                                        )
-                                    )
-                                ).respond()
-                            }
-                        }
+                        call.handleLogin()
                     }
                 }
                 getAndPost("/shopwindow/shopwindow/listPriceTier") {
                     // TODO: sniffing some packets and replace the hardcode
-                    call.respondText { """{"retcode":0,"message":"OK","data":{"suggest_currency":"USD","tiers":[]}}""" }
+                    call.respondText {
+                        """{"retcode":0,"message":"OK","data":{"suggest_currency":"USD","tiers":[]}}"""
+                    }
                 }
                 get("/agreement/api/getAgreementInfos") {
-                    call.forwardCallWithAll(
-                        DOMAIN_HK4E_OS_VERSE,
-                        AgreementData(
-                            returnCode = 0, message = "OK",
-                            data = AgreementData.Data(
-                                marketingAgreements = arrayListOf()
-                            )
-                        )
-                    ) // TODO: not sure so far
-                    { GetAgreementDataEvent(call, it) }
+                    call.handleGetAgreementInfos()
                 }
             }
         }
 
         get("/combo/box/api/config/sdk/combo") {
-            call.forwardCallWithAll(
-                DOMAIN_SDK_STATIC,
-                ComboData(
-                    returnCode = 0, message = "OK",
-                    data = ComboData.Data(
-                        values = mapOf("modify_real_name_other_verify" to "true")
-                    )
-                )
-            ) { GetComboDataEvent(call, it) }
+            call.handleGetComboData()
         }
 
 //        get("/admin/mi18n/plat_oversea/m{id}/m{id0}-version.json") {
@@ -314,7 +363,9 @@ internal fun Application.configureNeedHandlerRouting() {
             route("/announcement/api") {
                 getAndPost("/getAlertPic") {
                     // TODO: sniffing some packets and replace the hardcode
-                    call.respondText { """{"retcode":0,"message":"OK","data":{"alert":false,"alert_id":0,"remind":true}}""" }
+                    call.respondText {
+                        """{"retcode":0,"message":"OK","data":{"alert":false,"alert_id":0,"remind":true}}"""
+                    }
                 }
 
                 getAndPost("/getAnnList") {
@@ -392,6 +443,8 @@ internal fun Application.configureThirdPartyAuth() {
         }
     }
 }
+
+/* ktlint-disable max-line-length */
 
 internal fun Application.configureHardCodeRouting() {
     routing {

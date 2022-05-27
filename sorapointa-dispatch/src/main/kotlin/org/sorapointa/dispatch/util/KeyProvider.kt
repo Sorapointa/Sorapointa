@@ -1,4 +1,4 @@
-package org.sorapointa.dispatch
+package org.sorapointa.dispatch.util
 
 import io.ktor.network.tls.extensions.*
 import io.ktor.util.*
@@ -6,10 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
-import org.sorapointa.dispatch.util.KeyType
-import org.sorapointa.dispatch.util.buildKeyStore
-import org.sorapointa.dispatch.util.saveCertToFile
-import org.sorapointa.dispatch.util.saveToFile
+import org.sorapointa.dispatch.DispatchConfig
 import org.sorapointa.utils.isJUnitTest
 import java.io.File
 import java.security.KeyStore
