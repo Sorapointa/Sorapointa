@@ -1,40 +1,26 @@
 package org.sorapointa.dispatch
 
-import com.google.protobuf.ByteString
-import com.google.protobuf.kotlin.toByteString
 import com.password4j.types.Argon2
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.util.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.encodeToString
 import org.slf4j.LoggerFactory
 import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.data.provider.DatabaseConfig
 import org.sorapointa.data.provider.DatabaseManager
 import org.sorapointa.dispatch.data.AccountTable
-import org.sorapointa.dispatch.data.ClientCustomConfig
-import org.sorapointa.dispatch.data.RegionListClientCustomConfig
 import org.sorapointa.dispatch.plugins.*
 import org.sorapointa.dispatch.plugins.configureHTTP
 import org.sorapointa.dispatch.plugins.configureMonitoring
 import org.sorapointa.dispatch.plugins.configureRouting
 import org.sorapointa.dispatch.plugins.configureSerialization
 import org.sorapointa.dispatch.util.KeyProvider
-import org.sorapointa.proto.QueryCurrRegionHttpRspOuterClass.QueryCurrRegionHttpRsp
-import org.sorapointa.proto.QueryRegionListHttpRspOuterClass.QueryRegionListHttpRsp
-import org.sorapointa.proto.queryRegionListHttpRsp
-import org.sorapointa.proto.regionSimpleInfo
 import org.sorapointa.utils.*
 import org.sorapointa.utils.crypto.randomByteArray
 import org.sorapointa.utils.encoding.hex
@@ -105,86 +91,6 @@ object DispatchServer {
         embeddedServer(Netty, environment = environment).start(wait = true)
     }
 
-    // TODO: inline as a member variable and store it in memory
-    @SorapointaInternal
-    suspend fun getQueryRegionListHttpRsp(): QueryRegionListHttpRsp {
-        val serverList = DispatchConfig.data.servers.map {
-            regionSimpleInfo {
-                name = it.serverName
-                title = it.title
-                type = it.serverType
-                dispatchUrl = "https://${it.dispatchDomain}/query_cur_region"
-            }
-        }
-
-        return withContext(Dispatchers.IO) {
-            val dispatchSeed = File(configDirectory, "dispatchSeed.bin").readBytes()
-            val dispatchKey = File(configDirectory, "dispatchKey.bin").readBytes()
-
-            queryRegionListHttpRsp {
-                regionList.addAll(serverList)
-                clientSecretKey = ByteString.copyFrom(dispatchSeed)
-                enableLoginPc = true
-                clientCustomConfigEncrypted = networkJson.encodeToString(
-                    // TODO: Extract to be the event and config
-                    RegionListClientCustomConfig(
-                        sdkEnvironment = 2u,
-                        showException = false,
-                        loadPatch = false,
-                        regionConfig = "",
-                        regionDispatchType = 0u,
-                        videoKey = 5578228838233776,
-                        downloadMode = 0u
-                    )
-                ).toByteArray().xor(dispatchKey).toByteString()
-            }
-
-        }
-    }
-
-    private val QUERY_CURR_DOMAIN = "Y25nZmRpc3BhdGNoLnl1YW5zaGVuLmNvbQ==".decodeBase64String()
-
-    @SorapointaInternal
-    suspend fun getQueryCurrRegionHttpRsp(call: ApplicationCall): QueryCurrRegionHttpRsp {
-
-        val queryCurrRegionHttpRsp = QueryCurrRegionHttpRsp.parseFrom(
-            (if (DispatchConfig.data.forwardQueryCurrRegion) call.forwardCall(QUERY_CURR_DOMAIN)
-            else client.get(DispatchConfig.data.queryCurrRegionHardcode).bodyAsText()).decodeBase64Bytes()
-        )
-
-        val dispatchSeed = File(configDirectory, "dispatchSeed.bin").readBytes()
-        val dispatchKey = File(configDirectory, "dispatchKey.bin").readBytes()
-
-        return queryCurrRegionHttpRsp.toBuilder()
-            .setRegionInfo(
-                queryCurrRegionHttpRsp.regionInfo.toBuilder()
-                    .setGateserverIp(DispatchConfig.data.gateServerIp)
-                    .setGateserverPort(DispatchConfig.data.gateServerPort)
-                    .setSecretKey(ByteString.copyFrom(dispatchSeed))
-                    .build()
-            )
-            .setClientSecretKey(ByteString.copyFrom(dispatchSeed))
-            .setRegionCustomConfigEncrypted(
-                networkJson.encodeToString(
-                    // TODO: Extract to be the event and config
-                    ClientCustomConfig(
-                        codeSwitch = listOf(15u, 2410u, 2324u, 21u),
-                        coverSwitch = listOf(8u, 40u),
-                        perfReportEnable = false,
-                        homeDotPattern = true,
-                        homeItemFilter = 20u,
-                        reportNetDelayConfig = ClientCustomConfig.ReportNetDelayConfigData(
-                            openGateServer = true
-                        )
-                    )
-                ).toByteArray().xor(dispatchKey).toByteString()
-            ).build()
-
-//        val binFile = File(configDirectory, "query_cur_region.bin")
-//        val queryCurrRegionHttpRsp = QueryCurrRegionHttpRsp.parseFrom(binFile.readBytes())
-//
-//        return queryCurrRegionHttpRsp
-    }
 }
 
 /* ktlint-disable max-line-length */
