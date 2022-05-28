@@ -20,7 +20,7 @@ import org.sorapointa.dispatch.plugins.configureHTTP
 import org.sorapointa.dispatch.plugins.configureMonitoring
 import org.sorapointa.dispatch.plugins.configureRouting
 import org.sorapointa.dispatch.plugins.configureSerialization
-import org.sorapointa.dispatch.util.KeyProvider
+import org.sorapointa.dispatch.utils.KeyProvider
 import org.sorapointa.utils.*
 import org.sorapointa.utils.crypto.randomByteArray
 import org.sorapointa.utils.encoding.hex
