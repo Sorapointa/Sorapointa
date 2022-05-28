@@ -17,6 +17,8 @@ import org.sorapointa.dispatch.events.CreateAccountEvent
 import org.sorapointa.event.broadcast
 import org.sorapointa.utils.crypto.randomByteArray
 import org.sorapointa.utils.encoding.hex
+import org.sorapointa.utils.now
+import kotlin.random.Random
 
 private val logger = KotlinLogging.logger {}
 
@@ -95,11 +97,10 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
     private var dispatchTokenGenerationTime by AccountTable.dispatchTokenGenerationTime
     var permissionLevel by AccountTable.permissionLevel
 
-    suspend fun checkPassword(inputPassword: String): Boolean {
-        return Password.check(inputPassword, password)
+    suspend fun checkPassword(inputPassword: String): Boolean =
+        Password.check(inputPassword, password)
             .addPepper(pepper)
             .with(argon2)
-    }
 
     suspend fun updatePassword(inputPassword: String) {
         password = hashPassword(inputPassword, generateSalt())
