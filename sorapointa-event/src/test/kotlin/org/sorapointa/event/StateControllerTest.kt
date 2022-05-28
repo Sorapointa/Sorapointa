@@ -69,6 +69,10 @@ class StateControllerTest {
 
             override val state: SomeClassWithSomeDifferentState.State = SomeClassWithSomeDifferentState.State.HAPPY
 
+            override suspend fun startState() {
+                println("Start Happy!")
+            }
+
             override fun barfoo(): String = "Happy"
 
         }
