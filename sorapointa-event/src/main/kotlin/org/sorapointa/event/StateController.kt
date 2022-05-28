@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.concurrent.ConcurrentHashMap
 
 
@@ -44,7 +43,7 @@ class StateController<TState : Enum<*>, TInterfaceWithState: WithState<TState>, 
 
     init {
         // TODO: Check it whether needs to be extracted as a single function
-        runBlocking {
+        scope.launch {
             currentState.value.startState()
         }
     }
