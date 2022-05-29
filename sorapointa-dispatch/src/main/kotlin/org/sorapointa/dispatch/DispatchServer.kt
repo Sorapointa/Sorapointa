@@ -22,7 +22,7 @@ import org.sorapointa.dispatch.plugins.configureRouting
 import org.sorapointa.dispatch.plugins.configureSerialization
 import org.sorapointa.dispatch.utils.KeyProvider
 import org.sorapointa.utils.*
-import org.sorapointa.utils.crypto.randomByteArray
+import org.sorapointa.utils.randomByteArray
 import org.sorapointa.utils.encoding.hex
 import java.io.File
 import kotlin.text.toCharArray

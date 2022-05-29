@@ -5,7 +5,7 @@ package org.sorapointa.dispatch.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
-import org.sorapointa.utils.crypto.sha256sign
+import org.sorapointa.utils.sha256sign
 import org.sorapointa.utils.networkJson
 
 @Serializable
