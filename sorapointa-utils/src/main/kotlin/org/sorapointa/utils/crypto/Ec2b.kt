@@ -116,7 +116,7 @@ fun readEc2b(byteArray: ByteArray): Ec2bSeed =
     buildPacket {
         writeFully(byteArray)
     }.use { pk ->
-        val magic = pk.discard(4) // head, constantly "Ec2b"
+        pk.discard(4) // head, constantly "Ec2b"
         val keySize = pk.readIntLittleEndian().toUInt()
         val decryptionKey = pk.readBytes(keySize.toInt()).toUByteArray()
         val dataSize = pk.readIntLittleEndian().toUInt()

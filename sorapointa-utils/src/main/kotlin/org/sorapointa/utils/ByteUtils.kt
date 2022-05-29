@@ -35,6 +35,14 @@ fun UByteArray.xor(key: UByteArray): UByteArray {
     return this
 }
 
+fun ByteArray.xor(key: ByteArray): ByteArray {
+    for (i in this.indices) {
+        this[i] = (this[i].toInt() xor key[i % key.size].toInt()).toByte()
+    }
+    return this
+}
+
+
 fun UByteArray.entireToULong(): ULong {
     require(this.size == 8) { "Size must be 8" }
     val uints = this.map { it.toULong() }

@@ -15,7 +15,7 @@ import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import org.sorapointa.dispatch.DispatchConfig
 import org.sorapointa.dispatch.events.CreateAccountEvent
 import org.sorapointa.event.broadcast
-import org.sorapointa.utils.crypto.randomByteArray
+import org.sorapointa.utils.randomByteArray
 import org.sorapointa.utils.encoding.hex
 import org.sorapointa.utils.now
 import kotlin.random.Random

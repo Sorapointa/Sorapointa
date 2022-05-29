@@ -15,7 +15,7 @@ import org.sorapointa.data.provider.initTestDataProvider
 import org.sorapointa.dispatch.data.Account
 import org.sorapointa.dispatch.data.AccountTable
 import org.sorapointa.utils.TestOption
-import org.sorapointa.utils.crypto.randomByteArray
+import org.sorapointa.utils.randomByteArray
 import org.sorapointa.utils.encoding.hex
 import org.sorapointa.utils.runTest
 import kotlin.test.assertEquals
