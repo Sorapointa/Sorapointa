@@ -1,8 +1,2 @@
 # default ignore all files in config
 **/*
-
-# Unignore
-!/query_cur_region.bin
-!/query_region_list.bin
-!/dispatchKey.bin
-!/dispatchSeed.bin

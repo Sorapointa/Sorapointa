@@ -11,7 +11,6 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.util.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import mu.KotlinLogging
@@ -21,14 +20,14 @@ import org.sorapointa.dispatch.DispatchServer
 import org.sorapointa.dispatch.data.*
 import org.sorapointa.dispatch.events.*
 import org.sorapointa.event.broadcastEvent
-import org.sorapointa.proto.QueryCurrRegionHttpRspOuterClass
+import org.sorapointa.proto.QueryCurrRegionHttpRspOuterClass.QueryCurrRegionHttpRsp
 import org.sorapointa.proto.queryRegionListHttpRsp
 import org.sorapointa.proto.regionSimpleInfo
-import org.sorapointa.utils.configDirectory
+import org.sorapointa.utils.crypto.Ec2bSeed
+import org.sorapointa.utils.crypto.dumpToData
 import org.sorapointa.utils.i18n
 import org.sorapointa.utils.networkJson
 import org.sorapointa.utils.xor
-import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
 private val logger = KotlinLogging.logger {}
@@ -41,52 +40,55 @@ private val ANNOUNCE_URL =
     "aHR0cHM6Ly93ZWJzdGF0aWMubWlob3lvLmNvbS9oazRlL2Fubm91bmNlbWVudC9pbmRleC5odG1s".decodeBase64String()
 private val QUERY_CURR_DOMAIN = "Y25nZmRpc3BhdGNoLnl1YW5zaGVuLmNvbQ==".decodeBase64String()
 
-private val queryRegionListHttpRsp by lazy {
-    runBlocking {
-        val serverList = DispatchConfig.data.servers.map {
-            regionSimpleInfo {
-                name = it.serverName
-                title = it.title
-                type = it.serverType
-                dispatchUrl = "https://${it.dispatchDomain}/query_cur_region"
-            }
-        }
-
-        withContext(Dispatchers.IO) {
-            val dispatchSeed = File(configDirectory, "dispatchSeed.bin").readBytes()
-            val dispatchKey = File(configDirectory, "dispatchKey.bin").readBytes()
-
-            queryRegionListHttpRsp {
-                regionList.addAll(serverList)
-                clientSecretKey = ByteString.copyFrom(dispatchSeed)
-                enableLoginPc = true
-                clientCustomConfigEncrypted = networkJson.encodeToString(
-                    // TODO: Extract to be the event and config
-                    RegionListClientCustomConfig(
-                        sdkEnvironment = 2u,
-                        showException = false,
-                        loadPatch = false,
-                        regionConfig = "",
-                        regionDispatchType = 0u,
-                        videoKey = 5578228838233776,
-                        downloadMode = 0u
-                    )
-                ).toByteArray().xor(dispatchKey).toByteString()
-            }
-
-        }
+private val serverList = DispatchConfig.data.servers.map {
+    regionSimpleInfo {
+        name = it.serverName
+        title = it.title
+        type = it.serverType
+        dispatchUrl = "https://${it.dispatchDomain}/query_cur_region"
     }
 }
 
-private suspend fun ApplicationCall.forwardQueryCurrRegionHttpRsp(): QueryCurrRegionHttpRspOuterClass.QueryCurrRegionHttpRsp {
+private suspend fun getQueryRegionListHttpRsp(host: String) =
+    withContext(Dispatchers.IO) {
 
-    val queryCurrRegionHttpRsp = QueryCurrRegionHttpRspOuterClass.QueryCurrRegionHttpRsp.parseFrom(
-        (if (DispatchConfig.data.forwardQueryCurrRegion) forwardCall(QUERY_CURR_DOMAIN)
-        else DispatchServer.client.get(DispatchConfig.data.queryCurrRegionHardcode).bodyAsText()).decodeBase64Bytes()
-    )
+        val ec2b = DispatchServer.dispatchKeyMap.getOrPut(host) {
+            Ec2bSeed.generate().dumpToData()
+        }
 
-    val dispatchSeed = File(configDirectory, "dispatchSeed.bin").readBytes()
-    val dispatchKey = File(configDirectory, "dispatchKey.bin").readBytes()
+        val dispatchSeed = ec2b.seed
+        val dispatchKey = ec2b.key
+
+        queryRegionListHttpRsp {
+            regionList.addAll(serverList)
+            clientSecretKey = ByteString.copyFrom(dispatchSeed)
+            enableLoginPc = true
+            clientCustomConfigEncrypted = networkJson.encodeToString(
+                DispatchConfig.data.regionListClientCustomConfig
+            ).toByteArray().xor(dispatchKey).toByteString()
+        }
+
+    }
+
+private var queryCurrRegionHttpRsp: QueryCurrRegionHttpRsp? = null
+
+private suspend fun ApplicationCall.forwardQueryCurrRegionHttpRsp(): QueryCurrRegionHttpRsp {
+
+    val queryCurrRegionHttpRsp = queryCurrRegionHttpRsp ?: run {
+        QueryCurrRegionHttpRsp.parseFrom(
+            (if (DispatchConfig.data.requestSetting.forwardQueryCurrRegion) forwardCall(QUERY_CURR_DOMAIN)
+            else DispatchServer.client.get(DispatchConfig.data.requestSetting.queryCurrRegionHardcode).bodyAsText()).decodeBase64Bytes()
+        )
+    }
+
+    val host = request.local.host
+
+    val ec2b = DispatchServer.dispatchKeyMap.getOrPut(host) {
+        Ec2bSeed.generate().dumpToData()
+    }
+
+    val dispatchSeed = ec2b.seed
+    val dispatchKey = ec2b.key
 
     return queryCurrRegionHttpRsp.toBuilder()
         .setRegionInfo(
@@ -99,31 +101,18 @@ private suspend fun ApplicationCall.forwardQueryCurrRegionHttpRsp(): QueryCurrRe
         .setClientSecretKey(ByteString.copyFrom(dispatchSeed))
         .setRegionCustomConfigEncrypted(
             networkJson.encodeToString(
-                // TODO: Extract to be the event and config
-                ClientCustomConfig(
-                    codeSwitch = listOf(15u, 2410u, 2324u, 21u),
-                    coverSwitch = listOf(8u, 40u),
-                    perfReportEnable = false,
-                    homeDotPattern = true,
-                    homeItemFilter = 20u,
-                    reportNetDelayConfig = ClientCustomConfig.ReportNetDelayConfigData(
-                        openGateServer = true
-                    )
-                )
+                DispatchConfig.data.clientCustomConfig
             ).toByteArray().xor(dispatchKey).toByteString()
         ).build()
 
-//        val binFile = File(configDirectory, "query_cur_region.bin")
-//        val queryCurrRegionHttpRsp = QueryCurrRegionHttpRsp.parseFrom(binFile.readBytes())
-//
-//        return queryCurrRegionHttpRsp
 }
 
 // --- Route Handler ---
 
 internal suspend fun ApplicationCall.handleQueryRegionList() {
-    logger.info { "Client ${request.local.host} has queried region list" }
-    QueryRegionListEvent(this, queryRegionListHttpRsp).broadcastEvent {
+    val host = request.local.host
+    logger.info { "Client $host has queried region list" }
+    QueryRegionListEvent(this, getQueryRegionListHttpRsp(host)).broadcastEvent {
         respondText(it.data.toByteArray().encodeBase64())
     }
 }
@@ -137,7 +126,7 @@ internal suspend fun ApplicationCall.handleQueryCurRegion() {
         // because it's related with injecting new RSA key,
         // but that is uncessary for now.
         val data = it.data.toByteArray().encodeBase64()
-        if (DispatchConfig.data.v28) {
+        if (DispatchConfig.data.requestSetting.v28) {
             respond(QueryCurRegionData(data))
         } else {
             respondText(data)
@@ -392,7 +381,7 @@ internal suspend inline fun <reified T : Any> ApplicationCall.forwardCallWithAll
     defaultData: T,
     eventBuilder: (T) -> DispatchDataEvent<T>
 ) {
-    val data = if (DispatchConfig.data.forwardCommonRequest) {
+    val data = if (DispatchConfig.data.requestSetting.forwardCommonRequest) {
         this.forwardCall(domain)
     } else {
         defaultData

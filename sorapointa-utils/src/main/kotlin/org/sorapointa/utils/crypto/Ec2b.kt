@@ -51,6 +51,14 @@ private fun getDecryptVector(
     }.toByteArray()
 }
 
+class Ec2bData(
+    val seed: ByteArray,
+    val key: ByteArray
+)
+
+suspend fun Ec2bSeed.dumpToData() =
+    Ec2bData(toByteArray(), decrypt())
+
 class Ec2bSeed(
     private val keySize: UInt,
     private val decryptionKey: UByteArray,

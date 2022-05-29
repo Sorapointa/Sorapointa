@@ -42,10 +42,11 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
 
     companion object : EntityClass<UInt, Account>(AccountTable) {
 
-        private val pepper = DispatchConfig.data.password.hashPepper
+        private val usePepper = DispatchConfig.data.accountSetting.password.usePepper
+        private val pepper = DispatchConfig.data.accountSetting.password.hashPepper
 
         val argon2: Argon2Function by lazy {
-            val setting = DispatchConfig.data.password
+            val setting = DispatchConfig.data.accountSetting.password
             Argon2Function.getInstance(
                 setting.memory,
                 setting.iterations,
@@ -79,11 +80,15 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
         suspend fun hashPassword(inputPassword: String, salt: String): String =
             Password.hash(inputPassword)
                 .addSalt(salt)
-                .addPepper(pepper)
+                .apply {
+                    if (usePepper) {
+                        this.addPepper(pepper)
+                    }
+                }
                 .with(argon2).result
 
         fun generateSalt(): String =
-            randomByteArray(DispatchConfig.data.password.saltByteLength).encodeBase64()
+            randomByteArray(DispatchConfig.data.accountSetting.password.saltByteLength).encodeBase64()
     }
 
     val userId by AccountTable.id
@@ -99,7 +104,11 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
 
     suspend fun checkPassword(inputPassword: String): Boolean =
         Password.check(inputPassword, password)
-            .addPepper(pepper)
+            .apply {
+                if (usePepper) {
+                    this.addPepper(pepper)
+                }
+            }
             .with(argon2)
 
     suspend fun updatePassword(inputPassword: String) {
@@ -137,11 +146,11 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
 
     private suspend fun checkComboTokenExpire(): Boolean =
         comboTokenGenerationTime?.let {
-            now() - it > DispatchConfig.data.comboTokenExpiredTime
+            now() - it > DispatchConfig.data.accountSetting.comboTokenExpiredTime
         } ?: true
 
     private suspend fun checkDispatchTokenExpire(): Boolean =
         dispatchTokenGenerationTime?.let {
-            now() - it > DispatchConfig.data.dispatchTokenExpiredTime
+            now() - it > DispatchConfig.data.accountSetting.dispatchTokenExpiredTime
         } ?: true
 }
