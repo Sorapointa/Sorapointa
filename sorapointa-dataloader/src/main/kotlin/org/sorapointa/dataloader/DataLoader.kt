@@ -7,32 +7,30 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.serializer
 import mu.KotlinLogging
+import org.sorapointa.dataloader.ResourceHolder.loadAll
 import org.sorapointa.utils.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.KClass
 
 private val logger = KotlinLogging.logger {}
 
+/**
+ * ResourceHolder, store all DataLoader reference
+ *
+ * You can call [loadAll] to load all resources
+ */
 object ResourceHolder {
     private val dataMap = ConcurrentHashMap<String, DataLoader<Any>>()
 
-    private var scope = ModuleScope(logger, "ResourceLoader")
-
-    fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
-        scope = ModuleScope(logger, "ResourceLoader", parentContext)
-    }
-
     /**
      * Load all registered data
-     * @param stream use stream to boost load, but probably went exception
      * @see [DataLoader.loadFromStream]
      */
-    suspend fun loadAll(stream: Boolean = false) {
+    suspend fun loadAll() = withContext(Dispatchers.IO) {
         dataMap.map { (k, v) ->
-            scope.launch {
-                val loaded = if (stream) v.loadFromStream() else v.load()
+            launch {
+                val loaded = v.load()
                 finalizeData(k, loaded)
             }
         }.joinAll()
@@ -56,7 +54,6 @@ object ResourceHolder {
 /**
  * Construct a [DataLoader]
  */
-@OptIn(SorapointaInternal::class)
 @Suppress("FunctionName")
 inline fun <reified T : Any> DataLoader(
     path: String,
@@ -69,9 +66,9 @@ inline fun <reified T : Any> DataLoader(
 /**
  * Data loader, read json from file and deserialize
  *
- * @constructor [SorapointaInternal], please use factory function above instead
+ * @constructor internal, please use factory function above instead
  */
-class DataLoader<T : Any> @SorapointaInternal constructor(
+class DataLoader<T : Any> @PublishedApi internal constructor(
     path: String,
     private val clazz: KClass<T>,
     private val serializer: DeserializationStrategy<T>,
