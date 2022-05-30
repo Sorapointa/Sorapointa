@@ -88,11 +88,10 @@ internal object GetPlayerTokenReqFactory : IncomingPacketFactoryWithResponse
             packet, seed, networkHandler.getHost()
         )
     }
-
 }
 
-//internal object PlayerLoginReqFactory: IncomingPacketFactoryWithResponse
-//<PlayerLoginReq, PlayerLoginRsp>
+// internal object PlayerLoginReqFactory: IncomingPacketFactoryWithResponse
+// <PlayerLoginReq, PlayerLoginRsp>
 
 /*
 C: GetPlayerTokenReq
