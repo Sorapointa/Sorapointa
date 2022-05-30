@@ -58,11 +58,11 @@ class StateControllerTest {
         )
 
         fun foobar(): String {
-            return stateController.getState().foobar()
+            return stateController.getStateInstance().foobar()
         }
 
         fun barfoo(): String {
-            return stateController2.getState().barfoo()
+            return stateController2.getStateInstance().barfoo()
         }
 
         inner class Happy: SomeClassWithSomeDifferentState {

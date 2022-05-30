@@ -14,12 +14,10 @@ import org.sorapointa.command.CommandManager
 import org.sorapointa.command.ConsoleCommandSender
 import org.sorapointa.command.defaults.defaultsCommand
 import org.sorapointa.config.*
-import org.sorapointa.config.registeredConfig
-import org.sorapointa.config.registeredDatabaseTable
 import org.sorapointa.console.Console
 import org.sorapointa.console.JLineRedirector
-import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.data.provider.DatabaseManager
+import org.sorapointa.server.ServerNetwork
 import org.sorapointa.utils.*
 import java.io.File
 import java.io.OutputStream
@@ -63,6 +61,8 @@ class Sorapointa : CliktCommand(name = "sorapointa") {
         loadLanguages()
 
         setupDefaultsCommand()
+
+        ServerNetwork.boot(scope.coroutineContext)
 
         launch {
             while (isActive) {
@@ -128,17 +128,6 @@ class Sorapointa : CliktCommand(name = "sorapointa") {
             scope.cancel()
         }
     }
-
-}
-
-object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
-    File(configDirectory, "dispatchConfig.json"), Data()
-) {
-
-    @kotlinx.serialization.Serializable
-    data class Data(
-        val idleTimeout: Long = 30
-    )
 
 }
 

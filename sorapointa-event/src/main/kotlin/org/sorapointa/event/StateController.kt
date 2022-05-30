@@ -48,6 +48,9 @@ class StateController<TState : Enum<*>, TInterfaceWithState: WithState<TState>, 
         }
     }
 
+    fun getCurrentState(): TState =
+        currentState.value.state
+
     suspend fun setState(afterState: TState): TInterfaceWithState {
         val before = currentState.value
         val beforeState = before.state
@@ -88,7 +91,7 @@ class StateController<TState : Enum<*>, TInterfaceWithState: WithState<TState>, 
         return isIntercepted
     }
 
-    fun getState(): TInterfaceWithState {
+    fun getStateInstance(): TInterfaceWithState {
         return currentState.value
     }
 
