@@ -28,7 +28,7 @@ object CommandManager {
 
     private var commandScope = ModuleScope(logger, "CommandManager")
 
-    fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
+    internal fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
         commandScope = ModuleScope(logger, "CommandManager", parentContext)
     }
 

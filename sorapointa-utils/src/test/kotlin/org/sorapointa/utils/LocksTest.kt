@@ -20,5 +20,4 @@ class LocksTest {
             println("Working!")
         }
     }
-
 }

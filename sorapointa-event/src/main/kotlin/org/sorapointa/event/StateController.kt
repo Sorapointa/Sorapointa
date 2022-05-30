@@ -1,4 +1,4 @@
-@file:Suppress( "unused")
+@file:Suppress("unused")
 
 package org.sorapointa.event
 
@@ -12,22 +12,18 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
 
-
-interface WithState<out T: Enum<*>> {
+interface WithState<out T : Enum<*>> {
 
     val state: T
 
     suspend fun startState() {
-
     }
 
     suspend fun endState() {
-
     }
-
 }
 
-class StateController<TState : Enum<*>, TInterfaceWithState: WithState<TState>, TClassWithState> (
+class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState> (
     private var scope: ModuleScope,
     private var parentStateClass: TClassWithState,
     vararg stateInstances: TInterfaceWithState
@@ -40,7 +36,6 @@ class StateController<TState : Enum<*>, TInterfaceWithState: WithState<TState>, 
     private var observers = ConcurrentHashMap<suspend TClassWithState.(TState, TState) -> Unit, ListenerState>()
     private var interceptors = ConcurrentHashMap<suspend TClassWithState.(TState, TState) -> Boolean, ListenerState>()
 
-
     init {
         // TODO: Check it whether needs to be extracted as a single function
         scope.launch {
@@ -51,10 +46,10 @@ class StateController<TState : Enum<*>, TInterfaceWithState: WithState<TState>, 
     fun getCurrentState(): TState =
         currentState.value.state
 
-    suspend fun setState(afterState: TState): TInterfaceWithState {
+    suspend fun setState(after: TInterfaceWithState): TInterfaceWithState {
         val before = currentState.value
         val beforeState = before.state
-        val after = states.first { it.state == afterState }
+        val afterState = after.state
         if (invokeChange(beforeState, afterState, ListenerState.BEFORE_UPDATE, parentStateClass)) return before
         before.endState()
         currentState.update { after }
@@ -62,6 +57,9 @@ class StateController<TState : Enum<*>, TInterfaceWithState: WithState<TState>, 
         invokeChange(beforeState, afterState, ListenerState.AFTER_UPDATE, parentStateClass)
         return before
     }
+
+    suspend fun setState(afterState: TState): TInterfaceWithState =
+        setState(states.first { it.state == afterState })
 
     private suspend fun invokeChange(
         beforeState: TState,
@@ -73,7 +71,7 @@ class StateController<TState : Enum<*>, TInterfaceWithState: WithState<TState>, 
         observers
             .asSequence()
             .filter { it.value == listenerState }
-            .forEach {(observer, _) ->
+            .forEach { (observer, _) ->
                 scope.launch {
                     listenerCaller.observer(beforeState, afterState)
                 }
@@ -82,7 +80,7 @@ class StateController<TState : Enum<*>, TInterfaceWithState: WithState<TState>, 
             .asSequence()
             .asFlow()
             .filter { it.value == listenerState }
-            .map {(interceptor, _) ->
+            .map { (interceptor, _) ->
                 scope.launch {
                     isIntercepted = listenerCaller.interceptor(beforeState, afterState) || isIntercepted
                 }
@@ -121,29 +119,25 @@ class StateController<TState : Enum<*>, TInterfaceWithState: WithState<TState>, 
         BEFORE_UPDATE,
         AFTER_UPDATE
     }
-
-
 }
 
-
 @Suppress("NOTHING_TO_INLINE")
-inline fun <TState : Enum<*>, TInterfaceWithState: WithState<TState>, TClassWithState>
-    StateController<TState, TInterfaceWithState, TClassWithState>.observe(
+inline fun <TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState>
+StateController<TState, TInterfaceWithState, TClassWithState>.observe(
     listenerState: StateController.ListenerState = StateController.ListenerState.BEFORE_UPDATE,
     noinline observer: suspend TClassWithState.() -> Unit
 ) = observeStateChange(listenerState) { _, _ -> this.observer() }
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun <TState : Enum<*>, TInterfaceWithState: WithState<TState>, TClassWithState>
-    StateController<TState, TInterfaceWithState, TClassWithState>.intercept(
+inline fun <TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState>
+StateController<TState, TInterfaceWithState, TClassWithState>.intercept(
     listenerState: StateController.ListenerState = StateController.ListenerState.BEFORE_UPDATE,
     noinline interceptor: suspend TClassWithState.() -> Boolean
 ) = interceptStateChange(listenerState) { _, _ -> this.interceptor() }
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun <TState : Enum<*>, TInterfaceWithState: WithState<TState>, TClassWithState>
-    StateController<TState, TInterfaceWithState, TClassWithState>.block(
+inline fun <TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState>
+StateController<TState, TInterfaceWithState, TClassWithState>.block(
     listenerState: StateController.ListenerState = StateController.ListenerState.BEFORE_UPDATE,
     noinline interceptor: suspend TClassWithState.() -> Unit
 ) = interceptStateChange(listenerState) { _, _ -> this.interceptor(); false }
-

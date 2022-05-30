@@ -42,7 +42,6 @@ fun ByteArray.xor(key: ByteArray): ByteArray {
     return this
 }
 
-
 fun UByteArray.entireToULong(): ULong {
     require(this.size == 8) { "Size must be 8" }
     val uints = this.map { it.toULong() }

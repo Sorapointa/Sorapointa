@@ -18,7 +18,7 @@ import org.sorapointa.event.broadcast
 import org.sorapointa.utils.randomByteArray
 import org.sorapointa.utils.encoding.hex
 import org.sorapointa.utils.now
-import kotlin.random.Random
+import org.sorapointa.utils.randomUInt
 
 private val logger = KotlinLogging.logger {}
 
@@ -130,11 +130,11 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
     }
 
     internal suspend fun getComboIdOrGenerate(): UInt =
-        comboId ?: Random.nextInt(0, Int.MAX_VALUE).toUInt().also {
+        comboId ?: randomUInt().also {
             comboId = it
         }
 
-    internal suspend fun getComboToken(): String? {
+    suspend fun getComboToken(): String? {
         if (checkComboTokenExpire()) return null
         return comboToken
     }

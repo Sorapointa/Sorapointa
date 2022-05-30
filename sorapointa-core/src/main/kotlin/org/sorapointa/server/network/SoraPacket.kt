@@ -5,12 +5,13 @@ import io.ktor.utils.io.core.*
 import org.sorapointa.proto.GetPlayerTokenReqOuterClass.GetPlayerTokenReq
 import org.sorapointa.proto.PacketHeadOuterClass.PacketHead
 import org.sorapointa.proto.PacketId
+import org.sorapointa.proto.RetcodeOuterClass.Retcode
 import org.sorapointa.proto.getPlayerTokenRsp
 import org.sorapointa.proto.toByteString
 import org.sorapointa.proto.writeSoraPacket
 import org.sorapointa.utils.SorapointaInternal
+import org.sorapointa.utils.i18n
 import org.sorapointa.utils.randomByteArray
-
 
 internal abstract class OutgoingPacket(
     val cmdId: UShort,
@@ -18,7 +19,6 @@ internal abstract class OutgoingPacket(
 ) {
 
     abstract fun buildProto(): GeneratedMessageV3
-
 }
 
 @OptIn(SorapointaInternal::class)
@@ -29,33 +29,55 @@ internal fun OutgoingPacket.toFinalBytePacket(): ByteArray {
     }.readBytes()
 }
 
-
-internal class GetPlayerTokenRspPacket(
-    private val tokenReq: GetPlayerTokenReq,
-    private val keySeed: Long,
-    private val ip: String
-) : OutgoingPacket(
+internal abstract class GetPlayerTokenRspPacket: OutgoingPacket(
     PacketId.GET_PLAYER_TOKEN_RSP,
 ) {
 
-    override fun buildProto(): GeneratedMessageV3 =
-        getPlayerTokenRsp {
-            uid = tokenReq.uid
-            token = tokenReq.accountToken
-            accountType = tokenReq.accountType
-            accountUid = tokenReq.accountUid
-            isProficientPlayer = true
-            secretKeySeed = keySeed
-            securityCmdBuffer = randomByteArray(32).toByteString()
-            platformType = tokenReq.platformType
-            channelId = tokenReq.channelId
-            subChannelId = tokenReq.subChannelId
-            countryCode = "US"
-            clientVersionRandomKey = "aeb-bc90f1631c05"
-            regPlatform = 1
-            clientIpStr = ip
-        }
+    internal class Error(
+        private val retcode: Retcode,
+        private val msg: String
+    ): GetPlayerTokenRspPacket() {
+        override fun buildProto(): GeneratedMessageV3 =
+            getPlayerTokenRsp {
+                msg = this@Error.msg.i18n()
+                retcode = this@Error.retcode.number
+            }
+
+    }
+
+    internal class Succ(
+        private val tokenReq: GetPlayerTokenReq,
+        private val keySeed: ULong,
+        private val ip: String
+    ): GetPlayerTokenRspPacket() {
+        override fun buildProto(): GeneratedMessageV3 =
+            getPlayerTokenRsp {
+                uid = tokenReq.uid
+                token = tokenReq.accountToken
+                accountType = tokenReq.accountType
+                accountUid = tokenReq.accountUid
+                isProficientPlayer = true
+                secretKeySeed = keySeed.toLong()
+                securityCmdBuffer = randomByteArray(32).toByteString()
+                platformType = tokenReq.platformType
+                channelId = tokenReq.channelId
+                subChannelId = tokenReq.subChannelId
+                countryCode = "US"
+                clientVersionRandomKey = "aeb-bc90f1631c05"
+                regPlatform = 1
+                clientIpStr = ip
+            }
+    }
 
 }
 
+internal class PlayerLoginRspPacket: OutgoingPacket(
+    PacketId.PLAYER_LOGIN_RSP
+) {
 
+    override fun buildProto(): GeneratedMessageV3 {
+        TODO("Not yet implemented")
+    }
+
+
+}

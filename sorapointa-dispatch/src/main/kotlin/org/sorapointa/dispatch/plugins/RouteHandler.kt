@@ -20,10 +20,9 @@ import org.sorapointa.dispatch.data.*
 import org.sorapointa.dispatch.events.*
 import org.sorapointa.event.broadcastEvent
 import org.sorapointa.proto.QueryCurrRegionHttpRspOuterClass.QueryCurrRegionHttpRsp
+import org.sorapointa.proto.queryCurrRegionHttpRsp
 import org.sorapointa.proto.queryRegionListHttpRsp
 import org.sorapointa.proto.regionSimpleInfo
-import org.sorapointa.utils.crypto.Ec2bSeed
-import org.sorapointa.utils.crypto.dumpToData
 import org.sorapointa.utils.i18n
 import org.sorapointa.utils.networkJson
 import org.sorapointa.utils.xor
@@ -51,8 +50,8 @@ private val serverList = DispatchConfig.data.servers.map {
 private suspend fun getQueryRegionListHttpRsp(host: String) =
     withContext(Dispatchers.IO) {
 
-        val ec2b = DispatchServer.dispatchKeyMap.getOrPut(host) {
-            Ec2bSeed.generate().dumpToData()
+        val ec2b = newSuspendedTransaction {
+            DispatchKeyData.getOrGenerate(host)
         }
 
         val dispatchSeed = ec2b.seed
@@ -66,7 +65,6 @@ private suspend fun getQueryRegionListHttpRsp(host: String) =
                 DispatchConfig.data.regionListClientCustomConfig
             ).toByteArray().xor(dispatchKey).toByteString()
         }
-
     }
 
 private var queryCurrRegionHttpRsp: QueryCurrRegionHttpRsp? = null
@@ -74,16 +72,19 @@ private var queryCurrRegionHttpRsp: QueryCurrRegionHttpRsp? = null
 private suspend fun ApplicationCall.forwardQueryCurrRegionHttpRsp(): QueryCurrRegionHttpRsp {
 
     val queryCurrRegionHttpRsp = queryCurrRegionHttpRsp ?: run {
-        QueryCurrRegionHttpRsp.parseFrom(
-            (if (DispatchConfig.data.requestSetting.forwardQueryCurrRegion) forwardCall(QUERY_CURR_DOMAIN)
-            else DispatchServer.client.get(DispatchConfig.data.requestSetting.queryCurrRegionHardcode).bodyAsText()).decodeBase64Bytes()
-        )
+        if (DispatchConfig.data.requestSetting.forwardQueryCurrRegion) {
+            QueryCurrRegionHttpRsp.parseFrom(
+                (
+                    if (DispatchConfig.data.requestSetting.usingCurrRegionUrlHardcode) forwardCall(QUERY_CURR_DOMAIN)
+                    else DispatchServer.client.get(DispatchConfig.data.requestSetting.queryCurrRegionHardcode)
+                        .bodyAsText()
+                    ).decodeBase64Bytes()
+            )
+        } else queryCurrRegionHttpRsp {}
     }
 
-    val host = request.local.host
-
-    val ec2b = DispatchServer.dispatchKeyMap.getOrPut(host) {
-        Ec2bSeed.generate().dumpToData()
+    val ec2b = newSuspendedTransaction {
+        DispatchKeyData.getOrGenerate(host)
     }
 
     val dispatchSeed = ec2b.seed
@@ -103,13 +104,11 @@ private suspend fun ApplicationCall.forwardQueryCurrRegionHttpRsp(): QueryCurrRe
                 DispatchConfig.data.clientCustomConfig
             ).toByteArray().xor(dispatchKey).toByteString()
         ).build()
-
 }
 
 // --- Route Handler ---
 
 internal suspend fun ApplicationCall.handleQueryRegionList() {
-    val host = request.local.host
     logger.info { "Client $host has queried region list" }
     QueryRegionListEvent(this, getQueryRegionListHttpRsp(host)).broadcastEvent {
         respondText(it.data.toByteArray().encodeBase64())
@@ -137,7 +136,8 @@ internal suspend fun ApplicationCall.handleLogin() {
     val loginAccountRequestData = receive<LoginAccountRequestData>()
 
     val returnErrorMsg: suspend (String) -> Unit = { msg ->
-        LoginAccountResponseEvent(this,
+        LoginAccountResponseEvent(
+            this,
             LoginResultData(-201, msg.i18n())
         ).respond()
     }
@@ -187,12 +187,13 @@ internal suspend fun ApplicationCall.handleComboLogin() {
     val comboTokenRequestData = receive<ComboTokenRequestData>()
 
     val returnErrorMsg: suspend (String) -> Unit = { msg ->
-        ComboTokenResponseEvent(this,
+        ComboTokenResponseEvent(
+            this,
             ComboTokenResponseData(-201, msg.i18n())
         ).respond()
     }
 
-    //TODO: hardcode warning
+    // TODO: hardcode warning
     if (!comboTokenRequestData.signCheck(parameters["region"] == "hk4e_cn")) {
         returnErrorMsg("dispatch.login.error.sign")
         return
@@ -201,7 +202,7 @@ internal suspend fun ApplicationCall.handleComboLogin() {
     newSuspendedTransaction {
         val account = Account.findById(comboTokenRequestData.data.uid)
         if (account == null) {
-            returnErrorMsg("dispatch.login.error.user.notfound")
+            returnErrorMsg("user.notfound")
             return@newSuspendedTransaction
         }
         if (account.getDispatchToken() != comboTokenRequestData.data.token) {
@@ -212,7 +213,8 @@ internal suspend fun ApplicationCall.handleComboLogin() {
         val comboToken = account.generateComboToken()
         ComboTokenResponseEvent(
             this@handleComboLogin,
-            ComboTokenResponseData(returnCode = 0, message = "OK",
+            ComboTokenResponseData(
+                returnCode = 0, message = "OK",
                 ComboTokenResponseData.LoginData(
                     accountType = 1u,
                     comboId = comboId,
@@ -371,9 +373,7 @@ internal suspend inline fun <reified T : Any> DispatchDataEvent<T>.respond() {
     }
 }
 
-
 // --- Tool Method ---
-
 
 internal suspend inline fun <reified T : Any> ApplicationCall.forwardCallWithAll(
     domain: String,
@@ -410,3 +410,6 @@ internal suspend inline fun <reified T> ApplicationCall.forwardCall(domain: Stri
         result
     } as T
 }
+
+private val ApplicationCall.host
+    get() = request.local.host

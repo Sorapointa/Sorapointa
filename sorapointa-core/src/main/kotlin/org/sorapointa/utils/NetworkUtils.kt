@@ -4,13 +4,18 @@ import io.ktor.utils.io.core.*
 import io.ktor.utils.io.streams.*
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.ByteBufInputStream
+import io.netty.channel.Channel
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelOutboundInvoker
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.sorapointa.proto.SoraPacket
+import org.sorapointa.proto.packetHead
 import org.sorapointa.proto.readToSoraPacket
+import java.net.InetSocketAddress
 
+val Channel.host: String
+    get() = (remoteAddress() as InetSocketAddress).address.hostAddress
 internal suspend fun ChannelFuture.awaitKt(): ChannelFuture {
     suspendCancellableCoroutine<Unit> { cont ->
         cont.invokeOnCancellation {
@@ -56,3 +61,9 @@ internal fun ChannelOutboundInvoker.writeAndFlushOrCloseAsync(msg: Any?): Channe
         .addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE)
         .addListener(ChannelFutureListener.CLOSE_ON_FAILURE)
 }
+
+internal fun buildMetadata(sequenceId: Int) =
+    packetHead {
+        clientSequenceId = sequenceId
+        sentMs = now().toEpochMilliseconds()
+    }

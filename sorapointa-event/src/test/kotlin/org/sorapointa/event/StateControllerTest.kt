@@ -25,7 +25,6 @@ class StateControllerTest {
             DOING,
             END
         }
-
     }
 
     interface SomeClassWithSomeDifferentState : WithState<SomeClassWithSomeDifferentState.State> {
@@ -37,13 +36,11 @@ class StateControllerTest {
             BAD,
             CRY
         }
-
     }
 
     class SomeClassWithStateImpl {
 
         val count = atomic(0)
-
 
         val stateController = StateController(
             scope = ModuleScope(logger, "TestScopeWithState"),
@@ -65,7 +62,7 @@ class StateControllerTest {
             return stateController2.getStateInstance().barfoo()
         }
 
-        inner class Happy: SomeClassWithSomeDifferentState {
+        inner class Happy : SomeClassWithSomeDifferentState {
 
             override val state: SomeClassWithSomeDifferentState.State = SomeClassWithSomeDifferentState.State.HAPPY
 
@@ -74,27 +71,23 @@ class StateControllerTest {
             }
 
             override fun barfoo(): String = "Happy"
-
         }
 
-        inner class Bad: SomeClassWithSomeDifferentState {
+        inner class Bad : SomeClassWithSomeDifferentState {
 
             override val state: SomeClassWithSomeDifferentState.State = SomeClassWithSomeDifferentState.State.BAD
 
             override fun barfoo(): String = "Bad"
-
         }
 
-        inner class Cry: SomeClassWithSomeDifferentState {
+        inner class Cry : SomeClassWithSomeDifferentState {
 
             override val state: SomeClassWithSomeDifferentState.State = SomeClassWithSomeDifferentState.State.CRY
 
             override fun barfoo(): String = "Cry"
-
         }
 
-
-        inner class Start: SomeClassWithState {
+        inner class Start : SomeClassWithState {
 
             override val state: SomeClassWithState.State = SomeClassWithState.State.START
 
@@ -106,10 +99,9 @@ class StateControllerTest {
                 count.getAndIncrement()
                 println("Start!")
             }
-
         }
 
-        inner class Doing: SomeClassWithState {
+        inner class Doing : SomeClassWithState {
 
             override val state: SomeClassWithState.State = SomeClassWithState.State.DOING
 
@@ -126,10 +118,9 @@ class StateControllerTest {
                 count.getAndIncrement()
                 println("Done!")
             }
-
         }
 
-        inner class End: SomeClassWithState {
+        inner class End : SomeClassWithState {
 
             override val state: SomeClassWithState.State = SomeClassWithState.State.END
 
@@ -141,10 +132,7 @@ class StateControllerTest {
                 count.getAndIncrement()
                 println("End!")
             }
-
         }
-
-
     }
 
     @Test
@@ -165,7 +153,6 @@ class StateControllerTest {
             // throw
         }
 
-
         assertEquals("Start!", sc.foobar())
         sc.stateController.setState(SomeClassWithState.State.DOING)
         assertEquals("Doing!", sc.foobar())
@@ -179,9 +166,6 @@ class StateControllerTest {
         assertEquals("Bad", sc.barfoo())
         sc.stateController2.setState(SomeClassWithSomeDifferentState.State.CRY)
         assertEquals("Cry", sc.barfoo())
-
-
-
     }
 
     @Test
@@ -217,12 +201,5 @@ class StateControllerTest {
                 assertEquals("End!", sc2.foobar())
             }
         }.joinAll()
-
-
     }
-
-
-
-
-
 }

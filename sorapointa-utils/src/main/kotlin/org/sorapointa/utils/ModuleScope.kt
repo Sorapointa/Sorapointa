@@ -25,7 +25,5 @@ open class ModuleScope(
     }
 
     open fun onClosed() {
-
     }
-
 }

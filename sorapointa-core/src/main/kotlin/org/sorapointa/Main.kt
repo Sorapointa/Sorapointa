@@ -17,7 +17,6 @@ import org.sorapointa.config.*
 import org.sorapointa.console.Console
 import org.sorapointa.console.JLineRedirector
 import org.sorapointa.data.provider.DatabaseManager
-import org.sorapointa.server.ServerNetwork
 import org.sorapointa.utils.*
 import java.io.File
 import java.io.OutputStream
@@ -26,7 +25,7 @@ import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger {}
 
-class Sorapointa : CliktCommand(name = "sorapointa") {
+class SorapointaMain : CliktCommand(name = "sorapointa") {
 
     private val workingDirectory by option("-D", "--working-directory", help = "Set working directory")
         .convert { File(it) }
@@ -55,14 +54,15 @@ class Sorapointa : CliktCommand(name = "sorapointa") {
         setupRegisteredConfigs()
 
         logger.info { "Loading sorapointa database..." }
-        setupDatabase()
+        val databaseInitJob = setupDatabase()
 
         logger.info { "Loading languages..." }
         loadLanguages()
 
         setupDefaultsCommand()
 
-        ServerNetwork.boot(scope.coroutineContext)
+        databaseInitJob.join()
+        Sorapointa.init(scope.coroutineContext)
 
         launch {
             while (isActive) {
@@ -121,18 +121,17 @@ class Sorapointa : CliktCommand(name = "sorapointa") {
 
     companion object {
 
-        private val scope = ModuleScope(logger, "Sorapointa")
+        private val scope = ModuleScope(logger, "SorapointaRootScope")
 
         internal fun closeAll() {
             scope.dispose()
             scope.cancel()
         }
     }
-
 }
 
 suspend fun main(args: Array<String>) {
-    when (val result = Sorapointa().main(args)) {
+    when (val result = SorapointaMain().main(args)) {
         is CommandResult.Success -> {
             exitProcess(0)
         }

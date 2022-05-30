@@ -9,8 +9,8 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 private val logger = KotlinLogging.logger {}
 
-internal class Player(
-    private val networkHandler: NetworkHandler,
+class Player internal constructor(
+    internal val networkHandler: NetworkHandler,
     parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
 ) {
 
@@ -24,14 +24,6 @@ internal class Player(
         }
     }
 
-
-
     private fun onConnectionClosed() {
-
     }
-
-
-
 }
-
-
