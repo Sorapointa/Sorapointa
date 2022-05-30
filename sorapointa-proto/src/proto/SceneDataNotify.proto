@@ -2,10 +2,9 @@ syntax = "proto3";
 
 option java_package = "org.sorapointa.proto";
 
-// CmdId: 252
+// CmdId: 3117
 // EnetChannelId: 0
 // EnetIsReliable: true
-message EnterSceneReadyRsp {
-	int32 retcode = 5;
-	uint32 enter_scene_token = 8;
+message SceneDataNotify {
+	repeated string level_config_name_list = 2;
 }

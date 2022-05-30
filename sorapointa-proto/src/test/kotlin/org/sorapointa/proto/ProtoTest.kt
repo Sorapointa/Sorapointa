@@ -20,7 +20,6 @@ class ProtoTest {
                         key = abilityString {
                             str = "1919810"
                         }
-                        valueType = AbilityScalarTypeOuterClass.AbilityScalarType.FLOAT
                     }
                 )
             }
@@ -32,5 +31,4 @@ class ProtoTest {
     fun findName() {
         assertEquals("ABILITY_CHANGE_NOTIFY", findCommonNameFromCmdId(1155u))
     }
-
 }
