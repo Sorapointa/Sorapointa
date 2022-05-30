@@ -93,7 +93,7 @@ class EventPipelineTest {
             }
         }.joinAll()
 
-        assertEquals(3 * 1000 * 100, counter.value)
+        assertEquals(3 * 100 * 10, counter.value)
     }
 
     @Test
