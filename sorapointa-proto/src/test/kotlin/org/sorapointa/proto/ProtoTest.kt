@@ -1,6 +1,7 @@
 package org.sorapointa.proto
 
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 class ProtoTest {
     @Test
@@ -26,4 +27,10 @@ class ProtoTest {
             instancedAbilityId = 100
         }.toByteString()
     }
+
+    @Test
+    fun findName() {
+        assertEquals("ABILITY_CHANGE_NOTIFY", findCommonNameFromCmdId(1155u))
+    }
+
 }

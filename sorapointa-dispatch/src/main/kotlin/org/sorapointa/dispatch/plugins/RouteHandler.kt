@@ -1,6 +1,5 @@
 package org.sorapointa.dispatch.plugins
 
-import com.google.protobuf.ByteString
 import com.google.protobuf.kotlin.toByteString
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -61,7 +60,7 @@ private suspend fun getQueryRegionListHttpRsp(host: String) =
 
         queryRegionListHttpRsp {
             regionList.addAll(serverList)
-            clientSecretKey = ByteString.copyFrom(dispatchSeed)
+            clientSecretKey = dispatchSeed.toByteString()
             enableLoginPc = true
             clientCustomConfigEncrypted = networkJson.encodeToString(
                 DispatchConfig.data.regionListClientCustomConfig
@@ -95,10 +94,10 @@ private suspend fun ApplicationCall.forwardQueryCurrRegionHttpRsp(): QueryCurrRe
             queryCurrRegionHttpRsp.regionInfo.toBuilder()
                 .setGateserverIp(DispatchConfig.data.gateServerIp)
                 .setGateserverPort(DispatchConfig.data.gateServerPort)
-                .setSecretKey(ByteString.copyFrom(dispatchSeed))
+                .setSecretKey(dispatchSeed.toByteString())
                 .build()
         )
-        .setClientSecretKey(ByteString.copyFrom(dispatchSeed))
+        .setClientSecretKey(dispatchSeed.toByteString())
         .setRegionCustomConfigEncrypted(
             networkJson.encodeToString(
                 DispatchConfig.data.clientCustomConfig
