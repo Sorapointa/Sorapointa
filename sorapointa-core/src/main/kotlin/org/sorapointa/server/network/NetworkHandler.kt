@@ -51,7 +51,6 @@ internal open class NetworkHandler(
     var key: ByteArray = dispatchKey
         private set
 
-
     val networkStateController by lazy {
         StateController(
             scope = scope,
@@ -88,7 +87,6 @@ internal open class NetworkHandler(
             }
         }
 
-
     protected open fun setupConnectionPipeline() {
         connection.pipeline()
             .addLast(object : ChannelInboundHandlerAdapter() {
@@ -120,25 +118,21 @@ internal open class NetworkHandler(
             setupConnectionPipeline()
             networkStateController.setState(NetworkHandlerStateInterface.State.LOGIN)
         }
-
     }
 
     inner class Login : NetworkHandlerStateInterface {
 
         override val state: NetworkHandlerStateInterface.State = NetworkHandlerStateInterface.State.LOGIN
-
     }
 
     inner class OK : NetworkHandlerStateInterface {
 
         override val state: NetworkHandlerStateInterface.State = NetworkHandlerStateInterface.State.OK
-
     }
 
     inner class Closed : NetworkHandlerStateInterface {
 
         override val state: NetworkHandlerStateInterface.State = NetworkHandlerStateInterface.State.CLOSED
-
     }
 }
 

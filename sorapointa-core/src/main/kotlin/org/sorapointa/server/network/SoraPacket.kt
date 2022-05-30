@@ -29,27 +29,26 @@ internal fun OutgoingPacket.toFinalBytePacket(): ByteArray {
     }.readBytes()
 }
 
-internal abstract class GetPlayerTokenRspPacket: OutgoingPacket(
+internal abstract class GetPlayerTokenRspPacket : OutgoingPacket(
     PacketId.GET_PLAYER_TOKEN_RSP,
 ) {
 
     internal class Error(
         private val retcode: Retcode,
         private val msg: String
-    ): GetPlayerTokenRspPacket() {
+    ) : GetPlayerTokenRspPacket() {
         override fun buildProto(): GeneratedMessageV3 =
             getPlayerTokenRsp {
                 msg = this@Error.msg.i18n()
                 retcode = this@Error.retcode.number
             }
-
     }
 
     internal class Succ(
         private val tokenReq: GetPlayerTokenReq,
         private val keySeed: ULong,
         private val ip: String
-    ): GetPlayerTokenRspPacket() {
+    ) : GetPlayerTokenRspPacket() {
         override fun buildProto(): GeneratedMessageV3 =
             getPlayerTokenRsp {
                 uid = tokenReq.uid
@@ -68,16 +67,13 @@ internal abstract class GetPlayerTokenRspPacket: OutgoingPacket(
                 clientIpStr = ip
             }
     }
-
 }
 
-internal class PlayerLoginRspPacket: OutgoingPacket(
+internal class PlayerLoginRspPacket : OutgoingPacket(
     PacketId.PLAYER_LOGIN_RSP
 ) {
 
     override fun buildProto(): GeneratedMessageV3 {
         TODO("Not yet implemented")
     }
-
-
 }
