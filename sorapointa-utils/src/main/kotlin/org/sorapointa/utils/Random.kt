@@ -7,6 +7,8 @@ import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
+import kotlin.random.nextUInt
+import kotlin.random.nextULong
 
 private val logger = KotlinLogging.logger {}
 
@@ -29,6 +31,12 @@ fun randomByteArray(length: Int): ByteArray {
     return bytes
 }
 
+fun randomUInt(): UInt =
+    kotlin.random.Random.nextUInt()
+
+fun randomULong(): ULong =
+    kotlin.random.Random.nextULong()
+
 fun randomUByteArray(length: UInt): UByteArray =
     randomByteArray(length.toInt()).toUByteArray()
 
@@ -38,4 +46,3 @@ fun sha256sign(data: String, key: String): String {
     sha256Hmac.init(secretKey)
     return sha256Hmac.doFinal(data.toByteArray()).hex
 }
-

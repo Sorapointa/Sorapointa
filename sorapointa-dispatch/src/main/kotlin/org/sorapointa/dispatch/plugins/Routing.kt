@@ -110,7 +110,6 @@ internal fun Application.configureNeedHandlerRouting() {
     }
 }
 
-
 internal fun Application.configureThirdPartyAuth() {
     routing {
         route("/sorapointa_auth") {

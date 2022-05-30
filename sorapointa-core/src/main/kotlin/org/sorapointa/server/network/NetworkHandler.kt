@@ -2,22 +2,27 @@ package org.sorapointa.server.network
 
 import io.jpower.kcp.netty.UkcpChannel
 import io.netty.buffer.ByteBuf
-import io.netty.channel.*
+import io.netty.channel.ChannelHandlerContext
+import io.netty.channel.ChannelInboundHandlerAdapter
+import io.netty.channel.ChannelInitializer
+import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.handler.codec.MessageToByteEncoder
 import io.netty.handler.codec.MessageToMessageDecoder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import mu.KotlinLogging
-import org.sorapointa.dispatch.DispatchServer
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.sorapointa.dispatch.data.DispatchKeyData
 import org.sorapointa.event.StateController
 import org.sorapointa.event.WithState
 import org.sorapointa.game.Player
+import org.sorapointa.proto.PacketHeadOuterClass.PacketHead
 import org.sorapointa.proto.SoraPacket
 import org.sorapointa.server.network.IncomingPacketFactories.handlePacket
-import org.sorapointa.utils.ModuleScope
-import org.sorapointa.utils.readToSoraPacket
-import org.sorapointa.utils.writeAndFlushOrCloseAsync
-import org.sorapointa.utils.xor
-import java.net.InetSocketAddress
+import org.sorapointa.utils.*
+import org.sorapointa.utils.crypto.MT19937
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -25,25 +30,27 @@ private val logger = KotlinLogging.logger {}
 
 internal interface NetworkHandlerStateInterface : WithState<NetworkHandlerStateInterface.State> {
 
-    fun getKey(): ByteArray
-
     enum class State {
         INITIALIZE,
         LOGIN, // Client haven't got the in-game key
         OK, // Client got the in-game key
         CLOSED
     }
-
 }
 
 internal open class NetworkHandler(
     private val connection: UkcpChannel,
+    dispatchKey: ByteArray,
     parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
 ) {
 
     private lateinit var bindPlayer: Player
 
-    private val scope = ModuleScope(logger, "NetworkHandler[${connection.host}]", parentCoroutineContext)
+    private val scope = ModuleScope(logger, "NetworkHandler[${getHost()}]", parentCoroutineContext)
+
+    var key: ByteArray = dispatchKey
+        private set
+
 
     val networkStateController by lazy {
         StateController(
@@ -56,12 +63,15 @@ internal open class NetworkHandler(
     fun getHost(): String =
         connection.host
 
-    open fun sendPacket(packet: OutgoingPacket) {
+    open fun sendPacket(packet: OutgoingPacket, metadata: PacketHead? = null) {
         if (networkStateController.getCurrentState() == NetworkHandlerStateInterface.State.CLOSED) return
+        if (metadata != null) {
+            packet.metadata = metadata
+        }
         connection.writeAndFlushOrCloseAsync(packet)
     }
 
-    open fun handlePacket(soraPacket: SoraPacket)  {
+    open suspend fun handlePacket(soraPacket: SoraPacket) {
         if (networkStateController.getCurrentState() == NetworkHandlerStateInterface.State.CLOSED) return
         with(bindPlayer) {
             handlePacket(soraPacket)?.also {
@@ -70,8 +80,14 @@ internal open class NetworkHandler(
         }
     }
 
-    open fun getKey(): ByteArray =
-        networkStateController.getStateInstance().getKey()
+    open suspend fun updateKeyWithSeed(keySeed: ULong): ByteArray =
+        withContext(Dispatchers.Default) {
+            MT19937.generateKey(keySeed).also {
+                key = it
+                networkStateController.setState(NetworkHandlerStateInterface.State.OK)
+            }
+        }
+
 
     protected open fun setupConnectionPipeline() {
         connection.pipeline()
@@ -88,14 +104,12 @@ internal open class NetworkHandler(
             .addLast(IncomingPacketDecoder(this))
             .addLast(object : SimpleChannelInboundHandler<SoraPacket>() {
                 override fun channelRead0(ctx: ChannelHandlerContext, msg: SoraPacket) {
-                    handlePacket(msg)
+                    scope.launch {
+                        handlePacket(msg)
+                    }
                 }
             })
     }
-
-    private val Channel.host: String
-        get() = (remoteAddress() as InetSocketAddress).address.hostAddress
-
 
     inner class Initialize : NetworkHandlerStateInterface {
 
@@ -107,64 +121,11 @@ internal open class NetworkHandler(
             networkStateController.setState(NetworkHandlerStateInterface.State.LOGIN)
         }
 
-
-        override fun getKey(): ByteArray =
-            DispatchServer.dispatchKeyMap[getHost()]?.key ?: ByteArray(0)
-
-
     }
 
     inner class Login : NetworkHandlerStateInterface {
 
         override val state: NetworkHandlerStateInterface.State = NetworkHandlerStateInterface.State.LOGIN
-
-        override suspend fun startState() {
-            /*
-            C: GetPlayerTokenReq
-            S: GetPlayerTokenRsp
-
-            C: PlayerLoginReq
-
-            S: OpenStateUpdateNotify
-            S: StoreWeightLimitNotify
-            S: PlayerStoreNotify
-            S: AvatarDataNotify
-            S: PlayerEnterSceneNotify
-
-            S: PlayerLoginRsp
-
-            C: GetPlayerSocialDetailReq
-            S: GetPlayerSocialDetailRsp
-
-            C: EnterSceneReadyReq
-            S: EnterSceneReadyRsp
-
-            C: SceneInitFinishReq
-
-            S: EnterScenePeerNotify
-            S: WorldDataNotify
-            S: WorldPlayerInfoNotify
-            S: ScenePlayerInfoNotify
-            S: PlayerEnterSceneInfoNotify
-            S: PlayerGameTimeNotify
-            S: SceneTimeNotify
-            S: SceneDataNotify
-            S: HostPlayerNotify
-            S: SceneTeamUpdateNotify
-
-            S: SceneInitFinishRsp
-
-            C: EnterSceneDoneReq
-            S: SceneEntityAppearNotify
-            S: EnterSceneDoneRsp
-
-            C: PostEnterSceneReq
-            S: PostEnterSceneRsp
-             */
-        }
-
-        override fun getKey(): ByteArray =
-            DispatchServer.dispatchKeyMap[getHost()]?.key ?: ByteArray(0)
 
     }
 
@@ -172,24 +133,13 @@ internal open class NetworkHandler(
 
         override val state: NetworkHandlerStateInterface.State = NetworkHandlerStateInterface.State.OK
 
-
-        override fun getKey(): ByteArray {
-            TODO("Not yet implemented")
-        }
-
     }
 
     inner class Closed : NetworkHandlerStateInterface {
 
         override val state: NetworkHandlerStateInterface.State = NetworkHandlerStateInterface.State.CLOSED
 
-        override fun getKey(): ByteArray {
-            TODO("Not yet implemented")
-        }
-
     }
-
-
 }
 
 internal class ConnectionInitializer(
@@ -199,7 +149,12 @@ internal class ConnectionInitializer(
     private lateinit var networkHandler: NetworkHandler
 
     override fun initChannel(ch: UkcpChannel) {
-        networkHandler = NetworkHandler(ch, scope.coroutineContext)
+        val key = runBlocking {
+            newSuspendedTransaction {
+                DispatchKeyData.getOrGenerate(ch.host).key
+            }
+        }
+        networkHandler = NetworkHandler(ch, key, scope.coroutineContext)
         player = Player(networkHandler, scope.coroutineContext)
     }
 
@@ -209,7 +164,6 @@ internal class ConnectionInitializer(
                 .setState(NetworkHandlerStateInterface.State.CLOSED)
         }
     }
-
 }
 
 internal class OutgoingPacketEncoder(
@@ -218,9 +172,8 @@ internal class OutgoingPacketEncoder(
     MessageToByteEncoder<OutgoingPacket>(OutgoingPacket::class.java) {
 
     override fun encode(ctx: ChannelHandlerContext, msg: OutgoingPacket, out: ByteBuf) {
-        out.writeBytes(msg.toFinalBytePacket().xor(networkHandler.getKey()))
+        out.writeBytes(msg.toFinalBytePacket().xor(networkHandler.key))
     }
-
 }
 
 internal class IncomingPacketDecoder(
@@ -228,10 +181,6 @@ internal class IncomingPacketDecoder(
 ) : MessageToMessageDecoder<ByteBuf>() {
 
     override fun decode(ctx: ChannelHandlerContext, msg: ByteBuf, out: MutableList<Any>) {
-        out.add(msg.readToSoraPacket(networkHandler.getKey()))
+        out.add(msg.readToSoraPacket(networkHandler.key))
     }
-
 }
-
-
-

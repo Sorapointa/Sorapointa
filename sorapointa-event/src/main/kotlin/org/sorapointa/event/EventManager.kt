@@ -1,4 +1,4 @@
-@file:Suppress( "unused")
+@file:Suppress("unused")
 
 package org.sorapointa.event
 
@@ -84,7 +84,6 @@ object EventManager {
     ) {
         registeredBlockListener.first { it.priority == priority }.listeners.add(listener)
     }
-
 
     /**
      * Broadcast event, and return the cancel state of this event
@@ -186,7 +185,6 @@ suspend inline fun <reified T : Event> nextEvent(
     EventManager.getEventFlow(priority).firstOrNull { if (it is T) filter(it) else false }
 }
 
-
 /**
  * Register a parallel listener
  * All registered listeners will be called in parallel.
@@ -285,7 +283,6 @@ suspend inline fun <T : Event> T.broadcast() {
     EventManager.broadcastEvent(this)
 }
 
-
 object EventManagerConfig : DataFilePersist<EventManagerConfig.Data>(
     File(configDirectory, "eventManagerConfig.json"), Data()
 ) {
@@ -296,8 +293,6 @@ object EventManagerConfig : DataFilePersist<EventManagerConfig.Data>(
         val waitingAllBlockListenersTimeout: Long = 3 * blockListenerTimeout
     )
 }
-
-
 
 internal data class PriorityEntry(
     val priority: EventPriority,

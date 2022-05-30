@@ -4,7 +4,6 @@ import io.jpower.kcp.netty.ChannelOptionHelper
 import io.jpower.kcp.netty.UkcpChannelOption
 import io.jpower.kcp.netty.UkcpServerChannel
 import io.netty.bootstrap.UkcpServerBootstrap
-import io.netty.channel.*
 import io.netty.channel.nio.NioEventLoopGroup
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.job
@@ -27,7 +26,6 @@ object ServerNetwork {
 
     private lateinit var serverBootstrap: UkcpServerBootstrap
 
-
     internal fun boot(parentContext: CoroutineContext = EmptyCoroutineContext): Job {
         logger.info { "Starting Sorapointa Server..." }
         scope = ModuleScope(logger, "ServerNetwork", parentContext)
@@ -38,7 +36,6 @@ object ServerNetwork {
             val future = serverBootstrap
                 .group(workerGroup)
                 .channel(UkcpServerChannel::class.java)
-                .option(ChannelOption.SO_KEEPALIVE, true) // TCP Protocol Heartbeat
                 .childHandler(ConnectionInitializer(scope))
                 .bind(port)
 
@@ -65,10 +62,8 @@ object ServerNetwork {
                 future.channel().close()
                 workerGroup.shutdownGracefully()
             }
-
         }
 
         return job
     }
-
 }

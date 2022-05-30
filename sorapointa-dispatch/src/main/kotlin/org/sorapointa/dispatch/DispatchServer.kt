@@ -17,6 +17,7 @@ import org.sorapointa.data.provider.DatabaseConfig
 import org.sorapointa.data.provider.DatabaseManager
 import org.sorapointa.dispatch.data.AccountTable
 import org.sorapointa.dispatch.data.ClientCustomConfig
+import org.sorapointa.dispatch.data.DispatchKeyDataTable
 import org.sorapointa.dispatch.data.RegionListClientCustomConfig
 import org.sorapointa.dispatch.plugins.*
 import org.sorapointa.dispatch.plugins.configureHTTP
@@ -25,11 +26,9 @@ import org.sorapointa.dispatch.plugins.configureRouting
 import org.sorapointa.dispatch.plugins.configureSerialization
 import org.sorapointa.dispatch.utils.KeyProvider
 import org.sorapointa.utils.*
-import org.sorapointa.utils.crypto.Ec2bData
 import org.sorapointa.utils.randomByteArray
 import org.sorapointa.utils.encoding.hex
 import java.io.File
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.text.toCharArray
 import kotlin.time.Duration
 
@@ -39,8 +38,6 @@ internal fun main(): Unit = runBlocking {
 }
 
 object DispatchServer {
-
-    var dispatchKeyMap = ConcurrentHashMap<String, Ec2bData>()
 
     internal val client by lazy {
         HttpClient(CIO) {
@@ -92,16 +89,15 @@ object DispatchServer {
             DatabaseConfig.init()
             DatabaseManager.loadDatabase()
         }
-        DatabaseManager.loadTables(AccountTable)
+        DatabaseManager.loadTables(AccountTable, DispatchKeyDataTable)
         val environment = getEnvironment()
         environment.setupApplication()
         embeddedServer(Netty, environment = environment).start(wait = true)
     }
-
 }
 
 /* ktlint-disable max-line-length */
-private val QUERY_CURR_HARDCODE_DEFAULT = "aHR0cHM6Ly9jbmdmZGlzcGF0Y2gueXVhbnNoZW4uY29tL3F1ZXJ5X2N1cl9yZWdpb24/dmVyc2lvbj1DTlJFTFdpbjIuNi4wJmxhbmc9MiZwbGF0Zm9ybT0zJmJpbmFyeT0xJnRpbWU9MzcyJmNoYW5uZWxfaWQ9MSZzdWJfY2hhbm5lbF9pZD0xJmFjY291bnRfdHlwZT0xJmRpc3BhdGNoU2VlZD0yMjdmYTQ3ZGE4Y2U3ZGNh".decodeBase64String()
+private val QUERY_CURR_HARDCODE_DEFAULT = "aHR0cHM6Ly9jbmdmZGlzcGF0Y2gueXVhbnNoZW4uY29tL3F1ZXJ5X2N1cl9yZWdpb24/dmVyc2lvbj1DTlJFTFdpbjIuNy4wJmxhbmc9MiZwbGF0Zm9ybT0zJmJpbmFyeT0xJnRpbWU9ODE4JmNoYW5uZWxfaWQ9MSZzdWJfY2hhbm5lbF9pZD0xJmFjY291bnRfdHlwZT0xJmRpc3BhdGNoU2VlZD02N2QzZWUzOWZkYWFiMDlm".decodeBase64String()
 /* ktlint-enable max-line-length */
 
 object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
@@ -119,7 +115,7 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
         var certification: Certification = Certification(),
         val requestSetting: RequestSetting = RequestSetting(),
         val accountSetting: AccountSetting = AccountSetting(),
-        val regionListClientCustomConfig: RegionListClientCustomConfig =  RegionListClientCustomConfig(
+        val regionListClientCustomConfig: RegionListClientCustomConfig = RegionListClientCustomConfig(
             sdkEnvironment = 2u,
             showException = false,
             loadPatch = false,
@@ -140,12 +136,12 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
         )
     )
 
-
     @Serializable
     data class RequestSetting(
         val forwardCommonRequest: Boolean = true,
         // If false, dispatch server will use default config hardcoded in Sorapointa
         val forwardQueryCurrRegion: Boolean = true,
+        val usingCurrRegionUrlHardcode: Boolean = true,
         val queryCurrRegionHardcode: String = QUERY_CURR_HARDCODE_DEFAULT,
         @SerialName("v2.8responseFormat")
         val v28: Boolean = false
@@ -160,10 +156,10 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
         val password: Argon2PasswordSetting = Argon2PasswordSetting()
     ) {
         val comboTokenExpiredTime: Duration
-        get() = Duration.parse(_comboTokenExpiredTime)
+            get() = Duration.parse(_comboTokenExpiredTime)
 
         val dispatchTokenExpiredTime: Duration
-        get() = Duration.parse(_dispatchTokenExpiredTime)
+            get() = Duration.parse(_dispatchTokenExpiredTime)
     }
 
     @Serializable

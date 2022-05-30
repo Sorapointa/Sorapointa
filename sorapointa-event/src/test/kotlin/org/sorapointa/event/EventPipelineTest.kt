@@ -82,7 +82,7 @@ class EventPipelineTest {
             }
         }
 
-        (1..1000).toList().map {
+        (1..100).toList().map {
             launch {
                 repeat(10) {
                     val event = TestEvent3()
@@ -174,7 +174,5 @@ class EventPipelineTest {
         EventManager.broadcastEvent(TestEvent3())
 
         job.join()
-
     }
-
 }

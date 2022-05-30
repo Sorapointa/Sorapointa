@@ -11,7 +11,7 @@ import kotlin.coroutines.CoroutineContext
  * Data Loader for test, skip ci
  */
 @OptIn(SorapointaInternal::class)
-@Suppress( "TestFunctionName")
+@Suppress("TestFunctionName")
 inline fun <reified T : Any> TestDataLoader(
     path: String,
     context: CoroutineContext = Dispatchers.IO,

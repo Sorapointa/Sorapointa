@@ -6,7 +6,7 @@ import org.sorapointa.utils.configDirectory
 import java.io.File
 
 object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
-    File(configDirectory, "dispatchConfig.json"), Data()
+    File(configDirectory, "sorapointaConfig.json"), Data()
 ) {
 
     @Serializable
@@ -16,7 +16,7 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
 
     @Serializable
     data class NetworkSetting(
-        val bindPort: Int = 22021,
+        val bindPort: Int = 22101,
         val uKcpSetting: UKcpSetting = UKcpSetting()
     )
 
@@ -28,6 +28,4 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
         val nocwnd: Boolean = true,
         val MTU: Int = 1200,
     )
-
-
 }
