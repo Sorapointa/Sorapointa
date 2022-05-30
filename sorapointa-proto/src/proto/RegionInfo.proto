@@ -18,8 +18,8 @@ message RegionInfo {
 	uint32 client_data_version = 14;
 	string handbook_url = 16;
 	uint32 client_silence_data_version = 18;
-	string client_data_md5 = 19;
-	string client_silence_data_md5 = 20;
+	string client_data_md_5 = 19;
+	string client_silence_data_md_5 = 20;
 	ResVersionConfig res_version_config = 22;
 	bytes secret_key = 23;
 	string official_community_url = 24;

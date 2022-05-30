@@ -23,7 +23,6 @@ class SoraPacket(
     return SoraPacket(cmdId, PacketHead.parseFrom(metadata), data)
 }
 
-
 @SorapointaInternal fun BytePacketBuilder.writeSoraPacket(
     cmdId: UShort,
     data: GeneratedMessageV3,
@@ -44,21 +43,19 @@ class SoraPacket(
 fun ByteArray.toByteString(): ByteString =
     ByteString.copyFrom(this)
 
-//@SorapointaInternal fun BytePacketBuilder.encryptPacket(key: ByteArray): ByteReadPacket {
+// @SorapointaInternal fun BytePacketBuilder.encryptPacket(key: ByteArray): ByteReadPacket {
 //    val data = this.
 //    return buildPacket {
 //
 //
 //    }
-//}
-
-
+// }
 
 //
-//abstract class SoraPacket(
+// abstract class SoraPacket(
 //    private val cmdId: Int,
 //    private val data: GeneratedMessageV3
-//) {
+// ) {
 //
 //    companion object {
 //        private lateinit var dispatchKey: ByteArray
@@ -155,34 +152,33 @@ fun ByteArray.toByteString(): ByteString =
 //        return packet
 //    }
 //
-//}
+// }
 //
-//// Unsigned short
-//private fun ByteArrayOutputStream.writeUint16(i: Int) {
+// // Unsigned short
+// private fun ByteArrayOutputStream.writeUint16(i: Int) {
 //    write((i ushr 8 and 0xFF).toByte().toInt())
 //    write((i and 0xFF).toByte().toInt())
-//}
+// }
 //
-//// Unsigned int (long)
-//private fun ByteArrayOutputStream.writeUint32(i: Int) {
+// // Unsigned int (long)
+// private fun ByteArrayOutputStream.writeUint32(i: Int) {
 //    write((i ushr 24 and 0xFF).toByte().toInt())
 //    write((i ushr 16 and 0xFF).toByte().toInt())
 //    write((i ushr 8 and 0xFF).toByte().toInt())
 //    write((i and 0xFF).toByte().toInt())
-//}
+// }
 //
-//private fun ByteBuf.toByteArray(): ByteArray {
+// private fun ByteBuf.toByteArray(): ByteArray {
 //    val bytes = ByteArray(this.capacity())
 //    this.getBytes(0, bytes)
 //    return bytes
-//}
+// }
 //
 //
-//internal fun ByteBuf.toReadPacket(): ByteReadPacket {
+// internal fun ByteBuf.toReadPacket(): ByteReadPacket {
 //    val buf = this
 //    return buildPacket {
 //        ByteBufInputStream(buf).withUse { copyTo(outputStream()) }
 //    }
-//}
+// }
 //
-

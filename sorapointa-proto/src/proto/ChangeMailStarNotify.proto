@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-option java_package = "org.sorapointa.proto";
-
-message ChangeMailStarNotify {
-  repeated uint32 mail_id_list = 1;
-  bool is_star = 2;
-}
