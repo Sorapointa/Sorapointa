@@ -40,11 +40,6 @@ internal fun ByteBuf.toReadPacket(): ByteReadPacket {
     }
 }
 
-internal fun ByteArray.toReadPacket(): ByteReadPacket =
-    buildPacket {
-        writeFully(this@toReadPacket)
-    }
-
 internal fun ByteBuf.toByteArray(): ByteArray {
     val bytes = ByteArray(this.readableBytes())
     this.readBytes(bytes)

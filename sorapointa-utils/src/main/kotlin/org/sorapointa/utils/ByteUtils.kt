@@ -2,9 +2,11 @@
 
 package org.sorapointa.utils
 
+import io.ktor.utils.io.core.*
 import java.io.Closeable
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.io.use
 
 fun Int.toByteArray(littleEndian: Boolean = true) = ByteArray(4).also { a ->
     a[0] = shr(if (littleEndian) 0 else 24).toByte()
@@ -73,3 +75,8 @@ inline fun <I : Closeable, O : Closeable, R> I.withOut(output: O, block: I.(outp
     }
     return use { output.use { block(this, output) } }
 }
+
+fun ByteArray.toReadPacket(): ByteReadPacket =
+    buildPacket {
+        writeFully(this@toReadPacket)
+    }

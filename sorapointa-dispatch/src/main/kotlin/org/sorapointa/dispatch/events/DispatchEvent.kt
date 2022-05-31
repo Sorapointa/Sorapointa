@@ -71,7 +71,7 @@ class QueryRegionListEvent(
     override val data: QueryRegionListHttpRsp
 ) : DispatchDataEvent<QueryRegionListHttpRsp>(), CancelableEvent
 
-class QueryCurrRegionEvent(
+class QueryCurRegionEvent(
     override val call: ApplicationCall,
     override val data: QueryCurrRegionHttpRsp
 ) : DispatchDataEvent<QueryCurrRegionHttpRsp>(), CancelableEvent

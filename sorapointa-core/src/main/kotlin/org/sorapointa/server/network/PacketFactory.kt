@@ -5,7 +5,7 @@ import com.google.protobuf.Parser
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.sorapointa.dispatch.data.Account
-import org.sorapointa.dispatch.plugins.currRegionRsp
+import org.sorapointa.dispatch.plugins.curRegionRsp
 import org.sorapointa.event.broadcastEvent
 import org.sorapointa.events.HandleIncomingPacketEvent
 import org.sorapointa.game.Player
@@ -131,7 +131,7 @@ internal object PlayerLoginReqFactory : IncomingPacketFactoryWithResponse
     override val parser: Parser<PlayerLoginReq> = PlayerLoginReq.parser()
 
     override suspend fun Player.handlePacket(packet: PlayerLoginReq): PlayerLoginRspPacket {
-        return currRegionRsp
+        return curRegionRsp
             ?.let { PlayerLoginRspPacket.Succ(it) }
             ?: PlayerLoginRspPacket.Fail(Retcode.RETCODE_RET_SVR_ERROR)
     }

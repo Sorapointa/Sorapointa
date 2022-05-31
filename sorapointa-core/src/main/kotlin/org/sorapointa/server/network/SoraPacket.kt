@@ -12,7 +12,7 @@ import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.i18n
 import org.sorapointa.utils.randomByteArray
 
-internal abstract class OutgoingPacket(
+abstract class OutgoingPacket(
     val cmdId: UShort,
     var metadata: PacketHead? = null
 ) {
@@ -83,11 +83,11 @@ internal abstract class PlayerLoginRspPacket : OutgoingPacket(
     }
 
     class Succ(
-        private val queryCurrRegionHttpRsp: QueryCurrRegionHttpRsp
+        private val queryCurRegionHttpRsp: QueryCurrRegionHttpRsp
     ) : PlayerLoginRspPacket() {
         override fun buildProto(): GeneratedMessageV3 =
             playerLoginRsp {
-                val regionInfo = queryCurrRegionHttpRsp.regionInfo
+                val regionInfo = queryCurRegionHttpRsp.regionInfo
                 isUseAbilityHash = true
                 abilityHashCode = 557879627
                 clientDataVersion = regionInfo.clientDataVersion

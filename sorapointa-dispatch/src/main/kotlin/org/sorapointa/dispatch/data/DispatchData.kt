@@ -11,7 +11,7 @@ import org.sorapointa.utils.networkJson
 @Serializable
 data class QueryCurRegionData(
     val content: String,
-    val sign: String = "sorapointa don't need to sign"
+    val sign: String = "c29yYXBvaW50YQ==" // magic, don't change it
 )
 
 @Serializable
