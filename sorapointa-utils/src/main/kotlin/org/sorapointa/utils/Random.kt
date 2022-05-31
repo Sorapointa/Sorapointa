@@ -24,7 +24,6 @@ val secureRandom: Random
             ThreadLocalRandom.current()
         }
 
-// TODO: Move to proper package
 fun randomByteArray(length: Int): ByteArray {
     val bytes = ByteArray(length)
     secureRandom.nextBytes(bytes)
