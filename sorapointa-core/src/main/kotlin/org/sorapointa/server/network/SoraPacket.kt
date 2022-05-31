@@ -83,11 +83,11 @@ internal abstract class PlayerLoginRspPacket : OutgoingPacket(
     }
 
     class Succ(
-        private val queryCurRegionHttpRsp: QueryCurrRegionHttpRsp
+        private val queryCurrentRegionHttpRsp: QueryCurrRegionHttpRsp
     ) : PlayerLoginRspPacket() {
         override fun buildProto(): GeneratedMessageV3 =
             playerLoginRsp {
-                val regionInfo = queryCurRegionHttpRsp.regionInfo
+                val regionInfo = queryCurrentRegionHttpRsp.regionInfo
                 isUseAbilityHash = true
                 abilityHashCode = 557879627
                 clientDataVersion = regionInfo.clientDataVersion

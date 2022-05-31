@@ -9,7 +9,7 @@ import org.sorapointa.utils.sha256sign
 import org.sorapointa.utils.networkJson
 
 @Serializable
-data class QueryCurRegionData(
+data class QueryCurrentRegionData(
     val content: String,
     val sign: String = "c29yYXBvaW50YQ==" // magic, don't change it
 )

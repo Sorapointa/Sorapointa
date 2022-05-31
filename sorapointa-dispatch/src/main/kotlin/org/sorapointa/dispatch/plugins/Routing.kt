@@ -29,7 +29,7 @@ internal fun Application.configureNeedHandlerRouting() {
         }
 
         get("/query_cur_region") {
-            call.handleQueryCurRegion()
+            call.handleQueryCurrentRegion()
         }
 
         route("/hk4e_{region}") {

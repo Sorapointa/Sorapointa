@@ -66,31 +66,31 @@ private suspend fun getQueryRegionListHttpRsp(host: String): QueryRegionListHttp
     }
 }
 
-var curRegionRsp: QueryCurrRegionHttpRsp? = null
+var currentRegionRsp: QueryCurrRegionHttpRsp? = null
     private set
 
 private val dispatchRSAKey: RSAKey? = DispatchConfig.data.requestSetting.rsaKey.parseToRSAKey()
 
-private suspend fun ApplicationCall.forwardQueryCurRegionHttpRsp(): QueryCurrRegionHttpRsp {
+private suspend fun ApplicationCall.forwardQueryCurrentRegionHttpRsp(): QueryCurrRegionHttpRsp {
 
     val requestSetting = DispatchConfig.data.requestSetting
 
-    val queryCurRegionHttpRsp = curRegionRsp ?: run {
-        if (requestSetting.forwardQueryCurRegion) {
-            val forwardResult = if (!requestSetting.usingCurRegionUrlHardcode) {
+    val queryCurrentRegionHttpRsp = currentRegionRsp ?: run {
+        if (requestSetting.forwardQueryCurrentRegion) {
+            val forwardResult = if (!requestSetting.usingCurrentRegionUrlHardcode) {
                 forwardCall(QUERY_CURR_DOMAIN)
             } else {
-                DispatchServer.client.get(requestSetting.queryCurRegionHardcode)
+                DispatchServer.client.get(requestSetting.queryCurrentRegionHardcode)
             }.bodyAsText()
             if (!requestSetting.v28 || dispatchRSAKey == null) {
-                logger.debug { "QueryCurRegion Result: $forwardResult" }
+                logger.debug { "QueryCurrentRegion Result: $forwardResult" }
                 QueryCurrRegionHttpRsp.parseFrom(forwardResult.decodeBase64Bytes())
             } else {
-                val query: QueryCurRegionData = networkJson.decodeFromString(forwardResult)
-                logger.debug { "QueryCurRegion Result: $query" }
+                val query: QueryCurrentRegionData = networkJson.decodeFromString(forwardResult)
+                logger.debug { "QueryCurrentRegion Result: $query" }
                 with(dispatchRSAKey) {
                     val result = query.content.decodeBase64Bytes().decrypt()
-                    logger.debug { "QueryCurRegion Decrypted Result: ${result.encodeBase64()}" }
+                    logger.debug { "QueryCurrentRegion Decrypted Result: ${result.encodeBase64()}" }
                     QueryCurrRegionHttpRsp.parseFrom(result)
                 }
             }
@@ -104,15 +104,15 @@ private suspend fun ApplicationCall.forwardQueryCurRegionHttpRsp(): QueryCurrReg
     val dispatchSeed = ec2b.seed
     val dispatchKey = ec2b.key
 
-    return queryCurRegionHttpRsp.toBuilder()
+    return queryCurrentRegionHttpRsp.toBuilder()
         .setRegionInfo(
-            queryCurRegionHttpRsp.regionInfo.toBuilder()
+            queryCurrentRegionHttpRsp.regionInfo.toBuilder()
                 .setGateserverIp(DispatchConfig.data.gateServerIp)
                 .setGateserverPort(DispatchConfig.data.gateServerPort)
                 .setSecretKey(dispatchSeed.toByteString())
                 .build()
         ).apply {
-            if (requestSetting.curRegionContainsCustomClientConfig) {
+            if (requestSetting.currentRegionContainsCustomClientConfig) {
                 this.regionCustomConfigEncrypted = networkJson.encodeToString(
                     DispatchConfig.data.clientCustomConfig
                 ).toByteArray().xor(dispatchKey).toByteString()
@@ -131,17 +131,17 @@ internal suspend fun ApplicationCall.handleQueryRegionList() {
     }
 }
 
-internal suspend fun ApplicationCall.handleQueryCurRegion() {
+internal suspend fun ApplicationCall.handleQueryCurrentRegion() {
     logger.info { "Client ${request.local.host} has queried current region" }
-    val packet = this.forwardQueryCurRegionHttpRsp()
-    QueryCurRegionEvent(this, packet).broadcastEvent {
+    val packet = this.forwardQueryCurrentRegionHttpRsp()
+    QueryCurrentRegionEvent(this, packet).broadcastEvent {
         // We don't need to sign if client has been hooked
         // And we would not to implement this sign algorithm,
         // because it's related with injecting new RSA key,
         // but that is uncessary for now.
         val data = it.data.toByteArray().encodeBase64()
         if (DispatchConfig.data.requestSetting.v28) {
-            respond(QueryCurRegionData(data))
+            respond(QueryCurrentRegionData(data))
         } else {
             respondText(data)
         }
