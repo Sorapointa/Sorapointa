@@ -15,12 +15,9 @@ import org.sorapointa.command.ConsoleCommandSender
 import org.sorapointa.command.defaults.defaultsCommand
 import org.sorapointa.config.*
 import org.sorapointa.console.Console
-import org.sorapointa.console.JLineRedirector
 import org.sorapointa.data.provider.DatabaseManager
 import org.sorapointa.utils.*
 import java.io.File
-import java.io.OutputStream
-import java.io.PrintStream
 import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger {}
@@ -104,15 +101,8 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
 
     private fun redirectPrint() {
         when {
-            noOut -> {
-                val out = PrintStream(OutputStream.nullOutputStream())
-                System.setOut(out)
-                System.setErr(out)
-            }
-            !noOut && !noRedirect -> {
-                System.setErr(JLineRedirector)
-                System.setOut(JLineRedirector)
-            }
+            noOut -> Console.redirectToNull()
+            !noOut && !noRedirect -> Console.redirectToJLine()
             else -> {
                 // keep origin
             }
