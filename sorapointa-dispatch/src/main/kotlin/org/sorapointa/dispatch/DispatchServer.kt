@@ -142,11 +142,11 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
     data class RequestSetting(
         val forwardCommonRequest: Boolean = true,
         // If false, dispatch server will use default config hardcoded in Sorapointa
-        val forwardQueryCurRegion: Boolean = true,
-        val usingCurRegionUrlHardcode: Boolean = false,
-        val curRegionContainsCustomClientConfig: Boolean = true,
-        val queryCurRegionHardcode: String = QUERY_CURR_HARDCODE_DEFAULT,
-        @SerialName("v2.8CurRegionForwardFormat")
+        val forwardQueryCurrentRegion: Boolean = true,
+        val usingCurrentRegionUrlHardcode: Boolean = false,
+        val currentRegionContainsCustomClientConfig: Boolean = true,
+        val queryCurrentRegionHardcode: String = QUERY_CURR_HARDCODE_DEFAULT,
+        @SerialName("v2.8CurrentRegionForwardFormat")
         val v28: Boolean = false,
         @SerialName("v2.8RSAKey")
         val rsaKey: String = QUERY_CURR_RSA_KEY
