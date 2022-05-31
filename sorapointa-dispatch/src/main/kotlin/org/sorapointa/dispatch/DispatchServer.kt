@@ -125,10 +125,11 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
             downloadMode = 0u
         ),
         val clientCustomConfig: ClientCustomConfig = ClientCustomConfig(
-            codeSwitch = listOf(15u, 2410u, 2324u, 21u),
-            coverSwitch = listOf(8u, 40u),
             perfReportEnable = false,
-            homeDotPattern = true,
+            photographShareTopics = 753u,
+            gachaShareTopics = 372u,
+            photographSharePlatform = 13u,
+            gachaSharePlatform = 13u,
             homeItemFilter = 20u,
             reportNetDelayConfig = ClientCustomConfig.ReportNetDelayConfigData(
                 openGateServer = true
@@ -141,7 +142,8 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
         val forwardCommonRequest: Boolean = true,
         // If false, dispatch server will use default config hardcoded in Sorapointa
         val forwardQueryCurrRegion: Boolean = true,
-        val usingCurrRegionUrlHardcode: Boolean = true,
+        val usingCurrRegionUrlHardcode: Boolean = false,
+        val currRegionContainsCustomClientConfig: Boolean = true,
         val queryCurrRegionHardcode: String = QUERY_CURR_HARDCODE_DEFAULT,
         @SerialName("v2.8responseFormat")
         val v28: Boolean = false

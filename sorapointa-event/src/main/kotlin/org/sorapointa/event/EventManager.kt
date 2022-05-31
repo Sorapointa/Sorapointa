@@ -96,7 +96,7 @@ object EventManager {
         var isCancelled by atomic(false)
         var isIntercepted by atomic(false)
         val eventName = event::class.simpleName
-        logger.debug { "Try to broadcast event $eventName" }
+        logger.trace { "Try to broadcast event $eventName" }
         registeredListener.forEach { (priority, pListener) ->
             eventScope.launch {
                 pListener.forEach { listener ->
@@ -121,11 +121,11 @@ object EventManager {
                 }
             }
             if (isIntercepted) {
-                logger.debug { "Event $eventName has been intercepted" }
+                logger.trace { "Event $eventName has been intercepted" }
                 return isCancelled
             }
         }
-        logger.debug { "Broadcasted event $eventName, cancel state: $isCancelled" }
+        logger.trace { "Broadcasted event $eventName, cancel state: $isCancelled" }
         return isCancelled
     }
 
@@ -240,11 +240,11 @@ inline fun <reified T : Event> registerBlockListener(
  *
  * @param ifNotCancel lambda block with the action if broadcasted event has **NOT** been cancelled
  */
-suspend inline fun <T : Event> T.broadcastEvent(
-    noinline ifNotCancel: suspend (T) -> Unit
-) {
+suspend inline fun <T : Event, R> T.broadcastEvent(
+    noinline ifNotCancel: suspend (T) -> R
+): R? {
     val isCancelled = EventManager.broadcastEvent(this)
-    if (!isCancelled) ifNotCancel(this)
+    return if (!isCancelled) ifNotCancel(this) else null
 }
 
 /**
@@ -254,11 +254,11 @@ suspend inline fun <T : Event> T.broadcastEvent(
  *
  * @param ifCancelled lambda block with the action if broadcasted event has been cancelled
  */
-suspend inline fun <T : Event> T.broadcastEventIfCancelled(
-    noinline ifCancelled: suspend (T) -> Unit
-) {
+suspend inline fun <T : Event, R> T.broadcastEventIfCancelled(
+    noinline ifCancelled: suspend (T) -> R
+): R? {
     val isCancelled = EventManager.broadcastEvent(this)
-    if (isCancelled) ifCancelled(this)
+    return if (isCancelled) ifCancelled(this) else null
 }
 
 /**
@@ -268,12 +268,12 @@ suspend inline fun <T : Event> T.broadcastEventIfCancelled(
  *
  * @param ifNotCancel lambda block with the action if broadcasted event has **NOT** been cancelled
  */
-suspend inline fun <T : Event> T.broadcastEvent(
-    noinline ifNotCancel: suspend (T) -> Unit,
-    noinline ifCancelled: suspend (T) -> Unit
-) {
+suspend inline fun <T : Event, R> T.broadcastEvent(
+    noinline ifNotCancel: suspend (T) -> R,
+    noinline ifCancelled: suspend (T) -> R
+): R {
     val isCancelled = EventManager.broadcastEvent(this)
-    if (!isCancelled) ifNotCancel(this) else ifCancelled(this)
+    return if (!isCancelled) ifNotCancel(this) else ifCancelled(this)
 }
 
 /**

@@ -77,7 +77,7 @@ private suspend fun ApplicationCall.forwardQueryCurrRegionHttpRsp(): QueryCurrRe
         if (DispatchConfig.data.requestSetting.forwardQueryCurrRegion) {
             QueryCurrRegionHttpRsp.parseFrom(
                 (
-                    if (DispatchConfig.data.requestSetting.usingCurrRegionUrlHardcode) forwardCall(QUERY_CURR_DOMAIN)
+                    if (!DispatchConfig.data.requestSetting.usingCurrRegionUrlHardcode) forwardCall(QUERY_CURR_DOMAIN)
                     else DispatchServer.client.get(DispatchConfig.data.requestSetting.queryCurrRegionHardcode)
                         .bodyAsText()
                     ).decodeBase64Bytes()
@@ -90,6 +90,7 @@ private suspend fun ApplicationCall.forwardQueryCurrRegionHttpRsp(): QueryCurrRe
     }
 
     val dispatchSeed = ec2b.seed
+    val dispatchKey = ec2b.key
 
     return queryCurrRegionHttpRsp.toBuilder()
         .setRegionInfo(
@@ -98,12 +99,14 @@ private suspend fun ApplicationCall.forwardQueryCurrRegionHttpRsp(): QueryCurrRe
                 .setGateserverPort(DispatchConfig.data.gateServerPort)
                 .setSecretKey(dispatchSeed.toByteString())
                 .build()
-        )
+        ).apply {
+            if (DispatchConfig.data.requestSetting.currRegionContainsCustomClientConfig) {
+                this.regionCustomConfigEncrypted = networkJson.encodeToString(
+                    DispatchConfig.data.clientCustomConfig
+                ).toByteArray().xor(dispatchKey).toByteString()
+            }
+        }
         .setClientSecretKey(dispatchSeed.toByteString())
-//        .setRegionCustomConfigEncrypted(
-//            networkJson.encodeToString(
-//                DispatchConfig.data.clientCustomConfig
-//            ).toByteArray().xor(dispatchKey).toByteString())
         .build()
 }
 

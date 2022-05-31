@@ -68,7 +68,6 @@ object ServerNetwork {
             }.onFailure {
                 workerGroup.shutdownGracefully()
             }
-
         }
 
         return job

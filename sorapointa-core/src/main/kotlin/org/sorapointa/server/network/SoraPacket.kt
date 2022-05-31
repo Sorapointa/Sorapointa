@@ -74,7 +74,7 @@ internal abstract class PlayerLoginRspPacket : OutgoingPacket(
 
     class Fail(
         private val retcode: Retcode
-    ): PlayerLoginRspPacket() {
+    ) : PlayerLoginRspPacket() {
 
         override fun buildProto(): GeneratedMessageV3 =
             playerLoginRsp {
@@ -84,7 +84,7 @@ internal abstract class PlayerLoginRspPacket : OutgoingPacket(
 
     class Succ(
         private val queryCurrRegionHttpRsp: QueryCurrRegionHttpRsp
-    ): PlayerLoginRspPacket() {
+    ) : PlayerLoginRspPacket() {
         override fun buildProto(): GeneratedMessageV3 =
             playerLoginRsp {
                 val regionInfo = queryCurrRegionHttpRsp.regionInfo
@@ -115,5 +115,4 @@ internal class PingRspPacket(
         pingRsp {
             clientTime = pingReq.clientTime
         }
-
 }
