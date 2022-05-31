@@ -8,10 +8,7 @@ import io.netty.channel.ChannelInitializer
 import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.handler.codec.MessageToByteEncoder
 import io.netty.handler.codec.MessageToMessageDecoder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.sorapointa.dispatch.data.DispatchKeyData
@@ -20,6 +17,7 @@ import org.sorapointa.event.WithState
 import org.sorapointa.game.Player
 import org.sorapointa.proto.PacketHeadOuterClass.PacketHead
 import org.sorapointa.proto.SoraPacket
+import org.sorapointa.proto.findCommonNameFromCmdId
 import org.sorapointa.server.network.IncomingPacketFactories.handlePacket
 import org.sorapointa.utils.*
 import org.sorapointa.utils.crypto.MT19937
@@ -40,16 +38,20 @@ internal interface NetworkHandlerStateInterface : WithState<NetworkHandlerStateI
 
 internal open class NetworkHandler(
     private val connection: UkcpChannel,
-    dispatchKey: ByteArray,
     parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
 ) {
 
-    private lateinit var bindPlayer: Player
+    lateinit var bindPlayer: Player
 
     private val scope = ModuleScope(logger, "NetworkHandler[${getHost()}]", parentCoroutineContext)
 
-    var key: ByteArray = dispatchKey
-        private set
+    val dispatchKey: Deferred<ByteArray> = scope.async {
+        newSuspendedTransaction {
+            DispatchKeyData.getOrGenerate(getHost()).key
+        }
+    }
+
+    var gameKey: ByteArray? = null
 
     val networkStateController by lazy {
         StateController(
@@ -57,6 +59,12 @@ internal open class NetworkHandler(
             parentStateClass = this,
             Initialize(), Login(), OK(), Closed()
         )
+    }
+
+    suspend fun init(player: Player) {
+        bindPlayer = player
+        bindPlayer.init()
+        networkStateController.init()
     }
 
     fun getHost(): String =
@@ -67,6 +75,7 @@ internal open class NetworkHandler(
         if (metadata != null) {
             packet.metadata = metadata
         }
+        logger.debug { "Send: ${findCommonNameFromCmdId(packet.cmdId)} Id: ${packet.cmdId}" }
         connection.writeAndFlushOrCloseAsync(packet)
     }
 
@@ -82,7 +91,7 @@ internal open class NetworkHandler(
     open suspend fun updateKeyWithSeed(keySeed: ULong): ByteArray =
         withContext(Dispatchers.Default) {
             MT19937.generateKey(keySeed).also {
-                key = it
+                gameKey = it
                 networkStateController.setState(NetworkHandlerStateInterface.State.OK)
             }
         }
@@ -107,6 +116,7 @@ internal open class NetworkHandler(
                     }
                 }
             })
+        logger.debug { "Session [${connection.remoteAddress()}] has inited" }
     }
 
     inner class Initialize : NetworkHandlerStateInterface {
@@ -114,7 +124,6 @@ internal open class NetworkHandler(
         override val state: NetworkHandlerStateInterface.State = NetworkHandlerStateInterface.State.INITIALIZE
 
         override suspend fun startState() {
-            logger.info { "New session from [${connection.remoteAddress()}] connected" }
             setupConnectionPipeline()
             networkStateController.setState(NetworkHandlerStateInterface.State.LOGIN)
         }
@@ -143,17 +152,17 @@ internal class ConnectionInitializer(
     private lateinit var networkHandler: NetworkHandler
 
     override fun initChannel(ch: UkcpChannel) {
-        val key = runBlocking {
-            newSuspendedTransaction {
-                DispatchKeyData.getOrGenerate(ch.host).key
-            }
-        }
-        networkHandler = NetworkHandler(ch, key, scope.coroutineContext)
+        logger.info { "New session from [${ch.remoteAddress()}] connected" }
+        networkHandler = NetworkHandler(ch, scope.coroutineContext)
         player = Player(networkHandler, scope.coroutineContext)
+        runBlocking {
+            networkHandler.init(player)
+        }
     }
 
     override fun channelInactive(ctx: ChannelHandlerContext) {
         scope.launch {
+            logger.info { "Session [${ctx.channel().remoteAddress()}] has disconnected" }
             networkHandler.networkStateController
                 .setState(NetworkHandlerStateInterface.State.CLOSED)
         }
@@ -166,7 +175,10 @@ internal class OutgoingPacketEncoder(
     MessageToByteEncoder<OutgoingPacket>(OutgoingPacket::class.java) {
 
     override fun encode(ctx: ChannelHandlerContext, msg: OutgoingPacket, out: ByteBuf) {
-        out.writeBytes(msg.toFinalBytePacket().xor(networkHandler.key))
+        runBlocking {
+            val key = networkHandler.gameKey ?: networkHandler.dispatchKey.await()
+            out.writeBytes(msg.toFinalBytePacket().xor(key))
+        }
     }
 }
 
@@ -175,6 +187,9 @@ internal class IncomingPacketDecoder(
 ) : MessageToMessageDecoder<ByteBuf>() {
 
     override fun decode(ctx: ChannelHandlerContext, msg: ByteBuf, out: MutableList<Any>) {
-        out.add(msg.readToSoraPacket(networkHandler.key))
+        runBlocking {
+            val key = networkHandler.gameKey ?: networkHandler.dispatchKey.await()
+            msg.readToSoraPacket(key) { out.add(it) }
+        }
     }
 }

@@ -9,6 +9,7 @@ import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelOutboundInvoker
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.sorapointa.proto.START_MAGIC
 import org.sorapointa.proto.SoraPacket
 import org.sorapointa.proto.packetHead
 import org.sorapointa.proto.readToSoraPacket
@@ -51,10 +52,17 @@ internal fun ByteBuf.toByteArray(): ByteArray {
 }
 
 @OptIn(SorapointaInternal::class)
-internal fun ByteBuf.readToSoraPacket(
-    key: ByteArray
-): SoraPacket =
-    toByteArray().xor(key).toReadPacket().readToSoraPacket()
+internal inline fun <reified T> ByteBuf.readToSoraPacket(
+    key: ByteArray,
+    block: (SoraPacket) -> T
+) {
+    if (this.readableBytes() > 12) { // TODO: why it should be 12
+        val decrypt = this.toByteArray().xor(key).toReadPacket()
+        if (decrypt.copy().readUShort() == START_MAGIC) {
+            block(decrypt.readToSoraPacket())
+        }
+    }
+}
 
 internal fun ChannelOutboundInvoker.writeAndFlushOrCloseAsync(msg: Any?): ChannelFuture? {
     return writeAndFlush(msg)

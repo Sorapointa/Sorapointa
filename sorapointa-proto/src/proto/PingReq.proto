@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+// CmdId: 32
+// EnetChannelId: 0
+// EnetIsReliable: true
+// IsAllowClient: true
+message PingReq {
+	uint32 seq = 2;
+	uint32 client_time = 14;
+	bytes sc_data = 11;
+	float ue_time = 15;
+	double total_tick_time = 12;
+}

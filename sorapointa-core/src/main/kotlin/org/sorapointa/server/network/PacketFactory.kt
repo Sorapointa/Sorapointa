@@ -2,14 +2,19 @@ package org.sorapointa.server.network
 
 import com.google.protobuf.GeneratedMessageV3
 import com.google.protobuf.Parser
+import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.sorapointa.dispatch.data.Account
+import org.sorapointa.dispatch.plugins.currRegionRsp
 import org.sorapointa.game.Player
-import org.sorapointa.proto.PacketId
+import org.sorapointa.proto.*
 import org.sorapointa.proto.GetPlayerTokenReqOuterClass.GetPlayerTokenReq
+import org.sorapointa.proto.PingReqOuterClass.PingReq
+import org.sorapointa.proto.PlayerLoginReqOuterClass.PlayerLoginReq
 import org.sorapointa.proto.RetcodeOuterClass.Retcode
-import org.sorapointa.proto.SoraPacket
 import org.sorapointa.utils.randomULong
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * Server passively receives a packet (requst),
@@ -55,14 +60,32 @@ internal abstract class IncomingPacketFactoryWithResponse
 internal object IncomingPacketFactories {
 
     private val incomingPacketFactories = listOf<IncomingPacketFactory<*>>(
-        GetPlayerTokenReqFactory
+        GetPlayerTokenReqFactory,
+        PingReqFactory
     )
 
-    suspend fun Player.handlePacket(packet: SoraPacket): OutgoingPacket? =
-        incomingPacketFactories.firstOrNull { it.cmdId == packet.cmdId }
+    suspend fun Player.handlePacket(packet: SoraPacket): OutgoingPacket? {
+        logger.debug { "Recv: ${findCommonNameFromCmdId(packet.cmdId)} Id: ${packet.cmdId}" }
+        return incomingPacketFactories.firstOrNull { it.cmdId == packet.cmdId }
             ?.run {
                 handle(packet)
             }
+    }
+}
+
+internal object PingReqFactory : IncomingPacketFactoryWithResponse
+<PingReq, PingRspPacket>(
+    PacketId.PING_REQ
+) {
+
+    override val parser: Parser<PingReq> = PingReq.parser()
+
+
+    override suspend fun Player.handlePacket(packet: PingReq): PingRspPacket {
+        // TODO: Update Player Time
+        return PingRspPacket(packet)
+    }
+
 }
 
 internal object GetPlayerTokenReqFactory : IncomingPacketFactoryWithResponse
@@ -74,12 +97,14 @@ internal object GetPlayerTokenReqFactory : IncomingPacketFactoryWithResponse
 
     override suspend fun Player.handlePacket(packet: GetPlayerTokenReq): GetPlayerTokenRspPacket {
         val account = newSuspendedTransaction {
-            Account.findById(packet.uid.toUInt())
+            Account.findById(packet.accountUid.toUInt())
         } ?: return GetPlayerTokenRspPacket.Error(Retcode.RETCODE_RET_ACCOUNT_NOT_EXIST, "user.notfound")
         if (packet.accountToken != account.getComboToken()) return GetPlayerTokenRspPacket.Error(
             Retcode.RETCODE_RET_ACCOUNT_NOT_EXIST,
             "auth.failed"
         )
+
+        this.account = account
 
         val seed = randomULong()
         networkHandler.updateKeyWithSeed(seed)
@@ -90,8 +115,20 @@ internal object GetPlayerTokenReqFactory : IncomingPacketFactoryWithResponse
     }
 }
 
-// internal object PlayerLoginReqFactory: IncomingPacketFactoryWithResponse
-// <PlayerLoginReq, PlayerLoginRsp>
+ internal object PlayerLoginReqFactory: IncomingPacketFactoryWithResponse
+ <PlayerLoginReq, PlayerLoginRspPacket>(
+     PacketId.PLAYER_LOGIN_REQ
+ ) {
+
+     override val parser: Parser<PlayerLoginReq> = PlayerLoginReq.parser()
+
+     override suspend fun Player.handlePacket(packet: PlayerLoginReq): PlayerLoginRspPacket {
+         return currRegionRsp
+             ?.let { PlayerLoginRspPacket.Succ(it) }
+             ?: PlayerLoginRspPacket.Fail(Retcode.RETCODE_RET_SVR_ERROR)
+     }
+
+ }
 
 /*
 C: GetPlayerTokenReq
