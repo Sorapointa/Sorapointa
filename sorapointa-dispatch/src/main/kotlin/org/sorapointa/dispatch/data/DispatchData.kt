@@ -37,6 +37,10 @@ data class ClientCustomConfig(
     @SerialName("perf_report_enable") val perfReportEnable: Boolean? = null,
     @SerialName("perf_report_record_url") val perfReportRecordUrl: String? = null,
     @SerialName("perf_report_config_url") val perfReportConfigUrl: String? = null,
+    val photographShareTopics: UShort? = null,
+    val gachaShareTopics: UShort? = null,
+    val photographSharePlatform: UShort? = null,
+    val gachaSharePlatform: UShort? = null,
     val homeDotPattern: Boolean? = null,
     val homeItemFilter: UShort? = null,
     val reportNetDelayConfig: ReportNetDelayConfigData? = null

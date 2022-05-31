@@ -6,6 +6,8 @@ import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.sorapointa.dispatch.data.Account
 import org.sorapointa.dispatch.plugins.currRegionRsp
+import org.sorapointa.event.broadcastEvent
+import org.sorapointa.events.HandleIncomingPacketEvent
 import org.sorapointa.game.Player
 import org.sorapointa.proto.*
 import org.sorapointa.proto.GetPlayerTokenReqOuterClass.GetPlayerTokenReq
@@ -28,6 +30,8 @@ internal abstract class IncomingPacketFactory
     protected abstract val parser: Parser<TPacketReq>
 
     abstract suspend fun Player.handle(soraPacket: SoraPacket): OutgoingPacket?
+
+    fun parsing(data: ByteArray): TPacketReq = parser.parseFrom(data)
 }
 
 internal abstract class IncomingPacketFactoryWithoutResponse
@@ -38,7 +42,10 @@ internal abstract class IncomingPacketFactoryWithoutResponse
     protected abstract suspend fun Player.handlePacket(packet: TPacketReq)
 
     override suspend fun Player.handle(soraPacket: SoraPacket): OutgoingPacket? {
-        handlePacket(parser.parseFrom(soraPacket.data))
+        val packet = parsing(soraPacket.data)
+        HandleIncomingPacketEvent(this, packet).broadcastEvent {
+            handlePacket(packet)
+        }
         return null // No response for this type of packet
     }
 }
@@ -51,9 +58,12 @@ internal abstract class IncomingPacketFactoryWithResponse
     protected abstract suspend fun Player.handlePacket(packet: TPacketReq): TPacketRsp
 
     override suspend fun Player.handle(soraPacket: SoraPacket): OutgoingPacket? {
-        val rsp = handlePacket(parser.parseFrom(soraPacket.data))
-        rsp.metadata = soraPacket.metadata
-        return rsp
+        val packet = parsing(soraPacket.data)
+        return HandleIncomingPacketEvent(this, packet).broadcastEvent {
+            handlePacket(packet).also {
+                it.metadata = soraPacket.metadata
+            }
+        }
     }
 }
 
@@ -80,12 +90,10 @@ internal object PingReqFactory : IncomingPacketFactoryWithResponse
 
     override val parser: Parser<PingReq> = PingReq.parser()
 
-
     override suspend fun Player.handlePacket(packet: PingReq): PingRspPacket {
         // TODO: Update Player Time
         return PingRspPacket(packet)
     }
-
 }
 
 internal object GetPlayerTokenReqFactory : IncomingPacketFactoryWithResponse
@@ -115,20 +123,19 @@ internal object GetPlayerTokenReqFactory : IncomingPacketFactoryWithResponse
     }
 }
 
- internal object PlayerLoginReqFactory: IncomingPacketFactoryWithResponse
- <PlayerLoginReq, PlayerLoginRspPacket>(
-     PacketId.PLAYER_LOGIN_REQ
- ) {
+internal object PlayerLoginReqFactory : IncomingPacketFactoryWithResponse
+<PlayerLoginReq, PlayerLoginRspPacket>(
+    PacketId.PLAYER_LOGIN_REQ
+) {
 
-     override val parser: Parser<PlayerLoginReq> = PlayerLoginReq.parser()
+    override val parser: Parser<PlayerLoginReq> = PlayerLoginReq.parser()
 
-     override suspend fun Player.handlePacket(packet: PlayerLoginReq): PlayerLoginRspPacket {
-         return currRegionRsp
-             ?.let { PlayerLoginRspPacket.Succ(it) }
-             ?: PlayerLoginRspPacket.Fail(Retcode.RETCODE_RET_SVR_ERROR)
-     }
-
- }
+    override suspend fun Player.handlePacket(packet: PlayerLoginReq): PlayerLoginRspPacket {
+        return currRegionRsp
+            ?.let { PlayerLoginRspPacket.Succ(it) }
+            ?: PlayerLoginRspPacket.Fail(Retcode.RETCODE_RET_SVR_ERROR)
+    }
+}
 
 /*
 C: GetPlayerTokenReq

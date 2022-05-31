@@ -20,7 +20,7 @@ dependencies {
 
     // network
     implementation("io.netty:netty-handler:_")
-    implementation("moe.sdl.kcp:kcp-netty:1.5.0")
+    implementation("moe.sdl.kcp:kcp-netty:_")
     // Command
     implementation("moe.sdl.yac:core:_")
     // Console

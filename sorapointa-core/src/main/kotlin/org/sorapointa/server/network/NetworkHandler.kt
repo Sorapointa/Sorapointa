@@ -14,6 +14,9 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import org.sorapointa.dispatch.data.DispatchKeyData
 import org.sorapointa.event.StateController
 import org.sorapointa.event.WithState
+import org.sorapointa.event.broadcastEvent
+import org.sorapointa.events.HandleRawSoraPacketEvent
+import org.sorapointa.events.SendOutgoingPacketEvent
 import org.sorapointa.game.Player
 import org.sorapointa.proto.PacketHeadOuterClass.PacketHead
 import org.sorapointa.proto.SoraPacket
@@ -38,7 +41,7 @@ internal interface NetworkHandlerStateInterface : WithState<NetworkHandlerStateI
 
 internal open class NetworkHandler(
     private val connection: UkcpChannel,
-    parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
+    private val parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
 ) {
 
     lateinit var bindPlayer: Player
@@ -61,8 +64,8 @@ internal open class NetworkHandler(
         )
     }
 
-    suspend fun init(player: Player) {
-        bindPlayer = player
+    suspend fun init() {
+        bindPlayer = Player(this, parentCoroutineContext)
         bindPlayer.init()
         networkStateController.init()
     }
@@ -70,20 +73,28 @@ internal open class NetworkHandler(
     fun getHost(): String =
         connection.host
 
-    open fun sendPacket(packet: OutgoingPacket, metadata: PacketHead? = null) {
+    open suspend fun sendPacket(packet: OutgoingPacket, metadata: PacketHead? = null) {
         if (networkStateController.getCurrentState() == NetworkHandlerStateInterface.State.CLOSED) return
-        if (metadata != null) {
-            packet.metadata = metadata
+        scope.launch {
+            SendOutgoingPacketEvent(bindPlayer, packet).broadcastEvent {
+                if (metadata != null) {
+                    packet.metadata = metadata
+                }
+                logger.debug { "Send: ${findCommonNameFromCmdId(packet.cmdId)} Id: ${packet.cmdId}" }
+                connection.writeAndFlushOrCloseAsync(packet)
+            }
         }
-        logger.debug { "Send: ${findCommonNameFromCmdId(packet.cmdId)} Id: ${packet.cmdId}" }
-        connection.writeAndFlushOrCloseAsync(packet)
     }
 
-    open suspend fun handlePacket(soraPacket: SoraPacket) {
+    open suspend fun handlePacket(packet: SoraPacket) {
         if (networkStateController.getCurrentState() == NetworkHandlerStateInterface.State.CLOSED) return
-        with(bindPlayer) {
-            handlePacket(soraPacket)?.also {
-                sendPacket(it)
+        scope.launch {
+            HandleRawSoraPacketEvent(bindPlayer, packet).broadcastEvent {
+                with(bindPlayer) {
+                    handlePacket(packet)?.also {
+                        sendPacket(it)
+                    }
+                }
             }
         }
     }
@@ -148,15 +159,13 @@ internal open class NetworkHandler(
 internal class ConnectionInitializer(
     private val scope: ModuleScope
 ) : ChannelInitializer<UkcpChannel>() {
-    private lateinit var player: Player
     private lateinit var networkHandler: NetworkHandler
 
     override fun initChannel(ch: UkcpChannel) {
         logger.info { "New session from [${ch.remoteAddress()}] connected" }
         networkHandler = NetworkHandler(ch, scope.coroutineContext)
-        player = Player(networkHandler, scope.coroutineContext)
         runBlocking {
-            networkHandler.init(player)
+            networkHandler.init()
         }
     }
 
