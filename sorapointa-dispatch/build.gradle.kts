@@ -37,5 +37,5 @@ dependencies {
 
 application {
     applicationName = "sorapointa-dispatch"
-    mainClass.set("org.sorapointa.dispatch.DispatchServer")
+    mainClass.set("org.sorapointa.dispatch.DispatchServerKt")
 }
