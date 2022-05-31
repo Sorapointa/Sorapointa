@@ -1,17 +1,14 @@
 @file:Suppress("GradlePackageUpdate")
 
-import com.google.protobuf.gradle.builtins
-import com.google.protobuf.gradle.generateProtoTasks
-import com.google.protobuf.gradle.id
-import com.google.protobuf.gradle.ofSourceSet
-import com.google.protobuf.gradle.proto
-import com.google.protobuf.gradle.protobuf
+import com.google.protobuf.gradle.*
 
 plugins {
     id("sorapointa-conventions")
     id("com.google.protobuf")
     idea
 }
+
+val prop = getRootProjectLocalProps()
 
 dependencies {
     api("com.google.protobuf:protobuf-java:_")
@@ -26,6 +23,11 @@ protobuf {
         ofSourceSet("main").forEach { task ->
             task.builtins {
                 id("kotlin") {}
+            }
+            if (prop["proto.fullCompile"] == "true") {
+                task.doFirst {
+                    delete(task.outputs)
+                }
             }
         }
     }
