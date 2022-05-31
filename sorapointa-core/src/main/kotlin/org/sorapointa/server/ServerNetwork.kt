@@ -4,9 +4,10 @@ import io.jpower.kcp.netty.ChannelOptionHelper
 import io.jpower.kcp.netty.UkcpChannelOption
 import io.jpower.kcp.netty.UkcpServerChannel
 import io.netty.bootstrap.UkcpServerBootstrap
+import io.netty.channel.ChannelHandlerContext
+import io.netty.channel.ChannelInboundHandlerAdapter
 import io.netty.channel.nio.NioEventLoopGroup
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import org.sorapointa.SorapointaConfig
@@ -53,15 +54,21 @@ object ServerNetwork {
 
             future.runCatching {
                 awaitKt()
+                channel().pipeline().addLast(object : ChannelInboundHandlerAdapter() {
+                    @Deprecated("Deprecated in Java")
+                    override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
+                        scope.launch {
+                            future.channel().close()
+                            workerGroup.shutdownGracefully()
+                            throw cause
+                        }
+                    }
+                })
                 logger.info { "Bind server port on $port" }
             }.onFailure {
                 workerGroup.shutdownGracefully()
             }
 
-            coroutineContext.job.invokeOnCompletion {
-                future.channel().close()
-                workerGroup.shutdownGracefully()
-            }
         }
 
         return job

@@ -2,13 +2,12 @@ package org.sorapointa.server.network
 
 import com.google.protobuf.GeneratedMessageV3
 import io.ktor.utils.io.core.*
+import org.sorapointa.proto.*
 import org.sorapointa.proto.GetPlayerTokenReqOuterClass.GetPlayerTokenReq
 import org.sorapointa.proto.PacketHeadOuterClass.PacketHead
-import org.sorapointa.proto.PacketId
+import org.sorapointa.proto.PingReqOuterClass.PingReq
+import org.sorapointa.proto.QueryCurrRegionHttpRspOuterClass.QueryCurrRegionHttpRsp
 import org.sorapointa.proto.RetcodeOuterClass.Retcode
-import org.sorapointa.proto.getPlayerTokenRsp
-import org.sorapointa.proto.toByteString
-import org.sorapointa.proto.writeSoraPacket
 import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.i18n
 import org.sorapointa.utils.randomByteArray
@@ -51,7 +50,7 @@ internal abstract class GetPlayerTokenRspPacket : OutgoingPacket(
     ) : GetPlayerTokenRspPacket() {
         override fun buildProto(): GeneratedMessageV3 =
             getPlayerTokenRsp {
-                uid = tokenReq.uid
+                uid = tokenReq.accountUid.toInt()
                 token = tokenReq.accountToken
                 accountType = tokenReq.accountType
                 accountUid = tokenReq.accountUid
@@ -69,11 +68,52 @@ internal abstract class GetPlayerTokenRspPacket : OutgoingPacket(
     }
 }
 
-internal class PlayerLoginRspPacket : OutgoingPacket(
+internal abstract class PlayerLoginRspPacket : OutgoingPacket(
     PacketId.PLAYER_LOGIN_RSP
 ) {
 
-    override fun buildProto(): GeneratedMessageV3 {
-        TODO("Not yet implemented")
+    class Fail(
+        private val retcode: Retcode
+    ): PlayerLoginRspPacket() {
+
+        override fun buildProto(): GeneratedMessageV3 =
+            playerLoginRsp {
+                retcode = this@Fail.retcode.number
+            }
     }
+
+    class Succ(
+        private val queryCurrRegionHttpRsp: QueryCurrRegionHttpRsp
+    ): PlayerLoginRspPacket() {
+        override fun buildProto(): GeneratedMessageV3 =
+            playerLoginRsp {
+                val regionInfo = queryCurrRegionHttpRsp.regionInfo
+                isUseAbilityHash = true
+                abilityHashCode = 557879627
+                clientDataVersion = regionInfo.clientDataVersion
+                clientSilenceDataVersion = regionInfo.clientSilenceDataVersion
+                gameBiz = "hk4e_global" // TODO: rm hardcode
+                clientMd5 = regionInfo.clientDataMd5
+                clientSilenceMd5 = regionInfo.clientSilenceDataMd5
+                resVersionConfig = regionInfo.resVersionConfig
+                clientVersionSuffix = regionInfo.clientVersionSuffix
+                clientSilenceVersionSuffix = regionInfo.clientSilenceVersionSuffix
+                isScOpen = false
+                countryCode = "US"
+//            totalTickTime
+            }
+    }
+}
+
+internal class PingRspPacket(
+    private val pingReq: PingReq
+) : OutgoingPacket(
+    PacketId.PING_RSP
+) {
+
+    override fun buildProto(): GeneratedMessageV3 =
+        pingRsp {
+            clientTime = pingReq.clientTime
+        }
+
 }

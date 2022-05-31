@@ -6,6 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.util.*
@@ -67,11 +68,12 @@ private suspend fun getQueryRegionListHttpRsp(host: String) =
         }
     }
 
-private var queryCurrRegionHttpRsp: QueryCurrRegionHttpRsp? = null
+var currRegionRsp: QueryCurrRegionHttpRsp? = null
+    private set
 
 private suspend fun ApplicationCall.forwardQueryCurrRegionHttpRsp(): QueryCurrRegionHttpRsp {
 
-    val queryCurrRegionHttpRsp = queryCurrRegionHttpRsp ?: run {
+    val queryCurrRegionHttpRsp = currRegionRsp ?: run {
         if (DispatchConfig.data.requestSetting.forwardQueryCurrRegion) {
             QueryCurrRegionHttpRsp.parseFrom(
                 (
@@ -88,7 +90,6 @@ private suspend fun ApplicationCall.forwardQueryCurrRegionHttpRsp(): QueryCurrRe
     }
 
     val dispatchSeed = ec2b.seed
-    val dispatchKey = ec2b.key
 
     return queryCurrRegionHttpRsp.toBuilder()
         .setRegionInfo(
@@ -99,11 +100,11 @@ private suspend fun ApplicationCall.forwardQueryCurrRegionHttpRsp(): QueryCurrRe
                 .build()
         )
         .setClientSecretKey(dispatchSeed.toByteString())
-        .setRegionCustomConfigEncrypted(
-            networkJson.encodeToString(
-                DispatchConfig.data.clientCustomConfig
-            ).toByteArray().xor(dispatchKey).toByteString()
-        ).build()
+//        .setRegionCustomConfigEncrypted(
+//            networkJson.encodeToString(
+//                DispatchConfig.data.clientCustomConfig
+//            ).toByteArray().xor(dispatchKey).toByteString())
+        .build()
 }
 
 // --- Route Handler ---
@@ -241,7 +242,7 @@ internal suspend fun ApplicationCall.handleVerify() {
     newSuspendedTransaction {
         val account = Account.findById(verifyData.uid)
         if (account == null) {
-            returnErrorMsg("dispatch.login.error.user.notfound")
+            returnErrorMsg("user.notfound")
             return@newSuspendedTransaction
         }
         if (account.getDispatchToken() != verifyData.token) {
@@ -412,4 +413,4 @@ internal suspend inline fun <reified T> ApplicationCall.forwardCall(domain: Stri
 }
 
 private val ApplicationCall.host
-    get() = request.local.host
+    get() = request.origin.remoteHost

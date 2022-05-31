@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+// CmdId: 17
+// EnetChannelId: 0
+// EnetIsReliable: true
+message PingRsp {
+	int32 retcode = 9;
+	uint32 seq = 4;
+	uint32 client_time = 8;
+}

@@ -6,6 +6,8 @@ plugins {
 }
 
 dependencies {
+//    implementation(files("$projectDir/libs/kcp-netty-1.5.0.jar"))
+
     // Project submodules
     implementation(project(":sorapointa-dataloader"))
     implementation(project(":sorapointa-dataprovider"))
@@ -18,7 +20,7 @@ dependencies {
 
     // network
     implementation("io.netty:netty-handler:_")
-    implementation("io.jpower.kcp:kcp-netty:_")
+    implementation("moe.sdl.kcp:kcp-netty:1.5.0")
     // Command
     implementation("moe.sdl.yac:core:_")
     // Console

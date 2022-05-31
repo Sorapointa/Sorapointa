@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.ConcurrentHashMap
 
 interface WithState<out T : Enum<*>> {
@@ -36,11 +37,8 @@ class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TState>,
     private var observers = ConcurrentHashMap<suspend TClassWithState.(TState, TState) -> Unit, ListenerState>()
     private var interceptors = ConcurrentHashMap<suspend TClassWithState.(TState, TState) -> Boolean, ListenerState>()
 
-    init {
-        // TODO: Check it whether needs to be extracted as a single function
-        scope.launch {
-            currentState.value.startState()
-        }
+    suspend fun init() {
+        currentState.value.startState()
     }
 
     fun getCurrentState(): TState =

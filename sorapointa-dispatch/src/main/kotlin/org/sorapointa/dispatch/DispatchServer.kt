@@ -92,7 +92,7 @@ object DispatchServer {
         DatabaseManager.loadTables(AccountTable, DispatchKeyDataTable)
         val environment = getEnvironment()
         environment.setupApplication()
-        embeddedServer(Netty, environment = environment).start(wait = true)
+        embeddedServer(Netty, environment = environment).start(wait = isIndependent)
     }
 }
 

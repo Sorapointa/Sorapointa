@@ -1,6 +1,7 @@
 package org.sorapointa.game
 
 import mu.KotlinLogging
+import org.sorapointa.dispatch.data.Account
 import org.sorapointa.server.network.NetworkHandler
 import org.sorapointa.server.network.NetworkHandlerStateInterface
 import org.sorapointa.utils.ModuleScope
@@ -13,6 +14,8 @@ class Player internal constructor(
     internal val networkHandler: NetworkHandler,
     parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
 ) {
+
+    lateinit var account: Account
 
     private val scope = ModuleScope(logger, "Player[${networkHandler.getHost()}]", parentCoroutineContext)
 
