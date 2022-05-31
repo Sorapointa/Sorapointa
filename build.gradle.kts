@@ -1,5 +1,6 @@
 plugins {
     kotlin("plugin.serialization") apply false
+    id("com.github.johnrengelman.shadow") version "7.1.2" apply false
     id("org.jetbrains.kotlinx.binary-compatibility-validator")
 }
 
@@ -12,6 +13,7 @@ subprojects {
         mavenCentral()
     }
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+    apply(plugin = "com.github.johnrengelman.shadow")
 }
 
 subprojects.apply {
