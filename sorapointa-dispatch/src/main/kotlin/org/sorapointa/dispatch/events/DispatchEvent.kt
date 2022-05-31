@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package org.sorapointa.dispatch.events
 
 import io.ktor.server.application.*
