@@ -42,7 +42,7 @@ object KeyProvider {
             val generatedKeyStore = buildKeyStore {
                 certificate(alias) {
                     hash = HashAlgorithm.SHA256
-                    sign = SignatureAlgorithm.ECDSA
+                    sign = SignatureAlgorithm.RSA
                     keySizeInBits = 2048
                     password = privateKeyPassword
                     daysValid = expiredDays
