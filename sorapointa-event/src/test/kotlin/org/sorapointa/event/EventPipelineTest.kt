@@ -6,8 +6,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
-import java.lang.management.ManagementFactory
-import java.lang.management.RuntimeMXBean
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -105,14 +103,9 @@ class EventPipelineTest {
                 println("Caught Exception on Test Parent Scope: ${e.stackTraceToString()}")
             } + parentJob
 
-        val bean: RuntimeMXBean = ManagementFactory.getRuntimeMXBean()
-        val aList: List<String> = bean.inputArguments
-
-        aList.forEach(::println)
-
         EventManager.init(parentScope.coroutineContext)
 
-        var runCount by atomic(0)
+        val runCount = atomic(0)
 
         EventManager.registerEventListener {
             delay(100)
@@ -120,7 +113,7 @@ class EventPipelineTest {
         }
 
         EventManager.registerEventListener(EventPriority.LOWEST) {
-            delay(500)
+            delay(300)
             runCount += 1
         }
 
@@ -130,22 +123,22 @@ class EventPipelineTest {
         }
 
         EventManager.registerBlockEventListener(EventPriority.LOWEST) {
-            delay(500)
+            delay(300)
             runCount += 1
         }
 
         parentScope.launch {
-            delay(500)
+            delay(300)
             runCount += 1
         }
 
         EventManager.broadcastEvent(TestEvent1())
 
-        assertEquals(3, runCount)
+        delay(500)
+
+        assertEquals(3, runCount.value)
 
         EventManager.initAllListeners()
-
-        delay(300)
     }
 
     @Test
