@@ -7,7 +7,6 @@ import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
-import kotlin.random.nextUInt
 import kotlin.random.nextULong
 
 private val logger = KotlinLogging.logger {}
@@ -31,7 +30,7 @@ fun randomByteArray(length: Int): ByteArray {
 }
 
 fun randomUInt(): UInt =
-    kotlin.random.Random.nextUInt()
+    kotlin.random.Random.nextInt(0, Int.MAX_VALUE).toUInt()
 
 fun randomULong(): ULong =
     kotlin.random.Random.nextULong()

@@ -26,7 +26,7 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:_")
 
     implementation("io.ktor:ktor-network-tls-certificates:_")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:_")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:_")
 
     implementation("com.password4j:password4j:_")
 
