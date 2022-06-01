@@ -1,9 +1,10 @@
 @file:Suppress("GradlePackageUpdate")
 
 plugins {
-    id("sorapointa-conventions")
     kotlin("plugin.serialization")
     application
+    `sorapointa-conventions`
+    `sorapointa-publish`
 }
 
 dependencies {

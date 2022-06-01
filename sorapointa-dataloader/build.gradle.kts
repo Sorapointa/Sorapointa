@@ -1,7 +1,7 @@
 @file:Suppress("GradlePackageUpdate")
 
 plugins {
-    id("sorapointa-conventions")
+    `sorapointa-conventions`
 }
 
 dependencies {

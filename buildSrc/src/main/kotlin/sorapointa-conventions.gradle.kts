@@ -13,8 +13,6 @@ repositories {
     maven("https://plugins.gradle.org/m2/")
 }
 
-group = "org.sorapointa"
-
 dependencies {
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")

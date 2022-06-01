@@ -19,6 +19,6 @@ subprojects.apply {
 }
 
 allprojects {
-    group = "org.sorapointa"
-    version = "0.1.0-DEV"
+    group = "moe.sdl.sorapointa"
+    version = "0.1.0-SNAPSHOT"
 }

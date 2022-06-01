@@ -2,7 +2,7 @@
 
 plugins {
     `sorapointa-conventions`
-
+    `sorapointa-publish`
     kotlin("plugin.serialization")
 }
 
