@@ -44,7 +44,7 @@ object EventManager {
      *
      * You could **NOT CANCEL** or **INTERCEPT** any event in parallel listener.
      *
-     * @param priority, optional, set the priority of this listener
+     * @param priority optional, set the priority of this listener
      * @return [Flow]
      */
     fun getEventFlow(
@@ -59,8 +59,8 @@ object EventManager {
      *
      * You could **NOT CANCEL** or **INTERCEPT** any event in parallel listener.
      *
-     * @param priority, optional, set the priority of this listener
-     * @param listener, lambda block of your listener with the all event of parameter
+     * @param priority optional, set the priority of this listener
+     * @param listener lambda block of your listener with the all event of parameter
      */
     fun registerEventListener(
         priority: EventPriority = EventPriority.NORMAL,
@@ -75,8 +75,8 @@ object EventManager {
      *
      * You could cancel or intercept listened event in serial listener.
      *
-     * @param priority, optional, set the priority of this listener
-     * @param listener, lambda block of your listener with all type of event of parameter
+     * @param priority optional, set the priority of this listener
+     * @param listener lambda block of your listener with all type of event of parameter
      */
     fun registerBlockEventListener(
         priority: EventPriority = EventPriority.NORMAL,
@@ -88,8 +88,8 @@ object EventManager {
     /**
      * Broadcast event, and return the cancel state of this event
      *
-     * @param event, the event will be broadcasted
-     * @return [Boolean], that represents the cancel state of this event
+     * @param event the event will be broadcasted
+     * @return [Boolean] that represents the cancel state of this event
      */
 
     suspend fun broadcastEvent(event: Event): Boolean {
@@ -121,11 +121,11 @@ object EventManager {
                 }
             }
             if (isIntercepted) {
-                logger.trace { "Event $eventName has been intercepted" }
+                logger.debug { "Event $eventName has been intercepted" }
                 return isCancelled
             }
         }
-        logger.trace { "Broadcasted event $eventName, cancel state: $isCancelled" }
+        logger.debug { "Broadcasted event $eventName, cancel state: $isCancelled" }
         return isCancelled
     }
 
@@ -172,16 +172,16 @@ object EventManager {
  *
  * Use `inline` with `listener` would lose precise stacktrace for exception
  *
- * @param timeMillis, timeout time in milliseconds.
- * @param priority, optional, set the priority of this listener
- * @param filter, lambda block of your filter for specific event detail
- * @return [Event], return a caputered event
+ * @param timeoutMs timeout time in milliseconds.
+ * @param priority optional, set the priority of this listener
+ * @param filter lambda block of your filter for specific event detail
+ * @return [Event] return a caputered event
  */
 suspend inline fun <reified T : Event> nextEvent(
-    timeMillis: Long = 1000,
+    timeoutMs: Long = 1000,
     priority: EventPriority = EventPriority.NORMAL,
     noinline filter: (T) -> Boolean = { true },
-) = withTimeout(timeMillis) {
+) = withTimeout(timeoutMs) {
     EventManager.getEventFlow(priority).firstOrNull { if (it is T) filter(it) else false }
 }
 
@@ -195,8 +195,8 @@ suspend inline fun <reified T : Event> nextEvent(
  *
  * Use `inline` with `listener` would lose precise stacktrace for exception
  *
- * @param priority, optional, set the priority of this listener
- * @param listener, lambda block of your listener with the specific event of parameter
+ * @param priority optional, set the priority of this listener
+ * @param listener lambda block of your listener with the specific event of parameter
  */
 inline fun <reified T : Event> registerListener(
     priority: EventPriority = EventPriority.NORMAL,
@@ -219,8 +219,8 @@ inline fun <reified T : Event> registerListener(
  *
  * Use `inline` with `listener` would lose precise stacktrace for exception
  *
- * @param priority, optional, set the priority of this listener
- * @param listener, lambda block of your listener with the specific event of parameter
+ * @param priority optional, set the priority of this listener
+ * @param listener lambda block of your listener with the specific event of parameter
  */
 inline fun <reified T : Event> registerBlockListener(
     priority: EventPriority = EventPriority.NORMAL,
