@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm")
     id("com.github.gmazzo.buildconfig")
+    id("com.github.johnrengelman.shadow")
     java
 }
 
@@ -77,4 +78,9 @@ tasks.register<Jar>("testArchive") {
 
 artifacts {
     add("test", tasks["testArchive"])
+}
+
+tasks.withType<Jar>() {
+    exclude("main") // duplicated jar root main, very confusing
+    exclude("*.proto")
 }

@@ -13,6 +13,7 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21")
     implementation("com.github.gmazzo:gradle-buildconfig-plugin:3.0.3")
+    implementation("gradle.plugin.com.github.johnrengelman:shadow:7.1.2")
 }
 
 sourceSets {
