@@ -2,11 +2,14 @@ package org.sorapointa.server.network
 
 import com.google.protobuf.GeneratedMessageV3
 import com.google.protobuf.Parser
+import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.sorapointa.dispatch.data.Account
 import org.sorapointa.dispatch.plugins.currentRegionRsp
 import org.sorapointa.event.broadcastEvent
+import org.sorapointa.event.nextEvent
+import org.sorapointa.events.AfterSendIncomingPacketResponseEvent
 import org.sorapointa.events.HandleIncomingPacketEvent
 import org.sorapointa.game.Player
 import org.sorapointa.proto.*
@@ -104,8 +107,9 @@ internal object GetPlayerTokenReqFactory : IncomingPacketFactoryWithResponse
     override val parser: Parser<GetPlayerTokenReq> = GetPlayerTokenReq.parser()
 
     override suspend fun Player.handlePacket(packet: GetPlayerTokenReq): GetPlayerTokenRspPacket {
+        val uid = packet.accountUid.toUInt()
         val account = newSuspendedTransaction {
-            Account.findById(packet.accountUid.toUInt())
+            Account.findById(uid)
         } ?: return GetPlayerTokenRspPacket.Error(Retcode.RETCODE_RET_ACCOUNT_NOT_EXIST, "user.notfound")
         if (packet.accountToken != account.getComboToken()) return GetPlayerTokenRspPacket.Error(
             Retcode.RETCODE_RET_ACCOUNT_NOT_EXIST,
@@ -115,7 +119,14 @@ internal object GetPlayerTokenReqFactory : IncomingPacketFactoryWithResponse
         this.account = account
 
         val seed = randomULong()
-        networkHandler.updateKeyWithSeed(seed)
+
+        scope.launch {
+            nextEvent<AfterSendIncomingPacketResponseEvent> {
+                it.player.uid == uid &&
+                    it.dataPacket.cmdId == PacketId.GET_PLAYER_TOKEN_RSP
+            }
+            networkHandler.updateKeyWithSeed(seed)
+        }
 
         return GetPlayerTokenRspPacket.Succ(
             packet, seed, networkHandler.getHost()
@@ -131,6 +142,7 @@ internal object PlayerLoginReqFactory : IncomingPacketFactoryWithResponse
     override val parser: Parser<PlayerLoginReq> = PlayerLoginReq.parser()
 
     override suspend fun Player.handlePacket(packet: PlayerLoginReq): PlayerLoginRspPacket {
+
         return currentRegionRsp
             ?.let { PlayerLoginRspPacket.Succ(it) }
             ?: PlayerLoginRspPacket.Fail(Retcode.RETCODE_RET_SVR_ERROR)

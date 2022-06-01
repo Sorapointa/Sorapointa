@@ -10,5 +10,4 @@ class CertTest {
     fun `generate key test`(): Unit = runBlocking {
         KeyProvider.getCertsFromConfigOrGenerate()
     }
-
 }

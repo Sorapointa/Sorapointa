@@ -12,7 +12,6 @@ import java.security.spec.RSAPrivateKeySpec
 import java.security.spec.RSAPublicKeySpec
 import javax.crypto.Cipher
 
-
 /**
  * RSA key from C# format
  *
@@ -37,7 +36,6 @@ class RSAKey(
     private val publicSpec = RSAPublicKeySpec(modulus, exponent)
     private val publicKey = factory.generatePublic(publicSpec)
 
-
     suspend fun ByteArray.encrypt(): ByteArray = withContext(Dispatchers.Default) {
         cipher.init(Cipher.ENCRYPT_MODE, publicKey)
         chunkCipher()
@@ -60,7 +58,6 @@ class RSAKey(
             }
         }.readBytes()
     }
-
 }
 
 /**
@@ -68,7 +65,6 @@ class RSAKey(
  */
 fun String.parseToRSAKey(): RSAKey? =
     parseRSAKey(readToXMLDocument())
-
 
 /**
  * Convert C# XML RSA key to [RSAKey]

@@ -24,6 +24,11 @@ class HandleRawSoraPacketEvent(
     val dataPacket: SoraPacket
 ) : PlayerEvent(), CancelableEvent
 
+class AfterSendIncomingPacketResponseEvent(
+    override val player: Player,
+    val dataPacket: OutgoingPacket
+) : PlayerEvent()
+
 class SendOutgoingPacketEvent(
     override val player: Player,
     val dataPacket: OutgoingPacket

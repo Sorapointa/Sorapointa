@@ -21,7 +21,7 @@ object KeyProvider {
     private val ANIME_URL_2 = "Ki55dWFuc2hlbi5jb20=".decodeBase64String()
     private val ANIME_URL_3 = "Ki5ob3lvdmVyc2UuY29t".decodeBase64String()
 
-     suspend fun getCertsFromConfigOrGenerate(): KeyStore = withContext(Dispatchers.IO) {
+    suspend fun getCertsFromConfigOrGenerate(): KeyStore = withContext(Dispatchers.IO) {
         val dispatchConfig = DispatchConfig.data
         val keyStoreFile = File(dispatchConfig.certification.keyStoreFilePath)
         if (!keyStoreFile.exists()) {
@@ -62,5 +62,4 @@ object KeyProvider {
         store.load(certFile.inputStream(), password.toCharArray())
         return store
     }
-
 }
