@@ -2,6 +2,7 @@ package org.sorapointa.utils
 
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.withTimeout
 import org.junit.jupiter.api.Test
 
 class LocksTest {
@@ -10,8 +11,10 @@ class LocksTest {
 
     @Test
     fun `test mutex lock with coroutine`() = runBlocking {
-        mutex.withReentrantLock {
-            doSomeWork()
+        withTimeout(1000) {
+            mutex.withReentrantLock {
+                doSomeWork()
+            }
         }
     }
 
