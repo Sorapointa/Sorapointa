@@ -106,7 +106,7 @@ data class LanguagePack(
     }
 }
 
-object I18nConfig : DataFilePersist<I18nConfig.Config>(
+@SorapointaInternal object I18nConfig : DataFilePersist<I18nConfig.Config>(
     File(configDirectory, "i18n.json"),
     Config()
 ) {
@@ -117,12 +117,13 @@ object I18nConfig : DataFilePersist<I18nConfig.Config>(
     )
 }
 
+@OptIn(SorapointaInternal::class)
 inline val globalLocale: Locale
     get() = I18nConfig.data.globalLocale
 
-val DEFAULT_LOCALE: Locale = Locale.ENGLISH
+internal val DEFAULT_LOCALE: Locale = Locale.ENGLISH
 
-val FALLBACK_LOCALE: Locale = Locale.ENGLISH
+internal val FALLBACK_LOCALE: Locale = Locale.ENGLISH
 
 /**
  * @receiver i18n key, dot-styled path, like 'sorapointa.command.help.usage'
