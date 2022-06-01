@@ -7,9 +7,21 @@ import org.sorapointa.utils.safeCast
 const val START_MAGIC: UShort = 0x4567u
 const val END_MAGIC: UShort = 0x89abu
 
+/**
+ * Find a common name for a packet id
+ *
+ * This method is **inefficient** due to reflection,
+ * please call it in **performance insensitive situation**
+ * or lazy load it.
+ *
+ * @param cmdId packet id
+ */
 fun findCommonNameFromCmdId(cmdId: UShort): String =
     PacketId::class.java.declaredFields.first { it.get(PacketId).safeCast<Short>() == cmdId.toShort() }.name
 
+/**
+ * There are all packet id of the *anime game* of **VERSION 2.7**
+ */
 object PacketId {
     const val ABILITY_CHANGE_NOTIFY: UShort = 1155u
     const val ABILITY_INVOCATION_FAIL_NOTIFY: UShort = 1132u
