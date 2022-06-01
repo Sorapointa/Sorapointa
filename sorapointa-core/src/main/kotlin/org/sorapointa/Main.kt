@@ -16,6 +16,7 @@ import org.sorapointa.command.defaults.defaultsCommand
 import org.sorapointa.config.*
 import org.sorapointa.console.Console
 import org.sorapointa.data.provider.DatabaseManager
+import org.sorapointa.event.EventManager
 import org.sorapointa.utils.*
 import java.io.File
 import kotlin.system.exitProcess
@@ -57,6 +58,8 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
         loadLanguages()
 
         setupDefaultsCommand()
+
+        EventManager.init(scope.coroutineContext)
 
         databaseInitJob.join()
         Sorapointa.init(scope.coroutineContext)
