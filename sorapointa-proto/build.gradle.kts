@@ -1,10 +1,10 @@
 @file:Suppress("GradlePackageUpdate")
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.google.protobuf.gradle.*
 
 plugins {
-    id("sorapointa-conventions")
+    `sorapointa-conventions`
+    `sorapointa-publish`
     id("com.google.protobuf")
     idea
 }

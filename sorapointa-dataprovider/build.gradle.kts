@@ -4,7 +4,8 @@ import com.github.gmazzo.gradle.plugins.BuildConfigSourceSet
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
 plugins {
-    id("sorapointa-conventions")
+    `sorapointa-conventions`
+    `sorapointa-publish`
 }
 
 val props = getRootProjectLocalProps()
@@ -44,7 +45,7 @@ fun BuildConfigSourceSet.dbType(name: String, value: String) =
     buildConfigField("org.sorapointa.data.provider.DatabaseType", name, "DatabaseType.$value")
 
 buildConfig {
-    packageName("$group.config")
+    packageName("org.sorapointa.config")
     className("DbMeta")
     useKotlinOutput()
     dbType(

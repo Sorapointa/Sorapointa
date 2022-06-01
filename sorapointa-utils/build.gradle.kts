@@ -1,5 +1,6 @@
 plugins {
     `sorapointa-conventions`
+    `sorapointa-publish`
     kotlin("plugin.serialization")
 }
 
@@ -20,7 +21,7 @@ val branch by lazy {
 }
 
 buildConfig {
-    packageName("$group.config")
+    packageName("org.sorapointa.config")
     useKotlinOutput { topLevelConstants = true }
     string("VERSION", version.toString())
     string("BUILD_BRANCH", branch)
@@ -29,7 +30,7 @@ buildConfig {
     boolean("IS_CI", isCI)
 
     sourceSets["test"].apply {
-        packageName("$group.config")
+        packageName("org.sorapointa.config")
         className("TestConfig")
         useKotlinOutput { topLevelConstants = false }
         useKotlinOutput()

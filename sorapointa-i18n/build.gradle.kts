@@ -1,5 +1,6 @@
 plugins {
-    id("sorapointa-conventions")
+    `sorapointa-conventions`
+    `sorapointa-publish`
     kotlin("plugin.serialization")
 }
 
