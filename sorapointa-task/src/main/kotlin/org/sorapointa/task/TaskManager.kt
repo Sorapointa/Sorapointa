@@ -35,8 +35,6 @@ object TaskManager {
     /**
      * Register a task
      *
-     * This method **IS NOT** thread-safe for **same id**
-     *
      * @return If this job has been registered already, it would return null
      */
     @Suppress("MemberVisibilityCanBePrivate", "unused")
@@ -52,8 +50,6 @@ object TaskManager {
 
     /**
      * Register a task
-     *
-     * This method **IS NOT** thread-safe for **same id**
      *
      * @return If this job has been registered already, it would return null
      */
@@ -71,8 +67,6 @@ object TaskManager {
     /**
      * Register a task
      *
-     * This method **IS NOT** thread-safe for **same id**
-     *
      * @return If this job has been registered already, it would return null
      */
     fun registerTask(
@@ -83,8 +77,6 @@ object TaskManager {
 
     /**
      * Register a task
-     *
-     * This method **IS NOT** thread-safe for **same id**
      *
      * @return If this job has been registered already, it would return null
      */
