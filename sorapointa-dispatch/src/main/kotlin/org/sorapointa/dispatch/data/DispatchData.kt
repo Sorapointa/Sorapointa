@@ -187,8 +187,7 @@ data class ComboTokenRequestData(
 
     fun signCheck(isChina: Boolean): Boolean {
         val calSign = "app_id=$appId&channel_id=$channelId&data=$_data&device=$device"
-        val final = sha256sign(
-            calSign,
+        val final = calSign.sha256sign(
             if (isChina) "d0d3a7342df2026a70f650b907800111" else "6a4c78fe0356ba4673b8071127b28123"
         )
         return final == sign

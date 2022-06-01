@@ -48,24 +48,27 @@ object DispatchServer {
         }
     }
 
-    private fun getEnvironment() = applicationEngineEnvironment {
-        val dispatchConfig = DispatchConfig.data
-        log = LoggerFactory.getLogger("ktor.application")
-        if (dispatchConfig.useSSL) {
-            sslConnector(
-                keyStore = KeyProvider.getCerts(),
-                keyAlias = dispatchConfig.certification.keyAlias,
-                keyStorePassword = { dispatchConfig.certification.keyStorePassword.toCharArray() },
-                privateKeyPassword = { dispatchConfig.certification.privateKeyPassword.toCharArray() }
-            ) {
-                host = dispatchConfig.host
-                port = dispatchConfig.port
-                keyStorePath = File(dispatchConfig.certification.keyStoreFilePath)
-            }
-        } else {
-            connector {
-                host = dispatchConfig.host
-                port = dispatchConfig.port
+    private suspend fun getEnvironment(): ApplicationEngineEnvironment {
+        val cert = KeyProvider.getCertsFromConfigOrGenerate()
+        return applicationEngineEnvironment {
+            val dispatchConfig = DispatchConfig.data
+            log = LoggerFactory.getLogger("ktor.application")
+            if (dispatchConfig.useSSL) {
+                sslConnector(
+                    keyStore = cert,
+                    keyAlias = dispatchConfig.certification.keyAlias,
+                    keyStorePassword = { dispatchConfig.certification.keyStorePassword.toCharArray() },
+                    privateKeyPassword = { dispatchConfig.certification.privateKeyPassword.toCharArray() }
+                ) {
+                    host = dispatchConfig.host
+                    port = dispatchConfig.port
+                    keyStorePath = File(dispatchConfig.certification.keyStoreFilePath)
+                }
+            } else {
+                connector {
+                    host = dispatchConfig.host
+                    port = dispatchConfig.port
+                }
             }
         }
     }
@@ -149,7 +152,7 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
         @SerialName("v2.8CurrentRegionForwardFormat")
         val v28: Boolean = false,
         @SerialName("v2.8RSAKey")
-        val rsaKey: String = QUERY_CURR_RSA_KEY
+        val rsaPrivateKey: String = QUERY_CURR_RSA_KEY
     )
 
     @Serializable

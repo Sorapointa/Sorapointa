@@ -69,7 +69,7 @@ private suspend fun getQueryRegionListHttpRsp(host: String): QueryRegionListHttp
 var currentRegionRsp: QueryCurrRegionHttpRsp? = null
     private set
 
-private val dispatchRSAKey: RSAKey? = DispatchConfig.data.requestSetting.rsaKey.parseToRSAKey()
+private val dispatchRSAKey: RSAKey? = DispatchConfig.data.requestSetting.rsaPrivateKey.parseToRSAKey()
 
 private suspend fun ApplicationCall.forwardQueryCurrentRegionHttpRsp(): QueryCurrRegionHttpRsp {
 
