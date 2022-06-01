@@ -7,18 +7,25 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
+import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.now
 
-object CronTasks : IdTable<String>("cron_tasks") {
+@SorapointaInternal object CronTasks : IdTable<String>("cron_tasks") {
     override val id = varchar("id", 128).entityId()
 
-    //    override val id = varchar("id", 80)
     val cron: Column<String> = varchar("cron", 80)
     val lastExecution = this.timestamp("last_execution").nullable()
 
     override val primaryKey: PrimaryKey = PrimaryKey(id)
 }
 
+/**
+ * A cron task from database
+ *
+ * @property cron [com.cronutils.model.Cron] object
+ * @property lastExecution last execution time of this task
+ */
+@OptIn(SorapointaInternal::class)
 class CronTask(id: EntityID<String>) : Entity<String>(id) {
     companion object : EntityClass<String, CronTask>(CronTasks)
 
@@ -33,6 +40,12 @@ class CronTask(id: EntityID<String>) : Entity<String>(id) {
 
     var lastExecution by CronTasks.lastExecution
 
+    /**
+     * Get next execution time of this task
+     * from now or a specified time
+     *
+     * @param time next execution time from this time
+     */
     fun nextExecution(time: Instant = now()): Instant =
         cron.nextExecutionTime(lastExecution ?: time) ?: time
 }
