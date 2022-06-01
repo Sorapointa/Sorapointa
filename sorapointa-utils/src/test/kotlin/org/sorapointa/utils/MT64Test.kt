@@ -17,5 +17,4 @@ class MT64Test {
 
         assertEquals(key, MT19937.generateKey(seed).encodeBase64())
     }
-
 }

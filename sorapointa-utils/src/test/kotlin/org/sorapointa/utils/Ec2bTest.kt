@@ -18,6 +18,4 @@ class Ec2bTest {
         assertEquals(key, readEc2b(seed.decodeBase64Bytes()).decrypt().encodeBase64())
         assertEquals(seed, readEc2b(seed.decodeBase64Bytes()).toByteArray().encodeBase64())
     }
-
-
 }

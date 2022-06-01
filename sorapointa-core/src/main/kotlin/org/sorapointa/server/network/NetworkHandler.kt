@@ -14,7 +14,9 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import org.sorapointa.dispatch.data.DispatchKeyData
 import org.sorapointa.event.StateController
 import org.sorapointa.event.WithState
+import org.sorapointa.event.broadcast
 import org.sorapointa.event.broadcastEvent
+import org.sorapointa.events.AfterSendIncomingPacketResponseEvent
 import org.sorapointa.events.HandleRawSoraPacketEvent
 import org.sorapointa.events.SendOutgoingPacketEvent
 import org.sorapointa.game.Player
@@ -93,6 +95,7 @@ internal open class NetworkHandler(
                 with(bindPlayer) {
                     handlePacket(packet)?.also {
                         sendPacket(it)
+                        AfterSendIncomingPacketResponseEvent(bindPlayer, it).broadcast()
                     }
                 }
             }
@@ -100,11 +103,9 @@ internal open class NetworkHandler(
     }
 
     open suspend fun updateKeyWithSeed(keySeed: ULong): ByteArray =
-        withContext(Dispatchers.Default) {
-            MT19937.generateKey(keySeed).also {
-                gameKey = it
-                networkStateController.setState(NetworkHandlerStateInterface.State.OK)
-            }
+        MT19937.generateKey(keySeed).also {
+            gameKey = it
+            networkStateController.setState(NetworkHandlerStateInterface.State.OK)
         }
 
     protected open fun setupConnectionPipeline() {

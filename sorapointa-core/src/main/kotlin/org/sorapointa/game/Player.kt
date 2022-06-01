@@ -17,7 +17,10 @@ class Player internal constructor(
 
     lateinit var account: Account
 
-    private val scope = ModuleScope(logger, "Player[${networkHandler.getHost()}]", parentCoroutineContext)
+    inline val uid
+        get() = account.userId.value
+
+    internal val scope = ModuleScope(logger, "Player[${networkHandler.getHost()}]", parentCoroutineContext)
 
     fun init() {
         networkHandler.networkStateController.observeStateChange { _, state ->

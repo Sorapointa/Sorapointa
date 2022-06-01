@@ -18,5 +18,4 @@ class RSAKeyTest {
             assertEquals(testStr, testStr.toByteArray().encrypt().decrypt().toString(Charset.defaultCharset()))
         }
     }
-
 }
