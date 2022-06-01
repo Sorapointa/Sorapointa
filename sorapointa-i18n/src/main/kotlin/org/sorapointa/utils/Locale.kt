@@ -9,7 +9,7 @@ import kotlinx.serialization.encoding.Encoder
 import java.util.*
 import java.util.Locale.LanguageRange
 
-object LocaleSerializer : KSerializer<Locale> {
+internal object LocaleSerializer : KSerializer<Locale> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("Locale", PrimitiveKind.STRING)
 
@@ -18,15 +18,15 @@ object LocaleSerializer : KSerializer<Locale> {
     override fun serialize(encoder: Encoder, value: Locale) = encoder.encodeString(value.toLanguageTag())
 }
 
-val EMPTY_LOCALE: Locale = Locale.forLanguageTag("empty")
+internal val EMPTY_LOCALE: Locale = Locale.forLanguageTag("empty")
 
-fun Locale.toLanguageRange(weight: Double? = null): LanguageRange =
+private fun Locale.toLanguageRange(weight: Double? = null): LanguageRange =
     weight?.let {
         LanguageRange(this.toLanguageTag(), weight)
     } ?: LanguageRange(this.toLanguageTag())
 
-fun Collection<Locale>.toLanguageRanges(): Collection<LanguageRange> =
+private fun Collection<Locale>.toLanguageRanges(): Collection<LanguageRange> =
     map { it.toLanguageRange() }
 
-fun List<Locale>.byPriority(localePriority: List<Locale>): Locale? =
+internal fun List<Locale>.byPriority(localePriority: List<Locale>): Locale? =
     Locale.lookup(localePriority.toLanguageRanges().toList(), this)
