@@ -4,7 +4,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
 /**
- * For config purpose, as possible as lenient
+ * For the config purpose, as possible as lenient
  */
 val prettyJson = Json {
     isLenient = true
@@ -15,7 +15,9 @@ val prettyJson = Json {
 }
 
 /**
- * For network or storage purpose, strict but ignore unknown key
+ * For the network or storage purpose,
+ * strict but ignore the unknown key,
+ * and without null fields
  */
 @OptIn(ExperimentalSerializationApi::class)
 val networkJson = Json {

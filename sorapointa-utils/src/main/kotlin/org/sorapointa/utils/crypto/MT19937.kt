@@ -1,11 +1,12 @@
 package org.sorapointa.utils.crypto
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.sorapointa.utils.toByteArray
 
 /**
  * MT19937 Mersenne Twister Random Generator
- * @property seed random seed
- * Author: HolographicHat
+ * @param seed random seed
  */
 /* ktlint-disable max-line-length */
 class MT19937 internal constructor(seed: ULong) {
@@ -60,7 +61,10 @@ class MT19937 internal constructor(seed: ULong) {
 
     companion object {
 
-        fun generateKey(seed: ULong): ByteArray {
+        /**
+         * Generate MT64 Key from a seed
+         */
+        suspend fun generateKey(seed: ULong): ByteArray = withContext(Dispatchers.Default) {
             val gen = MT19937(MT19937(seed).generate()).also { it.generate() }
             val key = ByteArray(4096)
             for (i in key.indices step 8) {
@@ -69,7 +73,7 @@ class MT19937 internal constructor(seed: ULong) {
                     key[x] = byteVal[x % 8]
                 }
             }
-            return key
+            key
         }
 
         private operator fun Int.plus(uLong: ULong) = toULong().plus(uLong)

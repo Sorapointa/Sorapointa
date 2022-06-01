@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package org.sorapointa.utils.crypto
 
 import io.ktor.utils.io.core.*
@@ -21,17 +23,15 @@ private fun keyScramble(key: UByteArray) {
     }
 
     val chip = UByteArray(16)
-    oqsMhy128Encode(key, roundKeys, chip)
+    oqs128Encode(key, roundKeys, chip)
     memcpy(key, chip, 16)
 }
 
 private fun getDecryptVector(
     key: UByteArray,
     crypt: UByteArray,
-    outputSize: Int,
 ): ByteArray {
-    require(outputSize == 4096)
-
+    val outputSize = 4096
     val crypt64 = crypt.splitToULongArray()
 
     val var1 = crypt64.fold(0xFFFFFFFFFFFFFFFFuL) { acc, i ->
@@ -66,6 +66,9 @@ class Ec2bSeed(
     private val data: UByteArray,
 ) {
     companion object {
+        /**
+         * Generate Ec2b seed and key
+         */
         fun generate(keyLength: UInt = 16u, dataLength: UInt = 2048u): Ec2bSeed {
             val key = randomUByteArray(keyLength)
             val data = randomUByteArray(dataLength)
@@ -80,11 +83,11 @@ class Ec2bSeed(
         val key = decryptionKey.copyOf()
         keyScramble(key)
         key.xor(keyXorTable)
-        getDecryptVector(key, data, 4096)
+        getDecryptVector(key, data)
     }
 
     /**
-     * @return is successfully saved
+     * @return whether it is successfully saved
      */
     suspend fun decryptToFile(file: File, overwrite: Boolean = false): Boolean {
         if (file.exists()) {
@@ -101,7 +104,7 @@ class Ec2bSeed(
     }
 
     /**
-     * build ec2b seed to binary
+     * Build Ec2b seed to binary
      */
     fun toByteArray() = buildPacket {
         writeText("Ec2b")

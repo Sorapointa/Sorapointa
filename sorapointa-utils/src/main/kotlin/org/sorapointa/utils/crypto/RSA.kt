@@ -2,48 +2,93 @@ package org.sorapointa.utils.crypto
 
 import io.ktor.util.*
 import io.ktor.utils.io.core.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.sorapointa.utils.*
 import org.w3c.dom.Document
 import java.math.BigInteger
 import java.security.KeyFactory
 import java.security.spec.RSAPrivateKeySpec
+import java.security.spec.RSAPublicKeySpec
 import javax.crypto.Cipher
 
+
+/**
+ * RSA key from C# format
+ *
+ * @see parseRSAKey
+ * You could **NOT** use the [RSAKey.decrypt] method
+ * without the big number `d` parameter.
+ */
 class RSAKey(
     modulus: BigInteger,
-    d: BigInteger,
+    exponent: BigInteger,
+    d: BigInteger?,
 ) {
+    private val keySize = modulus.bitLength()
     private val factory = KeyFactory.getInstance("RSA")
     private val cipher = Cipher.getInstance("RSA")
-    private val privateSpec = RSAPrivateKeySpec(modulus, d)
-    private val privateKey = factory.generatePrivate(privateSpec)
+    private val privateSpec by lazy {
+        d?.let { RSAPrivateKeySpec(modulus, d) }
+    }
+    private val privateKey by lazy {
+        privateSpec?.let { factory.generatePrivate(privateSpec) }
+    }
+    private val publicSpec = RSAPublicKeySpec(modulus, exponent)
+    private val publicKey = factory.generatePublic(publicSpec)
 
-    init {
-        cipher.init(Cipher.DECRYPT_MODE, privateKey)
+
+    suspend fun ByteArray.encrypt(): ByteArray = withContext(Dispatchers.Default) {
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey)
+        chunkCipher()
     }
 
-    fun ByteArray.decrypt(): ByteArray {
+    suspend fun ByteArray.decrypt(): ByteArray = withContext(Dispatchers.Default) {
+        privateKey?.let {
+            cipher.init(Cipher.DECRYPT_MODE, privateKey)
+            chunkCipher()
+        } ?: error("Component of private key, `d`, has not been given in constructor")
+    }
+
+    private fun ByteArray.chunkCipher(): ByteArray {
         val packet = this.toReadPacket()
-        val keySize = privateSpec.modulus.bitLength()
         val chunkSize = keySize / 8
         return buildPacket {
             while (packet.canRead()) {
-                writeFully(cipher.doFinal(packet.readBytes(chunkSize)))
+                val readSize = if (packet.remaining > chunkSize) chunkSize else packet.remaining.toInt()
+                writeFully(cipher.doFinal(packet.readBytes(readSize)))
             }
         }.readBytes()
     }
+
 }
 
+/**
+ * Quick way to parse a xml RSA key to [RSAKey]
+ */
 fun String.parseToRSAKey(): RSAKey? =
     parseRSAKey(readToXMLDocument())
 
+
+/**
+ * Convert C# XML RSA key to [RSAKey]
+ *
+ * @param dom XML [Document]
+ * @see readToXMLDocument
+ * @return nullable [RSAKey], if document doesn't contain
+ * the RSA key modulus or exponent, it will return null.
+ * If document doesn't contain the RSA key big number `d`,
+ * you could **NOT** use the [RSAKey.decrypt] method.
+ */
 fun parseRSAKey(dom: Document): RSAKey? {
     val root = dom.byTagFirst("RSAKeyValue")?.childNodes?.toList() ?: return null
     val modulus = root.getTextByName("Modulus") ?: return null
-    val d = root.getTextByName("D") ?: return null
+    val exponent = root.getTextByName("Exponent") ?: return null
+    val d = root.getTextByName("D")
     return RSAKey(
         modulus.decodeBase64Bytes().toBigInteger(),
-        d.decodeBase64Bytes().toBigInteger()
+        exponent.decodeBase64Bytes().toBigInteger(),
+        d?.decodeBase64Bytes()?.toBigInteger()
     )
 }
 
