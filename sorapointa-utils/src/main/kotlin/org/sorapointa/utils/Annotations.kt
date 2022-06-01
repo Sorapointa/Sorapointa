@@ -2,7 +2,7 @@ package org.sorapointa.utils
 
 @RequiresOptIn(
     level = RequiresOptIn.Level.ERROR,
-    message = "This is an experimental sorapointa api, may be change in future without notice"
+    message = "This is an experimental Sorapointa api, may be change in future without notice"
 )
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
@@ -23,7 +23,7 @@ annotation class SorapointaExperimental
 
 @RequiresOptIn(
     level = RequiresOptIn.Level.ERROR,
-    message = "This is an internal sorapointa api, may be change in future without notice"
+    message = "This is an internal Sorapointa api, may be change in future without notice"
 )
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)

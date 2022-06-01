@@ -7,7 +7,6 @@ import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
-import kotlin.random.nextULong
 
 private val logger = KotlinLogging.logger {}
 
@@ -29,18 +28,41 @@ fun randomByteArray(length: Int): ByteArray {
     return bytes
 }
 
+/**
+ * Random unsigned long
+ *
+ * [kotlin.random.nextUInt] will produce negative number
+ * when convert to [Int]
+ */
 fun randomUInt(): UInt =
     kotlin.random.Random.nextInt(0, Int.MAX_VALUE).toUInt()
 
+/**
+ * Random unsigned long
+ * [kotlin.random.nextULong] will produce negative number
+ * when convert to [Long]
+ */
 fun randomULong(): ULong =
-    kotlin.random.Random.nextULong()
+    kotlin.random.Random.nextLong(0, Long.MAX_VALUE).toULong()
 
+/**
+ * Random unsigned byte array
+ *
+ * @param length byte length
+ */
 fun randomUByteArray(length: UInt): UByteArray =
     randomByteArray(length.toInt()).toUByteArray()
 
-fun sha256sign(data: String, key: String): String {
+/**
+ * SHA 256 Signature
+ *
+ * @receiver data to be signed
+ * @param key sign key
+ * @return sign result
+ */
+fun String.sha256sign(key: String): String {
     val sha256Hmac = Mac.getInstance("HmacSHA256")
     val secretKey = SecretKeySpec(key.toByteArray(), "HmacSHA256")
     sha256Hmac.init(secretKey)
-    return sha256Hmac.doFinal(data.toByteArray()).hex
+    return sha256Hmac.doFinal(this.toByteArray()).hex
 }

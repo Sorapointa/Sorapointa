@@ -1,6 +1,7 @@
 package org.sorapointa.utils.crypto
 
-private fun xorr(a: UByteArray, b: UByteArray, n: Int) {
+private fun xorr(a: UByteArray, b: UByteArray) {
+    val n = 16 // 16 rounds
     var i = 0
     while (i < n) {
         a[i] = a[i] xor b[i]
@@ -9,10 +10,11 @@ private fun xorr(a: UByteArray, b: UByteArray, n: Int) {
 }
 
 private fun xorRoundKey(state: UByteArray, keys: UByteArray, round: Int) {
-    xorr(state, keys.copyOfRange(round * 16, (round + 1) * 16), 16)
+    xorr(state, keys.copyOfRange(round * 16, (round + 1) * 16))
 }
 
-private fun subBytesInv(a: UByteArray, n: Int) {
+private fun subBytesInv(a: UByteArray) {
+    val n = 16 // 16 rounds
     for (i in 0 until n) {
         a[i] = lookupSBoxInv[a[i].toInt()]
     }
@@ -50,21 +52,21 @@ internal fun memcpy(dest: UByteArray, src: UByteArray, size: Int) {
     }
 }
 
-internal fun oqsMhy128Encode(plainText: UByteArray, schedule: UByteArray, cipherText: UByteArray) {
+internal fun oqs128Encode(plainText: UByteArray, schedule: UByteArray, cipherText: UByteArray) {
     // First Round
     memcpy(cipherText, plainText, 16)
     xorRoundKey(cipherText, schedule, 0)
 
     // Middle Rounds
     for (rounds in 0 until 9) {
-        subBytesInv(cipherText, 16)
+        subBytesInv(cipherText)
         shiftRowsInv(cipherText)
         mixColsInv(cipherText)
         xorRoundKey(cipherText, schedule, rounds + 1)
     }
 
     // Final Round
-    subBytesInv(cipherText, 16)
+    subBytesInv(cipherText)
     shiftRowsInv(cipherText)
     xorRoundKey(cipherText, schedule, 10)
 }

@@ -8,7 +8,7 @@ import kotlin.io.path.absolute
 import kotlin.io.path.pathString
 
 /**
- * Create file and its parents
+ * Create a file and its parents
  */
 suspend fun File.touch(): Boolean = withContext(Dispatchers.IO) {
     parentFile?.mkdirs()
@@ -18,10 +18,16 @@ suspend fun File.touch(): Boolean = withContext(Dispatchers.IO) {
 val File.absPath
     get() = toPath().normalize().absolute().pathString
 
+/**
+ * Read text from the file with [Dispatchers.IO] context
+ */
 suspend fun File.readTextBuffered() = withContext(Dispatchers.IO) {
     inputStream().bufferedReader().use(BufferedReader::readText)
 }
 
+/**
+ * Write text to the file with [Dispatchers.IO] context
+ */
 suspend fun File.writeTextBuffered(text: String) = withContext(Dispatchers.IO) {
     outputStream().bufferedWriter().use { it.write(text) }
 }

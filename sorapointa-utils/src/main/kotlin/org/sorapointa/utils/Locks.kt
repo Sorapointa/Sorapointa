@@ -6,6 +6,11 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * Use reenterable mutex lock in coroutine with different threads
+ *
+ * It will store mutex lock in [CoroutineContext] with [ReentrantMutexContextElement]
+ */
 suspend fun <T> Mutex.withReentrantLock(block: suspend () -> T): T {
     val key = ReentrantMutexContextKey(this)
     // call block directly when this mutex is already locked in the context
