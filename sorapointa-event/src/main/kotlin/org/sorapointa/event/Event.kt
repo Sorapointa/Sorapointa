@@ -7,7 +7,7 @@ import kotlinx.atomicfu.atomic
  * please inherit `AbstractEvent` or `AbstractCancellableEvent`,
  * **DON'T implement** this interface, it's sealed interface.
  *
- * @property [isIntercepted], whether this event has been intercepted
+ * @property [isIntercepted] whether this event has been intercepted
  */
 sealed interface Event {
 
@@ -27,7 +27,7 @@ sealed interface Event {
  * Cancelable Event Interface
  * If you want to the event could be cancelled, you should implement this interface.
  *
- * @property [isCancelled], whether this event has been cancelled
+ * @property [isCancelled] whether this event has been cancelled
  */
 interface CancelableEvent : Event {
 
@@ -51,8 +51,8 @@ interface CancelableEvent : Event {
  * and also could cancel the event, the final cancellation result
  * will return to the call site of `broadcastEvent()` method.
  *
- * @property [isIntercepted], whether this event has been intercepted
- * @property [isCancelled], whether this event has been cancelled
+ * @property [isIntercepted] whether this event has been intercepted
+ * @property [isCancelled] whether this event has been cancelled
  *
  * @see [EventManager.broadcastEvent]
  * @see [EventPriority]
