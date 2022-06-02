@@ -1,3 +1,5 @@
+@file:OptIn(SorapointaInternal::class)
+
 package org.sorapointa.dispatch.data
 
 import com.password4j.Argon2Function
@@ -15,6 +17,7 @@ import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import org.sorapointa.dispatch.DispatchConfig
 import org.sorapointa.dispatch.events.CreateAccountEvent
 import org.sorapointa.event.broadcast
+import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.randomByteArray
 import org.sorapointa.utils.encoding.hex
 import org.sorapointa.utils.now
@@ -22,7 +25,7 @@ import org.sorapointa.utils.randomUInt
 
 private val logger = KotlinLogging.logger {}
 
-object AccountTable : IdTable<UInt>("account_table") {
+@SorapointaInternal object AccountTable : IdTable<UInt>("account_table") {
     override val id: Column<EntityID<UInt>> = uinteger("user_id").autoIncrement().entityId()
     val userName: Column<String> = varchar("user_name", 60).uniqueIndex()
     val password: Column<String> = varchar("password", 255)
@@ -45,7 +48,7 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
         private val usePepper = DispatchConfig.data.accountSetting.password.usePepper
         private val pepper = DispatchConfig.data.accountSetting.password.hashPepper
 
-        val argon2: Argon2Function by lazy {
+        private val argon2: Argon2Function by lazy {
             val setting = DispatchConfig.data.accountSetting.password
             Argon2Function.getInstance(
                 setting.memory,
@@ -57,15 +60,35 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
             )
         }
 
+        /**
+         * Find a user account by email
+         */
         suspend fun findByEmail(email: String) =
             find { AccountTable.email eq email }
 
+        /**
+         * Find a user account by username
+         */
         suspend fun findByName(name: String) =
             find { AccountTable.userName eq name }
 
+        /**
+         * Find a user account by username or create one
+         *
+         * @param name username
+         * @param inputPassword plain password without hash
+         * @return [Account]
+         */
         suspend fun findOrCreate(name: String, inputPassword: String): Account =
             findByName(name).firstOrNull() ?: run { findById(create(name, inputPassword).value)!! }
 
+        /**
+         * Create an account to database
+         *
+         * @param name username
+         * @param inputPassword plain password without hash
+         * @return user id in databse
+         */
         suspend fun create(name: String, inputPassword: String): EntityID<UInt> {
             logger.info { "Creating user account of $name" }
             CreateAccountEvent(name).broadcast()
@@ -77,7 +100,7 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
             }
         }
 
-        suspend fun hashPassword(inputPassword: String, salt: String): String =
+        private suspend fun hashPassword(inputPassword: String, salt: String): String =
             Password.hash(inputPassword)
                 .addSalt(salt)
                 .apply {
@@ -87,7 +110,7 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
                 }
                 .with(argon2).result
 
-        fun generateSalt(): String =
+        private fun generateSalt(): String =
             randomByteArray(DispatchConfig.data.accountSetting.password.saltByteLength).encodeBase64()
     }
 
@@ -102,7 +125,7 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
     private var dispatchTokenGenerationTime by AccountTable.dispatchTokenGenerationTime
     var permissionLevel by AccountTable.permissionLevel
 
-    suspend fun checkPassword(inputPassword: String): Boolean =
+    internal suspend fun checkPassword(inputPassword: String): Boolean =
         Password.check(inputPassword, password)
             .apply {
                 if (usePepper) {
@@ -111,7 +134,7 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
             }
             .with(argon2)
 
-    suspend fun updatePassword(inputPassword: String) {
+    @SorapointaInternal suspend fun updatePassword(inputPassword: String) {
         password = hashPassword(inputPassword, generateSalt())
     }
 
@@ -134,7 +157,7 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
             comboId = it
         }
 
-    suspend fun getComboToken(): String? {
+    @SorapointaInternal suspend fun getComboToken(): String? {
         if (checkComboTokenExpire()) return null
         return comboToken
     }

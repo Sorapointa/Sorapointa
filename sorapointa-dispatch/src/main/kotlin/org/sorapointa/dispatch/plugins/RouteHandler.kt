@@ -1,3 +1,5 @@
+@file:OptIn(SorapointaInternal::class)
+
 package org.sorapointa.dispatch.plugins
 
 import com.google.protobuf.kotlin.toByteString
@@ -66,7 +68,7 @@ private suspend fun getQueryRegionListHttpRsp(host: String): QueryRegionListHttp
     }
 }
 
-var currentRegionRsp: QueryCurrRegionHttpRsp? = null
+@SorapointaInternal var currentRegionRsp: QueryCurrRegionHttpRsp? = null
     private set
 
 private val dispatchRSAKey: RSAKey? = DispatchConfig.data.requestSetting.rsaPrivateKey.parseToRSAKey()

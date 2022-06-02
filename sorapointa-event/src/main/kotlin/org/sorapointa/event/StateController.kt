@@ -38,7 +38,6 @@ import java.util.concurrent.ConcurrentHashMap
  */
 interface WithState<out T : Enum<*>> {
 
-
     val state: T
 
     /**
@@ -334,7 +333,6 @@ StateController<TState, TInterfaceWithState, TClassWithState>.intercept(
     listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
     noinline interceptor: suspend TClassWithState.() -> Boolean
 ) = interceptStateChange(listenerState) { _, _ -> this.interceptor() }
-
 
 /**
  * Quick way of [StateController.interceptStateChange]
