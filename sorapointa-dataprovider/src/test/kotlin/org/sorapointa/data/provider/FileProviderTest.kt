@@ -3,6 +3,7 @@ package org.sorapointa.data.provider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.sorapointa.utils.prettyJson
 import org.sorapointa.utils.readTextBuffered
 import java.io.File
@@ -10,6 +11,7 @@ import kotlin.test.assertEquals
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FileProviderTest {
     @Test
     fun readOnlyTest() = runBlocking {
@@ -35,14 +37,14 @@ class FileProviderTest {
 
         val file = File("./tmp/auto-save-provider-test.json")
         file.apply { if (exists()) delete() }
-        val config = AutoSaveFilePersist(file, TestConfig(), 5.toDuration(DurationUnit.SECONDS))
+        val config = AutoSaveFilePersist(file, TestConfig(), 30.toDuration(DurationUnit.MILLISECONDS))
         config.init()
         println(config.data)
         config.data.apply {
             test = "2222"
             foo = 1111
         }
-        delay(10_000)
+        delay(100)
         assertEquals(config.data, prettyJson.decodeFromString(TestConfig.serializer(), file.readTextBuffered()))
     }
 
@@ -56,7 +58,7 @@ class FileProviderTest {
 
         val file = File("./tmp/auto-save-provider-test.json")
         file.apply { if (exists()) delete() }
-        val config = AutoLoadFilePersist(file, AutoLoadData(), 5.toDuration(DurationUnit.SECONDS))
+        val config = AutoLoadFilePersist(file, AutoLoadData(), 30.toDuration(DurationUnit.MILLISECONDS))
         config.init()
         println(config.data)
         val writeJson = """
@@ -66,7 +68,7 @@ class FileProviderTest {
             }
         """
         file.writeText(writeJson.trimIndent())
-        delay(10_000)
+        delay(100)
         assertEquals(config.data, prettyJson.decodeFromString(AutoLoadData.serializer(), writeJson))
     }
 }
