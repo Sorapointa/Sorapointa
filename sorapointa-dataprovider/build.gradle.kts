@@ -15,6 +15,8 @@ val defaultDatabaseType: String? = props["database.default"]
 val databaseCompileList: String? = props["database.driver.list"]
 
 dependencies {
+    implementation(project(":sorapointa-utils:sorapointa-utils-json"))
+
     implementation("org.jetbrains.kotlin:kotlin-reflect:_")
 
     implementation(KotlinX.serialization.json)

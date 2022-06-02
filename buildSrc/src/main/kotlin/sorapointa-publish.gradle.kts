@@ -21,8 +21,6 @@ if (secretPropsFile.exists()) {
     ext["ossrhPassword"] = System.getenv("OSSRH_PASSWORD")
 }
 
-fun getExtraString(name: String) = kotlin.runCatching { ext[name]?.toString() }.getOrNull()
-
 publishing {
     publications {
         create<MavenPublication>("mavenKotlin") {

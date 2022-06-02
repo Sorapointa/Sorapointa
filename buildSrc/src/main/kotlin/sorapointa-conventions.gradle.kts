@@ -25,9 +25,12 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:_")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
 
-    if (project.name != "sorapointa-utils") {
-        implementation(project(":sorapointa-utils"))
-        testImplementation(project(":sorapointa-utils", "test"))
+    if (!project.name.startsWith("sorapointa-utils")) {
+        val noUtils = project.getExtraBoolean("no-utils")
+        if (noUtils != true) {
+            implementation(project(":sorapointa-utils:sorapointa-utils-core"))
+            testImplementation(project(":sorapointa-utils:sorapointa-utils-core", "test"))
+        }
     }
 
     testImplementation(kotlin("test"))

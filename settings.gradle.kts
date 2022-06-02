@@ -8,8 +8,13 @@ include("sorapointa-event")
 include("sorapointa-i18n")
 include("sorapointa-proto")
 include("sorapointa-task")
+
 include("sorapointa-utils")
-include("sorapointa-dataloader")
+include("sorapointa-utils:sorapointa-utils-all")
+include("sorapointa-utils:sorapointa-utils-core")
+include("sorapointa-utils:sorapointa-utils-crypto")
+include("sorapointa-utils:sorapointa-utils-json")
+include("sorapointa-utils:sorapointa-utils-time")
 
 pluginManagement {
     repositories {
