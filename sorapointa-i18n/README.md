@@ -1,5 +1,7 @@
 # I18n Module
 
+[简体中文](README.zh-CN.md)
+
 ## Included Config
 
 Following config must be load at program start, like `I18Config.reload()`:

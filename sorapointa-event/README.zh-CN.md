@@ -1,5 +1,7 @@
 # 事件模块
 
+[English](README.zh-CN.md)
+
 你可以查看 [EventPipelineTest](src/test/kotlin/org/sorapointa/event/EventPipelineTest.kt) 提供的例子，
 与在 [EventManager](src/main/kotlin/org/sorapointa/event/EventManager.kt) 
 和 [Event](src/main/kotlin/org/sorapointa/event/Event.kt) 代码中提供的详细文档

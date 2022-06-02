@@ -1,5 +1,7 @@
 # Data Loader Module
 
+[简体中文](README.zh-CN.md)
+
 ## Register Resource
 
 You can register resource like this:
