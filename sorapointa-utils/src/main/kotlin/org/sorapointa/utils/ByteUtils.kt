@@ -100,20 +100,6 @@ fun UByteArray.splitToULongArray() =
         it.toUByteArray().entireToULong()
     }.toULongArray()
 
-inline fun <C : Closeable, R> C.withUse(block: C.() -> R): R {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-    return use(block)
-}
-
-inline fun <I : Closeable, O : Closeable, R> I.withOut(output: O, block: I.(output: O) -> R): R {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-    return use { output.use { block(this, output) } }
-}
-
 /**
  * Convert [ByteArray] to [ByteReadPacket]
  */

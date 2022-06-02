@@ -33,13 +33,6 @@ internal suspend fun ChannelFuture.awaitKt(): ChannelFuture {
     return this
 }
 
-internal fun ByteBuf.toReadPacket(): ByteReadPacket {
-    val buf = this
-    return buildPacket {
-        ByteBufInputStream(buf).withUse { copyTo(outputStream()) }
-    }
-}
-
 internal fun ByteBuf.toByteArray(): ByteArray {
     val bytes = ByteArray(this.readableBytes())
     this.readBytes(bytes)
