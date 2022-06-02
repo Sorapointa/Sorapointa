@@ -6,11 +6,12 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.insert
+import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.crypto.Ec2bData
 import org.sorapointa.utils.crypto.Ec2bSeed
 import org.sorapointa.utils.crypto.dumpToData
 
-object DispatchKeyDataTable : IdTable<String>("dispatch_key_table") {
+@SorapointaInternal object DispatchKeyDataTable : IdTable<String>("dispatch_key_table") {
 
     override val id: Column<EntityID<String>> = varchar("host", 40).entityId()
 
@@ -20,10 +21,10 @@ object DispatchKeyDataTable : IdTable<String>("dispatch_key_table") {
     override val primaryKey: PrimaryKey = PrimaryKey(id)
 }
 
-class DispatchKeyData(id: EntityID<String>) : Entity<String>(id) {
+@SorapointaInternal class DispatchKeyData(id: EntityID<String>) : Entity<String>(id) {
 
     companion object : EntityClass<String, DispatchKeyData>(DispatchKeyDataTable) {
-
+        @SorapointaInternal
         suspend fun getOrGenerate(host: String): Ec2bData {
             return DispatchKeyData.findById(host)?.let {
                 Ec2bData(it.dispatchSeed, it.dispatchKey)

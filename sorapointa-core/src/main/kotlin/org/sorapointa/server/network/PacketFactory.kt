@@ -1,3 +1,5 @@
+@file:OptIn(SorapointaInternal::class)
+
 package org.sorapointa.server.network
 
 import com.google.protobuf.GeneratedMessageV3
@@ -17,6 +19,7 @@ import org.sorapointa.proto.GetPlayerTokenReqOuterClass.GetPlayerTokenReq
 import org.sorapointa.proto.PingReqOuterClass.PingReq
 import org.sorapointa.proto.PlayerLoginReqOuterClass.PlayerLoginReq
 import org.sorapointa.proto.RetcodeOuterClass.Retcode
+import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.randomULong
 
 private val logger = KotlinLogging.logger {}

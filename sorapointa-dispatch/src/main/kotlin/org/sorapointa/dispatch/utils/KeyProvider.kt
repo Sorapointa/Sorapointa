@@ -1,3 +1,5 @@
+@file:OptIn(SorapointaInternal::class)
+
 package org.sorapointa.dispatch.utils
 
 import io.ktor.network.tls.extensions.*
@@ -5,6 +7,7 @@ import io.ktor.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.sorapointa.dispatch.DispatchConfig
+import org.sorapointa.utils.SorapointaInternal
 import java.io.File
 import java.security.KeyStore
 import kotlin.text.toCharArray

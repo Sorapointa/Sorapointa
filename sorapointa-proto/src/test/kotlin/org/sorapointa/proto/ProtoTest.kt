@@ -43,7 +43,8 @@ class ProtoTest {
         val cmdId = PacketId.GET_PLAYER_TOKEN_REQ
         val randomInt = Random.nextInt()
         val soraPacket = buildPacket {
-            writeSoraPacket(cmdId,
+            writeSoraPacket(
+                cmdId,
                 getPlayerTokenReq { uid = randomInt },
                 packetHead { clientSequenceId = randomInt }
             )
@@ -53,6 +54,4 @@ class ProtoTest {
         assertEquals(randomInt, soraPacket.metadata.clientSequenceId)
         assertEquals(randomInt, GetPlayerTokenReq.parseFrom(soraPacket.data).uid)
     }
-
-
 }

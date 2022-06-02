@@ -3,10 +3,7 @@ package org.sorapointa.dispatch.plugins
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import mu.KotlinLogging
 import org.sorapointa.dispatch.utils.getAndPost
-
-private val logger = KotlinLogging.logger {}
 
 internal fun Application.configureRouting() {
 
