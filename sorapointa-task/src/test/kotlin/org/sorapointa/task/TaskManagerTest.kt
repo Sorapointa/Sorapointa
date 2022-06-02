@@ -12,6 +12,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.Timeout
 import org.sorapointa.data.provider.DatabaseManager
 import org.sorapointa.data.provider.initTestDataProvider
+import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.TestOption
 import org.sorapointa.utils.runTest
 import java.util.concurrent.TimeUnit
@@ -19,6 +20,7 @@ import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TaskManagerTest {
+    @OptIn(SorapointaInternal::class)
     @BeforeAll
     fun init() = runTest(TestOption.SKIP_CI) {
         initTestDataProvider()
