@@ -53,9 +53,10 @@ fun Project.configureLogbackCopy() {
 
 private val logbackCopyExcludes = listOf("sorapointa-core", "buildSrc")
 
-fun Collection<Project>.configureLogbackCopy() =
-    filter { !logbackCopyExcludes.contains(it.name) }
-        .forEach { it.configureLogbackCopy() }
+fun Collection<Project>.configureLogbackCopy() = asSequence()
+    .filter { it.pluginManager.hasPlugin("org.jetbrains.kotlin.jvm") }
+    .filter { !logbackCopyExcludes.contains(it.name) }
+    .forEach { it.configureLogbackCopy() }
 
 fun Project.configureLangsCopy() {
     tasks.register("copyLangsResource", Copy::class) {

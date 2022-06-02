@@ -8,6 +8,7 @@ plugins {
 
 dependencies {
     implementation(project(":sorapointa-dataprovider"))
+    implementation(project(":sorapointa-utils:sorapointa-utils-time"))
 
     implementation(KotlinX.coroutines.core)
     implementation(KotlinX.serialization.core)

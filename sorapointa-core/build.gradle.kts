@@ -17,7 +17,7 @@ dependencies {
     api(project(":sorapointa-i18n"))
     api(project(":sorapointa-proto"))
     api(project(":sorapointa-task"))
-    api(project(":sorapointa-utils"))
+    api(project(":sorapointa-utils:sorapointa-utils-all"))
 
     // network
     implementation("io.netty:netty-handler:_")

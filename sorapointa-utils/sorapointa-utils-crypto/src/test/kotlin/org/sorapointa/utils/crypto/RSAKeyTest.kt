@@ -1,8 +1,7 @@
-package org.sorapointa.utils
+package org.sorapointa.utils.crypto
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
-import org.sorapointa.utils.crypto.parseToRSAKey
 import java.nio.charset.Charset
 import kotlin.test.assertEquals
 

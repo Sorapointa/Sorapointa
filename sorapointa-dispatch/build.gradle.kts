@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":sorapointa-i18n"))
     implementation(project(":sorapointa-event"))
     implementation(project(":sorapointa-proto"))
+    implementation(project(":sorapointa-utils:sorapointa-utils-all"))
 
     implementation("io.ktor:ktor-server-core-jvm:_")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:_")

@@ -6,5 +6,6 @@ plugins {
 
 dependencies {
     implementation(project(":sorapointa-dataprovider"))
+    testImplementation(project(":sorapointa-utils:sorapointa-utils-json"))
     implementation(KotlinX.serialization.json)
 }

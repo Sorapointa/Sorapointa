@@ -1,9 +1,8 @@
-package org.sorapointa.utils
+package org.sorapointa.utils.crypto
 
 import io.ktor.util.*
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
-import org.sorapointa.utils.crypto.readEc2b
 import kotlin.test.assertEquals
 
 class Ec2bTest {

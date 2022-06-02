@@ -11,6 +11,8 @@ plugins {
 
 val prop = getRootProjectLocalProps()
 
+ext["no-utils"] = true
+
 dependencies {
     api("com.google.protobuf:protobuf-java:_")
     api("com.google.protobuf:protobuf-kotlin:_")
