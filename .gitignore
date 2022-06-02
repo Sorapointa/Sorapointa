@@ -44,6 +44,7 @@ generated/
 *.log
 **/src/main/resources/logback.xml
 **/src/test/resources/logback-test.xml
+**/src/main/resources/langs/
 !sorapointa-core/src/main/resources/logback.xml
 !sorapointa-core/src/test/resources/logback-test.xml
 

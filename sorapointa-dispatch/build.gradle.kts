@@ -36,6 +36,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:atomicfu:_")
 }
 
+configureLangsCopy()
+
 application {
     applicationName = "sorapointa-dispatch"
     mainClass.set("org.sorapointa.dispatch.DispatchServerKt")

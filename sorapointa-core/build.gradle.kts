@@ -28,6 +28,8 @@ dependencies {
     implementation("org.jline:jline:_")
 }
 
+configureLangsCopy()
+
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor(0, "seconds")
 }
