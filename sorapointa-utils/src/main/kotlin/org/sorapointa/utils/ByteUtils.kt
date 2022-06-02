@@ -3,10 +3,6 @@
 package org.sorapointa.utils
 
 import io.ktor.utils.io.core.*
-import java.io.Closeable
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
-import kotlin.io.use
 
 /**
  * Convert [Int] to [ByteArray]
