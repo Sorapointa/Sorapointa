@@ -32,15 +32,16 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
     private val noOut by option("-N", "--no-out", help = "stdout and stderr will be disable")
         .flag(default = false)
 
-    private val noRedirect by option("-R", "--no-redirect", help = "Print(ln) won't redirect to JLine's printAbove")
+    private val noRedirect by option("-R", "--no-redirect", help = "Whether redirect to JLine's printAbove")
         .flag(default = false)
 
     override suspend fun run(): Unit = scope.launch {
         redirectPrint()
 
         addShutdownHook {
-            Console
-            println("\nExiting sorapointa...")
+            closeAll()
+            println("\nExiting Sorapointa...")
+            Console.redirectToNull()
         }
 
         logger.info { "Version: $VERSION-$BUILD_BRANCH-$COMMIT_HASH" }
@@ -48,10 +49,10 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
         workingDirectory?.let { System.setProperty("user.dir", it.absPath) }
         logger.info { "Sorapointa is working in $globalWorkDirectory" }
 
-        logger.info { "Loading sorapointa configs..." }
+        logger.info { "Loading Sorapointa configs..." }
         setupRegisteredConfigs()
 
-        logger.info { "Loading sorapointa database..." }
+        logger.info { "Loading Sorapointa database..." }
         val databaseInitJob = setupDatabase()
 
         logger.info { "Loading languages..." }
@@ -98,6 +99,7 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
 
     private fun loadLanguages(): Job =
         scope.launch {
+            extractLanguages(SorapointaMain::class)
             I18nManager.registerLanguagesDirectory(languagesDirectory)
             logger.info { "Loaded languages: ${I18nManager.supportedLanguages.joinToString { it.toLanguageTag() }}" }
         }

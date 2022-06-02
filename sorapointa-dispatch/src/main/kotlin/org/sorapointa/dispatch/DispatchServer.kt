@@ -87,6 +87,7 @@ object DispatchServer {
         DispatchConfig.init()
         if (isIndependent) {
             I18nConfig.init()
+            extractLanguages(DispatchServer::class)
             I18nManager.registerLanguagesDirectory(languagesDirectory)
             DatabaseConfig.init()
             DatabaseManager.loadDatabase()
