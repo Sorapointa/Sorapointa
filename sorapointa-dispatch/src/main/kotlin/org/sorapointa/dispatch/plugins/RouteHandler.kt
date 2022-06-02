@@ -1,5 +1,3 @@
-@file:OptIn(SorapointaInternal::class)
-
 package org.sorapointa.dispatch.plugins
 
 import com.google.protobuf.kotlin.toByteString

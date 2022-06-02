@@ -117,7 +117,6 @@ data class LanguagePack(
     )
 }
 
-@OptIn(SorapointaInternal::class)
 inline val globalLocale: Locale
     get() = I18nConfig.data.globalLocale
 

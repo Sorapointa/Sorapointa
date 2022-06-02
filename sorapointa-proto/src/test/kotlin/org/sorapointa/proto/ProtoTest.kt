@@ -1,11 +1,8 @@
-@file:OptIn(SorapointaInternal::class)
-
 package org.sorapointa.proto
 
 import io.ktor.utils.io.core.*
 import org.junit.jupiter.api.Test
 import org.sorapointa.proto.GetPlayerTokenReqOuterClass.GetPlayerTokenReq
-import org.sorapointa.utils.SorapointaInternal
 import kotlin.random.Random
 import kotlin.test.assertEquals
 

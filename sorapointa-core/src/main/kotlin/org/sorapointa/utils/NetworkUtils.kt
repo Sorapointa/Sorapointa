@@ -1,7 +1,6 @@
 package org.sorapointa.utils
 
 import io.ktor.utils.io.core.*
-import io.ktor.utils.io.streams.*
 import io.netty.buffer.ByteBuf
 import io.netty.channel.Channel
 import io.netty.channel.ChannelFuture
@@ -38,7 +37,6 @@ internal fun ByteBuf.toByteArray(): ByteArray {
     return bytes
 }
 
-@OptIn(SorapointaInternal::class)
 internal inline fun <reified T> ByteBuf.readToSoraPacket(
     key: ByteArray,
     block: (SoraPacket) -> T

@@ -1,5 +1,3 @@
-@file:OptIn(SorapointaInternal::class)
-
 package org.sorapointa.command.defaults
 
 import kotlinx.coroutines.runBlocking
@@ -12,7 +10,6 @@ import org.sorapointa.command.CommandNode
 import org.sorapointa.command.CommandSender
 import org.sorapointa.utils.I18nConfig
 import org.sorapointa.utils.I18nManager
-import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.languagesDirectory
 import java.util.*
 import kotlin.system.measureTimeMillis

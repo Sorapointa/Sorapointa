@@ -8,7 +8,6 @@ import org.sorapointa.proto.PacketHeadOuterClass.PacketHead
 import org.sorapointa.proto.PingReqOuterClass.PingReq
 import org.sorapointa.proto.QueryCurrRegionHttpRspOuterClass.QueryCurrRegionHttpRsp
 import org.sorapointa.proto.RetcodeOuterClass.Retcode
-import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.i18n
 import org.sorapointa.utils.randomByteArray
 
@@ -20,7 +19,6 @@ abstract class OutgoingPacket(
     abstract fun buildProto(): GeneratedMessageV3
 }
 
-@OptIn(SorapointaInternal::class)
 internal fun OutgoingPacket.toFinalBytePacket(): ByteArray {
     val packet = this
     return buildPacket {
