@@ -28,33 +28,33 @@ alt="Maven Developer"/></a>
 
 <!--Content-->
 
-English | [简体中文](./README.zh-CN.MD)
+[English](./README.md) | 简体中文
 
-**WIP**: This project is under active development, you can take a part in contributing, but most of the features is unavailable.
+**WIP**: 该项目正被积极开发，你可以参与贡献，但大多数功能不可用。
 
 ## Build
 
-Requirement:
+需要:
 
 - JDK 17
 
 ```shell
 ./gradlew shadowJar
-# if you want to run test
+# 如果你想运行测试
 ./gradlew test
 ```
 
-### Available Build Configs
+### 可用的构建选项
 
-Create `local.properties` in project root and edit it. Config uses Java `.properties` format.
+在项目根目录创建 `local.properties` 并编辑。配置使用 Java `.properties` 格式。
 
-| key                    | description                     | available value        |
-|------------------------|---------------------------------|------------------------|
-| `database.default`     | default database for new config | `SQLITE`, `POSTGRESQL` |
-| `database.driver.list` | database drivers to build       | `SQLITE`, `POSTGRESQL` |
-| `proto.fullCompile`    | do full compile for proto       | `true`                 |
+| key                    | 描述                     | 可用值                    |
+|------------------------|-------------------------|------------------------|
+| `database.default`     | 为新配置填充的默认数据库    | `SQLITE`, `POSTGRESQL` |
+| `database.driver.list` | 构建将提供的数据库驱动列表  | `SQLITE`, `POSTGRESQL` |
+| `proto.fullCompile`    | 为 proto 开启全量编译     | `true`                 |
 
-Example:
+示例：
 
 ```properties
 database.default=SQLITE
@@ -64,7 +64,7 @@ proto.fullCompile=true
 
 ## Contributing
 
-See: [CONTRIBUTING](./CONTRIBUTING.md), and README in your interested subproject.
+参见：[CONTRIBUTING](./CONTRIBUTING.zh-CN.md)，以及对应模块的 README。
 
 ## Thanks
 
