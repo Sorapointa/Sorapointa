@@ -1,5 +1,7 @@
 # I18n 模块
 
+[English](README.zh-CN.md)
+
 ## 包含的配置
 
 下列配置应在程序开始时加载，例如 `I18Config.reload()`:

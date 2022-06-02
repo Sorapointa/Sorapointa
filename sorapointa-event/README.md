@@ -1,5 +1,7 @@
 # Event Module
 
+[简体中文](README.zh-CN.md)
+
 You could refer a lot of examples provided in [EventPipelineTest](src/test/kotlin/org/sorapointa/event/EventPipelineTest.kt),
 and detailed docs in [EventManager](src/main/kotlin/org/sorapointa/event/EventManager.kt), [Event](src/main/kotlin/org/sorapointa/event/Event.kt)
 

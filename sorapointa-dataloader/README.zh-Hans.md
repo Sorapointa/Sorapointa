@@ -1,5 +1,7 @@
 # Data Loader 模块
 
+[English](README.zh-CN.md)
+
 ## 注册 Resource
 
 像这样注册资源：

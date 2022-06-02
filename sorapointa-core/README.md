@@ -1,5 +1,7 @@
 # Core Module
 
+[简体中文](README.zh-CN.md)
+
 ## Command System
 
 The command system is based on [**Yac**](https://githubfast.com/Colerar/Yac)
