@@ -1,5 +1,3 @@
-@file:OptIn(SorapointaInternal::class)
-
 package org.sorapointa.utils
 
 import kotlinx.coroutines.runBlocking

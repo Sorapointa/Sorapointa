@@ -36,14 +36,12 @@ open class DataFilePersist<T : Any>(
     @Suppress("PropertyName")
     @SorapointaInternal val _data = atomic(default)
 
-    @OptIn(SorapointaInternal::class)
     final override val data: T by _data
 
     init {
         clazz.requireSerializable()
     }
 
-    @OptIn(SorapointaInternal::class)
     inline fun updateData(update: (T) -> T) = _data.update(update)
 
     override suspend fun init(): Unit =

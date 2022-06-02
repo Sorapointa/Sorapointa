@@ -1,5 +1,3 @@
-@file:OptIn(SorapointaInternal::class)
-
 package org.sorapointa.server.network
 
 import io.jpower.kcp.netty.UkcpChannel

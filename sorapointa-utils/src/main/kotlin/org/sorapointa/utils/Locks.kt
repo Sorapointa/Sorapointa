@@ -4,6 +4,8 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -12,6 +14,9 @@ import kotlin.coroutines.CoroutineContext
  * It will store mutex lock in [CoroutineContext] with [ReentrantMutexContextElement]
  */
 suspend fun <T> Mutex.withReentrantLock(block: suspend () -> T): T {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
     val key = ReentrantMutexContextKey(this)
     // call block directly when this mutex is already locked in the context
     if (currentCoroutineContext()[key] != null) return block()

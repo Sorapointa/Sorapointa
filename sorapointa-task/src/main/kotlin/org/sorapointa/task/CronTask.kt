@@ -25,7 +25,6 @@ import org.sorapointa.utils.now
  * @property cron [com.cronutils.model.Cron] object
  * @property lastExecution last execution time of this task
  */
-@OptIn(SorapointaInternal::class)
 class CronTask(id: EntityID<String>) : Entity<String>(id) {
     companion object : EntityClass<String, CronTask>(CronTasks)
 

@@ -1,5 +1,3 @@
-@file:OptIn(SorapointaInternal::class)
-
 package org.sorapointa.dispatch
 
 import io.ktor.util.*
@@ -16,7 +14,6 @@ import org.sorapointa.data.provider.DatabaseManager
 import org.sorapointa.data.provider.initTestDataProvider
 import org.sorapointa.dispatch.data.Account
 import org.sorapointa.dispatch.data.AccountTable
-import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.TestOption
 import org.sorapointa.utils.randomByteArray
 import org.sorapointa.utils.encoding.hex

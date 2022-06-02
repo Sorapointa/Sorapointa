@@ -1,5 +1,3 @@
-@file:OptIn(SorapointaInternal::class)
-
 package org.sorapointa.dispatch
 
 import com.password4j.types.Argon2

@@ -3,5 +3,6 @@ object OptInAnnotations {
         "kotlin.RequiresOptIn",
         "kotlin.ExperimentalUnsignedTypes",
         "kotlin.contracts.ExperimentalContracts",
+        "org.sorapointa.utils.SorapointaInternal",
     )
 }
