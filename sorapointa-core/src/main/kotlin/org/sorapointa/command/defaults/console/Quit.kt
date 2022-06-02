@@ -1,6 +1,5 @@
 package org.sorapointa.command.defaults.console
 
-import org.sorapointa.SorapointaMain
 import org.sorapointa.command.Command
 import org.sorapointa.command.CommandSender
 import org.sorapointa.command.ConsoleCommandSender
@@ -15,7 +14,6 @@ class Quit(private val sender: CommandSender) : Command(sender, Quit) {
 
     override suspend fun run() {
         if (sender !is ConsoleCommandSender) return
-        SorapointaMain.closeAll()
         exitProcess(0)
     }
 }

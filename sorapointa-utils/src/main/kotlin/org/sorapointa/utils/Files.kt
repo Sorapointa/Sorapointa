@@ -1,6 +1,7 @@
 package org.sorapointa.utils
 
 import java.io.File
+import kotlin.reflect.KClass
 
 private val logger = mu.KotlinLogging.logger { }
 
@@ -36,3 +37,14 @@ val configDirectory by lazy { resolveWorkDirectory("./config") }
 val languagesDirectory by lazy { resolveWorkDirectory("./langs") }
 
 val resourceDirectory by lazy { resolveWorkDirectory("./resources") }
+
+/**
+ * Extract languages files in resources (resources/langs) to [languagesDirectory]
+ */
+@SorapointaInternal
+suspend fun extractLanguages(mainClazz: KClass<*>) {
+    val source = jar(mainClazz.java)
+    if (!languagesDirectory.exists() && source != null) {
+        copyResourceDirectory(source, "langs", languagesDirectory)
+    }
+}
