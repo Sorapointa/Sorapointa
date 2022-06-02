@@ -1,5 +1,9 @@
 # 事件模块
 
+你可以查看 [EventPipelineTest](src/test/kotlin/org/sorapointa/event/EventPipelineTest.kt) 提供的例子，
+与在 [EventManager](src/main/kotlin/org/sorapointa/event/EventManager.kt) 
+和 [Event](src/main/kotlin/org/sorapointa/event/Event.kt) 代码中提供的详细文档
+
 ## 事件模块包括的配置
 
 以下配置必须在程序启动时加载，如 `EventManagerConfig.reload()`:
@@ -8,9 +12,8 @@
 
 ## 初始化
 
-- `EventManager.init()` should be called at program start to 
-initialize the queue of listener in priority order, 
-and set its parent scope to ensure structured concurrency.
+- `EventManager.init(parentCoroutineContext)` 应该在程序开始时被调用，
+以便按优先级顺序初始化监听器队列，并设置其父协程上下文以确保结构化并发。
 
 ## 用法
 
@@ -195,3 +198,7 @@ suspend fun broadcastEvent(event: Event): Boolean
 
 ![Snipaste_2022-05-06_15-46-22](https://user-images.githubusercontent.com/25319400/167162147-a9302a06-8aa6-4d60-a568-147dcb9c7586.png)
 
+# 状态机模块
+
+你可以查看 [StateControllerTest](src/test/kotlin/org/sorapointa/event/StateControllerTest.kt) 提供的例子，
+与在 [StateController](src/main/kotlin/org/sorapointa/event/StateController.kt) 代码中提供的详细文档

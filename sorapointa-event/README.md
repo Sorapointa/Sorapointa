@@ -1,5 +1,8 @@
 # Event Module
 
+You could refer a lot of examples provided in [EventPipelineTest](src/test/kotlin/org/sorapointa/event/EventPipelineTest.kt),
+and detailed docs in [EventManager](src/main/kotlin/org/sorapointa/event/EventManager.kt), [Event](src/main/kotlin/org/sorapointa/event/Event.kt)
+
 ## Included Config
 
 Following config must be load at program start, like `EventManagerConfig.reload()`:
@@ -192,4 +195,9 @@ suspend fun broadcastEvent(event: Event): Boolean
 ## Broadcast Path
 
 ![Snipaste_2022-05-06_15-46-22](https://user-images.githubusercontent.com/25319400/167162147-a9302a06-8aa6-4d60-a568-147dcb9c7586.png)
+
+# State Controller Module
+
+You could refer a lot of examples provided in [StateControllerTest](src/test/kotlin/org/sorapointa/event/StateControllerTest.kt),
+and detailed docs in [StateController](src/main/kotlin/org/sorapointa/event/StateController.kt)
 

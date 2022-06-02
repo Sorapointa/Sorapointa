@@ -140,6 +140,9 @@ class StateControllerTest {
 
         val sc = SomeClassWithStateImpl()
 
+        sc.stateController.init()
+        sc.stateController2.init()
+
         sc.stateController.observeStateChange(StateController.ListenerState.AFTER_UPDATE) { before, after ->
             println("Count: ${count.value}, before: $before, after: $after")
         }
@@ -174,6 +177,7 @@ class StateControllerTest {
         val testCount = 1000
 
         val sc = SomeClassWithStateImpl()
+        sc.stateController.init()
         (1..testCount).map {
             launch {
                 sc.stateController.setState(SomeClassWithState.State.START)
@@ -188,6 +192,7 @@ class StateControllerTest {
         assertEquals(testCount * 4 + 1, sc.count.value)
 
         val sc2 = SomeClassWithStateImpl()
+        sc2.stateController2.init()
         sc2.stateController.block {
             delay((0..200L).random())
         }
