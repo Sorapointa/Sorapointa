@@ -1,14 +1,12 @@
 package org.sorapointa.utils
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
+import net.mamoe.yamlkt.Yaml
 import org.sorapointa.data.provider.DataFilePersist
 import java.io.File
 import java.util.*
@@ -40,7 +38,7 @@ object I18nManager {
     suspend fun registerLanguage(languageFile: File) {
         runCatching {
             if (!languageFile.exists()) throw NoSuchFileException(languageFile)
-            val langPack = DataFilePersist(languageFile, LanguagePack.EMPTY).apply { init() }.data
+            val langPack = DataFilePersist(languageFile, LanguagePack.EMPTY, format = Yaml).apply { init() }.data
             if (langPack == LanguagePack.EMPTY) {
                 logger.error { "Failed to load language pack ${languageFile.absPath}" }
                 return@runCatching
@@ -57,9 +55,9 @@ object I18nManager {
         }
     }
 
-    // ends with .lang.json
+    // ends with .lang.yaml
     private val languageFileRegex by lazy {
-        Regex("""^.+\.lang\.json$""", RegexOption.IGNORE_CASE)
+        Regex("""^.+\.lang\.yaml$""", RegexOption.IGNORE_CASE)
     }
 
     /**
@@ -106,9 +104,11 @@ data class LanguagePack(
     }
 }
 
-@SorapointaInternal object I18nConfig : DataFilePersist<I18nConfig.Config>(
-    File(configDirectory, "i18n.json"),
-    Config()
+@SorapointaInternal
+object I18nConfig : DataFilePersist<I18nConfig.Config>(
+    File(configDirectory, "i18n.yaml"),
+    Config(),
+    format = Yaml,
 ) {
     @Serializable
     data class Config(
