@@ -1,6 +1,7 @@
 package org.sorapointa
 
 import kotlinx.serialization.Serializable
+import net.mamoe.yamlkt.Comment
 import net.mamoe.yamlkt.Yaml
 import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.utils.configDirectory
@@ -12,12 +13,18 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
 
     @Serializable
     data class Data(
+        @Comment("Game server network setting")
         val networkSetting: NetworkSetting = NetworkSetting()
     )
 
     @Serializable
     data class NetworkSetting(
+        @Comment("Game server bind port")
         val bindPort: Int = 22101,
+        @Comment("""
+            Game server kcp setting, don't change those settings if you don't know about KCP
+            See more: https://github.com/skywind3000/kcp
+        """)
         val uKcpSetting: UKcpSetting = UKcpSetting()
     )
 

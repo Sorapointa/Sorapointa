@@ -11,6 +11,7 @@ import io.ktor.util.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.mamoe.yamlkt.Comment
 import net.mamoe.yamlkt.Yaml
 import org.slf4j.LoggerFactory
 import org.sorapointa.data.provider.DataFilePersist
@@ -114,15 +115,36 @@ private val QUERY_CURR_RSA_KEY = "PFJTQUtleVZhbHVlPjxNb2R1bHVzPnovZnlmb3psRElEV0
 
     @Serializable
     data class Data(
+        @Comment("Bind address of dispach server")
         val host: String = "0.0.0.0",
+        @Comment("Bind port of dispatch server")
         val port: Int = 443,
+        @Comment("""
+            Game server public ip address
+            After client access `/query_cur_region` routing, 
+            client connection will be forwarded to this address
+        """)
         val gateServerIp: String = "localhost",
+        @Comment("Game server port")
         val gateServerPort: Int = 22101,
+        @Comment("Server list of routing `/query_region_list`")
         val servers: ArrayList<Server> = arrayListOf(Server()),
+        @Comment("""
+            Use SSL encrypted connection
+            If you use fiddler, mitmdump, or some similar tools to forward your connection,
+            and decrypted the forwarding traffic, you could turn off this option.
+        """)
         val useSSL: Boolean = true,
+        @Comment("SSL certification setting")
         var certification: Certification = Certification(),
+        @Comment("Request handling setting")
         val requestSetting: RequestSetting = RequestSetting(),
+        @Comment("Account system setting")
         val accountSetting: AccountSetting = AccountSetting(),
+        @Comment("""
+            Client config that will be included in `query_region_list`
+            Don't change it unless you know what you are doing.
+        """)
         val regionListClientCustomConfig: RegionListClientCustomConfig = RegionListClientCustomConfig(
             sdkEnvironment = 2u,
             showException = false,
@@ -132,6 +154,10 @@ private val QUERY_CURR_RSA_KEY = "PFJTQUtleVZhbHVlPjxNb2R1bHVzPnovZnlmb3psRElEV0
             videoKey = 5578228838233776,
             downloadMode = 0u
         ),
+        @Comment("""
+            Client config that will be included in `query_cur_region`
+            Don't change it unless you know what you are doing.
+            """)
         val clientCustomConfig: ClientCustomConfig = ClientCustomConfig(
             perfReportEnable = false,
             photographShareTopics = 753u,
@@ -147,24 +173,53 @@ private val QUERY_CURR_RSA_KEY = "PFJTQUtleVZhbHVlPjxNb2R1bHVzPnovZnlmb3psRElEV0
 
     @Serializable
     data class RequestSetting(
+        @Comment("""
+            Forward the common request to original website
+            For example, `/agreement/api/getAgreementInfos` will be forwared.
+            If you turn off this option, dispatch server will use default config hardcoded in Sorapointa.
+        """)
         val forwardCommonRequest: Boolean = true,
-        // If false, dispatch server will use default config hardcoded in Sorapointa
+        @Comment("""
+            Forward `query_cur_region` request to original website
+            And sorapointa will auto replace important settings of the final request result,
+            such as gate server address and custom config.
+            If you turn off this option, sorapointa will only include those important settings metioned above.
+        """)
         val forwardQueryCurrentRegion: Boolean = true,
+        @Comment("""
+           Forward `query_cur_region` to a hardcode url, rather than using client request arguments
+           In general, this option should be used for accessing beta or other client version.
+        """)
         val usingCurrentRegionUrlHardcode: Boolean = false,
-        val currentRegionContainsCustomClientConfig: Boolean = true,
+        @Comment("""
+            In some special cases, containing custom client config will cause client stuck in loading scene,
+            turn off this option may solve this issue.
+        """)
         val queryCurrentRegionHardcode: String = QUERY_CURR_HARDCODE_DEFAULT,
+        val currentRegionContainsCustomClientConfig: Boolean = true,
+        @Comment("Response `query_cur_region` in client 2.8 or higher version format")
         @SerialName("v2.8CurrentRegionForwardFormat")
         val v28: Boolean = false,
+        @Comment("""
+            If dispatch server try to forward 2.8 or higher version, 
+            dispatch server will use this RSA key to decrypt the forwarding result.
+        """)
         @SerialName("v2.8RSAKey")
         val rsaPrivateKey: String = QUERY_CURR_RSA_KEY
     )
 
     @Serializable
     data class AccountSetting(
+        @Comment("Combo token will be used for login game server")
         @SerialName("comboExpiredExpiredTime")
         private val _comboTokenExpiredTime: String = "3d",
+        @Comment("Dispatch token will be used for auto login dispatch server")
         @SerialName("dispatchTokenExpiredTime")
         private val _dispatchTokenExpiredTime: String = "3d",
+        @Comment("""
+            Password hash setting
+            Don't change it unless you know what you are doing.
+        """)
         val password: Argon2PasswordSetting = Argon2PasswordSetting()
     ) {
         val comboTokenExpiredTime: Duration
@@ -199,8 +254,20 @@ private val QUERY_CURR_RSA_KEY = "PFJTQUtleVZhbHVlPjxNb2R1bHVzPnovZnlmb3psRElEV0
     @Serializable
     data class Server(
         val serverName: String = "sorapointa_01",
+        @Comment("This title will be displayed on client screen")
         val title: String = "Sorapointa",
+        @Comment("DEV_PUBLIC or DEV_PRIVATE, don't change it unless you know what you are doing")
         val serverType: String = "DEV_PUBLIC",
+        @Comment("""
+            According region dispatch server domain
+            In general, it should be dispatch server public address
+            Client will access `/query_region_list` before `/query_cur_region`,
+            and client will access `/query_cur_region` for game server address information, 
+            thus `/query_cur_region` should be on a seperate server, 
+            but sorapointa dispatch server has done those two things together,
+            so unless you want to setup mutiple game or dispatch servers,
+            just keep it as public address of dispatch server.
+        """)
         val dispatchDomain: String = "localhost"
     )
 }
