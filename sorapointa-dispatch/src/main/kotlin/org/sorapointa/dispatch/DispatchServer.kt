@@ -85,12 +85,15 @@ object DispatchServer {
 
     @SorapointaInternal
     suspend fun startDispatch(isIndependent: Boolean = false) {
-        DispatchConfig.init()
         if (isIndependent) {
+            DispatchConfig.init()
+            DispatchConfig.save()
             I18nConfig.init()
+            I18nConfig.save()
             extractLanguages(DispatchServer::class)
             I18nManager.registerLanguagesDirectory(languagesDirectory)
             DatabaseConfig.init()
+            DatabaseConfig.save()
             DatabaseManager.loadDatabase()
         }
         DatabaseManager.loadTables(AccountTable, DispatchKeyDataTable)

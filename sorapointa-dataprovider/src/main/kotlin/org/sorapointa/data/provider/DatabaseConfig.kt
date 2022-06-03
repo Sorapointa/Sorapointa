@@ -69,7 +69,7 @@ object DatabaseConfig : DataFilePersist<DatabaseConfig.Data>(
             """
             Available value for isolation level
             
-            If you don't what it means, just keep default.
+            If you don't know what it means, just keep default.
             
             Lenient / Unsafe / Fast -> Strict / Safe / Slow 
             SQLite: READ_UNCOMMITTED, SERIALIZABLE
