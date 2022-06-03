@@ -82,7 +82,10 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
     private fun setupRegisteredConfigs(): Job =
         scope.launch {
             registeredConfig.map {
-                launch { it.init() }
+                launch {
+                    it.init()
+                    it.save()
+                }
             }.joinAll()
         }
 
