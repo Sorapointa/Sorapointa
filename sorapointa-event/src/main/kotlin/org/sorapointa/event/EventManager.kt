@@ -11,6 +11,7 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import mu.KotlinLogging
+import net.mamoe.yamlkt.Comment
 import net.mamoe.yamlkt.Yaml
 import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.utils.ModuleScope
@@ -292,7 +293,9 @@ object EventManagerConfig : DataFilePersist<EventManagerConfig.Data>(
 
     @kotlinx.serialization.Serializable
     data class Data(
+        @Comment("Single event listener timeout in ms")
         val blockListenerTimeout: Long = 1000 * 30L,
+        @Comment("All event listeners timeout in ms")
         val waitingAllBlockListenersTimeout: Long = 3 * blockListenerTimeout
     )
 }
