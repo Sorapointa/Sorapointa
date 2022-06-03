@@ -24,11 +24,12 @@ alt="Apache 2.0 Open Source License"/></a><a
 href="https://s01.oss.sonatype.org/content/repositories/snapshots/moe/sdl/sorapointa/"><img 
 src="https://img.shields.io/nexus/s/moe.sdl.sorapointa/sorapointa-core?logo=apache-maven&label=Maven%20Dev&server=https%3A%2F%2Fs01.oss.sonatype.org&style=for-the-badge" 
 alt="Maven Developer"/></a>
-</p>
+
+<div align="center"><a href="https://discord.gg/MRadGNhqce"><img alt="Discord - Sorapointa" src="https://img.shields.io/discord/976764233029140550?label=Discord&logo=discord&style=for-the-badge"></a></div>
 
 <!--Content-->
 
-English | [简体中文](./README.zh-CN.MD)
+English | [简体中文](README.zh-CN.MD)
 
 **WIP**: This project is under active development, you can take a part in contributing, but most of the features is unavailable.
 
@@ -64,10 +65,11 @@ proto.fullCompile=true
 
 ## Contributing
 
-See: [CONTRIBUTING](./CONTRIBUTING.md), and README in your interested subproject.
+See: [CONTRIBUTING](CONTRIBUTING.md), and README in your interested subproject.
 
 ## Thanks
 
+- [HolographicHat](https://github.com/HolographicHat) - Supports a lot on algorithms and computer security.
 - [Grasscutter](https://github.com/Grasscutters/Grasscutter)
 - [Kotlin](https://github.com/JetBrains/kotlin) - A modern programming language that makes developers happier.
 - [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) - Kotlin multiplatform / multi-format
