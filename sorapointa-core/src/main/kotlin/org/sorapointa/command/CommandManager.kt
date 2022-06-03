@@ -59,7 +59,7 @@ object CommandManager {
     fun invokeCommand(
         sender: CommandSender,
         rawMsg: String,
-    ) = commandScope.launch {
+    ): Job = commandScope.launch {
         if (rawMsg.isEmpty()) {
             sender.sendMessage("sora.cmd.manager.invoke.empty".i18n(locale = sender))
             return@launch

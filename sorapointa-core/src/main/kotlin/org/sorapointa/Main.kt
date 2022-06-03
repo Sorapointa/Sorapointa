@@ -69,7 +69,7 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
         launch {
             while (isActive) {
                 try {
-                    CommandManager.invokeCommand(ConsoleCommandSender(), Console.readln())
+                    CommandManager.invokeCommand(ConsoleCommandSender(), Console.readln()).join()
                 } catch (e: UserInterruptException) { // Ctrl + C
                     println("<Interrupted> use 'quit' command to exit process")
                 } catch (e: EndOfFileException) { // Ctrl + D
