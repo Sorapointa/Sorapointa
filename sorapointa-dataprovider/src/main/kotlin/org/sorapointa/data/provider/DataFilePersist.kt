@@ -49,7 +49,6 @@ open class DataFilePersist<T : Any>(
     override suspend fun init(): Unit =
         withContext(scope.coroutineContext) {
             load()
-            save()
         }
 
     suspend fun initAndLoad(): T =
