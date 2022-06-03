@@ -116,7 +116,7 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
 
     companion object {
 
-        private val scope = ModuleScope(logger, "SorapointaRootScope")
+        private val scope = ModuleScope("SorapointaRootScope")
 
         internal fun closeAll() {
             scope.dispose()

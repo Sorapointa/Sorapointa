@@ -14,7 +14,7 @@ import kotlin.time.Duration
 private val logger = KotlinLogging.logger {}
 
 object TaskManager {
-    private var scope = ModuleScope(logger, "TaskManager")
+    private var scope = ModuleScope("TaskManager")
 
     private val cronJobMap: MutableMap<String, Job> = ConcurrentHashMap()
 
@@ -24,7 +24,7 @@ object TaskManager {
      * This method **IS NOT** thread-safe
      */
     fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
-        scope = ModuleScope(logger, "TaskManager", parentContext)
+        scope = ModuleScope("TaskManager", parentContext)
     }
 
     @Suppress("MemberVisibilityCanBePrivate", "unused")

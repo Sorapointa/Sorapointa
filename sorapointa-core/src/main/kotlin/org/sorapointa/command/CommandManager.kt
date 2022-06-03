@@ -26,10 +26,10 @@ object CommandManager {
 
     val commandEntries: List<Command.Entry> get() = cmdMap.entries.map { it.value.entry }
 
-    private var commandScope = ModuleScope(logger, "CommandManager")
+    private var commandScope = ModuleScope("CommandManager")
 
     internal fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
-        commandScope = ModuleScope(logger, "CommandManager", parentContext)
+        commandScope = ModuleScope("CommandManager", parentContext)
     }
 
     @Suppress("unused")

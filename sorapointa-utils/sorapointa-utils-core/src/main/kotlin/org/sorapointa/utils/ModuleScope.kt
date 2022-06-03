@@ -6,7 +6,7 @@ import mu.KotlinLogging
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-private val defaultLogger = KotlinLogging.logger {}
+private val logger = KotlinLogging.logger {}
 
 /**
  * Provide a common [CoroutineScope] for module
@@ -18,7 +18,6 @@ private val defaultLogger = KotlinLogging.logger {}
  *
  * @property parentJob specified [Job] with parent coroutine context [Job]
  *
- * @param logger exception [KLogger]
  * @param moduleName coroutine name, and name also would appear
  * @param parentContext parent scope [CoroutineContext]
  * @param dispatcher custom [CoroutineDispatcher]
@@ -26,7 +25,6 @@ private val defaultLogger = KotlinLogging.logger {}
  * with [CoroutineContext], [Throwable], [KLogger] the specified logger, [String] module name
  */
 open class ModuleScope(
-    private val logger: KLogger = defaultLogger,
     private val moduleName: String = "UnnamedModule",
     parentContext: CoroutineContext = EmptyCoroutineContext,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,

@@ -14,10 +14,10 @@ class ScopeTest {
     @Test
     fun `scope test`(): Unit = runBlocking {
 
-        val parentScope = ModuleScope(logger, "TestParent")
+        val parentScope = ModuleScope("TestParent")
 
-        val moduleScope = ModuleScope(logger, "TestModule", parentScope.coroutineContext)
-        val moduleScope2 = ModuleScope(logger, "TestModule2", parentScope.coroutineContext)
+        val moduleScope = ModuleScope("TestModule", parentScope.coroutineContext)
+        val moduleScope2 = ModuleScope("TestModule2", parentScope.coroutineContext)
 
         parentScope.launch {
             logger.info { "Running... Parent Scope ${this.coroutineContext}" }
