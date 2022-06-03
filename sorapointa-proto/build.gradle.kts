@@ -52,3 +52,7 @@ idea {
         sourceDirs.plus(file("src/proto"))
     }
 }
+
+tasks.withType<Javadoc> {
+    exclude("**/*OuterClass*")
+}
