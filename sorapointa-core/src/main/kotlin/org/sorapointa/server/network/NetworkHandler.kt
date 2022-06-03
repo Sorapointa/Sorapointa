@@ -48,7 +48,7 @@ internal open class NetworkHandler(
 
     lateinit var bindPlayer: Player
 
-    private val scope = ModuleScope(logger, "NetworkHandler[${getHost()}]", parentCoroutineContext)
+    private val scope = ModuleScope("NetworkHandler[${getHost()}]", parentCoroutineContext)
 
     val dispatchKey: Deferred<ByteArray> = scope.async {
         newSuspendedTransaction {

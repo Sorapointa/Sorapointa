@@ -24,7 +24,7 @@ open class DataFilePersist<T : Any>(
     final override val file: File,
     default: T,
     final override val scope: CoroutineScope =
-        ModuleScope(logger, "DataFilePersist", dispatcher = Dispatchers.IO)
+        ModuleScope("DataFilePersist", dispatcher = Dispatchers.IO)
 ) : FilePersist<T> {
 
     protected val clazz = default::class

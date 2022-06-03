@@ -21,7 +21,7 @@ private val logger = KotlinLogging.logger {}
 
 object ServerNetwork {
 
-    private var scope = ModuleScope(logger, "ServerNetwork")
+    private var scope = ModuleScope("ServerNetwork")
 
     private lateinit var workerGroup: NioEventLoopGroup
 
@@ -29,7 +29,7 @@ object ServerNetwork {
 
     internal fun boot(parentContext: CoroutineContext = EmptyCoroutineContext): Job {
         logger.info { "Starting Sorapointa Server..." }
-        scope = ModuleScope(logger, "ServerNetwork", parentContext)
+        scope = ModuleScope("ServerNetwork", parentContext)
         val port = SorapointaConfig.data.networkSetting.bindPort
         val job = scope.launch {
             workerGroup = NioEventLoopGroup()

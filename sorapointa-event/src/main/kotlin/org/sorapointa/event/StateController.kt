@@ -76,7 +76,7 @@ interface WithState<out T : Enum<*>> {
  *  val count = atomic(0)
  *
  *  val stateController = StateController(
- *      scope = ModuleScope(logger, "TestScopeWithState"),
+ *      scope = ModuleScope("TestScopeWithState"),
  *      parentStateClass = this,
  *      Start(), Doing(), End(),
  *  )

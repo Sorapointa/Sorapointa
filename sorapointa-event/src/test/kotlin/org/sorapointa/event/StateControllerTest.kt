@@ -5,13 +5,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import mu.KotlinLogging
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.sorapointa.utils.ModuleScope
 import kotlin.test.assertEquals
-
-private val logger = KotlinLogging.logger {}
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class StateControllerTest {
@@ -43,13 +40,13 @@ class StateControllerTest {
         val count = atomic(0)
 
         val stateController = StateController(
-            scope = ModuleScope(logger, "TestScopeWithState"),
+            scope = ModuleScope("TestScopeWithState"),
             parentStateClass = this,
             Start(), Doing(), End(),
         )
 
         val stateController2 = StateController(
-            scope = ModuleScope(logger, "TestScopeWithState2"),
+            scope = ModuleScope("TestScopeWithState2"),
             parentStateClass = this,
             Happy(), Bad(), Cry()
         )

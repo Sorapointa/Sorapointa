@@ -3,11 +3,13 @@
 package org.sorapointa.event
 
 import kotlinx.atomicfu.atomic
-import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import mu.KotlinLogging
 import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.utils.ModuleScope
@@ -26,7 +28,7 @@ private val logger = KotlinLogging.logger {}
  */
 object EventManager {
 
-    private var eventScope = ModuleScope(logger, "EventManager")
+    private var eventScope = ModuleScope("EventManager")
 
     private val registeredListener = ConcurrentLinkedQueue<PriorityEntry>()
     private val registeredBlockListener = ConcurrentLinkedQueue<PriorityEntry>()
@@ -136,7 +138,7 @@ object EventManager {
      * This method **IS NOT** thread-safe
      */
     fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
-        eventScope = ModuleScope(logger, "EventManager", parentContext)
+        eventScope = ModuleScope("EventManager", parentContext)
         initAllListeners()
     }
 
