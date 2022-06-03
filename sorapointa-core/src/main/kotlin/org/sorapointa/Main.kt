@@ -49,22 +49,23 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
         workingDirectory?.let { System.setProperty("user.dir", it.absPath) }
         logger.info { "Sorapointa is working in $globalWorkDirectory" }
 
+        logger.info { "Loading languages..." }
+        loadLanguages()
+
         logger.info { "Loading Sorapointa configs..." }
-        setupRegisteredConfigs()
+        setupRegisteredConfigs().join()
+
+        setupDefaultsCommand()
+        EventManager.init(scope.coroutineContext)
 
         logger.info { "Loading Sorapointa database..." }
         val databaseInitJob = setupDatabase()
 
-        logger.info { "Loading languages..." }
-        loadLanguages()
-
-        setupDefaultsCommand()
-
-        EventManager.init(scope.coroutineContext)
-
         databaseInitJob.join()
+
         Sorapointa.init(scope.coroutineContext)
 
+        // setup console command input
         launch {
             while (isActive) {
                 try {
