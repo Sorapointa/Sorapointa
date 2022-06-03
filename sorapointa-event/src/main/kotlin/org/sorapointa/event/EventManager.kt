@@ -11,6 +11,7 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import mu.KotlinLogging
+import net.mamoe.yamlkt.Yaml
 import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.utils.ModuleScope
 import org.sorapointa.utils.configDirectory
@@ -286,7 +287,7 @@ suspend inline fun <T : Event> T.broadcast() {
 }
 
 object EventManagerConfig : DataFilePersist<EventManagerConfig.Data>(
-    File(configDirectory, "eventManagerConfig.json"), Data()
+    File(configDirectory, "eventManagerConfig.yaml"), Data(), Yaml,
 ) {
 
     @kotlinx.serialization.Serializable

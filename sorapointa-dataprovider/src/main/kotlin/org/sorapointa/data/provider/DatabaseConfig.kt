@@ -2,6 +2,7 @@ package org.sorapointa.data.provider
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.mamoe.yamlkt.Yaml
 import org.sorapointa.config.DbMeta
 import org.sorapointa.utils.absPath
 import org.sorapointa.utils.configDirectory
@@ -33,8 +34,7 @@ enum class DatabaseType {
 }
 
 object DatabaseConfig : DataFilePersist<DatabaseConfig.Data>(
-    File(configDirectory, "databaseConfig.json"),
-    Data()
+    File(configDirectory, "databaseConfig.yaml"), Data(), Yaml,
 ) {
     @Serializable
     data class Data(

@@ -1,12 +1,13 @@
 package org.sorapointa
 
 import kotlinx.serialization.Serializable
+import net.mamoe.yamlkt.Yaml
 import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.utils.configDirectory
 import java.io.File
 
 object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
-    File(configDirectory, "sorapointaConfig.json"), Data()
+    File(configDirectory, "sorapointaConfig.yaml"), Data(), format = Yaml
 ) {
 
     @Serializable

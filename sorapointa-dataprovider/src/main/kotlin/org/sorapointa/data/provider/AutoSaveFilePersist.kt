@@ -1,7 +1,9 @@
 package org.sorapointa.data.provider
 
 import kotlinx.coroutines.*
+import kotlinx.serialization.StringFormat
 import org.sorapointa.utils.addShutdownHook
+import org.sorapointa.utils.prettyJson
 import java.io.File
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -18,9 +20,10 @@ private val logger = mu.KotlinLogging.logger { }
 open class AutoSaveFilePersist<T : Any>(
     file: File,
     default: T,
+    format: StringFormat = prettyJson,
     private val saveInterval: Duration = 60.toDuration(DurationUnit.SECONDS),
     scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-) : DataFilePersist<T>(file, default, scope) {
+) : DataFilePersist<T>(file, default, format, scope) {
 
     override suspend fun init() {
         addShutdownHook {
