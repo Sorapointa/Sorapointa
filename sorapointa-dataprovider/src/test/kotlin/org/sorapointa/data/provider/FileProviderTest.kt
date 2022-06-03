@@ -37,7 +37,10 @@ class FileProviderTest {
 
         val file = File("./tmp/auto-save-provider-test.json")
         file.apply { if (exists()) delete() }
-        val config = AutoSaveFilePersist(file, TestConfig(), 30.toDuration(DurationUnit.MILLISECONDS))
+        val config = AutoSaveFilePersist(
+            file, TestConfig(),
+            saveInterval = 30.toDuration(DurationUnit.MILLISECONDS),
+        )
         config.init()
         println(config.data)
         config.data.apply {
@@ -58,7 +61,7 @@ class FileProviderTest {
 
         val file = File("./tmp/auto-save-provider-test.json")
         file.apply { if (exists()) delete() }
-        val config = AutoLoadFilePersist(file, AutoLoadData(), 30.toDuration(DurationUnit.MILLISECONDS))
+        val config = AutoLoadFilePersist(file, AutoLoadData(), scanInterval = 30.toDuration(DurationUnit.MILLISECONDS))
         config.init()
         println(config.data)
         val writeJson = """

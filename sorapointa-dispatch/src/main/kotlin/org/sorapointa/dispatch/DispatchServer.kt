@@ -11,6 +11,7 @@ import io.ktor.util.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.mamoe.yamlkt.Yaml
 import org.slf4j.LoggerFactory
 import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.data.provider.DatabaseConfig
@@ -105,7 +106,7 @@ private val QUERY_CURR_RSA_KEY = "PFJTQUtleVZhbHVlPjxNb2R1bHVzPnovZnlmb3psRElEV0
 /* ktlint-enable max-line-length */
 
 @SorapointaInternal object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
-    File(configDirectory, "dispatchConfig.json"), Data()
+    File(configDirectory, "dispatchConfig.yaml"), Data(), format = Yaml,
 ) {
 
     @Serializable

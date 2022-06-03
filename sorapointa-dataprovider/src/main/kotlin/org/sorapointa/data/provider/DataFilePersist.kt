@@ -6,6 +6,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.StringFormat
 import kotlinx.serialization.serializer
 import org.sorapointa.utils.*
 import java.io.File
@@ -23,6 +24,7 @@ private val logger = mu.KotlinLogging.logger { }
 open class DataFilePersist<T : Any>(
     final override val file: File,
     default: T,
+    override val format: StringFormat = prettyJson,
     final override val scope: CoroutineScope =
         ModuleScope("DataFilePersist", dispatcher = Dispatchers.IO)
 ) : FilePersist<T> {
@@ -59,7 +61,7 @@ open class DataFilePersist<T : Any>(
         withContext(scope.coroutineContext) {
             logger.debug { "Saving data $saveData" }
             file.touch()
-            file.writeTextBuffered(prettyJson.encodeToString(serializer, saveData))
+            file.writeTextBuffered(format.encodeToString(serializer, saveData))
         }
     }
 
@@ -72,7 +74,7 @@ open class DataFilePersist<T : Any>(
             mutex.withLock {
                 val json = file.readTextBuffered()
                 val t = (
-                    prettyJson.decodeFromString(serializer, json) as? T
+                    format.decodeFromString(serializer, json) as? T
                         ?: error("Failed to cast Any? to ${clazz.qualifiedOrSimple}")
                     )
                 updateData { t }
