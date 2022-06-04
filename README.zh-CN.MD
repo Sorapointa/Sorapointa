@@ -28,9 +28,18 @@ alt="Maven Developer"/></a>
 
 <!--Content-->
 
-[English](./README.md) | 简体中文
+[English](README.MD) | 简体中文
 
 **WIP**: 该项目正被积极开发，你可以参与贡献，但大多数功能不可用。
+
+## 名称
+
+如你所见，我们的项目名为 **Sorapointa**。这来自于 `Java` 中闻名的 `NullPointerException`。
+我们将 `NullPointer` 日语化再以英语拟音，得到了这个名字。
+
+Sorapointa 旨在减少运行时错误，编写可读性高、易于维护的代码。因此，**Sorapointa 避免 Sorapointa**。
+
+Sorapointa 可以写成对应的汉字「空想家」，但无论如何，请你读作 <ruby>Sorapointa<rt>ソラポインタ</rt></ruby>
 
 ## Build
 
@@ -68,11 +77,30 @@ proto.fullCompile=true
 
 ## Thanks
 
-- [Grasscutter](https://github.com/Grasscutters/Grasscutter)
+### Person
+
+- [HolographicHat](https://github.com/HolographicHat) - Supports a lot on algorithms and computer security.
+
+### Project
+
+- JVM - The best programming language VM
 - [Kotlin](https://github.com/JetBrains/kotlin) - A modern programming language that makes developers happier.
+- [IDEA](https://www.jetbrains.com/idea/) - Capable and Ergonomic IDE for JVM
+- [Grasscutter](https://github.com/Grasscutters/Grasscutter)
 - [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) - Kotlin multiplatform / multi-format
   **reflectionless** serialization
 - [kotlinx.coroutines](https://github.com/Kotlin/kotlinx.coroutines) - A rich library for coroutines developed by
   JetBrains
+- [kotlinx.atomicfu](https://github.com/Kotlin/kotlinx.atomicfu) - The idiomatic way to use atomic operations in Kotlin
 - [Ktor](https://github.com/ktorio/ktor) - An asynchronous framework for creating microservices, web applications and
   more.
+- [Netty](https://netty.io/) - Netty is an asynchronous event-driven network application framework
+- [Exposed](https://github.com/JetBrains/Exposed) - Kotlin SQL Framework
+- [Clikt](https://github.com/ajalt/clikt/tree/master/clikt) - Multiplatform command line interface parsing for Kotlin
+- [Kotlin-Logging](https://github.com/MicroUtils/kotlin-logging) - Lightweight logging framework for Kotlin
+- [Password4j](https://github.com/Password4j/password4j) - Password4j is a user-friendly cryptographic library that
+  supports Argon2 and so on
+- [JLine](https://github.com/jline/jline3) - JLine is a Java library for handling console input.
+- [yamlkt](https://github.com/him188/yamlkt) - Multiplatform YAML parser & serializer for kotlinx.serialization
+- [Protobuf](https://developers.google.com/protocol-buffers) - Protocol buffers are a language-neutral, platform-neutral
+  extensible mechanism for serializing structured data
