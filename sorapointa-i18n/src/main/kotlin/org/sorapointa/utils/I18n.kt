@@ -1,11 +1,15 @@
 package org.sorapointa.utils
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
+import net.mamoe.yamlkt.Comment
 import net.mamoe.yamlkt.Yaml
 import org.sorapointa.data.provider.DataFilePersist
 import java.io.File
@@ -112,6 +116,23 @@ object I18nConfig : DataFilePersist<I18nConfig.Config>(
 ) {
     @Serializable
     data class Config(
+        @Comment(
+            """
+            Global locale setting
+            
+            We uses RFC 1766 standard and two-letter language tag with IANA defined subtag.
+            
+            Sorapointa will find i18n string by order, Personal -> Global -> Fallback(i.e. English)
+            When a language variant is not available, but main language is, fallback to main 
+            - Like: zh-Hant missing, so fallback to zh
+            
+            See more: 
+            - [Language tags in HTML and XML] https://www.w3.org/International/articles/language-tags/
+            - [RFC 1766] https://datatracker.ietf.org/doc/html/rfc1766
+            - [ISO 639] https://www.loc.gov/standards/iso639-2/php/code_list.php
+            - [IANA Subtag Registry] https://www.iana.org/assignments/language-subtag-registry/
+        """
+        )
         @Serializable(LocaleSerializer::class)
         val globalLocale: Locale = DEFAULT_LOCALE,
     )

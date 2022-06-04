@@ -21,10 +21,12 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
     data class NetworkSetting(
         @Comment("Game server bind port")
         val bindPort: Int = 22101,
-        @Comment("""
+        @Comment(
+            """
             Game server kcp setting, don't change those settings if you don't know about KCP
             See more: https://github.com/skywind3000/kcp
-        """)
+        """
+        )
         val uKcpSetting: UKcpSetting = UKcpSetting()
     )
 
