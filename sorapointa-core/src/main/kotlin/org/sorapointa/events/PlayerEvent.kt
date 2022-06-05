@@ -6,7 +6,7 @@ import com.google.protobuf.GeneratedMessageV3
 import org.sorapointa.event.AbstractEvent
 import org.sorapointa.event.CancelableEvent
 import org.sorapointa.game.Player
-import org.sorapointa.proto.SoraPacket
+import org.sorapointa.server.network.NetworkHandler
 import org.sorapointa.server.network.OutgoingPacket
 
 abstract class PlayerEvent : AbstractEvent() {
@@ -19,17 +19,17 @@ class HandleIncomingPacketEvent<T : GeneratedMessageV3>(
     val dataPacket: T
 ) : PlayerEvent(), CancelableEvent
 
-class HandleRawSoraPacketEvent(
-    override val player: Player,
-    val dataPacket: SoraPacket
-) : PlayerEvent(), CancelableEvent
+internal abstract class NetworkEvent : AbstractEvent() {
 
-class AfterSendIncomingPacketResponseEvent(
-    override val player: Player,
-    val dataPacket: OutgoingPacket
-) : PlayerEvent()
+    abstract val networkHandler: NetworkHandler
+}
 
-class SendOutgoingPacketEvent(
-    override val player: Player,
+internal class HandlePreLoginIncomingPacketEvent<T : GeneratedMessageV3>(
+    override val networkHandler: NetworkHandler,
+    val dataPacket: T
+) : NetworkEvent(), CancelableEvent
+
+internal class SendOutgoingPacketEvent(
+    override val networkHandler: NetworkHandler,
     val dataPacket: OutgoingPacket
-) : PlayerEvent(), CancelableEvent
+) : NetworkEvent(), CancelableEvent

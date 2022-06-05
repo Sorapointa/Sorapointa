@@ -12,7 +12,8 @@ import kotlin.coroutines.EmptyCoroutineContext
 object Sorapointa {
 
     private var scope = ModuleScope("Sorapointa")
-    private val playerList = ConcurrentLinkedDeque<Player>()
+
+    val playerList = ConcurrentLinkedDeque<Player>()
 
     internal suspend fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
         scope = ModuleScope("Sorapointa", parentContext)

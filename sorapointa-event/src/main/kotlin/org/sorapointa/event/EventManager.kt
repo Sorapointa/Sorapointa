@@ -129,7 +129,7 @@ object EventManager {
                 return isCancelled
             }
         }
-        logger.debug { "Broadcasted event $eventName, cancel state: $isCancelled" }
+        if (isCancelled) logger.debug { "Broadcasted event $eventName, has been cancelled" }
         return isCancelled
     }
 

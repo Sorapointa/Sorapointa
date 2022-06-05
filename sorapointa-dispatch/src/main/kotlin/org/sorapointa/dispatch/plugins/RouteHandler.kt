@@ -379,6 +379,8 @@ internal suspend fun ApplicationCall.handleM18n() {
     respondText(forwardCall(DOMAIN_WEB_STATIC))
 }
 
+// --- Tool Method ---
+
 internal val forwardCache = ConcurrentHashMap<String, Any>()
 internal val matchHeaders = Regex("^[xX]-")
 
@@ -388,8 +390,6 @@ internal suspend inline fun <reified T : Any> DispatchDataEvent<T>.respond() {
         logger.debug { "Respond data ${it.data}" }
     }
 }
-
-// --- Tool Method ---
 
 internal suspend inline fun <reified T : Any> ApplicationCall.forwardCallWithAll(
     domain: String,
@@ -406,13 +406,15 @@ internal suspend inline fun <reified T : Any> ApplicationCall.forwardCallWithAll
     }
 }
 
-internal suspend inline fun <reified T> ApplicationCall.forwardCall(domain: String): T {
+internal suspend inline fun <reified T> ApplicationCall.forwardCall(
+    domain: String
+): T {
     val url = "https://$domain${this.request.uri}"
     logger.debug { "Forwarding request from ${this.request.uri} to $url" }
     val idUrl = url + this.request.queryParameters.formUrlEncode()
     return forwardCache.getOrPut(idUrl) {
         val call = this
-        val result: T = DispatchServer.client.request {
+        val request = DispatchServer.client.request {
             url(url)
             host = domain
             method = call.request.httpMethod
@@ -422,7 +424,8 @@ internal suspend inline fun <reified T> ApplicationCall.forwardCall(domain: Stri
             call.request.headers.forEach { s, strings ->
                 if (s.contains(matchHeaders)) header(s, strings)
             }
-        }.body()
+        }
+        val result: T = if (T::class == String::class) request.bodyAsText() as T else request.body()
         logger.debug { "Forwarding result of $url is $result" }
         result
     } as T

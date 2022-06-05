@@ -75,7 +75,7 @@ interface WithState<out T : Enum<*>> {
  *
  *  val count = atomic(0)
  *
- *  val stateController = StateController(
+ *  val stateController = InitStateController(
  *      scope = ModuleScope("TestScopeWithState"),
  *      parentStateClass = this,
  *      Start(), Doing(), End(),
@@ -141,18 +141,15 @@ interface WithState<out T : Enum<*>> {
  * @param scope [ModuleScope] will provide a coroutine scope during the state transfering
  * @param parentStateClass is your parent state that would
  * be a receiver in state observer, and interceptor lambda
- * @param stateInstances all instances of your different state classes
  * @see WithState
  */
-class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState> (
-    private var scope: ModuleScope,
-    private var parentStateClass: TClassWithState,
-    vararg stateInstances: TInterfaceWithState
+open class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState> (
+    protected var scope: ModuleScope,
+    protected var parentStateClass: TClassWithState,
+    firstState: TInterfaceWithState
 ) {
 
-    private val states = listOf(*stateInstances)
-
-    private var currentState = atomic(states.first())
+    protected var currentState = atomic(firstState)
 
     private var observers = ConcurrentHashMap<suspend TClassWithState.(TState, TState) -> Unit, ListenerState>()
     private var interceptors = ConcurrentHashMap<suspend TClassWithState.(TState, TState) -> Boolean, ListenerState>()
@@ -200,21 +197,6 @@ class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TState>,
         invokeChange(beforeState, afterState, ListenerState.AFTER_UPDATE, parentStateClass)
         return before
     }
-
-    /**
-     * Transfer state from current state to specfied state
-     *
-     * It will call all observers in parallel, all interceptors in serial during transfering,
-     * if there is an intercetpor with [ListenerState.BEFORE_UPDATE] priority,
-     * it could intercept and cancel this transfering.
-     *
-     * @see ListenerState
-     * @see observeStateChange
-     * @see interceptStateChange
-     * @param afterState transfer to this state, enum type [TState]
-     */
-    suspend fun setState(afterState: TState): TInterfaceWithState =
-        setState(states.first { it.state == afterState })
 
     private suspend fun invokeChange(
         beforeState: TState,
@@ -300,6 +282,33 @@ class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TState>,
         BEFORE_UPDATE,
         AFTER_UPDATE
     }
+}
+
+/**
+ * @param stateInstances all instances of your different state classes
+ */
+class InitStateController<TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState> (
+    scope: ModuleScope,
+    parentStateClass: TClassWithState,
+    vararg stateInstances: TInterfaceWithState
+) : StateController<TState, TInterfaceWithState, TClassWithState>(scope, parentStateClass, stateInstances.first()) {
+
+    private val states = listOf(*stateInstances)
+
+    /**
+     * Transfer state from current state to specfied state
+     *
+     * It will call all observers in parallel, all interceptors in serial during transfering,
+     * if there is an intercetpor with [ListenerState.BEFORE_UPDATE] priority,
+     * it could intercept and cancel this transfering.
+     *
+     * @see ListenerState
+     * @see observeStateChange
+     * @see interceptStateChange
+     * @param afterState transfer to this state, enum type [TState]
+     */
+    suspend fun setState(afterState: TState): TInterfaceWithState =
+        setState(states.first { it.state == afterState })
 }
 
 /**
