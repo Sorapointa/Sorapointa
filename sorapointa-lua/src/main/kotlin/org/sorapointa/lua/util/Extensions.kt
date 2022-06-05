@@ -1,10 +1,11 @@
-package org.sorapointa.lua
+package org.sorapointa.lua.util
 
 import net.sandius.rembulan.ByteString
 import net.sandius.rembulan.LuaType
 import net.sandius.rembulan.Table
 import net.sandius.rembulan.runtime.Coroutine
 import net.sandius.rembulan.runtime.LuaFunction
+import org.sorapointa.lua.MetaTable
 import org.sorapointa.utils.uncheckedCast
 
 inline fun <reified T : Any> Any?.luaToJVM(): T? = (this.uncheckedCast<MetaTable<T>>()).exactObject

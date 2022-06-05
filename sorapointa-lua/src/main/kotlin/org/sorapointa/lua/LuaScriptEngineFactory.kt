@@ -44,5 +44,5 @@ object LuaScriptEngineFactory : ScriptEngineFactory {
 
     override fun getProgram(vararg statements: String): String = statements.joinToString { " " }
 
-    override fun getScriptEngine(): ScriptEngine = LuaScriptEngine
+    override fun getScriptEngine(): ScriptEngine = LuaScriptEngine()
 }

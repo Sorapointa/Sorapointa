@@ -2,6 +2,8 @@ package org.sorapointa.lua
 
 import net.sandius.rembulan.LuaType
 import net.sandius.rembulan.runtime.LuaFunction
+import org.sorapointa.lua.exception.LuaException
+import org.sorapointa.lua.util.luaType
 import java.io.BufferedReader
 import java.io.Reader
 import java.lang.reflect.InvocationHandler
@@ -10,9 +12,11 @@ import java.lang.reflect.Proxy
 import javax.script.*
 import kotlin.reflect.KClass
 
-object LuaScriptEngine : AbstractScriptEngine(), Invocable {
+val globalLuaScope = LuaScriptEngine()
 
-    private val luaExecutor = LuaExecutor
+class LuaScriptEngine(
+    val luaExecutor: LuaExecutor = LuaExecutor()
+) : AbstractScriptEngine(), Invocable {
 
     fun putAll(bindings: Map<String, Any>) =
         bindings.forEach { (k, v) -> put(k, v) }

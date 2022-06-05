@@ -1,10 +1,14 @@
 package org.sorapinta.lua
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.sandius.rembulan.runtime.AbstractFunction0
+import net.sandius.rembulan.runtime.ExecutionContext
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.sorapointa.lua.LuaScriptEngine
-import org.sorapointa.lua.luaToJVM
+import org.sorapointa.lua.MetaTable
+import org.sorapointa.lua.globalLuaScope
+import org.sorapointa.lua.util.luaToJVM
 import kotlin.test.assertEquals
 
 class LuaScriptEngineTest {
@@ -13,33 +17,33 @@ class LuaScriptEngineTest {
         val script = "print(hello) return 0"
         val context: MutableMap<String, Any> = HashMap()
         context["hello"] = "hello Lua"
-        LuaScriptEngine.putAll(context)
-        val result: Any = LuaScriptEngine.eval(script)
+        globalLuaScope.putAll(context)
+        val result: Any = globalLuaScope.eval(script)
         Assertions.assertEquals(0L, result)
     }
 
     @Test
     fun testInvokeFunction() {
         val script = """testHello=function() print("hello") return 1 end"""
-        LuaScriptEngine.eval(script)
-        val result = LuaScriptEngine.invokeFunction("testHello")
+        globalLuaScope.eval(script)
+        val result = globalLuaScope.invokeFunction("testHello")
         Assertions.assertEquals(1L, result)
     }
 
     @Test
     fun testAddFunction() {
         val script = "testAdd=function() return 1+2 end"
-        LuaScriptEngine.eval(script)
-        val result = LuaScriptEngine.invokeFunction("testAdd")
+        globalLuaScope.eval(script)
+        val result = globalLuaScope.invokeFunction("testAdd")
         Assertions.assertEquals(3L, result)
     }
 
     @Test
     fun testPassArgument() {
         val script = "returnSelf=function(a) return a end"
-        LuaScriptEngine.eval(script)
+        globalLuaScope.eval(script)
         val param1 = 100L
-        val result = LuaScriptEngine.invokeFunction("returnSelf", param1)
+        val result = globalLuaScope.invokeFunction("returnSelf", param1)
         Assertions.assertEquals(100L, result)
     }
 
@@ -53,15 +57,15 @@ class LuaScriptEngineTest {
 
     @Test
     fun testInterfaceInvocable() {
-        LuaScriptEngine.eval("""printHello=function(a) print(a) end""")
-        val impl = LuaScriptEngine.getInterface(TestInterface::class)!!
+        globalLuaScope.eval("""printHello=function(a) print(a) end""")
+        val impl = globalLuaScope.getInterface(TestInterface::class)!!
         impl.printHello("hello!")
     }
 
     @Test
     fun testInterfacePlusInvocable() {
-        LuaScriptEngine.eval("""interfacePlus=function(a, b) return a + b end""")
-        val impl = LuaScriptEngine.getInterface(TestInterface1::class)!!
+        globalLuaScope.eval("""interfacePlus=function(a, b) return a + b end""")
+        val impl = globalLuaScope.getInterface(TestInterface1::class)!!
         assertEquals(3, impl.interfacePlus(1, 2))
     }
 
@@ -73,10 +77,10 @@ class LuaScriptEngineTest {
 
     @Test
     fun testSimpleData() {
-        LuaScriptEngine.eval("testMetaTable=function(a) return a end")
+        globalLuaScope.eval("testMetaTable=function(a) return a end")
         val data = SimpleDataForLua("100", 123)
         val result =
-            LuaScriptEngine.invokeFunction("testMetaTable", data).luaToJVM<SimpleDataForLua>()
+            globalLuaScope.invokeFunction("testMetaTable", data).luaToJVM<SimpleDataForLua>()
         assertEquals(data, result)
     }
 
@@ -86,9 +90,56 @@ class LuaScriptEngineTest {
 
     @Test
     fun testInterfaceSimpleData() {
-        LuaScriptEngine.eval("testInterfaceMetaTable=function(a) return a end")
+        globalLuaScope.eval("testInterfaceMetaTable=function(a) return a end")
         val data = SimpleDataForLua("100", 123)
-        val impl = LuaScriptEngine.getInterface(TestInterface2::class)!!
+        val impl = globalLuaScope.getInterface(TestInterface2::class)!!
         assertEquals(data, impl.testInterfaceMetaTable(data))
+    }
+
+    @Test
+    fun luaCallJVM() {
+        var local = 100
+
+        val invocable = object : AbstractFunction0() {
+            override fun resume(context: ExecutionContext?, suspendedState: Any?) = TODO()
+
+            override fun invoke(context: ExecutionContext?) {
+                local++
+                println("Call from Lua!")
+            }
+        }
+
+        globalLuaScope.putAll(mapOf("callJVM" to invocable))
+
+        globalLuaScope.eval("callJVM()")
+
+        assertEquals(101, local)
+    }
+
+    @Test
+    fun returnFromLua() {
+        @Serializable
+        data class ParticleShapeType(
+            @SerialName("Volume") var volume: Int? = null,
+            @SerialName("Edge") var edge: Int? = null,
+            @SerialName("Shell") var shell: Int? = null,
+        )
+
+        globalLuaScope.eval(
+            """
+            ConfigCommon=function(a)
+                print(a.Volume)
+                a.Volume = 0
+                print(a.Volume)
+                a.Edge = 1
+                print(a.Edge)
+                a.Shell = 2
+                print(a.Shell)
+                return a
+            end
+            """.trimIndent()
+        )
+        val result = globalLuaScope.invokeFunction("ConfigCommon", ParticleShapeType()) as MetaTable<*>
+        assertEquals(ParticleShapeType(0, 1, 2), result.exactObject)
     }
 }

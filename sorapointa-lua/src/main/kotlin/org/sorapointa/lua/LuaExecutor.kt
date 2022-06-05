@@ -1,8 +1,8 @@
 package org.sorapointa.lua
 
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.serializer
+import net.sandius.rembulan.ByteString
 import net.sandius.rembulan.Table
 import net.sandius.rembulan.Variable
 import net.sandius.rembulan.compiler.CompilerChunkLoader
@@ -13,6 +13,8 @@ import net.sandius.rembulan.lib.StandardLibrary
 import net.sandius.rembulan.load.ChunkLoader
 import net.sandius.rembulan.load.LoaderException
 import net.sandius.rembulan.runtime.LuaFunction
+import org.sorapointa.lua.exception.LuaException
+import org.sorapointa.lua.util.isUserData
 import org.sorapointa.utils.castOrNull
 import org.sorapointa.utils.qualifiedOrSimple
 import org.sorapointa.utils.readTextBuffered
@@ -26,7 +28,7 @@ private const val ROOT_CLASS_PREFIX = "LUA_CLASSES"
 private const val FUNCTION_NAME = "LUA_FUNCTION"
 
 @Suppress("unused")
-object LuaExecutor {
+class LuaExecutor {
     /**
      * default context
      */
@@ -37,6 +39,8 @@ object LuaExecutor {
      * default context is standard library of lua 5.3, but compilation of code chunk may add new values
      */
     private val env = StandardLibrary.`in`(RuntimeEnvironments.system()).installInto(state)
+
+    fun getEnv(key: String) = env.rawget(key)
 
     /**
      * default executor of Rembulan
@@ -59,7 +63,7 @@ object LuaExecutor {
             val function = loader.loadTextChunk(Variable(env), FUNCTION_NAME, script)
             executor.call(state, function, *convertArgs(*args))
         } catch (e: LoaderException) {
-            throw LuaException(e.message)
+            throw LuaException("Lua run failed:", e.cause)
         }
     }
 
@@ -122,9 +126,7 @@ object LuaExecutor {
 
 private inline fun <reified T : Any> MetaTable(value: T?): MetaTable<Any> {
     val clazz = value?.let { it::class }
-    val serializer =
-        clazz?.let { serializer(it.createType()) }
-    return MetaTable(value, clazz, serializer)
+    return MetaTable(value, clazz)
 }
 
 /**
@@ -133,8 +135,11 @@ private inline fun <reified T : Any> MetaTable(value: T?): MetaTable<Any> {
 class MetaTable<T : Any> internal constructor(
     value: T?,
     private val clazz: KClass<*>?,
-    private val serializer: KSerializer<T?>?,
 ) : Table() {
+
+    private val serializer by lazy {
+        clazz?.let { serializer(it.createType()) }
+    }
 
     /**
      * to store a table whose key type is **Integer** or **Long** in Java
@@ -210,6 +215,7 @@ class MetaTable<T : Any> internal constructor(
             is Double -> insertIntoDoubleTable(key, value)
             is Float -> insertIntoDoubleTable(key.toDouble(), value)
             is String -> insertIntoStringTable(key, value)
+            is ByteString -> insertIntoStringTable(key.toRawString(), value)
             is Boolean -> insertIntoBoolKeyTable(key, value)
             else -> anyTable[key] = value
         }
