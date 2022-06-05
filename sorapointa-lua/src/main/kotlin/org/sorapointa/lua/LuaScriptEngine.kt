@@ -1,5 +1,6 @@
 package org.sorapointa.lua
 
+import net.sandius.rembulan.LuaType
 import net.sandius.rembulan.runtime.LuaFunction
 import java.io.BufferedReader
 import java.io.Reader
@@ -61,27 +62,33 @@ object LuaScriptEngine : AbstractScriptEngine(), Invocable {
     @Suppress("UNCHECKED_CAST")
     override fun <T> getInterface(clazz: Class<T>): T? =
         runCatching {
-            clazz.declaredMethods.forEach { m ->
-                if (luaExecutor.getFunction(m.name) != null) return@forEach
+            clazz.declaredMethods.filter {
+                luaExecutor.getFunction(it.name) == null
+            }.forEach {
                 val bindings = getBindings(ScriptContext.ENGINE_SCOPE)
-                if (bindings?.get(m.name) is LuaFunction) {
+                if (bindings?.get(it.name) is LuaFunction) {
                     luaExecutor.putContext(bindings)
-                } else throw LuaException("no such method called ${m.name}")
+                } else return null
             }
             Proxy.newProxyInstance(
                 clazz.classLoader, arrayOf(clazz),
-                LuaInvocationHandler(luaExecutor)
+                LuaInvocationHandler(luaExecutor),
             ) as T
         }.getOrNull()
 
     override fun <T> getInterface(target: Any?, clazz: Class<T>): T? =
-        if (target is LuaScriptEngine) {
-            target.getInterface(clazz)
-        } else null
+        (target as? LuaScriptEngine)?.getInterface(clazz)
 
     private class LuaInvocationHandler(private val executor: LuaExecutor) : InvocationHandler {
         override fun invoke(proxy: Any, method: Method, args: Array<out Any>): Any? {
-            return executor.call(method.name, args = args)?.firstOrNull()
+            val result = executor.call(method.name, args = args)?.firstOrNull()
+
+            if (method.returnType === Void.TYPE && result === null) return Unit
+
+            return when (method.returnType.luaType) {
+                LuaType.USERDATA -> (result as MetaTable<*>).exactObject
+                else -> result
+            }
         }
     }
 }

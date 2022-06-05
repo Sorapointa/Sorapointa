@@ -79,4 +79,16 @@ class LuaScriptEngineTest {
             LuaScriptEngine.invokeFunction("testMetaTable", data).luaToJVM<SimpleDataForLua>()
         assertEquals(data, result)
     }
+
+    interface TestInterface2 {
+        fun testInterfaceMetaTable(string: SimpleDataForLua): SimpleDataForLua
+    }
+
+    @Test
+    fun testInterfaceSimpleData() {
+        LuaScriptEngine.eval("testInterfaceMetaTable=function(a) return a end")
+        val data = SimpleDataForLua("100", 123)
+        val impl = LuaScriptEngine.getInterface(TestInterface2::class)!!
+        assertEquals(data, impl.testInterfaceMetaTable(data))
+    }
 }

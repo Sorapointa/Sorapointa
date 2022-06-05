@@ -3,7 +3,6 @@ package org.sorapointa.lua
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.serializer
-import net.sandius.rembulan.LuaType
 import net.sandius.rembulan.Table
 import net.sandius.rembulan.Variable
 import net.sandius.rembulan.compiler.CompilerChunkLoader
@@ -25,14 +24,6 @@ import kotlin.reflect.full.createType
 
 private const val ROOT_CLASS_PREFIX = "LUA_CLASSES"
 private const val FUNCTION_NAME = "LUA_FUNCTION"
-
-private inline val Any?.luaType
-    get() = LuaType.typeOf(this)
-
-private inline val Any?.isUserData
-    get() = luaType == LuaType.USERDATA
-
-inline fun <reified T : Any> Any?.luaToJVM(): T? = this?.let(LuaExecutor::toObject)
 
 @Suppress("unused")
 object LuaExecutor {
@@ -127,17 +118,6 @@ object LuaExecutor {
         args.map {
             if (it.isUserData) MetaTable(it) else it
         }.toTypedArray()
-
-    /**
-     * convert non-userdata lua result to exact java class object
-     *
-     * @param luaResult a result returned by executing scripts
-     * @param <T>       target java type
-     * @return a java object
-     */
-    inline fun <reified T : Any> toObject(luaResult: Any): T? {
-        return (luaResult as MetaTable<*>).toExactObject(serializer())
-    }
 }
 
 private inline fun <reified T : Any> MetaTable(value: T?): MetaTable<Any> {
@@ -150,11 +130,10 @@ private inline fun <reified T : Any> MetaTable(value: T?): MetaTable<Any> {
 /**
  * Lua MetaTable
  */
-@PublishedApi
-internal class MetaTable<T : Any>(
+class MetaTable<T : Any> internal constructor(
     value: T?,
-    clazz: KClass<*>?,
-    serializer: KSerializer<T?>?,
+    private val clazz: KClass<*>?,
+    private val serializer: KSerializer<T?>?,
 ) : Table() {
 
     /**
@@ -182,6 +161,9 @@ internal class MetaTable<T : Any>(
      */
     private val anyTable = TreeMap<Any, Any?>()
 
+    private fun checkedSerializer() =
+        serializer ?: throw SerializationException("Serializer for class '${clazz?.qualifiedOrSimple}' is not found")
+
     init {
         when (value) {
             null -> {
@@ -193,9 +175,7 @@ internal class MetaTable<T : Any>(
                 any?.also { insertIntoTable(it, mapValue) }
             }
             else -> {
-                serializer
-                    ?: throw SerializationException("Serializer for class '${clazz?.qualifiedOrSimple}' is not found")
-                val json = luaJson.encodeToJsonElement(serializer, value)
+                val json = luaJson.encodeToJsonElement(checkedSerializer(), value)
                 val table = json.toLuaTable().castOrNull<Map<String, *>>()
                 table?.forEach { (k, v) ->
                     insertIntoTable(k, v)
@@ -211,9 +191,11 @@ internal class MetaTable<T : Any>(
         }
     }
 
-    fun <T : Any> toExactObject(serializer: KSerializer<T>): T? {
+    val exactObject: T? by lazy { toExactObject() }
+
+    fun <T : Any> toExactObject(): T? {
         val jsonElement = stringKeyTable.toJsonElement()
-        return luaJson.decodeFromJsonElement(serializer, jsonElement).uncheckedCast()
+        return luaJson.decodeFromJsonElement(checkedSerializer(), jsonElement).uncheckedCast()
     }
 
     override fun setMode(weakKeys: Boolean, weakValues: Boolean) {
