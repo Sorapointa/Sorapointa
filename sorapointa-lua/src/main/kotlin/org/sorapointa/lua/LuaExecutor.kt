@@ -124,7 +124,7 @@ class LuaExecutor {
         }.toTypedArray()
 }
 
-private inline fun <reified T : Any> MetaTable(value: T?): MetaTable<Any> {
+inline fun <reified T : Any> MetaTable(value: T?): MetaTable<Any> {
     val clazz = value?.let { it::class }
     return MetaTable(value, clazz)
 }
@@ -132,7 +132,7 @@ private inline fun <reified T : Any> MetaTable(value: T?): MetaTable<Any> {
 /**
  * Lua MetaTable
  */
-class MetaTable<T : Any> internal constructor(
+class MetaTable<T : Any> @PublishedApi internal constructor(
     value: T?,
     private val clazz: KClass<*>?,
 ) : Table() {

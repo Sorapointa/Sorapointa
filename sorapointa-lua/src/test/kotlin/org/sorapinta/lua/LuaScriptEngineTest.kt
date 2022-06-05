@@ -7,6 +7,7 @@ import net.sandius.rembulan.runtime.ExecutionContext
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.sorapointa.lua.MetaTable
+import org.sorapointa.lua.function.toLuaFunction
 import org.sorapointa.lua.globalLuaScope
 import org.sorapointa.lua.util.luaToJVM
 import kotlin.test.assertEquals
@@ -118,6 +119,7 @@ class LuaScriptEngineTest {
 
     @Test
     fun returnFromLua() {
+
         @Serializable
         data class ParticleShapeType(
             @SerialName("Volume") var volume: Int? = null,
@@ -141,5 +143,16 @@ class LuaScriptEngineTest {
         )
         val result = globalLuaScope.invokeFunction("ConfigCommon", ParticleShapeType()) as MetaTable<*>
         assertEquals(ParticleShapeType(0, 1, 2), result.exactObject)
+    }
+
+    fun repeat(string: String, repeat: Int): String = string.repeat(repeat)
+
+    @Test
+    fun dynamicGenerate() {
+        globalLuaScope.put("test", ::repeat.toLuaFunction())
+        globalLuaScope.eval("""luaTest=function() return test("123123", 10) end""".trimIndent())
+        globalLuaScope.invokeFunction("luaTest").also {
+            println(it)
+        }
     }
 }
