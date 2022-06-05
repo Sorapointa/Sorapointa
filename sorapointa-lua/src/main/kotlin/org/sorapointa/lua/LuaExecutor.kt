@@ -202,7 +202,6 @@ internal class MetaTable<T : Any>(
                 }
             }
         }
-
     }
 
     private fun Collection<*>.buildMetaTable() {

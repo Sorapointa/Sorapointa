@@ -18,7 +18,6 @@ class LuaScriptEngineTest {
         Assertions.assertEquals(0L, result)
     }
 
-
     @Test
     fun testInvokeFunction() {
         val script = """testHello=function() print("hello") return 1 end"""
@@ -51,7 +50,6 @@ class LuaScriptEngineTest {
     interface TestInterface1 {
         fun interfacePlus(a: Int, b: Int): Long
     }
-
 
     @Test
     fun testInterfaceInvocable() {

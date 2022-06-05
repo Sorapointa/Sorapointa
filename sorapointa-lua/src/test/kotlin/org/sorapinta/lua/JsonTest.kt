@@ -61,5 +61,4 @@ class JsonTest {
             .also { println(it) }
         assertEquals(data, decoded)
     }
-
 }
