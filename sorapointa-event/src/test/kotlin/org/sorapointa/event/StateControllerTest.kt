@@ -39,13 +39,13 @@ class StateControllerTest {
 
         val count = atomic(0)
 
-        val stateController = StateController(
+        val stateController = InitStateController(
             scope = ModuleScope("TestScopeWithState"),
             parentStateClass = this,
             Start(), Doing(), End(),
         )
 
-        val stateController2 = StateController(
+        val stateController2 = InitStateController(
             scope = ModuleScope("TestScopeWithState2"),
             parentStateClass = this,
             Happy(), Bad(), Cry()

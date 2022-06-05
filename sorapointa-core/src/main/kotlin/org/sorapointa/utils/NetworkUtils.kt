@@ -7,11 +7,15 @@ import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelOutboundInvoker
 import kotlinx.coroutines.suspendCancellableCoroutine
+import mu.KotlinLogging
 import org.sorapointa.proto.START_MAGIC
 import org.sorapointa.proto.SoraPacket
 import org.sorapointa.proto.packetHead
 import org.sorapointa.proto.readToSoraPacket
+import org.sorapointa.utils.encoding.hex
 import java.net.InetSocketAddress
+
+private val logger = KotlinLogging.logger {}
 
 val Channel.host: String
     get() = (remoteAddress() as InetSocketAddress).address.hostAddress
@@ -41,10 +45,13 @@ internal inline fun <reified T> ByteBuf.readToSoraPacket(
     key: ByteArray,
     block: (SoraPacket) -> T
 ) {
-    if (this.readableBytes() > 12) { // TODO: why it should be 12
+    if (this.readableBytes() > 12) { // 2+2+2+4+2 at least to be > 12 bytes
+        val before = this.copy().toByteArray()
         val decrypt = this.toByteArray().xor(key).toReadPacket()
         if (decrypt.copy().readUShort() == START_MAGIC) {
             block(decrypt.readToSoraPacket())
+        } else {
+            logger.debug { "Detected insanity packet, hex: ${before.hex} decrypted: ${decrypt.readBytes().hex}" }
         }
     }
 }

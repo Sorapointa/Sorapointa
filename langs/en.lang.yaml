@@ -85,3 +85,4 @@ strings:
   dispatch.login.error.sign: Combo sign is incorrect
   user.notfound: User not found
   auth.error.token: Combo token verification failed
+  server.error: Server internal error
