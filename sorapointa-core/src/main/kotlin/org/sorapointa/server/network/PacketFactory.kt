@@ -2,7 +2,6 @@ package org.sorapointa.server.network
 
 import com.google.protobuf.GeneratedMessageV3
 import com.google.protobuf.Parser
-import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.sorapointa.dispatch.data.Account
 import org.sorapointa.dispatch.plugins.currentRegionRsp
