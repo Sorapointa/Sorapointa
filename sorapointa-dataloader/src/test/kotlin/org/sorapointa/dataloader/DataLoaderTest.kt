@@ -13,7 +13,7 @@ class DataLoaderTest {
     fun test() = runTest(TestOption.SKIP_CI) {
         ResourceHolder.apply {
             measureTime {
-                registerAnnotated()
+                findAndRegister()
             }.also { println("Costed: $it") }
             measureTime {
                 loadAll()
