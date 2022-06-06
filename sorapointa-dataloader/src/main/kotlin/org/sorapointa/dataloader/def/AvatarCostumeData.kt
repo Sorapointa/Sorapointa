@@ -2,6 +2,12 @@ package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.sorapointa.dataloader.DataLoader
+
+private val avatarCostumeDataLoader =
+    DataLoader<List<AvatarCostumeData>>("./ExcelBinOutput/AvatarCostumeExcelConfigData.json")
+
+val avatarCostumeDataList get() = avatarCostumeDataLoader.data
 
 @Serializable
 data class AvatarCostumeData(

@@ -1,6 +1,11 @@
 package org.sorapointa.dataloader
 
-import kotlinx.coroutines.*
+import io.github.classgraph.ClassGraph
+import io.github.classgraph.ClassRefTypeSignature
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -22,6 +27,38 @@ private val logger = KotlinLogging.logger {}
  */
 object ResourceHolder {
     private val dataMap = ConcurrentHashMap<String, DataLoader<Any>>()
+
+    private val dataLoaderTypeName = DataLoader::class.java.canonicalName
+
+    fun registerAnnotated() {
+        var count = 0
+        ClassGraph()
+            .enableClassInfo()
+            .enableFieldInfo()
+            .ignoreFieldVisibility()
+            .acceptPackages("org.sorapointa.dataloader")
+            .scan().allClasses.standardClasses
+            .flatMap { classInfo ->
+                classInfo.declaredFieldInfo
+                    .filter {
+                        (it.typeSignature as? ClassRefTypeSignature)?.fullyQualifiedClassName == dataLoaderTypeName
+                    }
+                    .map { fieldInfo ->
+                        runCatching {
+                            val clazz = classInfo.loadClass()
+                            fieldInfo.loadClassAndGetField().apply {
+                                isAccessible = true
+                            }.get(clazz)
+                        }.onSuccess {
+                            count++
+                        }.onFailure {
+                            logger.warn(it) { "Failed to register data loader for '${fieldInfo.name}'" }
+                        }.getOrNull()
+                    }
+            }
+            .filterIsInstance<DataLoader<*>>()
+            .forEach { it.init() }
+    }
 
     /**
      * Load all registered data
@@ -59,9 +96,7 @@ inline fun <reified T : Any> DataLoader(
     path: String,
     context: CoroutineContext = Dispatchers.IO,
 ): DataLoader<T> =
-    DataLoader(path, T::class, serializer(), context).apply {
-        init()
-    }
+    DataLoader(path, T::class, serializer(), context)
 
 /**
  * Data loader, read json from file and deserialize

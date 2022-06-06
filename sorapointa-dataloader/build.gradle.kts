@@ -9,4 +9,5 @@ dependencies {
 
     implementation(KotlinX.serialization.json)
     implementation("org.jetbrains.kotlinx:atomicfu:_")
+    implementation("io.github.classgraph:classgraph:_")
 }
