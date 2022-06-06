@@ -30,7 +30,12 @@ object ResourceHolder {
 
     private val dataLoaderTypeName = DataLoader::class.java.canonicalName
 
-    fun registerAnnotated() {
+    /**
+     * Find field with type [DataLoader] in [org.sorapointa.dataloader] package
+     * and initialize them
+     * @return the count of successful initialized data loaders
+     */
+    fun findAndRegister(): Int {
         var count = 0
         ClassGraph()
             .enableClassInfo()
@@ -58,6 +63,7 @@ object ResourceHolder {
             }
             .filterIsInstance<DataLoader<*>>()
             .forEach { it.init() }
+        return count
     }
 
     /**

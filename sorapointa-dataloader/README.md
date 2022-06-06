@@ -28,6 +28,7 @@ Please put declaration at **top-level** to make sure class loader init them at p
 ## Load Resource
 
 ```kotlin
+DataHolder.findAndRegister()
 DataHolder.loadAll()
 ```
 
