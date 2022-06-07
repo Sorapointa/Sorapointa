@@ -134,7 +134,7 @@ object I18nConfig : DataFilePersist<I18nConfig.Config>(
         """
         )
         @Serializable(LocaleSerializer::class)
-        val globalLocale: Locale = DEFAULT_LOCALE,
+        var globalLocale: Locale = DEFAULT_LOCALE,
     )
 }
 
