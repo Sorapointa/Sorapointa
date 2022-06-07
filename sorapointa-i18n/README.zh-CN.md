@@ -1,6 +1,6 @@
 # I18n 模块
 
-[English](README.zh-CN.md)
+[English](README.md)
 
 ## 包含的配置
 

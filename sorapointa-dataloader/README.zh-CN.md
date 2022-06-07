@@ -1,6 +1,6 @@
 # Data Loader 模块
 
-[English](README.zh-CN.md)
+[English](README.md)
 
 ## 注册 Resource
 
@@ -29,7 +29,7 @@ val exampleData get() = exampleLoader.data
 
 ```kotlin
 DataHolder.findAndRegister()
-DataHolder.loadAll()
+ResourceHolder.loadAll()
 ```
 
 ## 访问 Resource
