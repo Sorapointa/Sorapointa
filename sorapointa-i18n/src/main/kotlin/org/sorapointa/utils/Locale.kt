@@ -28,5 +28,6 @@ private fun Locale.toLanguageRange(weight: Double? = null): LanguageRange =
 private fun Collection<Locale>.toLanguageRanges(): Collection<LanguageRange> =
     map { it.toLanguageRange() }
 
-internal fun List<Locale>.byPriority(localePriority: List<Locale>): Locale? =
+@SorapointaInternal
+fun List<Locale>.byPriority(localePriority: List<Locale>): Locale? =
     Locale.lookup(localePriority.toLanguageRanges().toList(), this)
