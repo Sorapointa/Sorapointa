@@ -29,7 +29,7 @@ Please put declaration at **top-level** to make sure class loader init them at p
 
 ```kotlin
 DataHolder.findAndRegister()
-DataHolder.loadAll()
+ResourceHolder.loadAll()
 ```
 
 ## Visit Resource
