@@ -1,4 +1,4 @@
-package org.sorapointa.command.defaults
+package org.sorapointa.command.defaults.general
 
 import moe.sdl.yac.core.UsageError
 import moe.sdl.yac.parameters.arguments.argument
@@ -15,7 +15,7 @@ import org.sorapointa.utils.i18n
 class Help(private val sender: CommandSender) : Command(sender, Help) {
     companion object : Entry(
         name = "help",
-        help = "",
+        help = "sora.cmd.help.desc",
         alias = listOf("?")
     )
 
