@@ -2,9 +2,11 @@ locale: en
 strings:
   '': ''
   sora.cmd.manager.alias: "\n\nAlias: {0}"
-  sora.cmd.manager.no.permission: No permission
   sora.cmd.manager.invoke.empty: No command input
   sora.cmd.manager.invoke.error: "No such command '{0}'"
+  sora.cmd.isnotplayer: This command only could be executed by player.
+  sora.cmd.nopermission: You do not have the permission to execute this command.
+  sora.cmd.help.desc: Print Sorapointa command help
   sora.cmd.help.arg.pagenum.name: PAGENUM
   sora.cmd.help.arg.pagenum.desc: The page number of the help.
   sora.cmd.help.arg.pagenum.exceed: The page number exceeds the total number of pages.
@@ -13,6 +15,21 @@ strings:
   sora.cmd.help.msg.more: 'Use "<command> -h" for more details'
   sora.cmd.help.msg.emptydesc: No description available
   sora.cmd.quit.desc: Quit Sorapointa program
+  sora.cmd.version.desc: Print version of Sorapointa
+  sora.cmd.listplayer.desc: List all online players in the server
+  sora.cmd.listplayer.msg: "List of players ({0}): {1}"
+  sora.cmd.locale.desc: Set or view your locale setting
+  sora.cmd.locale.arg.operation.name: OPERATION
+  sora.cmd.locale.arg.operation.desc: "Available values: [set, view], default 'view'"
+  sora.cmd.locale.arg.newvalue.name: LOCALE
+  sora.cmd.locale.arg.newvalue.desc: New locale value
+  sora.cmd.locale.opt.force.desc: Force using new locale without checking
+  sora.cmd.locale.msg.view: "Current locale: {0}"
+  sora.cmd.locale.msg.newvalue.missing: "Missing arugment: [LOCALE]"
+  sora.cmd.locale.msg.newvalue.toolong: "Langugage tag is too long (>= {0})"
+  sora.cmd.locale.msg.newvalue.notfound: "The locale you inputted can not be found in system, if you still want to set it, please add '--force' option"
+  sora.cmd.locale.msg.success: "You have set your locale to {0} successfully!"
+  sora.cmd.locale.msg.unsupported: "Unsupported command sender for i18n"
   clikt.aborted: Aborted!
   clikt.usage.error: 'Error: {0}'
   clikt.bad.parameter: Invalid value
@@ -76,7 +93,7 @@ strings:
   clikt.title.commands: 'Commands:'
   clikt.help.tag.default: default
   clikt.help.tag.required: required
-  clikt.help.option.message: Show this message and exit
+  clikt.help.option.message: Show this message
   dispatch.login.error.split: 'Please use `:` to split your username and password in the username input field'
   dispatch.login.error.length.name: 'Input name length should be 3-16 characters'
   dispatch.login.error.length.password: 'Input password length should be 8-32 characters'
