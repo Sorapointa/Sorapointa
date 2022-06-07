@@ -1,10 +1,12 @@
 package org.sorapointa.command
 
 import kotlinx.coroutines.*
+import moe.sdl.yac.core.CommandResult
 import moe.sdl.yac.core.CommandResult.Error
 import moe.sdl.yac.core.CommandResult.Success
 import moe.sdl.yac.core.PrintHelpMessage
 import moe.sdl.yac.core.parseToArgs
+import org.sorapointa.game.Player
 import org.sorapointa.utils.ModuleScope
 import org.sorapointa.utils.i18n
 import java.util.concurrent.ConcurrentHashMap
@@ -13,16 +15,31 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 private val logger = mu.KotlinLogging.logger {}
 
-data class CommandNode(
+abstract class AbstractCommandNode<TSender : CommandSender>(
     val entry: Command.Entry,
-    val creator: (sender: CommandSender) -> Command,
+    val creator: (sender: TSender) -> Command,
 )
 
+class CommandNode(
+    entry: Command.Entry,
+    creator: (CommandSender) -> Command
+) : AbstractCommandNode<CommandSender>(entry, creator)
+
+class ConsoleCommandNode(
+    entry: Command.Entry,
+    creator: (ConsoleCommandSender) -> Command
+) : AbstractCommandNode<ConsoleCommandSender>(entry, creator)
+
+class PlayerCommandNode(
+    entry: Command.Entry,
+    creator: (Player) -> Command
+) : AbstractCommandNode<Player>(entry, creator)
+
 object CommandManager {
-    private val cmdMap: MutableMap<String, CommandNode> = ConcurrentHashMap()
+    private val cmdMap: MutableMap<String, AbstractCommandNode<*>> = ConcurrentHashMap()
 
     // A map to save the registered commands with alias.
-    private val aliasMap: MutableMap<String, CommandNode> = ConcurrentHashMap()
+    private val aliasMap: MutableMap<String, AbstractCommandNode<*>> = ConcurrentHashMap()
 
     val commandEntries: List<Command.Entry> get() = cmdMap.entries.map { it.value.entry }
 
@@ -38,7 +55,7 @@ object CommandManager {
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    fun registerCommand(commandNode: CommandNode) {
+    fun registerCommand(commandNode: AbstractCommandNode<*>) {
         val name = commandNode.entry.name
         val alias = commandNode.entry.alias
 
@@ -53,7 +70,7 @@ object CommandManager {
         }
     }
 
-    fun registerCommands(collection: Collection<CommandNode>): Unit =
+    fun registerCommands(collection: Collection<AbstractCommandNode<*>>): Unit =
         collection.forEach { registerCommand(it) }
 
     fun invokeCommand(
@@ -73,7 +90,36 @@ object CommandManager {
             return@launch
         }
 
-        when (val result = cmd.creator(sender).main(args.drop(1))) {
+        val result: CommandResult = run {
+            if (sender is Player && sender.account.permissionLevel < cmd.entry.permissionRequired) {
+                return@run Error(null, userMessage = "sora.cmd.nopermission".i18n(locale = sender))
+            }
+            when (cmd) {
+                is CommandNode -> {
+                    cmd.creator(sender).execute(args)
+                }
+
+                is ConsoleCommandNode -> {
+                    if (sender is ConsoleCommandSender) {
+                        cmd.creator(sender).execute(args)
+                    } else {
+                        Error(null, userMessage = "sora.cmd.nopermission".i18n(locale = sender))
+                    }
+                }
+
+                is PlayerCommandNode -> {
+                    if (sender is Player) {
+                        cmd.creator(sender).execute(args)
+                    } else {
+                        Error(null, userMessage = "sora.cmd.isnotplayer".i18n(locale = sender))
+                    }
+                }
+
+                else -> Error(null, userMessage = "server.error".i18n(locale = sender))
+            }
+        }
+
+        when (result) {
             is Error -> {
                 val msg = buildString {
                     append(result.userMessage)
@@ -83,9 +129,12 @@ object CommandManager {
                 }
                 sender.sendMessage(msg)
             }
+
             is Success -> {
                 // pass
             }
         }
     }
 }
+
+private suspend fun Command.execute(args: List<String>) = this.main(args.drop(1))

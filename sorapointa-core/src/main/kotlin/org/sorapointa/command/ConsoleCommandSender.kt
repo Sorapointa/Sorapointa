@@ -1,7 +1,9 @@
 package org.sorapointa.command
 
-class ConsoleCommandSender : CommandSender(
-    locale = null
-) {
-    override fun sendMessage(msg: String): Unit = println(msg)
+import java.util.*
+
+class ConsoleCommandSender(
+    override val locale: Locale? = null
+) : CommandSender {
+    override suspend fun sendMessage(msg: String): Unit = println(msg)
 }
