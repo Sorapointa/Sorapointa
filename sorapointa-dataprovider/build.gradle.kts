@@ -38,9 +38,7 @@ dependencies {
         implementation("org.xerial:sqlite-jdbc:_")
     }
 
-    if (databaseCompileList.contains("postgresql")) {
-        implementation("org.postgresql:postgresql:_")
-    }
+    implementation("org.postgresql:postgresql:_")
 }
 
 fun BuildConfigSourceSet.dbType(name: String, value: String) =
