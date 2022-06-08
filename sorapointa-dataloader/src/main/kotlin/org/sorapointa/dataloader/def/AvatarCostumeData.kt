@@ -11,13 +11,13 @@ val avatarCostumeDataList get() = avatarCostumeDataLoader.data
 
 @Serializable
 data class AvatarCostumeData(
-    @SerialName("CostumeId") val costumeId: Int,
+    @SerialName("costumeId") val costumeId: Int,
 //    @SerialName("PGFEJENILJP") val pGFEJENILJP: Int,
-    @SerialName("NameTextMapHash") val nameTextMapHash: Long,
-    @SerialName("DescTextMapHash") val descTextMapHash: Long,
-    @SerialName("ItemId") val itemId: Int? = null,
-    @SerialName("AvatarId") val avatarId: Int,
-    @SerialName("JsonName") val jsonName: String,
+    @SerialName("nameTextMapHash") val nameTextMapHash: Long,
+    @SerialName("descTextMapHash") val descTextMapHash: Long,
+    @SerialName("itemId") val itemId: Int? = null,
+    @SerialName("avatarId") val avatarId: Int,
+    @SerialName("jsonName") val jsonName: String,
 //    @SerialName("MIJFCCGEOFL") val mIJFCCGEOFL: Long,
 //    @SerialName("KCOMHBHHJJJ") val kCOMHBHHJJJ: Int,
 //    @SerialName("BMOFGCFGPMG") val bMOFGCFGPMG: Long,
@@ -28,11 +28,11 @@ data class AvatarCostumeData(
 //    @SerialName("IFLCIOGDJPB") val iFLCIOGDJPB: Int,
 //    @SerialName("FFCIPMIMKMD") val fFCIPMIMKMD: Int,
 //    @SerialName("DANEMGDCNIM") val dANEMGDCNIM: String,
-    @SerialName("SideIconName") val sideIconName: String,
+    @SerialName("sideIconName") val sideIconName: String,
 //    @SerialName("GIJBECPECPK") val gIJBECPECPK: Long,
 //    @SerialName("HGGOICMOECA") val hGGOICMOECA: Int,
 //    @SerialName("JEGDGCKPKPK") val jEGDGCKPKPK: Boolean,
-    @SerialName("Hide") val hide: Boolean? = null,
-    @SerialName("IsDefault") val isDefault: Boolean? = null,
+    @SerialName("hide") val hide: Boolean? = null,
+    @SerialName("isDefault") val isDefault: Boolean? = null,
 //    @SerialName("GNPEIFNDGKP") val gNPEIFNDGKP: Boolean
 )
