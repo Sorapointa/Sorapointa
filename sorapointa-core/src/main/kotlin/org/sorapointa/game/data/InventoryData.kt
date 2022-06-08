@@ -29,6 +29,8 @@ internal object ItemTable : IdTable<ULong>("inventory_item") {
     override val id: Column<EntityID<ULong>> = ulong("item_unique_id").autoIncrement().entityId()
 
     val itemData: Column<ItemData> = jsonb("item_data")
+
+    override val primaryKey: PrimaryKey = PrimaryKey(id)
 }
 
 class InventoryItem(id: EntityID<ULong>) : Entity<ULong>(id) {
