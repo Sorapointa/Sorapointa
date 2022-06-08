@@ -1,12 +1,32 @@
 <!--Please edit this file on Sorapointa Core, other copy would be overwritten-->
 <configuration debug="false">
+    <!--NopStatus for remove long beginning notice-->
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+    <!--stdout logger, for non-info level-->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <withJansi>true</withJansi>
-        <encoder>
-            <pattern>%d{MM-dd'T'HH:mm:ss} - %highlight(%.-1level) [%thread] %green([%class]) >>> %highlight(%msg) %n</pattern>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+        <encoder class="org.sorapointa.utils.logging.PatternLayoutNoLambda">
+            <pattern>%d{MM-dd'T'HH:mm:ss} - %highlight(%.-1le) [%t] %green([%lo{40}]) >>> %highlight(%m) %n%rEx{full}</pattern>
         </encoder>
     </appender>
+    <!--info logger, minimize info for keep clean-->
+    <appender name="INFO-LOGGER" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder class="org.sorapointa.utils.logging.PatternLayoutNoLambda">
+            <pattern>%d{MM-dd'T'HH:mm:ss} - %highlight(%.-1le) %green([%lo{0}]) >>> %highlight(%m) %n%rEx{full}</pattern>
+        </encoder>
+    </appender>
+    <!--File logger with midnight rolling policy-->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>./logs/%d{yyyy-MM-dd}.%i.log</fileNamePattern>
@@ -14,12 +34,18 @@
             <maxHistory>15</maxHistory>
             <totalSizeCap>1GB</totalSizeCap>
         </rollingPolicy>
-        <encoder>
-            <pattern>%d{MM-dd'T'HH:mm:ss} - %highlight(%.-1level) [%thread] %green([%class]) >>> %highlight(%msg) %n</pattern>
+        <encoder class="org.sorapointa.utils.logging.PatternLayoutNoLambda">
+            <pattern>%d{MM-dd'T'HH:mm:ss} - %highlight(%.-1le) [%t] %green([%lo{60}]) >>> %highlight(%m) %n%rEx{full}</pattern>
         </encoder>
     </appender>
-    <root level="info">
+    <!--Root Logger-->
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="INFO-LOGGER"/>
         <appender-ref ref="FILE"/>
     </root>
+    <!--Sub-loggers, the name is NOT same as package path-->
+    <logger name="Exposed" level="WARN"/>
+    <logger name="ktor" level="WARN"/>
+    <logger name="com.zaxxer.hikari" level="WARN"/>
 </configuration>
