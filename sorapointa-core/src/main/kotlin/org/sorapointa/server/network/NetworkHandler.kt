@@ -18,6 +18,7 @@ import org.sorapointa.dispatch.data.DispatchKeyData
 import org.sorapointa.event.*
 import org.sorapointa.events.SendOutgoingPacketEvent
 import org.sorapointa.game.Player
+import org.sorapointa.game.data.PlayerData
 import org.sorapointa.proto.PacketHeadOuterClass.PacketHead
 import org.sorapointa.proto.SoraPacket
 import org.sorapointa.proto.findCommonNameFromCmdId
@@ -169,7 +170,12 @@ internal open class NetworkHandler(
 
         suspend fun updateKeyAndBindPlayer(account: Account, seed: ULong) {
 
-            val player = Player(account, networkHandler, scope.coroutineContext)
+            val player = Player(
+                account = account,
+                data = PlayerData.findOrCreate(account.id.value),
+                networkHandler = networkHandler,
+                parentCoroutineContext = scope.coroutineContext
+            )
             player.init()
 
             Sorapointa.playerList.add(player)
