@@ -188,7 +188,7 @@ internal suspend fun ApplicationCall.handleLogin() {
                     returnCode = 0, message = "OK",
                     LoginResultData.VerifyData(
                         LoginResultData.VerifyAccountData(
-                            uid = account.userId.value,
+                            uid = account.id.value,
                             token = token,
                             email = account.email ?: name
                         )
@@ -271,7 +271,7 @@ internal suspend fun ApplicationCall.handleVerify() {
                 returnCode = 0, message = "OK",
                 LoginResultData.VerifyData(
                     LoginResultData.VerifyAccountData(
-                        uid = account.userId.value,
+                        uid = account.id.value,
                         token = token,
                         email = account.email
                     )

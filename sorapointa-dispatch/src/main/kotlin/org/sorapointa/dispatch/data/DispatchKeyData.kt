@@ -38,8 +38,6 @@ import org.sorapointa.utils.crypto.dumpToData
         }
     }
 
-    @Suppress("unused")
-    val host by DispatchKeyDataTable.id
     private var dispatchSeed by DispatchKeyDataTable.dispatchSeed
     private var dispatchKey by DispatchKeyDataTable.dispatchKey
 }
