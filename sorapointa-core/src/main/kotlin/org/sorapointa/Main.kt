@@ -16,6 +16,7 @@ import org.sorapointa.command.defaults.defaultsCommand
 import org.sorapointa.config.*
 import org.sorapointa.console.Console
 import org.sorapointa.data.provider.DatabaseManager
+import org.sorapointa.dataloader.ResourceHolder
 import org.sorapointa.event.EventManager
 import org.sorapointa.utils.*
 import java.io.File
@@ -63,13 +64,17 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
 
         databaseInitJob.join()
 
+        ResourceHolder.findAndRegister()
+        ResourceHolder.loadAll()
+
         Sorapointa.init(scope.coroutineContext)
 
         // setup console command input
         launch {
+            val consoleSender = ConsoleCommandSender()
             while (isActive) {
                 try {
-                    CommandManager.invokeCommand(ConsoleCommandSender(), Console.readln()).join()
+                    CommandManager.invokeCommand(consoleSender, Console.readln()).join()
                 } catch (e: UserInterruptException) { // Ctrl + C
                     println("<Interrupted> use 'quit' command to exit process")
                 } catch (e: EndOfFileException) { // Ctrl + D

@@ -138,7 +138,7 @@ class DataLoader<T : Any> @PublishedApi internal constructor(
      */
     internal suspend fun load(): T = withContext(context) {
         val buffered = file.readTextBuffered()
-        prettyJson.decodeFromString(serializer, buffered)
+        networkJson.decodeFromString(serializer, buffered)
     }
 
     /**
