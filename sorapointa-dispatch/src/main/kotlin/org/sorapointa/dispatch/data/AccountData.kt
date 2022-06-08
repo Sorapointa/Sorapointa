@@ -112,7 +112,6 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
             randomByteArray(DispatchConfig.data.accountSetting.password.saltByteLength).encodeBase64()
     }
 
-    val userId by AccountTable.id
     var userName by AccountTable.userName
     private var password by AccountTable.password
     var email by AccountTable.email
