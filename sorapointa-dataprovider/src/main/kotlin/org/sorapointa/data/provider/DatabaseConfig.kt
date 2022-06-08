@@ -14,7 +14,7 @@ import java.sql.Connection.*
 enum class DatabaseType {
     SQLITE {
         override val defaultConnectionString: String by lazy {
-            "jdbc:sqlite:${resolveWorkDirectory("sqlite.db").absPath}"
+            "jdbc:sqlite:${resolveWorkDirectory("sqlite.db").absPath}?foreign_keys=on"
         }
 
         override val defaultMaxPoolSize: Int = 1
