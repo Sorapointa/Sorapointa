@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.model.KotlinProject
-
 plugins {
     kotlin("plugin.serialization") apply false
     id("org.jetbrains.kotlinx.binary-compatibility-validator")
@@ -14,12 +12,9 @@ subprojects {
         mavenCentral()
     }
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
-}
-
-subprojects.filter { it is KotlinProject }
-
-subprojects.apply {
-    configureLogbackCopy()
+    afterEvaluate {
+        configureLogbackCopy()
+    }
 }
 
 allprojects {
