@@ -41,8 +41,10 @@ class HelpTest {
         }
     }
 
-    object TestSender : CommandSender(Locale.CHINESE) {
-        override fun sendMessage(msg: String) {
+    object TestSender : CommandSender {
+
+        override val locale: Locale = Locale.CHINESE
+        override suspend fun sendMessage(msg: String) {
             println(msg)
         }
     }

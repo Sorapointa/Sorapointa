@@ -176,7 +176,7 @@ internal object PlayerLoginReqFactory : IncomingPacketFactoryWithResponse
     override val parser: Parser<PlayerLoginReq> = PlayerLoginReq.parser()
 
     override suspend fun Player.handlePacket(packet: PlayerLoginReq): PlayerLoginRspPacket {
-
+        onLogin()
         return currentRegionRsp
             ?.let { PlayerLoginRspPacket.Succ(it) }
             ?: PlayerLoginRspPacket.Fail(Retcode.RETCODE_RET_SVR_ERROR)

@@ -10,7 +10,7 @@ import org.sorapointa.command.Command
 import org.sorapointa.command.CommandSender
 import org.sorapointa.command.ConsoleCommandSender
 import org.sorapointa.game.Player
-import org.sorapointa.game.PlayerDataTable.LENGTH_LIMIT
+import org.sorapointa.game.data.PlayerDataTable.LOCALE_LENGTH_LIMIT
 import org.sorapointa.utils.I18nConfig
 import org.sorapointa.utils.I18nManager
 import org.sorapointa.utils.byPriority
@@ -55,8 +55,8 @@ class Locale(private val sender: CommandSender) : Command(sender, Locale) {
             sender.sendMessage("sora.cmd.locale.msg.newvalue.missing".i18n(locale = sender))
             return
         }
-        if (newValue.length > LENGTH_LIMIT) {
-            sender.sendMessage("sora.cmd.locale.msg.newvalue.toolong".i18n(LENGTH_LIMIT, locale = sender))
+        if (newValue.length > LOCALE_LENGTH_LIMIT) {
+            sender.sendMessage("sora.cmd.locale.msg.newvalue.toolong".i18n(LOCALE_LENGTH_LIMIT, locale = sender))
             return
         }
         val locale = JavaLocale.forLanguageTag(newValue)
