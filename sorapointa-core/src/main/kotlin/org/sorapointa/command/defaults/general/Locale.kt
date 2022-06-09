@@ -29,10 +29,12 @@ class Locale(private val sender: CommandSender) : Command(sender, Locale) {
         VIEW, SET, LIST,
     }
 
+    private val defaultOp = Operation.VIEW
     private val operation by argument(
         "sora.cmd.locale.arg.operation.name".i18n(locale = sender),
-        help = "sora.cmd.locale.arg.operation.desc".i18n(locale = sender),
-    ).enum<Operation>(ignoreCase = true).default(Operation.VIEW)
+        help = "sora.cmd.locale.arg.operation.desc".i18n(
+            Operation.values().joinToString() { it.name }, defaultOp.name, locale = sender),
+    ).enum<Operation>(ignoreCase = true).default(defaultOp)
 
     private val newValue by argument(
         "sora.cmd.locale.arg.newvalue.name".i18n(locale = sender),
