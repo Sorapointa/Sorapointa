@@ -19,6 +19,9 @@ dependencies {
     api(project(":sorapointa-task"))
     api(project(":sorapointa-utils:sorapointa-utils-all"))
 
+    // KotlinX
+    api("org.jetbrains.kotlinx:atomicfu:_")
+
     // network
     implementation("io.netty:netty-handler:_")
     implementation("moe.sdl.kcp:kcp-netty:_")
@@ -26,6 +29,7 @@ dependencies {
     api("moe.sdl.yac:core:_")
     // Console
     implementation("org.jline:jline:_")
+    implementation("com.password4j:password4j:_")
 }
 
 configureLangsCopy()

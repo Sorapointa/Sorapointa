@@ -3,7 +3,8 @@ strings:
   '': ''
   sora.cmd.manager.alias: "\n\n别名: {0}"
   sora.cmd.manager.invoke.empty: 未输入命令
-  sora.cmd.manager.invoke.error: "无输入的命令 '{0}'"
+  sora.cmd.manager.invoke.error: '不存在此命令 "{0}"'
+  sora.cmd.manager.invoke.typosuggest: '不存在此命令 "{0}"，你可能想输入 "{1}"？'
   sora.cmd.isnotplayer: 这条命令只能由玩家执行
   sora.cmd.nopermission: 你没有权限来执行这个命令
   sora.cmd.help.desc: 打印 Sorapointa 的帮助信息
@@ -20,7 +21,7 @@ strings:
   sora.cmd.listplayer.msg: "当前在线玩家 ({0}): {1}"
   sora.cmd.locale.desc: 设置或查看你的本地化设置
   sora.cmd.locale.arg.operation.name: 操作
-  sora.cmd.locale.arg.operation.desc: 查看（view）或者设置（set）你的本地化设置
+  sora.cmd.locale.arg.operation.desc: '可用操作: [{0}], 默认 {1}'
   sora.cmd.locale.arg.newvalue.name: 本地化标签
   sora.cmd.locale.arg.newvalue.desc: 新的本地化标签设置
   sora.cmd.locale.opt.force.desc: 跳过可用性检查，强制启用新本地化标签
@@ -28,8 +29,19 @@ strings:
   sora.cmd.locale.msg.newvalue.missing: "缺少参数: [LOCALE]"
   sora.cmd.locale.msg.newvalue.toolong: "语言标签太长 (>= {0})"
   sora.cmd.locale.msg.newvalue.notfound: "输入的本地化标签无法在系统中找到，如果仍想设置，请添加 '--force' 选项"
-  sora.cmd.locale.msg.success: "你已成功将将本地化标签设置为 {0}！"
+  sora.cmd.locale.msg.success: "你已成功将本地化标签设置为 {0}！"
   sora.cmd.locale.msg.unsupported: "命令发送者未支持 i18n"
+  sora.cmd.consoleuser.desc: 为 Daemon-CLI 连接创建新的命令行用户
+  sora.cmd.consoleuser.opt.user: 用户名
+  sora.cmd.consoleuser.opt.pwd: 密码
+  sora.cmd.consoleuser.msg.duplicate: '用户 "{0}" 已经存在，可使用 "--update" 更新现有密码'
+  sora.cmd.consoleuser.msg.emptypwd: "您没有输入密码，基于安全性考量，建议设置强密码"
+  sora.cmd.consoleuser.opt.operation: 你想执行什么操作？
+  sora.cmd.consoleuser.msg.success.add: '成功创建用户 "{0}"！'
+  sora.cmd.consoleuser.msg.success.update: '成功更新用户 "{0}"！'
+  sora.cmd.consoleuser.msg.success.remove: '成功移除用户 "{0}"！'
+  sora.cmd.consoleuser.msg.nosuch: '不存在该用户 "{0}"。'
+  sora.cmd.consoleuser.msg.list: '命令行用户列表（共 {0}）：{1}'
   clikt.aborted: 中断!
   clikt.usage.error: '错误: {0}'
   clikt.bad.parameter: 无效值
