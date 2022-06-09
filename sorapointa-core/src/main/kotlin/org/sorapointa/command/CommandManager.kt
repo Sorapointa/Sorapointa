@@ -1,6 +1,7 @@
 package org.sorapointa.command
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import moe.sdl.yac.core.CommandResult
 import moe.sdl.yac.core.CommandResult.Error
 import moe.sdl.yac.core.CommandResult.Success
@@ -9,6 +10,7 @@ import moe.sdl.yac.core.parseToArgs
 import org.sorapointa.game.Player
 import org.sorapointa.utils.ModuleScope
 import org.sorapointa.utils.i18n
+import org.sorapointa.utils.suggestTypo
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -86,7 +88,12 @@ object CommandManager {
         val mainCommand = args[0]
 
         val cmd = cmdMap[mainCommand] ?: aliasMap[mainCommand] ?: run {
-            sender.sendMessage("sora.cmd.manager.invoke.error".i18n(mainCommand, locale = sender))
+            val mainTypo = suggestTypo(mainCommand, cmdMap.keys.toList())
+            if (mainTypo == null) {
+                sender.sendMessage("sora.cmd.manager.invoke.error".i18n(mainCommand, locale = sender))
+            } else {
+                sender.sendMessage("sora.cmd.manager.invoke.typosuggest".i18n(mainCommand, mainTypo, locale = sender))
+            }
             return@launch
         }
 
