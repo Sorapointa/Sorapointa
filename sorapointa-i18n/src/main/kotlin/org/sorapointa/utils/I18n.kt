@@ -120,7 +120,7 @@ object I18nConfig : DataFilePersist<I18nConfig.Config>(
             """
             Global locale setting
             
-            We uses RFC 1766 standard and two-letter language tag with IANA defined subtag.
+            We use RFC 1766 standard and two-letter language tag with IANA defined subtag.
             
             Sorapointa will find i18n string by order, Personal -> Global -> Fallback(i.e. English)
             When a language variant is not available, but main language is, fallback to main 
