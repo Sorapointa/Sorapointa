@@ -153,13 +153,22 @@ internal val FALLBACK_LOCALE: Locale = Locale.ENGLISH
  */
 fun String.i18n(vararg args: Any?, locale: Locale? = null): String {
     val selected =
-        I18nManager.supportedLanguages.byPriority(listOfNotNull(locale, globalLocale))
-            ?: FALLBACK_LOCALE
-    return I18nManager.languageMap[selected]?.strings
-        ?.get(this)?.replaceWithOrder(*args) ?: run {
-        logger.info { "Missing i18n value for key '$this', locale '$locale'" }
-        this
+        I18nManager.supportedLanguages.byPriority(listOfNotNull(locale, globalLocale, FALLBACK_LOCALE))
+
+    // Add more information for writing language file
+    if (logger.isDebugEnabled) {
+        if (locale != null && I18nManager.languageMap[locale] == null) {
+            logger.debug { "Missing i18n user locale $locale for key '$this'" }
+        }
+        if (I18nManager.languageMap[globalLocale] == null) {
+            logger.debug { "Missing i18n global locale $globalLocale for key '$this'" }
+        }
+        if (FALLBACK_LOCALE != globalLocale && I18nManager.languageMap[FALLBACK_LOCALE] == null) {
+            logger.debug { "Missing i18n fallback locale $globalLocale for key '$this'" }
+        }
     }
+
+    return I18nManager.languageMap[selected]?.strings?.get(this)?.replaceWithOrder(*args) ?: this
 }
 
 /**
