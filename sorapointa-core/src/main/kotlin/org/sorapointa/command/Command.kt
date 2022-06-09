@@ -8,7 +8,22 @@ import org.sorapointa.utils.i18n
 abstract class Command(
     sender: CommandSender,
     entry: Entry,
-) : CliktCommand(name = entry.name, help = entry.help.i18n(locale = sender)) {
+    option: Option = Option(),
+) : CliktCommand(
+    name = entry.name,
+    help = entry.help.i18n(locale = sender),
+    invokeWithoutSubcommand = option.invokeWithoutSubCommand,
+    printHelpOnEmptyArgs = option.printHelpOnEmptyArgs,
+    allowMultipleSubcommands = option.allowMultipleSubcommands,
+    treatUnknownOptionsAsArgs = option.treatUnknownOptionsAsArgs,
+) {
+    class Option(
+        val invokeWithoutSubCommand: Boolean = false,
+        val printHelpOnEmptyArgs: Boolean = false,
+        val allowMultipleSubcommands: Boolean = false,
+        val treatUnknownOptionsAsArgs: Boolean = false,
+    )
+
     /**
      * @param help, will be invoked with i18n
      */
@@ -26,10 +41,12 @@ abstract class Command(
 
 abstract class ConsoleCommand(
     sender: ConsoleCommandSender,
-    entry: Entry
-) : Command(sender, entry)
+    entry: Entry,
+    option: Option = Option(),
+) : Command(sender, entry, option)
 
 abstract class PlayerCommand(
     sender: Player,
-    entry: Entry
-) : Command(sender, entry)
+    entry: Entry,
+    option: Option = Option(),
+) : Command(sender, entry, option)

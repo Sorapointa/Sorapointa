@@ -10,4 +10,5 @@ val defaultsCommand: List<AbstractCommandNode<*>> = listOf(
     CommandNode(Locale) { sender -> Locale(sender) },
     CommandNode(Version) { sender -> Version(sender) },
     ConsoleCommandNode(Quit) { sender -> Quit(sender) },
+    ConsoleCommandNode(ConsoleUser) { sender -> ConsoleUser(sender) },
 )

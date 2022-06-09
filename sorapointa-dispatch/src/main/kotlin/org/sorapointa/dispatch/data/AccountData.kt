@@ -16,14 +16,15 @@ import org.sorapointa.dispatch.DispatchConfig
 import org.sorapointa.dispatch.events.CreateAccountEvent
 import org.sorapointa.event.broadcast
 import org.sorapointa.utils.SorapointaInternal
-import org.sorapointa.utils.randomByteArray
 import org.sorapointa.utils.encoding.hex
 import org.sorapointa.utils.now
+import org.sorapointa.utils.randomByteArray
 import org.sorapointa.utils.randomUInt
 
 private val logger = KotlinLogging.logger {}
 
-@SorapointaInternal object AccountTable : IdTable<UInt>("account_table") {
+@SorapointaInternal
+object AccountTable : IdTable<UInt>("account_table") {
     override val id: Column<EntityID<UInt>> = uinteger("user_id").autoIncrement().entityId()
     val userName: Column<String> = varchar("user_name", 60).uniqueIndex()
     val password: Column<String> = varchar("password", 255)
@@ -38,6 +39,19 @@ private val logger = KotlinLogging.logger {}
     override val primaryKey: PrimaryKey = PrimaryKey(id)
 }
 
+@SorapointaInternal
+val argon2Function: Argon2Function by lazy {
+    val setting = DispatchConfig.data.accountSetting.password
+    Argon2Function.getInstance(
+        setting.memory,
+        setting.iterations,
+        setting.parallelism,
+        setting.byteLength,
+        setting.argon2Type,
+        setting.argon2Version
+    )
+}
+
 @Suppress("RedundantSuspendModifier", "MemberVisibilityCanBePrivate", "unused")
 class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
 
@@ -45,18 +59,6 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
 
         private val usePepper = DispatchConfig.data.accountSetting.password.usePepper
         private val pepper = DispatchConfig.data.accountSetting.password.hashPepper
-
-        private val argon2: Argon2Function by lazy {
-            val setting = DispatchConfig.data.accountSetting.password
-            Argon2Function.getInstance(
-                setting.memory,
-                setting.iterations,
-                setting.parallelism,
-                setting.byteLength,
-                setting.argon2Type,
-                setting.argon2Version
-            )
-        }
 
         /**
          * Find a user account by email
@@ -106,7 +108,7 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
                         this.addPepper(pepper)
                     }
                 }
-                .with(argon2).result
+                .with(argon2Function).result
 
         private fun generateSalt(): String =
             randomByteArray(DispatchConfig.data.accountSetting.password.saltByteLength).encodeBase64()
@@ -128,10 +130,10 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
                 if (usePepper) {
                     this.addPepper(pepper)
                 }
-            }
-            .with(argon2)
+            }.with(argon2Function)
 
-    @SorapointaInternal suspend fun updatePassword(inputPassword: String) {
+    @SorapointaInternal
+    suspend fun updatePassword(inputPassword: String) {
         password = hashPassword(inputPassword, generateSalt())
     }
 
@@ -154,7 +156,8 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
             comboId = it
         }
 
-    @SorapointaInternal suspend fun getComboToken(): String? {
+    @SorapointaInternal
+    suspend fun getComboToken(): String? {
         if (checkComboTokenExpire()) return null
         return comboToken
     }

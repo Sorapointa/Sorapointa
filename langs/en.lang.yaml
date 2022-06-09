@@ -3,7 +3,8 @@ strings:
   '': ''
   sora.cmd.manager.alias: "\n\nAlias: {0}"
   sora.cmd.manager.invoke.empty: No command input
-  sora.cmd.manager.invoke.error: "No such command '{0}'"
+  sora.cmd.manager.invoke.error: 'No such command "{0}"'
+  sora.cmd.manager.invoke.typosuggest: 'No such command "{0}". Did you mean "{1}"?'
   sora.cmd.isnotplayer: This command only could be executed by player.
   sora.cmd.nopermission: You do not have the permission to execute this command.
   sora.cmd.help.desc: Print Sorapointa command help
@@ -20,7 +21,7 @@ strings:
   sora.cmd.listplayer.msg: "List of players ({0}): {1}"
   sora.cmd.locale.desc: Set or view your locale setting
   sora.cmd.locale.arg.operation.name: OPERATION
-  sora.cmd.locale.arg.operation.desc: "Available values: [set, view], default 'view'"
+  sora.cmd.locale.arg.operation.desc: 'Available values: [{0}], default "{1}"'
   sora.cmd.locale.arg.newvalue.name: LOCALE
   sora.cmd.locale.arg.newvalue.desc: New locale value
   sora.cmd.locale.opt.force.desc: Force using new locale without checking
@@ -30,6 +31,17 @@ strings:
   sora.cmd.locale.msg.newvalue.notfound: "The locale you inputted can not be found in system, if you still want to set it, please add '--force' option"
   sora.cmd.locale.msg.success: "You have set your locale to {0} successfully!"
   sora.cmd.locale.msg.unsupported: "Unsupported command sender for i18n"
+  sora.cmd.consoleuser.desc: Manage console user for Daemon-CLI connection
+  sora.cmd.consoleuser.opt.user: Username
+  sora.cmd.consoleuser.opt.pwd: Password
+  sora.cmd.consoleuser.opt.operation: What you want to do?
+  sora.cmd.consoleuser.msg.duplicate: 'User "{0}" already exists, use "--update" to update existing user password.'
+  sora.cmd.consoleuser.msg.emptypwd: "Your password input is empty, it's suggested to set a strong password for secure."
+  sora.cmd.consoleuser.msg.success.add: 'Created user "{0}" successfully!'
+  sora.cmd.consoleuser.msg.success.update: 'Updated user "{0}" successfully!'
+  sora.cmd.consoleuser.msg.success.remove: 'Removed user "{0}" successfully!'
+  sora.cmd.consoleuser.msg.nosuch: 'No such user "{0}".'
+  sora.cmd.consoleuser.msg.list: 'Console Users (total {0}): {1}'
   clikt.aborted: Aborted!
   clikt.usage.error: 'Error: {0}'
   clikt.bad.parameter: Invalid value
