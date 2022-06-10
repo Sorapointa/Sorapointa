@@ -1,10 +1,7 @@
 plugins {
     kotlin("plugin.serialization") apply false
+    kotlin("jvm") apply false
     id("org.jetbrains.kotlinx.binary-compatibility-validator")
-}
-
-if (JavaVersion.current() != JavaVersion.VERSION_17) {
-    throw GradleException("Sorapointa requires JDK 17 to build and develop, current version: ${JavaVersion.current()}")
 }
 
 subprojects {
