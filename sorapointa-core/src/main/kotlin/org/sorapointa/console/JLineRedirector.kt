@@ -7,7 +7,7 @@ import java.util.*
  * Work around, not a good implementation
  */
 internal object JLineRedirector : PrintStream(nullOutputStream()) {
-    private fun println0() = Console.println()
+    private fun println0() = Console.println("")
 
     private fun println0(x: Any?) = Console.println(x)
 

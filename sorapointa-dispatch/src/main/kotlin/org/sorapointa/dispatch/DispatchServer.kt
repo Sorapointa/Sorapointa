@@ -4,10 +4,15 @@ import com.password4j.types.Argon2
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.util.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -30,14 +35,14 @@ import kotlin.text.toCharArray
 import kotlin.time.Duration
 
 internal fun main(): Unit = runBlocking {
-    DispatchServer.startDispatch(isIndependent = true)
+    DispatchServer.startDispatch(this, isIndependent = true).join()
 }
 
 object DispatchServer {
 
     internal val client by lazy {
         HttpClient(CIO) {
-//            install(Logging)
+            install(Logging)
             install(ContentNegotiation) {
                 json(prettyJson)
             }
@@ -69,18 +74,21 @@ object DispatchServer {
         }
     }
 
-    private fun ApplicationEngineEnvironment.setupApplication() {
-        this.application.apply {
+    private fun ApplicationEngineEnvironment.setupApplication(): Application =
+        application.apply {
             configureSerialization()
             configureStatusPage()
             configureMonitoring()
             configureHTTP()
             configureRouting()
         }
-    }
 
     @SorapointaInternal
-    suspend fun startDispatch(isIndependent: Boolean = false) {
+    fun startDispatch(
+        scope: CoroutineScope,
+        isIndependent: Boolean = false,
+        config: (Application) -> Unit = {},
+    ): Job = scope.launch {
         if (isIndependent) {
             DispatchConfig.init()
             DispatchConfig.save()
@@ -95,7 +103,8 @@ object DispatchServer {
         DatabaseManager.loadTables(AccountTable, DispatchKeyDataTable)
         val environment = getEnvironment()
         environment.setupApplication()
-        embeddedServer(Netty, environment = environment).start(wait = isIndependent)
+        environment.application.apply(config)
+        embeddedServer(Netty, environment = environment).start(wait = true)
     }
 }
 

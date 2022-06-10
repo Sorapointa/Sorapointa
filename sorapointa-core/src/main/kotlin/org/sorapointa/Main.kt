@@ -1,20 +1,24 @@
 package org.sorapointa
 
+import io.ktor.server.application.*
 import kotlinx.coroutines.*
 import moe.sdl.yac.core.CliktCommand
 import moe.sdl.yac.core.CommandResult
-import moe.sdl.yac.parameters.options.check
-import moe.sdl.yac.parameters.options.convert
-import moe.sdl.yac.parameters.options.flag
-import moe.sdl.yac.parameters.options.option
+import moe.sdl.yac.parameters.groups.OptionGroup
+import moe.sdl.yac.parameters.groups.defaultByName
+import moe.sdl.yac.parameters.groups.groupSwitch
+import moe.sdl.yac.parameters.options.*
 import mu.KotlinLogging
 import org.jline.reader.EndOfFileException
 import org.jline.reader.UserInterruptException
+import org.sorapointa.SorapointaMain.Mode.*
 import org.sorapointa.command.CommandManager
 import org.sorapointa.command.ConsoleCommandSender
 import org.sorapointa.command.defaults.defaultsCommand
 import org.sorapointa.config.*
 import org.sorapointa.console.Console
+import org.sorapointa.console.setupConsoleClient
+import org.sorapointa.console.setupWebConsoleServer
 import org.sorapointa.data.provider.DatabaseManager
 import org.sorapointa.dataloader.ResourceHolder
 import org.sorapointa.event.EventManager
@@ -25,7 +29,6 @@ import kotlin.system.exitProcess
 private val logger = KotlinLogging.logger {}
 
 class SorapointaMain : CliktCommand(name = "sorapointa") {
-
     private val workingDirectory by option("-D", "--working-directory", help = "Set working directory")
         .convert { File(it) }
         .check("File must be directory") { (it.exists() && it.isDirectory) || (!it.exists()) }
@@ -36,56 +39,91 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
     private val noRedirect by option("-R", "--no-redirect", help = "Whether redirect to JLine's printAbove")
         .flag(default = false)
 
+    private sealed class Mode : OptionGroup() {
+        class Server : Mode()
+        class Client : Mode() {
+            val username by option("--username", "--usr", "-u").required()
+            val password by option("--password", "--pwd", "-p").default("")
+            val wssUrl by option("--wss-url", "--url", "-I").default("wss://localhost:443/webconsole")
+        }
+
+        class Mixed : Mode()
+    }
+
+    private val mode by option().groupSwitch(
+        "--server" to Server(),
+        "--client" to Client(),
+        "--mixed" to Mixed(),
+    ).defaultByName("--mixed")
+
     override suspend fun run(): Unit = scope.launch {
+        setupShutdownHook()
+
+        logger.info { "Version: $VERSION-$BUILD_BRANCH+$COMMIT_HASH" }
+
+        workingDirectory?.let { System.setProperty("user.dir", it.absPath) }
+        logger.info { "Sorapointa is working in $globalWorkDirectory" }
+
         redirectPrint()
 
+        when (val m = mode) {
+            is Server -> {
+                val server = setupServer {
+                    it.setupWebConsoleServer()
+                }
+                server.join()
+            }
+            is Mixed -> {
+                val server = setupServer()
+                setupLocalConsole()
+                server.join()
+            }
+            is Client -> {
+                setupConsoleClient(m.username, m.password, m.wssUrl)
+            }
+        }
+    }.join()
+
+    private fun setupShutdownHook() {
         addShutdownHook {
             closeAll()
             println("\nExiting Sorapointa...")
             Console.redirectToNull()
         }
+    }
 
-        logger.info { "Version: $VERSION-$BUILD_BRANCH-$COMMIT_HASH" }
-
-        workingDirectory?.let { System.setProperty("user.dir", it.absPath) }
-        logger.info { "Sorapointa is working in $globalWorkDirectory" }
-
-        logger.info { "Loading languages..." }
+    private fun setupServer(config: (Application) -> Unit = {}) = scope.launch {
         loadLanguages()
-
-        logger.info { "Loading Sorapointa configs..." }
         setupRegisteredConfigs().join()
 
         setupDefaultsCommand()
         EventManager.init(scope.coroutineContext)
 
-        logger.info { "Loading Sorapointa database..." }
         val databaseInitJob = setupDatabase()
-
         databaseInitJob.join()
 
         ResourceHolder.findAndRegister()
         ResourceHolder.loadAll()
 
-        Sorapointa.init(scope.coroutineContext)
+        Sorapointa.init(this, scope.coroutineContext, config)
+    }
 
-        // setup console command input
-        launch {
-            val consoleSender = ConsoleCommandSender()
-            while (isActive) {
-                try {
-                    CommandManager.invokeCommand(consoleSender, Console.readln()).join()
-                } catch (e: UserInterruptException) { // Ctrl + C
-                    println("<Interrupted> use 'quit' command to exit process")
-                } catch (e: EndOfFileException) { // Ctrl + D
-                    exitProcess(0)
-                }
+    private fun setupLocalConsole() = scope.launch {
+        val consoleSender = ConsoleCommandSender()
+        while (isActive) {
+            try {
+                CommandManager.invokeCommand(consoleSender, Console.readln()).join()
+            } catch (e: UserInterruptException) { // Ctrl + C
+                println("<Interrupted> use 'quit' command to exit process")
+            } catch (e: EndOfFileException) { // Ctrl + D
+                exitProcess(0)
             }
         }
-    }.join()
+    }
 
     private fun setupRegisteredConfigs(): Job =
         scope.launch {
+            logger.info { "Loading Sorapointa configs..." }
             registeredConfig.map {
                 launch {
                     it.init()
@@ -96,6 +134,7 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
 
     private fun setupDatabase(): Job =
         scope.launch {
+            logger.info { "Loading Sorapointa database..." }
             DatabaseManager.loadDatabase()
             DatabaseManager.loadTables(registeredDatabaseTable)
         }
@@ -108,6 +147,7 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
 
     private fun loadLanguages(): Job =
         scope.launch {
+            logger.info { "Loading languages..." }
             extractLanguages(SorapointaMain::class)
             I18nManager.registerLanguagesDirectory(languagesDirectory)
             logger.info { "Loaded languages: ${I18nManager.supportedLanguages.joinToString { it.toLanguageTag() }}" }

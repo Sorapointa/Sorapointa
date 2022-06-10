@@ -47,10 +47,13 @@ class ConsoleUser(val sender: ConsoleCommandSender) : ConsoleCommand(
     private suspend fun addOrUpdate(username: String?) {
         if (username == null) throw PrintMessage(CommandLocalization.missingOption("--username"))
         val sender = this@ConsoleUser.sender
-        ConsoleUsers.addOrUpdate(username, password ?: run {
-            sender.sendMessage("sora.cmd.consoleuser.msg.emptypwd".i18n(locale = sender))
-            ""
-        })
+        ConsoleUsers.addOrUpdate(
+            username,
+            password ?: run {
+                sender.sendMessage("sora.cmd.consoleuser.msg.emptypwd".i18n(locale = sender))
+                ""
+            }
+        )
     }
 
     override suspend fun run() {
@@ -86,6 +89,5 @@ class ConsoleUser(val sender: ConsoleCommandSender) : ConsoleCommand(
                 )
             }
         }
-
     }
 }

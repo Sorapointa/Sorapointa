@@ -8,6 +8,9 @@ import org.sorapointa.utils.ModuleScope
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import io.ktor.server.application.Application
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 
 object Sorapointa {
 
@@ -15,10 +18,14 @@ object Sorapointa {
 
     val playerList = ConcurrentLinkedDeque<Player>()
 
-    internal suspend fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
+    internal fun init(
+        serverScope: CoroutineScope,
+        parentContext: CoroutineContext = EmptyCoroutineContext,
+        config: (Application) -> Unit = {},
+    ): Job {
         scope = ModuleScope("Sorapointa", parentContext)
         CommandManager.init(scope.coroutineContext)
         ServerNetwork.boot(scope.coroutineContext)
-        DispatchServer.startDispatch()
+        return DispatchServer.startDispatch(serverScope, config = config)
     }
 }

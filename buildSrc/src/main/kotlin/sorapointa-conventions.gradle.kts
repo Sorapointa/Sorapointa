@@ -83,5 +83,6 @@ artifacts {
 
 tasks.withType<Jar>() {
     exclude("main") // duplicated jar root main, very confusing
+    exclude("logback-test.xml")
     exclude("*.proto")
 }
