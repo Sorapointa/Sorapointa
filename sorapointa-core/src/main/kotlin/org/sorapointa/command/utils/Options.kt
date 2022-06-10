@@ -19,7 +19,7 @@ import moe.sdl.yac.parameters.options.switch
  * )
  * ```
  */
-fun <T: Any> RawOption.switchSet(vararg choices: Pair<Collection<String>, T>): FlagOption<T?> =
+fun <T : Any> RawOption.switchSet(vararg choices: Pair<Collection<String>, T>): FlagOption<T?> =
     switch(
         choices.flatMap { (keys, value) ->
             keys.map { it to value }
