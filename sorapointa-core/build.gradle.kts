@@ -25,11 +25,14 @@ dependencies {
     // network
     implementation("io.netty:netty-handler:_")
     implementation("moe.sdl.kcp:kcp-netty:_")
+    // Ktor
+    implementation("io.ktor:ktor-server-websockets:_")
     // Command
     api("moe.sdl.yac:core:_")
     // Console
     implementation("org.jline:jline:_")
     implementation("com.password4j:password4j:_")
+    testImplementation(project(":sorapointa-dispatch", "test"))
 }
 
 configureLangsCopy()
