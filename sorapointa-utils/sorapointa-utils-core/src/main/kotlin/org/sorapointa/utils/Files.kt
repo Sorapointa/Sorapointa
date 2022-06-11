@@ -24,6 +24,8 @@ private val testDir by lazy {
     }.getOrNull()
 }
 
+fun resolveHome(path: String): File? = System.getProperty("user.home")?.let { File(it, path) }
+
 /**
  * Resolve work dir
  */
