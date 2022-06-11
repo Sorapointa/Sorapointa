@@ -26,7 +26,6 @@ import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.dispatch.data.argon2Function
 import org.sorapointa.utils.ModuleScope
 import org.sorapointa.utils.configDirectory
-import org.sorapointa.utils.encoding.RSAProvider
 import org.sorapointa.utils.networkJson
 import java.io.File
 import java.security.cert.X509Certificate
@@ -210,7 +209,7 @@ internal suspend fun setupConsoleClient(username: String, password: String, url:
                 when (val pkt = networkJson.decodeFromString<WebConsolePacket>(json)) {
                     is VerifyResp -> {
                         if (!pkt.ok) {
-                            logger.error{ "Server denied connection, maybe username or password error" }
+                            logger.error { "Server denied connection, maybe username or password error" }
                             exitProcess(0)
                         }
                         logger.info { "Successfully connected to remote!" }
