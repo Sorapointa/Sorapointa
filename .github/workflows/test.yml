@@ -31,9 +31,15 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: 'adopt'
+          distribution: 'temurin'
 
-      - name: Check
+      - name: Format Check
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: ktlintCheck
+          gradle-version: 7.4.2
+
+      - name: Test Check
         uses: gradle/gradle-build-action@v2
         with:
           arguments: test
