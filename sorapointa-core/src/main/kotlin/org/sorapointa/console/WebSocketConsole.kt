@@ -27,10 +27,8 @@ import org.sorapointa.dispatch.data.argon2Function
 import org.sorapointa.utils.ModuleScope
 import org.sorapointa.utils.configDirectory
 import org.sorapointa.utils.encoding.RSAProvider
-import org.sorapointa.utils.encoding.encodeBase64
 import org.sorapointa.utils.networkJson
 import java.io.File
-import java.security.KeyPair
 import java.security.cert.X509Certificate
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
@@ -43,15 +41,9 @@ private val logger = KotlinLogging.logger {}
 @Serializable
 internal sealed class WebConsolePacket
 
-@Serializable
-internal object PublicKeyReq : WebConsolePacket()
-
-@Serializable
-internal class PublicKeyResp(val publicKey: String) : WebConsolePacket()
-
 /**
  * @param username user to login
- * @param password password encrypted by RSA [PublicKeyResp.publicKey]
+ * @param password password
  */
 @Serializable
 internal class VerifyReq(val username: String, val password: String) : WebConsolePacket()
@@ -74,32 +66,14 @@ internal object ConsoleUsers : DataFilePersist<ConsoleUsers.Data>(
 ) {
     @Serializable
     data class Data(
-        var publicKey: String? = null,
-        var privateKey: String? = null,
         val tokenLength: Int = 128,
         val users: MutableMap<String, String> = ConcurrentHashMap<String, String>(),
     )
 
     override suspend fun init() = withContext(Dispatchers.IO) {
         super.init()
-        if (data.publicKey == null || data.privateKey == null) {
-            genKeyPair()
-        }
         save()
     }
-
-    private suspend fun genKeyPair(): KeyPair = withContext(Dispatchers.Default) {
-        val pair = RSAProvider.keyPairGenerate()
-        data.publicKey = pair.public.encoded.encodeBase64()
-        data.privateKey = pair.private.encoded.encodeBase64()
-        pair
-    }
-
-    suspend fun getPublicKeyOrGen() =
-        data.publicKey ?: genKeyPair().public.encoded.encodeBase64()
-
-    suspend fun getPrivateKeyOrGen() =
-        data.privateKey ?: genKeyPair().private.encoded.encodeBase64()
 
     fun addOrUpdate(username: String, password: String) {
         val user = username.lowercase()
@@ -116,7 +90,7 @@ internal object ConsoleUsers : DataFilePersist<ConsoleUsers.Data>(
 internal fun Application.setupWebConsoleServer() {
     install(WebSockets) {
         contentConverter = KotlinxWebsocketSerializationConverter(networkJson)
-        pingPeriod = Duration.ofSeconds(15)
+        pingPeriod = Duration.ofSeconds(30)
         timeout = Duration.ofSeconds(60)
     }
 
@@ -129,8 +103,8 @@ internal fun Application.setupWebConsoleServer() {
                 logger.info { "Closed: $reason" }
             }
 
-            val _verified = atomic(false)
-            var verified by _verified
+            val atomicVerified = atomic(false)
+            var verified by atomicVerified
 
             val remoteSender = RemoteCommandSender(this, null)
 
@@ -158,19 +132,13 @@ internal fun Application.setupWebConsoleServer() {
                         } else logger.info(it) { "Unexpected exception:" }
                     }.getOrNull() ?: return@consumeEach
                     when (pkt) {
-                        is PublicKeyReq -> {
-                            sendSerialized<WebConsolePacket>(PublicKeyResp(ConsoleUsers.getPublicKeyOrGen()))
-                        }
                         is VerifyReq -> {
                             if (verified) {
                                 sendSerialized<WebConsolePacket>(VerifyResp(true))
                                 return@consumeEach
                             }
 
-                            val pwd = RSAProvider.decryptWithPrivateKey(
-                                ConsoleUsers.getPrivateKeyOrGen(),
-                                pkt.password
-                            )
+                            val pwd = pkt.password
                             val success = ConsoleUsers.verify(pkt.username, pwd)
                             verified = success
                             if (success) {
@@ -219,12 +187,18 @@ private val client by lazy {
 internal suspend fun setupConsoleClient(username: String, password: String, url: String) {
     val scope = ModuleScope("ConsoleClient")
     client.webSocket(url) {
-        logger.info { "Try connecting remote..." }
-        sendSerialized<WebConsolePacket>(PublicKeyReq)
+        logger.info { "Try connecting remote console $url..." }
+        sendSerialized<WebConsolePacket>(
+            VerifyReq(
+                username,
+                password
+            )
+        )
 
         val closedNotifyJob = scope.launch {
             val reason = closeReason.await()
             logger.info { "Closed: $reason" }
+            exitProcess(0)
         }
 
         val mutex = Mutex()
@@ -234,16 +208,11 @@ internal suspend fun setupConsoleClient(username: String, password: String, url:
                 val json = (it as? Frame.Text)?.readText() ?: return@consumeEach
                 logger.debug { "Received json: $json" }
                 when (val pkt = networkJson.decodeFromString<WebConsolePacket>(json)) {
-                    is PublicKeyResp -> {
-                        sendSerialized<WebConsolePacket>(
-                            VerifyReq(
-                                username,
-                                RSAProvider.encryptWithPublicKey(pkt.publicKey, password)
-                            )
-                        )
-                    }
                     is VerifyResp -> {
-                        if (!pkt.ok) error("Server denied connection, maybe username or password error")
+                        if (!pkt.ok) {
+                            logger.error{ "Server denied connection, maybe username or password error" }
+                            exitProcess(0)
+                        }
                         logger.info { "Successfully connected to remote!" }
                     }
                     is MessageNotify -> println(pkt.message)

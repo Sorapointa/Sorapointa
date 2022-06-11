@@ -48,13 +48,16 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
         }
 
         class Mixed : Mode()
+
+        class Local : Mode()
     }
 
     private val mode by option().groupSwitch(
         "--server" to Server(),
         "--client" to Client(),
+        "--local" to Local(),
         "--mixed" to Mixed(),
-    ).defaultByName("--mixed")
+    ).defaultByName("--local")
 
     override suspend fun run(): Unit = scope.launch {
         setupShutdownHook()
@@ -74,6 +77,13 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
                 server.join()
             }
             is Mixed -> {
+                val server = setupServer {
+                    it.setupWebConsoleServer()
+                }
+                setupLocalConsole()
+                server.join()
+            }
+            is Local -> {
                 val server = setupServer()
                 setupLocalConsole()
                 server.join()
