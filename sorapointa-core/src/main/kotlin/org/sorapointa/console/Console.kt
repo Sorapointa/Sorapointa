@@ -3,25 +3,34 @@ package org.sorapointa.console
 import io.ktor.util.collections.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.jline.builtins.Completers.TreeCompleter
+import org.jline.builtins.Completers.TreeCompleter.node
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
+import org.jline.reader.impl.LineReaderImpl
 import org.jline.reader.impl.history.DefaultHistory
 import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
 import org.jline.widget.AutosuggestionWidgets
-import org.sorapointa.command.RemoteCommandSender
-import org.sorapointa.utils.ModuleScope
-import org.sorapointa.utils.addShutdownHook
-import org.sorapointa.utils.resolveHome
-import org.sorapointa.utils.resolveWorkDirectory
+import org.sorapointa.command.*
+import org.sorapointa.utils.*
 import java.io.OutputStream
 import java.io.PrintStream
+import java.util.*
+import kotlin.reflect.jvm.ExperimentalReflectionOnLambdas
+import kotlin.reflect.jvm.reflect
+import kotlin.reflect.typeOf
 
 @Suppress("MemberVisibilityCanBePrivate")
 internal object Console {
     private val terminal: Terminal = TerminalBuilder.terminal()
 
     private var reader: LineReader? = null
+
+    private object FakeSender : ConsoleCommandSender() {
+        override suspend fun sendMessage(msg: String) {}
+        override val locale: Locale = Locale.ENGLISH
+    }
 
     internal fun initReader() {
         reader = LineReaderBuilder.builder()
@@ -32,6 +41,26 @@ internal object Console {
                 AutosuggestionWidgets(this).enable()
                 initHistory()
             }
+    }
+
+    @OptIn(ExperimentalReflectionOnLambdas::class)
+    internal fun setupCompletion() {
+        val completions by lazy {
+            CommandManager.commandMap.filter { (_, node) ->
+                val type = node.creator.reflect()?.parameters?.firstOrNull()?.type
+                type == typeOf<CommandSender>() || type == typeOf<ConsoleCommandSender>()
+            }.flatMap { (_, node) ->
+                val creator = node.creator.uncheckedCast<(sender: CommandSender) -> Command>()
+                val nodes = creator(FakeSender).toCompleterNodes()
+                buildList {
+                    add(node.entry.name)
+                    addAll(node.entry.alias)
+                }.map {
+                    node(it, *nodes.toTypedArray())
+                }
+            }.let { TreeCompleter(it) }
+        }
+        (reader as? LineReaderImpl)?.completer = completions
     }
 
     private const val HISTORY_FILE = ".sorapointa_history"
