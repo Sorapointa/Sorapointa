@@ -38,6 +38,9 @@ class PlayerCommandNode(
 ) : AbstractCommandNode<Player>(entry, creator)
 
 object CommandManager {
+    val commandMap: Map<String, AbstractCommandNode<*>>
+        get() = cmdMap
+
     private val cmdMap: MutableMap<String, AbstractCommandNode<*>> = ConcurrentHashMap()
 
     // A map to save the registered commands with alias.

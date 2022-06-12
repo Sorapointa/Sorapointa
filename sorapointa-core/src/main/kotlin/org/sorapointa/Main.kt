@@ -25,6 +25,7 @@ import org.sorapointa.event.EventManager
 import org.sorapointa.utils.*
 import java.io.File
 import kotlin.system.exitProcess
+import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
 
@@ -106,6 +107,12 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
         setupRegisteredConfigs().join()
 
         setupDefaultsCommand()
+        measureTimeMillis {
+            Console.setupCompletion()
+        }.also {
+            logger.debug { "Costed ${it}ms to initialize command completion" }
+        }
+
         EventManager.init(scope.coroutineContext)
 
         val databaseInitJob = setupDatabase()
