@@ -227,7 +227,7 @@ internal suspend fun setupConsoleClient(username: String, password: String, url:
             while (isActive) {
                 try {
                     mutex.lock()
-                    sendSerialized<WebConsolePacket>(CommandReq(Console.readln()))
+                    sendSerialized<WebConsolePacket>(CommandReq(Console.readln("> ")))
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: UserInterruptException) {

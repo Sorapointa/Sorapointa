@@ -142,6 +142,13 @@ object CommandManager {
             }
         }
     }
+
+    /**
+     * @param mainCommand main command or alias
+     * @return [Boolean] has or not
+     */
+    fun hasCommand(mainCommand: String): Boolean =
+        cmdMap.containsKey(mainCommand) || aliasMap.containsKey(mainCommand)
 }
 
 private suspend fun Command.execute(args: List<String>) = this.main(args.drop(1))
