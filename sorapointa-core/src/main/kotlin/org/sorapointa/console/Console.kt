@@ -5,7 +5,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
-import org.jline.reader.impl.DefaultParser
 import org.jline.reader.impl.history.DefaultHistory
 import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
@@ -28,7 +27,7 @@ internal object Console {
         reader = LineReaderBuilder.builder()
             .appName("Sorapointa")
             .terminal(terminal)
-            .parser(DefaultParser())
+            .highlighter(SoraHighlighter)
             .build().apply {
                 AutosuggestionWidgets(this).enable()
                 initHistory()
@@ -54,7 +53,7 @@ internal object Console {
 
     internal val consoleUsers = ConcurrentSet<RemoteCommandSender>()
 
-    fun readln(): String = reader?.readLine("> ") ?: error("Reader not prepared")
+    fun readln(prompt: String = "> "): String = reader?.readLine(prompt) ?: error("Reader not prepared")
 
     fun println(any: Any?) {
         if (consoleUsers.isNotEmpty()) {
@@ -68,7 +67,8 @@ internal object Console {
         reader?.printAbove(any.toString()) ?: kotlin.io.println(any)
     }
 
-    fun println(string: String?) = reader?.printAbove(string) ?: kotlin.io.println(string)
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun println(string: String?) = println(any = string)
 
     internal fun redirectToJLine() {
         System.setErr(JLineRedirector)

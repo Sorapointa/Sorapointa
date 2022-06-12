@@ -7,9 +7,11 @@ import java.util.*
  * Work around, not a good implementation
  */
 internal object JLineRedirector : PrintStream(nullOutputStream()) {
-    private fun println0() = Console.println("")
+    @Suppress("NOTHING_TO_INLINE")
+    private inline fun println0() = Console.println("")
 
-    private fun println0(x: Any?) = Console.println(x)
+    @Suppress("NOTHING_TO_INLINE")
+    private inline fun println0(x: Any?) = Console.println(x)
 
     override fun println(x: Any?) = println0(x)
 
