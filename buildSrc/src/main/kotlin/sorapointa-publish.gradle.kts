@@ -36,7 +36,7 @@ publishing {
             }
 
             pom {
-                name.set("kcp-netty")
+                name.set("Sorapointa")
                 description.set("A server software implementation for a certain anime game, and avoid sorapointa")
                 url.set("https://github.com/Sorapointa/Sorapointa")
 
