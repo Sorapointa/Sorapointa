@@ -1,6 +1,6 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
 import org.sorapointa.dataloader.DataLoader
 
@@ -10,37 +10,66 @@ val weaponData
 
 @Serializable
 data class WeaponData(
-    @SerialName("weaponType") val weaponType: String,
-    @SerialName("rankLevel") val rankLevel: Int,
-    @SerialName("weaponBaseExp") val weaponBaseExp: Int,
-    @SerialName("skillAffix") val skillAffix: List<Int>,
-    @SerialName("weaponProp") val weaponProp: List<WeaponProp>,
-    @SerialName("awakenTexture") val awakenTexture: String,
-    @SerialName("awakenLightMapTexture") val awakenLightMapTexture: String,
-    @SerialName("awakenIcon") val awakenIcon: String,
-    @SerialName("weaponPromoteId") val weaponPromoteId: Int,
-    @SerialName("storyId") val storyId: Int? = null,
-    @SerialName("awakenCosts") val awakenCosts: List<Int>,
-    @SerialName("gachaCardNameHashSuffix") val gachaCardNameHashSuffix: Long,
-    @SerialName("destroyRule") val destroyRule: String? = null,
-    @SerialName("destroyReturnMaterial") val destroyReturnMaterial: List<Int>,
-    @SerialName("destroyReturnMaterialCount") val destroyReturnMaterialCount: List<Int>,
-    @SerialName("id") val id: Int,
-    @SerialName("nameTextMapHash") val nameTextMapHash: Long,
-    @SerialName("descTextMapHash") val descTextMapHash: Long,
-    @SerialName("icon") val icon: String,
-    @SerialName("itemType") val itemType: String,
-    @SerialName("weight") val weight: Int,
-    @SerialName("rank") val rank: Int,
-    @SerialName("gadgetId") val gadgetId: Int,
-    @SerialName("awakenMaterial") val awakenMaterial: Int? = null,
-    @SerialName("initialLockState") val initialLockState: Int? = null,
-    @SerialName("unRotate") val unRotate: Boolean? = null
+    @JsonNames("weaponType", "WeaponType")
+    val weaponType: String,
+    @JsonNames("rankLevel", "RankLevel")
+    val rankLevel: Int,
+    @JsonNames("weaponBaseExp", "WeaponBaseExp")
+    val weaponBaseExp: Int,
+    @JsonNames("skillAffix", "SkillAffix")
+    val skillAffix: List<Int>,
+    @JsonNames("weaponProp", "WeaponProp")
+    val weaponProp: List<WeaponProp>,
+    @JsonNames("awakenTexture", "AwakenTexture")
+    val awakenTexture: String,
+    @JsonNames("awakenLightMapTexture", "AwakenLightMapTexture")
+    val awakenLightMapTexture: String,
+    @JsonNames("awakenIcon", "AwakenIcon")
+    val awakenIcon: String,
+    @JsonNames("weaponPromoteId", "WeaponPromoteId")
+    val weaponPromoteId: Int,
+    @JsonNames("storyId", "StoryId")
+    val storyId: Int? = null,
+    @JsonNames("awakenCosts", "AwakenCosts")
+    val awakenCosts: List<Int>,
+    @JsonNames("gachaCardNameHashSuffix", "GachaCardNameHashSuffix")
+    val gachaCardNameHashSuffix: Long,
+    @JsonNames("destroyRule", "DestroyRule")
+    val destroyRule: String? = null,
+    @JsonNames("destroyReturnMaterial", "DestroyReturnMaterial")
+    val destroyReturnMaterial: List<Int>,
+    @JsonNames("destroyReturnMaterialCount", "DestroyReturnMaterialCount")
+    val destroyReturnMaterialCount: List<Int>,
+    @JsonNames("id", "Id")
+    val id: Int,
+    @JsonNames("nameTextMapHash", "NameTextMapHash")
+    val nameTextMapHash: Long,
+    @JsonNames("descTextMapHash", "DescTextMapHash")
+    val descTextMapHash: Long,
+    @JsonNames("icon", "Icon")
+    val icon: String,
+    @JsonNames("itemType", "ItemType")
+    val itemType: String,
+    @JsonNames("weight", "Weight")
+    val weight: Int,
+    @JsonNames("rank", "Rank")
+    val rank: Int,
+    @JsonNames("gadgetId", "GadgetId")
+    val gadgetId: Int,
+    @JsonNames("awakenMaterial", "AwakenMaterial")
+    val awakenMaterial: Int? = null,
+    @JsonNames("initialLockState", "InitialLockState")
+    val initialLockState: Int? = null,
+    @JsonNames("unRotate", "UnRotate")
+    val unRotate: Boolean? = null
 ) {
     @Serializable
     data class WeaponProp(
-        @SerialName("propType") val propType: String? = null,
-        @SerialName("initValue") val initValue: Double? = null,
-        @SerialName("type") val type: String
+        @JsonNames("propType", "PropType")
+        val propType: String? = null,
+        @JsonNames("initValue", "InitValue")
+        val initValue: Double? = null,
+        @JsonNames("type", "Type")
+        val type: String
     )
 }

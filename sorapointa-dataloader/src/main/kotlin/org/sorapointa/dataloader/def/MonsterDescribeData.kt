@@ -1,13 +1,24 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import org.sorapointa.dataloader.DataLoader
+
+private val monsterDescribeLoader =
+    DataLoader<List<MonsterDescribeData>>("./ExcelBinOutput/MonsterDescribeExcelConfigData.json")
+
+val monsterDescribeData get() = monsterDescribeLoader.data
 
 @Serializable
 data class MonsterDescribeData(
-    @SerialName("Id") val id: Int,
-    @SerialName("NameTextMapHash") val nameTextMapHash: Long,
-    @SerialName("TitleID") val titleID: Int,
-    @SerialName("SpecialNameLabID") val specialNameLabID: Int,
-    @SerialName("Icon") val icon: String
+    @JsonNames("id", "Id")
+    val id: Int,
+    @JsonNames("nameTextMapHash", "NameTextMapHash")
+    val nameTextMapHash: Long,
+    @JsonNames("titleID", "TitleID")
+    val titleID: Int,
+    @JsonNames("specialNameLabID", "SpecialNameLabID")
+    val specialNameLabID: Int,
+    @JsonNames("icon", "Icon")
+    val icon: String
 )

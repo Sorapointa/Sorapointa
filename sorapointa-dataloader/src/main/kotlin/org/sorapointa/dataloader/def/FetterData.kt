@@ -1,25 +1,43 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import org.sorapointa.dataloader.DataLoader
+
+private val fetterDataLoader =
+    DataLoader<List<FetterData>>("./ExcelBinOutput/FettersExcelConfigData.json")
+
+val fetterData get() = fetterDataLoader.data
 
 @Serializable
 data class FetterData(
-    @SerialName("IsHiden") val isHiden: Int,
-    @SerialName("Tips") val tips: List<Long>,
-    @SerialName("VoiceTitleTextMapHash") val voiceTitleTextMapHash: Int,
-    @SerialName("VoiceFile") val voiceFile: String,
-    @SerialName("VoiceFileTextTextMapHash") val voiceFileTextTextMapHash: Long,
-    @SerialName("VoiceTitleLockedTextMapHash") val voiceTitleLockedTextMapHash: Int,
-    @SerialName("FetterId") val fetterId: Int,
-    @SerialName("AvatarId") val avatarId: Int,
-    @SerialName("OpenConds") val openConds: List<OpenCond>,
+    @JsonNames("isHiden", "IsHiden")
+    val isHiden: Int,
+    @JsonNames("tips", "Tips")
+    val tips: List<Long>,
+    @JsonNames("voiceTitleTextMapHash", "VoiceTitleTextMapHash")
+    val voiceTitleTextMapHash: Int,
+    @JsonNames("voiceFile", "VoiceFile")
+    val voiceFile: String,
+    @JsonNames("voiceFileTextTextMapHash", "VoiceFileTextTextMapHash")
+    val voiceFileTextTextMapHash: Long,
+    @JsonNames("voiceTitleLockedTextMapHash", "VoiceTitleLockedTextMapHash")
+    val voiceTitleLockedTextMapHash: Int,
+    @JsonNames("fetterId", "FetterId")
+    val fetterId: Int,
+    @JsonNames("avatarId", "AvatarId")
+    val avatarId: Int,
+    @JsonNames("openConds", "OpenConds")
+    val openConds: List<OpenCond>,
 //    This one in json maybe has no data.
-//    @SerialName("FinishConds") val finishConds: List<Any>
+//    @JsonNames("finishConds", "FinishConds")
+//    val finishConds: List<Any>
 ) {
     @Serializable
     data class OpenCond(
-        @SerialName("CondType") val condType: String,
-        @SerialName("ParamList") val paramList: List<Int>
+        @JsonNames("condType", "CondType")
+        val condType: String,
+        @JsonNames("paramList", "ParamList")
+        val paramList: List<Int>
     )
 }

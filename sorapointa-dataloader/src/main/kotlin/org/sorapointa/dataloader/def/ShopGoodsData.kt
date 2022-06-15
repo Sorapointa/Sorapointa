@@ -1,43 +1,79 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import org.sorapointa.dataloader.DataLoader
+
+private val shopGoodsLoader =
+    DataLoader<List<ShopGoodsData>>("./ExcelBinOutput/ShopGoodsExcelConfigData.json")
+
+val shopGoodsData get() = shopGoodsLoader.data
 
 @Serializable
 data class ShopGoodsData(
-    @SerialName("GoodsId") val goodsId: Int,
-    @SerialName("SubTagNameTextMapHash") val subTagNameTextMapHash: Long,
-    @SerialName("ShopType") val shopType: Int,
-    @SerialName("ItemId") val itemId: Int,
-    @SerialName("ItemCount") val itemCount: Int,
-    @SerialName("CostItems") val costItems: List<CostItem>,
-    @SerialName("BeginTime") val beginTime: String,
-    @SerialName("EndTime") val endTime: String,
+    @JsonNames("goodsId", "GoodsId")
+    val goodsId: Int,
+    @JsonNames("subTagNameTextMapHash", "SubTagNameTextMapHash")
+    val subTagNameTextMapHash: Long,
+    @JsonNames("shopType", "ShopType")
+    val shopType: Int,
+    @JsonNames("itemId", "ItemId")
+    val itemId: Int,
+    @JsonNames("itemCount", "ItemCount")
+    val itemCount: Int,
+    @JsonNames("costItems", "CostItems")
+    val costItems: List<CostItem>,
+    @JsonNames("beginTime", "BeginTime")
+    val beginTime: String,
+    @JsonNames("endTime", "EndTime")
+    val endTime: String,
 //    Maybe has no data in json.
-//    @SerialName("PreconditionParamList") val preconditionParamList: List<Any>,
-    @SerialName("MinShowLevel") val minShowLevel: Int,
-    @SerialName("MinPlayerLevel") val minPlayerLevel: Int,
-    @SerialName("MaxPlayerLevel") val maxPlayerLevel: Int,
-    @SerialName("SortLevel") val sortLevel: Int,
-    @SerialName("BuyLimit") val buyLimit: Int,
-    @SerialName("IsBuyOnce") val isBuyOnce: Boolean,
-    @SerialName("Precondition") val precondition: String,
-    @SerialName("CostScoin") val costScoin: Int,
-    @SerialName("RefreshType") val refreshType: String,
-    @SerialName("RefreshParam") val refreshParam: Int,
-    @SerialName("SubTabId") val subTabId: Int,
-    @SerialName("CostHcoin") val costHcoin: Int,
-    @SerialName("RotateId") val rotateId: Int,
-    @SerialName("DiscountRate") val discountRate: Double,
-    @SerialName("OriginalPrice") val originalPrice: Int,
-    @SerialName("PreconditionParam") val preconditionParam: Int,
-    @SerialName("ShowId") val showId: Int,
-    @SerialName("CostMcoin") val costMcoin: Int,
-    @SerialName("ChooseOneGroupId") val chooseOneGroupId: Int
+//    @JsonNames("preconditionParamList", "PreconditionParamList")
+//    val preconditionParamList: List<Any>,
+    @JsonNames("minShowLevel", "MinShowLevel")
+    val minShowLevel: Int,
+    @JsonNames("minPlayerLevel", "MinPlayerLevel")
+    val minPlayerLevel: Int,
+    @JsonNames("maxPlayerLevel", "MaxPlayerLevel")
+    val maxPlayerLevel: Int,
+    @JsonNames("sortLevel", "SortLevel")
+    val sortLevel: Int,
+    @JsonNames("buyLimit", "BuyLimit")
+    val buyLimit: Int,
+    @JsonNames("isBuyOnce", "IsBuyOnce")
+    val isBuyOnce: Boolean,
+    @JsonNames("precondition", "Precondition")
+    val precondition: String,
+    @JsonNames("costScoin", "CostScoin")
+    val costScoin: Int,
+    @JsonNames("refreshType", "RefreshType")
+    val refreshType: String,
+    @JsonNames("refreshParam", "RefreshParam")
+    val refreshParam: Int,
+    @JsonNames("subTabId", "SubTabId")
+    val subTabId: Int,
+    @JsonNames("costHcoin", "CostHcoin")
+    val costHcoin: Int,
+    @JsonNames("rotateId", "RotateId")
+    val rotateId: Int,
+    @JsonNames("discountRate", "DiscountRate")
+    val discountRate: Double,
+    @JsonNames("originalPrice", "OriginalPrice")
+    val originalPrice: Int,
+    @JsonNames("preconditionParam", "PreconditionParam")
+    val preconditionParam: Int,
+    @JsonNames("showId", "ShowId")
+    val showId: Int,
+    @JsonNames("costMcoin", "CostMcoin")
+    val costMcoin: Int,
+    @JsonNames("chooseOneGroupId", "ChooseOneGroupId")
+    val chooseOneGroupId: Int
 ) {
     @Serializable
     data class CostItem(
-        @SerialName("Id") val id: Int,
-        @SerialName("Count") val count: Int
+        @JsonNames("id", "Id")
+        val id: Int,
+        @JsonNames("count", "Count")
+        val count: Int
     )
 }

@@ -1,66 +1,129 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import org.sorapointa.dataloader.DataLoader
+
+private val avatarDataLoader =
+    DataLoader<List<AvatarData>>("./ExcelBinOutput/AvatarExcelConfigData.json")
+
+val avatarDataList get() = avatarDataLoader.data
 
 @Serializable
 data class AvatarData(
-    @SerialName("BodyType") val bodyType: String,
-    @SerialName("ScriptDataPathHashSuffix") val scriptDataPathHashSuffix: Long,
-    @SerialName("ScriptDataPathHashPre") val scriptDataPathHashPre: Int,
-    @SerialName("IconName") val iconName: String,
-    @SerialName("SideIconName") val sideIconName: String,
-    @SerialName("QualityType") val qualityType: String,
-    @SerialName("ChargeEfficiency") val chargeEfficiency: Double,
-    @SerialName("CombatConfigHashSuffix") val combatConfigHashSuffix: Long,
-    @SerialName("CombatConfigHashPre") val combatConfigHashPre: Int,
-    @SerialName("InitialWeapon") val initialWeapon: Int,
-    @SerialName("WeaponType") val weaponType: String,
-    @SerialName("ManekinPathHashSuffix") val manekinPathHashSuffix: Long,
-    @SerialName("ManekinPathHashPre") val manekinPathHashPre: Int,
-    @SerialName("ImageName") val imageName: String,
-    @SerialName("GachaCardNameHashSuffix") val gachaCardNameHashSuffix: Long,
-    @SerialName("GachaImageNameHashSuffix") val gachaImageNameHashSuffix: Long,
-    @SerialName("ControllerPathRemoteHashPre") val controllerPathRemoteHashPre: Int,
-    @SerialName("CutsceneShow") val cutsceneShow: String,
-    @SerialName("SkillDepotId") val skillDepotId: Int,
-    @SerialName("StaminaRecoverSpeed") val staminaRecoverSpeed: Double,
-    @SerialName("CandSkillDepotIds") val candSkillDepotIds: List<Int>,
-    @SerialName("ManekinJsonConfigHashSuffix") val manekinJsonConfigHashSuffix: Long,
-    @SerialName("ManekinJsonConfigHashPre") val manekinJsonConfigHashPre: Int,
-    @SerialName("ManekinMotionConfig") val manekinMotionConfig: Int,
-    @SerialName("DescTextMapHash") val descTextMapHash: Long,
-    @SerialName("AvatarIdentityType") val avatarIdentityType: String,
-    @SerialName("AvatarPromoteId") val avatarPromoteId: Int,
-    @SerialName("AvatarPromoteRewardLevelList") val avatarPromoteRewardLevelList: List<Int>,
-    @SerialName("AvatarPromoteRewardIdList") val avatarPromoteRewardIdList: List<Int>,
-    @SerialName("FeatureTagGroupID") val featureTagGroupID: Int,
-    @SerialName("InfoDescTextMapHash") val infoDescTextMapHash: Long,
-    @SerialName("HpBase") val hpBase: Double,
-    @SerialName("AttackBase") val attackBase: Double,
-    @SerialName("DefenseBase") val defenseBase: Double,
-    @SerialName("Critical") val critical: Double,
-    @SerialName("CriticalHurt") val criticalHurt: Double,
-    @SerialName("PropGrowCurves") val propGrowCurves: List<PropGrowCurve>,
-    @SerialName("PrefabPathRagdollHashSuffix") val prefabPathRagdollHashSuffix: Long,
-    @SerialName("PrefabPathRagdollHashPre") val prefabPathRagdollHashPre: Int,
-    @SerialName("Id") val id: Int,
-    @SerialName("NameTextMapHash") val nameTextMapHash: Long,
-    @SerialName("PrefabPathHashSuffix") val prefabPathHashSuffix: Long,
-    @SerialName("PrefabPathHashPre") val prefabPathHashPre: Int,
-    @SerialName("PrefabPathRemoteHashSuffix") val prefabPathRemoteHashSuffix: Long,
-    @SerialName("PrefabPathRemoteHashPre") val prefabPathRemoteHashPre: Int,
-    @SerialName("ControllerPathHashSuffix") val controllerPathHashSuffix: Long,
-    @SerialName("ControllerPathHashPre") val controllerPathHashPre: Int,
-    @SerialName("ControllerPathRemoteHashSuffix") val controllerPathRemoteHashSuffix: Long,
-    @SerialName("LODPatternName") val lODPatternName: String,
-    @SerialName("UseType") val useType: String,
-    @SerialName("CoopPicNameHashSuffix") val coopPicNameHashSuffix: Long,
-    @SerialName("IsRangeAttack") val isRangeAttack: Boolean
+    @JsonNames("bodyType", "BodyType")
+    val bodyType: String,
+    @JsonNames("scriptDataPathHashSuffix", "ScriptDataPathHashSuffix")
+    val scriptDataPathHashSuffix: Long,
+    @JsonNames("scriptDataPathHashPre", "ScriptDataPathHashPre")
+    val scriptDataPathHashPre: Int,
+    @JsonNames("iconName", "IconName")
+    val iconName: String,
+    @JsonNames("sideIconName", "SideIconName")
+    val sideIconName: String,
+    @JsonNames("qualityType", "QualityType")
+    val qualityType: String,
+    @JsonNames("chargeEfficiency", "ChargeEfficiency")
+    val chargeEfficiency: Double,
+    @JsonNames("combatConfigHashSuffix", "CombatConfigHashSuffix")
+    val combatConfigHashSuffix: Long,
+    @JsonNames("combatConfigHashPre", "CombatConfigHashPre")
+    val combatConfigHashPre: Int,
+    @JsonNames("initialWeapon", "InitialWeapon")
+    val initialWeapon: Int,
+    @JsonNames("weaponType", "WeaponType")
+    val weaponType: String,
+    @JsonNames("manekinPathHashSuffix", "ManekinPathHashSuffix")
+    val manekinPathHashSuffix: Long,
+    @JsonNames("manekinPathHashPre", "ManekinPathHashPre")
+    val manekinPathHashPre: Int,
+    @JsonNames("imageName", "ImageName")
+    val imageName: String,
+    @JsonNames("gachaCardNameHashSuffix", "GachaCardNameHashSuffix")
+    val gachaCardNameHashSuffix: Long,
+    @JsonNames("gachaImageNameHashSuffix", "GachaImageNameHashSuffix")
+    val gachaImageNameHashSuffix: Long,
+    @JsonNames("controllerPathRemoteHashPre", "ControllerPathRemoteHashPre")
+    val controllerPathRemoteHashPre: Int,
+    @JsonNames("cutsceneShow", "CutsceneShow")
+    val cutsceneShow: String,
+    @JsonNames("skillDepotId", "SkillDepotId")
+    val skillDepotId: Int,
+    @JsonNames("staminaRecoverSpeed", "StaminaRecoverSpeed")
+    val staminaRecoverSpeed: Double,
+    @JsonNames("candSkillDepotIds", "CandSkillDepotIds")
+    val candSkillDepotIds: List<Int>,
+    @JsonNames("manekinJsonConfigHashSuffix", "ManekinJsonConfigHashSuffix")
+    val manekinJsonConfigHashSuffix: Long,
+    @JsonNames("manekinJsonConfigHashPre", "ManekinJsonConfigHashPre")
+    val manekinJsonConfigHashPre: Int,
+    @JsonNames("manekinMotionConfig", "ManekinMotionConfig")
+    val manekinMotionConfig: Int,
+    @JsonNames("descTextMapHash", "DescTextMapHash")
+    val descTextMapHash: Long,
+    @JsonNames("avatarIdentityType", "AvatarIdentityType")
+    val avatarIdentityType: String,
+    @JsonNames("avatarPromoteId", "AvatarPromoteId")
+    val avatarPromoteId: Int,
+    @JsonNames("avatarPromoteRewardLevelList", "AvatarPromoteRewardLevelList")
+    val avatarPromoteRewardLevelList: List<Int>,
+    @JsonNames("avatarPromoteRewardIdList", "AvatarPromoteRewardIdList")
+    val avatarPromoteRewardIdList: List<Int>,
+    @JsonNames("featureTagGroupID", "FeatureTagGroupID")
+    val featureTagGroupID: Int,
+    @JsonNames("infoDescTextMapHash", "InfoDescTextMapHash")
+    val infoDescTextMapHash: Long,
+    @JsonNames("hpBase", "HpBase")
+    val hpBase: Double,
+    @JsonNames("attackBase", "AttackBase")
+    val attackBase: Double,
+    @JsonNames("defenseBase", "DefenseBase")
+    val defenseBase: Double,
+    @JsonNames("critical", "Critical")
+    val critical: Double,
+    @JsonNames("criticalHurt", "CriticalHurt")
+    val criticalHurt: Double,
+    @JsonNames("propGrowCurves", "PropGrowCurves")
+    val propGrowCurves: List<PropGrowCurve>,
+    @JsonNames("prefabPathRagdollHashSuffix", "PrefabPathRagdollHashSuffix")
+    val prefabPathRagdollHashSuffix: Long,
+    @JsonNames("prefabPathRagdollHashPre", "PrefabPathRagdollHashPre")
+    val prefabPathRagdollHashPre: Int,
+    @JsonNames("id", "Id")
+    val id: Int,
+    @JsonNames("nameTextMapHash", "NameTextMapHash")
+    val nameTextMapHash: Long,
+    @JsonNames("prefabPathHashSuffix", "PrefabPathHashSuffix")
+    val prefabPathHashSuffix: Long,
+    @JsonNames("prefabPathHashPre", "PrefabPathHashPre")
+    val prefabPathHashPre: Int,
+    @JsonNames("prefabPathRemoteHashSuffix", "PrefabPathRemoteHashSuffix")
+    val prefabPathRemoteHashSuffix: Long,
+    @JsonNames("prefabPathRemoteHashPre", "PrefabPathRemoteHashPre")
+    val prefabPathRemoteHashPre: Int,
+    @JsonNames("controllerPathHashSuffix", "ControllerPathHashSuffix")
+    val controllerPathHashSuffix: Long,
+    @JsonNames("controllerPathHashPre", "ControllerPathHashPre")
+    val controllerPathHashPre: Int,
+    @JsonNames("controllerPathRemoteHashSuffix", "ControllerPathRemoteHashSuffix")
+    val controllerPathRemoteHashSuffix: Long,
+    @JsonNames("lODPatternName", "LODPatternName")
+    val lODPatternName: String,
+    @JsonNames("useType", "UseType")
+    val useType: String,
+    @JsonNames("coopPicNameHashSuffix", "CoopPicNameHashSuffix")
+    val coopPicNameHashSuffix: Long,
+    @JsonNames("isRangeAttack", "IsRangeAttack")
+    val isRangeAttack: Boolean
 ) {
     @Serializable
     data class PropGrowCurve(
-        @SerialName("Type") val type: String,
-        @SerialName("GrowCurve") val growCurve: String
+        @JsonNames("type", "Type")
+        val type: String,
+        @JsonNames("growCurve", "GrowCurve")
+        val growCurve: String
     )
 }

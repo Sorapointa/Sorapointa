@@ -1,31 +1,54 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import org.sorapointa.dataloader.DataLoader
+
+private val combineDataLoader =
+    DataLoader<List<CombineData>>("./ExcelBinOutput/CombineExcelConfigData.json")
+val combineData get() = combineDataLoader.data
 
 @Serializable
 data class CombineData(
-    @SerialName("CombineId") val combineId: Int,
-    @SerialName("PlayerLevel") val playerLevel: Int,
-    @SerialName("IsDefaultShow") val isDefaultShow: Boolean,
-    @SerialName("CombineType") val combineType: Int,
-    @SerialName("SubCombineType") val subCombineType: Int,
-    @SerialName("ResultItemId") val resultItemId: Int,
-    @SerialName("ResultItemCount") val resultItemCount: Int,
-    @SerialName("ScoinCost") val scoinCost: Int,
-    @SerialName("RandomItems") val randomItems: List<RandomItem>,
-    @SerialName("MaterialItems") val materialItems: List<MaterialItem>,
-    @SerialName("EffectDescTextMapHash") val effectDescTextMapHash: Int,
-    @SerialName("RecipeType") val recipeType: String
+    @JsonNames("combineId", "CombineId")
+    val combineId: Int,
+    @JsonNames("playerLevel", "PlayerLevel")
+    val playerLevel: Int,
+    @JsonNames("isDefaultShow", "IsDefaultShow")
+    val isDefaultShow: Boolean,
+    @JsonNames("combineType", "CombineType")
+    val combineType: Int,
+    @JsonNames("subCombineType", "SubCombineType")
+    val subCombineType: Int,
+    @JsonNames("resultItemId", "ResultItemId")
+    val resultItemId: Int,
+    @JsonNames("resultItemCount", "ResultItemCount")
+    val resultItemCount: Int,
+    @JsonNames("scoinCost", "ScoinCost")
+    val scoinCost: Int,
+    @JsonNames("randomItems", "RandomItems")
+    val randomItems: List<RandomItem>,
+    @JsonNames("materialItems", "MaterialItems")
+    val materialItems: List<MaterialItem>,
+    @JsonNames("effectDescTextMapHash", "EffectDescTextMapHash")
+    val effectDescTextMapHash: Int,
+    @JsonNames("recipeType", "RecipeType")
+    val recipeType: String
 ) {
     @Serializable
     data class RandomItem(
-        @SerialName("Count") val count: Int
+        @JsonNames("count", "Count")
+        val count: Int
     )
 
     @Serializable
     data class MaterialItem(
-        @SerialName("Id") val id: Int,
-        @SerialName("Count") val count: Int
+        @JsonNames("id", "Id")
+        val id: Int,
+        @JsonNames("count", "Count")
+        val count: Int
     )
 }

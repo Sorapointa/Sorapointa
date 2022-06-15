@@ -1,24 +1,42 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import org.sorapointa.dataloader.DataLoader
+
+private val towerLevelLoader =
+    DataLoader<List<TowerLevelData>>("./ExcelBinOutput/TowerLevelExcelConfigData.json")
+
+val towerLevelData get() = towerLevelLoader.data
 
 @Serializable
 data class TowerLevelData(
-    @SerialName("ID") val iD: Int,
-    @SerialName("LevelId") val levelId: Int,
-    @SerialName("LevelIndex") val levelIndex: Int,
-    @SerialName("DungeonId") val dungeonId: Int,
-    @SerialName("Param") val `param`: List<Param>,
-    @SerialName("TowerBuffConfigStrList") val towerBuffConfigStrList: List<String>,
-    @SerialName("FirstPassRewardId") val firstPassRewardId: Int,
-    @SerialName("MonsterLevel") val monsterLevel: Int,
-    @SerialName("FirstMonsterList") val firstMonsterList: List<Int>,
-    @SerialName("SecondMonsterList") val secondMonsterList: List<Int>
+    @JsonNames("iD", "ID")
+    val iD: Int,
+    @JsonNames("levelId", "LevelId")
+    val levelId: Int,
+    @JsonNames("levelIndex", "LevelIndex")
+    val levelIndex: Int,
+    @JsonNames("dungeonId", "DungeonId")
+    val dungeonId: Int,
+    @JsonNames("param", "Param")
+    val `param`: List<Param>,
+    @JsonNames("towerBuffConfigStrList", "TowerBuffConfigStrList")
+    val towerBuffConfigStrList: List<String>,
+    @JsonNames("firstPassRewardId", "FirstPassRewardId")
+    val firstPassRewardId: Int,
+    @JsonNames("monsterLevel", "MonsterLevel")
+    val monsterLevel: Int,
+    @JsonNames("firstMonsterList", "FirstMonsterList")
+    val firstMonsterList: List<Int>,
+    @JsonNames("secondMonsterList", "SecondMonsterList")
+    val secondMonsterList: List<Int>
 ) {
     @Serializable
     data class Param(
-        @SerialName("TowerCondType") val towerCondType: String,
-        @SerialName("ArgumentList") val argumentList: List<Int>
+        @JsonNames("towerCondType", "TowerCondType")
+        val towerCondType: String,
+        @JsonNames("argumentList", "ArgumentList")
+        val argumentList: List<Int>
     )
 }

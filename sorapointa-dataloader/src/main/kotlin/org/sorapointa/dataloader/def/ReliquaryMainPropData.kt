@@ -1,13 +1,24 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import org.sorapointa.dataloader.DataLoader
+
+private val reliquaryMainPropLoader =
+    DataLoader<List<ReliquaryMainPropData>>("./ExcelBinOutput/ReliquaryMainPropExcelConfigData.json")
+
+val reliquaryMainPropData get() = reliquaryMainPropLoader.data
 
 @Serializable
 data class ReliquaryMainPropData(
-    @SerialName("Id") val id: Int,
-    @SerialName("PropDepotId") val propDepotId: Int,
-    @SerialName("PropType") val propType: String,
-    @SerialName("AffixName") val affixName: String,
-    @SerialName("Weight") val weight: Int
+    @JsonNames("id", "Id")
+    val id: Int,
+    @JsonNames("propDepotId", "PropDepotId")
+    val propDepotId: Int,
+    @JsonNames("propType", "PropType")
+    val propType: String,
+    @JsonNames("affixName", "AffixName")
+    val affixName: String,
+    @JsonNames("weight", "Weight")
+    val weight: Int,
 )
