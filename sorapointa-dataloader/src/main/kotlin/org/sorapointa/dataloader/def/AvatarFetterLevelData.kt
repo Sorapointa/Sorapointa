@@ -1,10 +1,21 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import org.sorapointa.dataloader.DataLoader
+
+private val avatarFetterLevelDataLoader =
+    DataLoader<List<AvatarFetterLevelData>>("./ExcelBinOutput/AvatarFettersLevelExcelConfigData.json")
+
+val avatarFetterLevelData get() = avatarFetterLevelDataLoader.data
 
 @Serializable
 data class AvatarFetterLevelData(
-    @SerialName("FetterLevel") val fetterLevel: Int,
-    @SerialName("NeedExp") val needExp: Int
+    @JsonNames("fetterLevel", "FetterLevel")
+    val fetterLevel: Int,
+    @JsonNames("needExp", "NeedExp")
+    val needExp: Int
 )

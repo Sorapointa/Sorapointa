@@ -1,18 +1,30 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import org.sorapointa.dataloader.DataLoader
+
+private val reliquaryLevelLoader =
+    DataLoader<List<ReliquaryLevelData>>("./ExcelBinOutput/ReliquaryLevelExcelConfigData.json")
+
+val reliquaryLevelData get() = reliquaryLevelLoader.data
 
 @Serializable
 data class ReliquaryLevelData(
-    @SerialName("Level") val level: Int,
-    @SerialName("AddProps") val addProps: List<AddProp>,
-    @SerialName("Rank") val rank: Int,
-    @SerialName("Exp") val exp: Int
+    @JsonNames("level", "Level")
+    val level: Int,
+    @JsonNames("addProps", "AddProps")
+    val addProps: List<AddProp>,
+    @JsonNames("rank", "Rank")
+    val rank: Int,
+    @JsonNames("exp", "Exp")
+    val exp: Int
 ) {
     @Serializable
     data class AddProp(
-        @SerialName("PropType") val propType: String,
-        @SerialName("Value") val value: Double
+        @JsonNames("propType", "PropType")
+        val propType: String,
+        @JsonNames("value", "Value")
+        val value: Double
     )
 }

@@ -1,32 +1,57 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import org.sorapointa.dataloader.DataLoader
+
+private val proudSkillLoader =
+    DataLoader<List<ProudSkillData>>("./ExcelBinOutput/ProudSkillExcelConfigData.json")
+
+val proudSkillData get() = proudSkillLoader.data
 
 @Serializable
 data class ProudSkillData(
-    @SerialName("ProudSkillId") val proudSkillId: Int,
-    @SerialName("ProudSkillGroupId") val proudSkillGroupId: Int,
-    @SerialName("Level") val level: Int,
-    @SerialName("ProudSkillType") val proudSkillType: Int,
-    @SerialName("NameTextMapHash") val nameTextMapHash: Long,
-    @SerialName("DescTextMapHash") val descTextMapHash: Long,
-    @SerialName("UnlockDescTextMapHash") val unlockDescTextMapHash: Long,
-    @SerialName("Icon") val icon: String,
-    @SerialName("CoinCost") val coinCost: Int,
-    @SerialName("CostItems") val costItems: List<CostItem>,
-    @SerialName("FilterConds") val filterConds: List<String>,
-    @SerialName("BreakLevel") val breakLevel: Int,
-    @SerialName("ParamDescList") val paramDescList: List<Long>,
-    @SerialName("LifeEffectParams") val lifeEffectParams: List<String>,
-    @SerialName("OpenConfig") val openConfig: String,
-    @SerialName("AddProps") val addProps: List<AddProp>,
-    @SerialName("ParamList") val paramList: List<Double>
+    @JsonNames("proudSkillId", "ProudSkillId")
+    val proudSkillId: Int,
+    @JsonNames("proudSkillGroupId", "ProudSkillGroupId")
+    val proudSkillGroupId: Int,
+    @JsonNames("level", "Level")
+    val level: Int,
+    @JsonNames("proudSkillType", "ProudSkillType")
+    val proudSkillType: Int,
+    @JsonNames("nameTextMapHash", "NameTextMapHash")
+    val nameTextMapHash: Long,
+    @JsonNames("descTextMapHash", "DescTextMapHash")
+    val descTextMapHash: Long,
+    @JsonNames("unlockDescTextMapHash", "UnlockDescTextMapHash")
+    val unlockDescTextMapHash: Long,
+    @JsonNames("icon", "Icon")
+    val icon: String,
+    @JsonNames("coinCost", "CoinCost")
+    val coinCost: Int,
+    @JsonNames("costItems", "CostItems")
+    val costItems: List<CostItem>,
+    @JsonNames("filterConds", "FilterConds")
+    val filterConds: List<String>,
+    @JsonNames("breakLevel", "BreakLevel")
+    val breakLevel: Int,
+    @JsonNames("paramDescList", "ParamDescList")
+    val paramDescList: List<Long>,
+    @JsonNames("lifeEffectParams", "LifeEffectParams")
+    val lifeEffectParams: List<String>,
+    @JsonNames("openConfig", "OpenConfig")
+    val openConfig: String,
+    @JsonNames("addProps", "AddProps")
+    val addProps: List<AddProp>,
+    @JsonNames("paramList", "ParamList")
+    val paramList: List<Double>
 ) {
     @Serializable
     data class CostItem(
-        @SerialName("Id") val id: Int,
-        @SerialName("Count") val count: Int
+        @JsonNames("id", "Id")
+        val id: Int,
+        @JsonNames("count", "Count")
+        val count: Int
     )
 
     @Serializable

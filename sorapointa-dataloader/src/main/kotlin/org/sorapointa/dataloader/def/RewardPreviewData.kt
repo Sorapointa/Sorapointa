@@ -1,17 +1,28 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import org.sorapointa.dataloader.DataLoader
+
+private val rewardPreviewLoader =
+    DataLoader<List<RewardPreviewData>>("./ExcelBinOutput/RewardExcelConfigData.json")
+
+val rewardPreviewData get() = rewardPreviewLoader.data
 
 @Serializable
 data class RewardPreviewData(
-    @SerialName("Desc") val desc: String,
-    @SerialName("PreviewItems") val previewItems: List<PreviewItem>,
-    @SerialName("Id") val id: Int
+    @JsonNames("desc", "Desc")
+    val desc: String,
+    @JsonNames("previewItems", "PreviewItems")
+    val previewItems: List<PreviewItem>,
+    @JsonNames("id", "Id")
+    val id: Int
 ) {
     @Serializable
     data class PreviewItem(
-        @SerialName("Id") val id: Int,
-        @SerialName("Count") val count: String
+        @JsonNames("id", "Id")
+        val id: Int,
+        @JsonNames("count", "Count")
+        val count: String
     )
 }
