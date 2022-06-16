@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import org.sorapointa.dataloader.DataLoader
 
 private val materialDataLoader =
-    DataLoader<List<MaterialData>>("./ExcelBinOutput/GadgetExcelConfigData.json")
+    DataLoader<List<MaterialData>>("./ExcelBinOutput/MaterialExcelConfigData.json")
 
 val materialData get() = materialDataLoader.data
 
