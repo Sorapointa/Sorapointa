@@ -1,11 +1,12 @@
 package org.sorapointa.dataloader.custom
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.common.PointData
 
 // TODO: 2022/5/8 ?
-@kotlinx.serialization.Serializable
+@Serializable
 data class ScenePointEntry(
-    @SerialName("name") val name: String,
-    @SerialName("pointData") val pointData: PointData,
+    @JsonNames("name", "Name") val name: String,
+    @JsonNames("pointData", "PointData") val pointData: PointData,
 )
