@@ -1,9 +1,10 @@
 package org.sorapointa.dataloader.common
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class PropGrowCurve(
-    @SerialName("Type") val type: String,
-    @SerialName("GrowCurve") val growCurve: String,
+    @JsonNames("type", "Type") val type: String,
+    @JsonNames("growCurve", "GrowCurve") val growCurve: String,
 )

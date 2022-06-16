@@ -1,13 +1,14 @@
 package org.sorapointa.dataloader.common
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 
 // TODO: 2022/5/8 ?
-@kotlinx.serialization.Serializable
+@Serializable
 data class PointData(
-    @SerialName("id") val id: Int,
-    @SerialName("${'$'}type") val type: String,
-    @SerialName("transPos") val transPos: Triple<Int, Int, Int>, // Position
-    @SerialName("dungeonIds") val dungeonIds: List<Int>, // Array
-    @SerialName("dungeonRandomList") val dungeonRandomList: List<Int> // Array
+    @JsonNames("id", "Id") val id: Int,
+    @JsonNames("\$type", "\$Type") val type: String,
+    @JsonNames("transPos", "TransPos") val transPos: Triple<Int, Int, Int>, // Position
+    @JsonNames("dungeonIds", "DungeonIds") val dungeonIds: List<Int>, // Array
+    @JsonNames("dungeonRandomList", "DungeonRandomList") val dungeonRandomList: List<Int> // Array
 )
