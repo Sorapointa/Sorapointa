@@ -1,9 +1,10 @@
 package org.sorapointa.dataloader.common
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class RewardItemData(
-    @SerialName("ItemId") val itemId: Int,
-    @SerialName("ItemCount") val itemCount: Int,
+    @JsonNames("itemId", "ItemId") val itemId: Int,
+    @JsonNames("itemCount", "ItemCount") val itemCount: Int,
 )

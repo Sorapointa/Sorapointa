@@ -1,10 +1,11 @@
 package org.sorapointa.dataloader.common
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class CurveInfo(
-    @SerialName("Type") val type: String,
-    @SerialName("Arith") val arith: String,
-    @SerialName("Value") val value: Float,
+    @JsonNames("type", "Type") val type: String,
+    @JsonNames("arith", "Arith") val arith: String,
+    @JsonNames("value", "Value") val value: Float,
 )
