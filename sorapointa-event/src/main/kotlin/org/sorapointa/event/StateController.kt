@@ -149,7 +149,7 @@ open class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TSt
     firstState: TInterfaceWithState
 ) {
 
-    protected var currentState = atomic(firstState)
+    protected val currentState = atomic(firstState)
 
     private var observers = ConcurrentHashMap<suspend TClassWithState.(TState, TState) -> Unit, ListenerState>()
     private var interceptors = ConcurrentHashMap<suspend TClassWithState.(TState, TState) -> Boolean, ListenerState>()
