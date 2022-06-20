@@ -54,6 +54,3 @@ only adding fields can be updated automatically.
 
 Any database operations API provided to the upper layer should not include any transaction block.
 It will cause nested transactions and raises the issues mentioned above due to transaction isolation.
-
-Database operation methods must add the `suspend` modifier.
-and suppress warnings with `@Suppress("RedundantSuspendModifier")`.
