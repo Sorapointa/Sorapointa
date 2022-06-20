@@ -51,9 +51,15 @@ generated/
 ### Resources ###
 /resources/
 
-### Config ###
+### Build Config ###
 local.properties
 
+### Sorapointa Config & Generated Files ###
+sorapointa-core/langs/
+sorapointa-dispatch/langs/
+**/config/
+
+
 ### Database ###
-*.db
+**/*.db
 *.db-journal
