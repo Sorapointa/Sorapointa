@@ -8,6 +8,7 @@ import org.sorapointa.utils.*
 import org.w3c.dom.Document
 import java.math.BigInteger
 import java.security.KeyFactory
+import java.security.Signature
 import java.security.spec.RSAPrivateKeySpec
 import java.security.spec.RSAPublicKeySpec
 import javax.crypto.Cipher
@@ -27,6 +28,7 @@ class RSAKey(
     private val keySize = modulus.bitLength()
     private val factory = KeyFactory.getInstance("RSA")
     private val cipher = Cipher.getInstance("RSA")
+    private val signature: Signature = Signature.getInstance("SHA256withRSA")
     private val privateSpec by lazy {
         d?.let { RSAPrivateKeySpec(modulus, d) }
     }
@@ -45,6 +47,20 @@ class RSAKey(
         privateKey?.let {
             cipher.init(Cipher.DECRYPT_MODE, privateKey)
             chunkCipher()
+        } ?: error("Component of private key, `d`, has not been given in constructor")
+    }
+
+    suspend fun ByteArray.signVerify(sign: ByteArray): Boolean = withContext(Dispatchers.Default) {
+        signature.initVerify(publicKey)
+        signature.update(this@signVerify)
+        signature.verify(sign)
+    }
+
+    suspend fun ByteArray.sign(): ByteArray = withContext(Dispatchers.Default) {
+        privateKey?.let {
+            signature.initSign(it)
+            signature.update(this@sign)
+            signature.sign()
         } ?: error("Component of private key, `d`, has not been given in constructor")
     }
 
