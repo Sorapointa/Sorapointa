@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+echo "======== MESSAGE ========"
+
+INPUT_FILE=$1
+
+START_LINE=$(head -n1 "$INPUT_FILE")
+
+PATTERN="^(#[0-9]+ )?(feat(ure)?|fix|docs|style|refactor|ci|chore|pref|build|test|revert)(\(.+\))?: .+$"
+
+if [ "${#START_LINE}" -gt "72" ]; then
+  echo "Message too long! Assert length <= 72."
+  echo "Consider multi-line messages instead."
+  exit
+fi
+
+if ! [[ "$START_LINE" =~ $PATTERN ]]; then
+  echo "$START_LINE"
+  echo
+  echo "↑ Bad commit message, commit message must be matched by $PATTERN"
+  echo "Template: type(scope): messages"
+  echo "For example: feat(i18n): LocalAble interface"
+  exit 1
+fi

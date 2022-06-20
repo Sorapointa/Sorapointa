@@ -1,4 +1,5 @@
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import java.nio.file.Files
 
 plugins {
     kotlin("plugin.serialization") apply false
@@ -32,3 +33,12 @@ allprojects {
     group = "moe.sdl.sorapointa"
     version = "0.1.0-SNAPSHOT"
 }
+
+fun installGitHooks() {
+    val target = File(project.rootProject.rootDir, ".git/hooks")
+    val source = File(project.rootProject.rootDir, ".git-hooks")
+    if (target.canonicalFile == source) return
+    target.deleteRecursively()
+    Files.createSymbolicLink(target.toPath(), source.toPath())
+}
+installGitHooks()
