@@ -24,9 +24,12 @@ import org.sorapointa.proto.QueryRegionListHttpRspOuterClass.QueryRegionListHttp
 import org.sorapointa.proto.queryCurrRegionHttpRsp
 import org.sorapointa.proto.queryRegionListHttpRsp
 import org.sorapointa.proto.regionSimpleInfo
-import org.sorapointa.utils.*
+import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.crypto.RSAKey
 import org.sorapointa.utils.crypto.parseToRSAKey
+import org.sorapointa.utils.i18n
+import org.sorapointa.utils.networkJson
+import org.sorapointa.utils.xor
 import java.util.concurrent.ConcurrentHashMap
 
 private val logger = KotlinLogging.logger {}
@@ -70,6 +73,7 @@ private suspend fun getQueryRegionListHttpRsp(host: String): QueryRegionListHttp
     private set
 
 private val dispatchRSAKey: RSAKey? = DispatchConfig.data.requestSetting.rsaPrivateKey.parseToRSAKey()
+private val dispatchPublicRSAKey: RSAKey? = DispatchConfig.data.requestSetting.rsaPublicKey.parseToRSAKey()
 
 private suspend fun ApplicationCall.forwardQueryCurrentRegionHttpRsp(): QueryCurrRegionHttpRsp {
 
@@ -82,16 +86,25 @@ private suspend fun ApplicationCall.forwardQueryCurrentRegionHttpRsp(): QueryCur
             } else {
                 DispatchServer.client.get(requestSetting.queryCurrentRegionHardcode)
             }.bodyAsText()
-            if (!requestSetting.v28 || dispatchRSAKey == null) {
+            if (!requestSetting.v28CurrentRegionForwardFormat || dispatchRSAKey == null) {
                 logger.debug { "QueryCurrentRegion Result: $forwardResult" }
                 QueryCurrRegionHttpRsp.parseFrom(forwardResult.decodeBase64Bytes())
             } else {
                 val query: QueryCurrentRegionData = networkJson.decodeFromString(forwardResult)
                 logger.debug { "QueryCurrentRegion Result: $query" }
                 with(dispatchRSAKey) {
-                    val result = query.content.decodeBase64Bytes().decrypt()
-                    logger.debug { "QueryCurrentRegion Decrypted Result: ${result.encodeBase64()}" }
-                    QueryCurrRegionHttpRsp.parseFrom(result)
+                    val decryptResult = query.content.decodeBase64Bytes().decrypt()
+                    val signVerifyResult = if (requestSetting.enableSignVerify) {
+                        dispatchPublicRSAKey?.run {
+                            decryptResult.signVerify(query.sign.decodeBase64Bytes())
+                        } ?: false
+                    } else true // If disable signVerify, return true
+                    logger.debug { "QueryCurrentRegion Decrypted Result: ${decryptResult.encodeBase64()}" }
+                    if (signVerifyResult) {
+                        QueryCurrRegionHttpRsp.parseFrom(decryptResult)
+                    } else {
+                        error("QueryCurrentRegion sign verify failed")
+                    }
                 }
             }
         } else queryCurrRegionHttpRsp {}
@@ -140,7 +153,7 @@ internal suspend fun ApplicationCall.handleQueryCurrentRegion() {
         // because it's related with injecting new RSA key,
         // but that is uncessary for now.
         val data = it.data.toByteArray().encodeBase64()
-        if (DispatchConfig.data.requestSetting.v28) {
+        if (DispatchConfig.data.requestSetting.v28CurrentRegionForwardFormat) {
             respond(QueryCurrentRegionData(data))
         } else {
             respondText(data)
@@ -181,7 +194,7 @@ internal suspend fun ApplicationCall.handleLogin() {
                 returnErrorMsg("dispatch.login.error.password")
                 return@newSuspendedTransaction
             }
-            val token = account.generateDipatchToken()
+            val token = account.generateDispatchToken()
             LoginAccountResponseEvent(
                 this@handleLogin,
                 LoginResultData(
@@ -232,7 +245,7 @@ internal suspend fun ApplicationCall.handleComboLogin() {
             ComboTokenResponseData(
                 returnCode = 0, message = "OK",
                 ComboTokenResponseData.LoginData(
-                    accountType = 1u,
+                    accountType = 1,
                     comboId = comboId,
                     comboToken = comboToken,
                     data = ComboTokenResponseData.LoginData.LoginGuestData(guest = false),
@@ -264,7 +277,7 @@ internal suspend fun ApplicationCall.handleVerify() {
             returnErrorMsg("dispatch.login.error.token")
             return@newSuspendedTransaction
         }
-        val token = account.generateDipatchToken()
+        val token = account.generateDispatchToken()
         LoginAccountResponseEvent(
             this@handleVerify,
             LoginResultData(
@@ -287,7 +300,7 @@ internal suspend fun ApplicationCall.handleLoadConfig() {
         MdkShieldLoadConfigData(
             returnCode = 0, message = "OK",
             data = MdkShieldLoadConfigData.Data(
-                id = 6u,
+                id = 6,
                 gameKey = "sora",
                 client = "PC",
                 identity = "I_IDENTITY",
@@ -318,7 +331,7 @@ internal suspend fun ApplicationCall.handleGetConfig() {
                 qrEnabled = false,
                 logLevel = "INFO",
                 announceUrl = ANNOUNCE_URL.decodeBase64String(),
-                pushAliasType = 1u,
+                pushAliasType = 1,
                 enableAnnouncePicPopup = true,
                 disableYsdkGuard = true
             )
@@ -334,14 +347,14 @@ internal suspend fun ApplicationCall.handleGetCompareProtocolVersion() {
             data = CompareProtocolVersionData.Data(
                 modified = true,
                 protocol = CompareProtocolVersionData.Data.Protocol(
-                    id = 0u,
-                    appId = 4u,
+                    id = 0,
+                    appId = 4,
                     language = "en",
                     userProto = "",
                     privProto = "",
-                    major = 26u,
-                    minimum = 2u,
-                    createTime = 0u,
+                    major = 26,
+                    minimum = 2,
+                    createTime = 0,
                     teenagerProto = "",
                     thirdProto = ""
                 )

@@ -19,22 +19,22 @@ import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.encoding.hex
 import org.sorapointa.utils.now
 import org.sorapointa.utils.randomByteArray
-import org.sorapointa.utils.randomUInt
+import kotlin.random.Random
 
 private val logger = KotlinLogging.logger {}
 
 @SorapointaInternal
-object AccountTable : IdTable<UInt>("account_table") {
-    override val id: Column<EntityID<UInt>> = uinteger("user_id").autoIncrement().entityId()
+object AccountTable : IdTable<Int>("account_table") {
+    override val id: Column<EntityID<Int>> = integer("user_id").autoIncrement().entityId()
     val userName: Column<String> = varchar("user_name", 60).uniqueIndex()
     val password: Column<String> = varchar("password", 255)
     val email: Column<String?> = varchar("email", 255).uniqueIndex().nullable()
     val comboToken: Column<String?> = varchar("combo_token", 40).nullable()
     val comboTokenGenerationTime: Column<Instant?> = timestamp("combo_token_generation_time").nullable()
-    val comboId: Column<UInt?> = uinteger("combo_id").nullable()
+    val comboId: Column<Int?> = integer("combo_id").nullable()
     val dispatchToken: Column<String?> = varchar("dispatch_token", 32).nullable()
     val dispatchTokenGenerationTime: Column<Instant?> = timestamp("dispatch_token_generation_time").nullable()
-    val permissionLevel: Column<UShort> = ushort("permission_level").default(0u)
+    val permissionLevel: Column<Int> = integer("permission_level").default(0)
 
     override val primaryKey: PrimaryKey = PrimaryKey(id)
 }
@@ -52,10 +52,10 @@ val argon2Function: Argon2Function by lazy {
     )
 }
 
-@Suppress("RedundantSuspendModifier", "MemberVisibilityCanBePrivate", "unused")
-class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
+@Suppress("MemberVisibilityCanBePrivate", "unused")
+class Account(id: EntityID<Int>) : Entity<Int>(id) {
 
-    companion object : EntityClass<UInt, Account>(AccountTable) {
+    companion object : EntityClass<Int, Account>(AccountTable) {
 
         private val usePepper = DispatchConfig.data.accountSetting.password.usePepper
         private val pepper = DispatchConfig.data.accountSetting.password.hashPepper
@@ -63,13 +63,13 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
         /**
          * Find a user account by email
          */
-        suspend fun findByEmail(email: String) =
+        fun findByEmail(email: String) =
             find { AccountTable.email eq email }
 
         /**
          * Find a user account by username
          */
-        suspend fun findByName(name: String) =
+        fun findByName(name: String) =
             find { AccountTable.userName eq name }
 
         /**
@@ -89,7 +89,7 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
          * @param inputPassword plain password without hash
          * @return user id in databse
          */
-        suspend fun create(name: String, inputPassword: String): EntityID<UInt> {
+        suspend fun create(name: String, inputPassword: String): EntityID<Int> {
             logger.info { "Creating user account of $name" }
             CreateAccountEvent(name).broadcast()
             val hashSalt = generateSalt()
@@ -100,7 +100,7 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
             }
         }
 
-        private suspend fun hashPassword(inputPassword: String, salt: String): String =
+        private fun hashPassword(inputPassword: String, salt: String): String =
             Password.hash(inputPassword)
                 .addSalt(salt)
                 .apply {
@@ -124,7 +124,7 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
     private var dispatchTokenGenerationTime by AccountTable.dispatchTokenGenerationTime
     var permissionLevel by AccountTable.permissionLevel
 
-    internal suspend fun checkPassword(inputPassword: String): Boolean =
+    internal fun checkPassword(inputPassword: String): Boolean =
         Password.check(inputPassword, password)
             .apply {
                 if (usePepper) {
@@ -133,46 +133,46 @@ class Account(id: EntityID<UInt>) : Entity<UInt>(id) {
             }.with(argon2Function)
 
     @SorapointaInternal
-    suspend fun updatePassword(inputPassword: String) {
+    fun updatePassword(inputPassword: String) {
         password = hashPassword(inputPassword, generateSalt())
     }
 
-    internal suspend fun generateDipatchToken(): String {
+    internal fun generateDispatchToken(): String {
         val token = randomByteArray(32).encodeBase64()
         dispatchToken = token
         dispatchTokenGenerationTime = now()
         return token
     }
 
-    internal suspend fun generateComboToken(): String {
+    internal fun generateComboToken(): String {
         val token = randomByteArray(20).hex
         comboToken = token
         comboTokenGenerationTime = now()
         return token
     }
 
-    internal suspend fun getComboIdOrGenerate(): UInt =
-        comboId ?: randomUInt().also {
+    internal fun getComboIdOrGenerate(): Int =
+        comboId ?: Random.nextInt().also {
             comboId = it
         }
 
     @SorapointaInternal
-    suspend fun getComboToken(): String? {
+    fun getComboTokenWithCheck(): String? {
         if (checkComboTokenExpire()) return null
         return comboToken
     }
 
-    internal suspend fun getDispatchToken(): String? {
+    internal fun getDispatchToken(): String? {
         if (checkDispatchTokenExpire()) return null
         return dispatchToken
     }
 
-    private suspend fun checkComboTokenExpire(): Boolean =
+    private fun checkComboTokenExpire(): Boolean =
         comboTokenGenerationTime?.let {
             now() - it > DispatchConfig.data.accountSetting.comboTokenExpiredTime
         } ?: true
 
-    private suspend fun checkDispatchTokenExpire(): Boolean =
+    private fun checkDispatchTokenExpire(): Boolean =
         dispatchTokenGenerationTime?.let {
             now() - it > DispatchConfig.data.accountSetting.dispatchTokenExpiredTime
         } ?: true

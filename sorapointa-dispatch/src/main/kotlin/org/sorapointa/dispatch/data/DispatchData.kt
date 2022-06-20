@@ -5,8 +5,8 @@ package org.sorapointa.dispatch.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
-import org.sorapointa.utils.sha256sign
 import org.sorapointa.utils.networkJson
+import org.sorapointa.utils.sha256sign
 
 @Serializable
 data class QueryCurrentRegionData(
@@ -251,24 +251,24 @@ data class LoginResultData(
     data class VerifyAccountData(
         val uid: UInt,
         val token: String,
-        val name: String ? = null,
-        val email: String ? = null,
-        val mobile: String ? = null,
-        val country: String ? = null,
-        @SerialName("is_email_verify") val isEmailVerify: UShort ? = null,
-        @SerialName("realname") val realName: String ? = null,
-        @SerialName("identity_card") val identityCard: String ? = null,
+        val name: String? = null,
+        val email: String? = null,
+        val mobile: String? = null,
+        val country: String? = null,
+        @SerialName("is_email_verify") val isEmailVerify: Int? = null,
+        @SerialName("realname") val realName: String? = null,
+        @SerialName("identity_card") val identityCard: String? = null,
         @SerialName("safe_mobile") val safeMobile: String? = null,
-        @SerialName("facebook_name") val facebookName: String ? = null,
-        @SerialName("twitter_name") val twitterName: String ? = null,
-        @SerialName("game_center_name") val gameCenterName: String ? = null,
-        @SerialName("google_name") val googleName: String ? = null,
-        @SerialName("apple_name") val appleName: String ? = null,
-        @SerialName("sony_name") val sonyName: String ? = null,
-        @SerialName("tap_name") val tapName: String ? = null,
-        @SerialName("reactivate_ticket") val reactivateTicket: String ? = null,
-        @SerialName("area_code") val areaCode: String ? = null,
-        @SerialName("device_grant_ticket") val deviceGrantTicket: String ? = null,
+        @SerialName("facebook_name") val facebookName: String? = null,
+        @SerialName("twitter_name") val twitterName: String? = null,
+        @SerialName("game_center_name") val gameCenterName: String? = null,
+        @SerialName("google_name") val googleName: String? = null,
+        @SerialName("apple_name") val appleName: String? = null,
+        @SerialName("sony_name") val sonyName: String? = null,
+        @SerialName("tap_name") val tapName: String? = null,
+        @SerialName("reactivate_ticket") val reactivateTicket: String? = null,
+        @SerialName("area_code") val areaCode: String? = null,
+        @SerialName("device_grant_ticket") val deviceGrantTicket: String? = null,
     )
 }
 
