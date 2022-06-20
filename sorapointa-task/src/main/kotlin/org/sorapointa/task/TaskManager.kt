@@ -13,7 +13,61 @@ import kotlin.time.Duration
 
 private val logger = KotlinLogging.logger {}
 
-object TaskManager {
+interface ITaskManager {
+
+    /**
+     * Init task manager scope for structured concurrency
+     *
+     * This method **IS NOT** thread-safe
+     */
+    fun init(parentContext: CoroutineContext = EmptyCoroutineContext)
+
+    fun close()
+
+    /**
+     * Register a simple delayed task
+     *
+     * @return task job
+     */
+    fun registerTask(
+        delay: Duration,
+        task: suspend () -> Unit,
+    ): Job
+
+    /**
+     * Register a simple delayed task
+     *
+     * @return task job
+     */
+    fun registerTask(
+        delayMillis: Long,
+        task: suspend () -> Unit,
+    ): Job
+
+    /**
+     * Register a task
+     *
+     * @return If this job has been registered already, it would return null
+     */
+    fun registerTask(
+        id: String,
+        cron: String,
+        task: suspend () -> Unit,
+    ): Job?
+
+    /**
+     * Register a task
+     *
+     * @return If this job has been registered already, it would return null
+     */
+    fun registerTask(
+        id: String,
+        cron: Cron,
+        task: suspend () -> Unit,
+    ): Job?
+}
+
+object TaskManager : ITaskManager {
     private var scope = ModuleScope("TaskManager")
 
     private val cronJobMap: MutableMap<String, Job> = ConcurrentHashMap()
@@ -23,22 +77,20 @@ object TaskManager {
      *
      * This method **IS NOT** thread-safe
      */
-    fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
+    override fun init(parentContext: CoroutineContext) {
         scope = ModuleScope("TaskManager", parentContext)
     }
 
-    @Suppress("MemberVisibilityCanBePrivate", "unused")
-    fun close() {
+    override fun close() {
         scope.cancel("Closing")
     }
 
     /**
-     * Register a task
+     * Register a simple delayed task
      *
-     * @return If this job has been registered already, it would return null
+     * @return task job
      */
-    @Suppress("MemberVisibilityCanBePrivate", "unused")
-    fun registerTask(
+    override fun registerTask(
         delay: Duration,
         task: suspend () -> Unit,
     ): Job = scope.launch {
@@ -49,12 +101,11 @@ object TaskManager {
     }
 
     /**
-     * Register a task
+     * Register a simple delayed task
      *
-     * @return If this job has been registered already, it would return null
+     * @return task job
      */
-    @Suppress("MemberVisibilityCanBePrivate", "unused")
-    fun registerTask(
+    override fun registerTask(
         delayMillis: Long,
         task: suspend () -> Unit,
     ): Job = scope.launch {
@@ -69,7 +120,7 @@ object TaskManager {
      *
      * @return If this job has been registered already, it would return null
      */
-    fun registerTask(
+    override fun registerTask(
         id: String,
         cron: String,
         task: suspend () -> Unit,
@@ -80,8 +131,7 @@ object TaskManager {
      *
      * @return If this job has been registered already, it would return null
      */
-    @Suppress("MemberVisibilityCanBePrivate")
-    fun registerTask(
+    override fun registerTask(
         id: String,
         cron: Cron,
         task: suspend () -> Unit,
