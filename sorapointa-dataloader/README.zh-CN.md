@@ -28,7 +28,7 @@ val exampleData get() = exampleLoader.data
 ## 加载 Resource
 
 ```kotlin
-DataHolder.findAndRegister()
+ResourceHolder.findAndRegister()
 ResourceHolder.loadAll()
 ```
 
