@@ -66,3 +66,26 @@ fun String.sha256sign(key: String): String {
     sha256Hmac.init(secretKey)
     return sha256Hmac.doFinal(this.toByteArray()).hex
 }
+
+fun Collection<Int>.partialSum(): List<Int> {
+    var sum = 0
+    return map { i ->
+        (i + sum).also { sum = it }
+    }
+}
+
+fun Collection<Int>.weightRandom(): Int {
+    val ps = partialSum()
+    val random = (1..ps.last()).random()
+    var l = 0
+    var r = ps.size - 1
+    while (l < r) {
+        val mid = (l + r) ushr 1 // safe from overflows
+        if (ps[mid] < random) l = mid + 1
+        else r = mid
+    }
+    return l
+}
+
+fun <K> Map<K, Int>.weightRandom(): K =
+    keys.elementAt(values.weightRandom())
