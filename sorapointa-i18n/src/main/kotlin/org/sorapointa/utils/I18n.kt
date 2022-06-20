@@ -19,14 +19,34 @@ import kotlin.coroutines.CoroutineContext
 
 private val logger = mu.KotlinLogging.logger { }
 
-object I18nManager {
+// ends with .lang.yaml
+private val languageFileRegex by lazy {
+    Regex("""^.+\.lang\.yaml$""", RegexOption.IGNORE_CASE)
+}
+
+interface I18nIManager {
+
+    fun registerLanguage(languagePack: LanguagePack)
+
+    suspend fun registerLanguage(languageFile: File)
+
+    suspend fun registerLanguagesDirectory(
+        directory: File,
+        match: Regex = languageFileRegex,
+        depth: Int = 1,
+        context: CoroutineContext = Dispatchers.IO
+    )
+
+}
+
+object I18nManager: I18nIManager {
     // locale to i18n files
     internal val languageMap = ConcurrentHashMap<Locale, LanguagePack>()
 
     val supportedLanguages: List<Locale>
         get() = languageMap.keys().toList()
 
-    fun registerLanguage(languagePack: LanguagePack) {
+    override fun registerLanguage(languagePack: LanguagePack) {
         val locale = languagePack.locale
         if (languageMap.containsKey(locale)) {
             logger.warn { "Language pack $locale already exists, overwriting it." }
@@ -38,8 +58,7 @@ object I18nManager {
      * Register language pack from file
      * @param languageFile the file store [LanguagePack]
      */
-    @Suppress("MemberVisibilityCanBePrivate")
-    suspend fun registerLanguage(languageFile: File) {
+    override suspend fun registerLanguage(languageFile: File) {
         runCatching {
             if (!languageFile.exists()) throw NoSuchFileException(languageFile)
             val langPack = DataFilePersist(languageFile, LanguagePack.EMPTY, format = Yaml).apply { init() }.data
@@ -59,22 +78,17 @@ object I18nManager {
         }
     }
 
-    // ends with .lang.yaml
-    private val languageFileRegex by lazy {
-        Regex("""^.+\.lang\.yaml$""", RegexOption.IGNORE_CASE)
-    }
-
     /**
      * @param directory languages dir to register up
      * @param match regex for matching entire filename and extension
      * @param depth directory walk depth
      * @throws [IllegalStateException] when [directory] is empty or not exists
      */
-    suspend fun registerLanguagesDirectory(
+    override suspend fun registerLanguagesDirectory(
         directory: File,
-        match: Regex = languageFileRegex,
-        depth: Int = 1,
-        context: CoroutineContext = Dispatchers.IO
+        match: Regex,
+        depth: Int,
+        context: CoroutineContext
     ) = withContext(context) {
         check(directory.exists()) { "Directory doesn't exist: ${directory.absPath}" }
         check(directory.isDirectory) { "File not a directory: ${directory.absPath}" }
