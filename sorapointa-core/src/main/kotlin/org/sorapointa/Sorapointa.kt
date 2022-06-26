@@ -36,5 +36,4 @@ object Sorapointa {
 
     fun findPlayerById(id: Int) =
         playerList.firstOrNull { it.uid == id }
-
 }

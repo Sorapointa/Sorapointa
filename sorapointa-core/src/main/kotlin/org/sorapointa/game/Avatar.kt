@@ -59,7 +59,6 @@ interface Avatar : SceneEntity {
 
     private fun Inventory.findItem(guid: Long?): ItemData? =
         guid?.let { findItem(guid) }
-
 }
 
 abstract class AbstractAvatar : SceneEntityBase(), Avatar {
@@ -67,14 +66,13 @@ abstract class AbstractAvatar : SceneEntityBase(), Avatar {
     internal abstract val avatarProto: AvatarProto
 
     internal abstract fun initNewAvatar()
-
 }
 
 class AvatarImpl(
     override val ownerPlayer: Player,
     override val data: AvatarData,
     override val avatarType: AvatarType = AvatarType.FORMAL,
-): AbstractAvatar() {
+) : AbstractAvatar() {
 
     override val guid = data.guid
 
@@ -166,8 +164,6 @@ class AvatarImpl(
 
     override fun toString(): String =
         "Avatar[guid: $guid, position: $position]"
-    
-
 }
 
 internal interface AvatarProto : SceneEntityProto<Avatar> {
@@ -175,7 +171,6 @@ internal interface AvatarProto : SceneEntityProto<Avatar> {
     val protoPropMap: Map<Int, PropValue>
 
     fun toAvatarInfoProto(): AvatarInfo
-
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -212,8 +207,7 @@ internal class AvatarProtoImpl(
             entity.data.equipCirclet,
             entity.data.equipWeapon,
         )
-    
-    
+
     private val equipList
         get() = listOfNotNull(
             entity.equipFlower,
@@ -223,10 +217,10 @@ internal class AvatarProtoImpl(
             entity.equipCirclet,
             entity.equipWeapon,
         )
-    
+
     private val protoEquipIdList
         get() = equipList.map { it.itemId }
-    
+
     private val protoSceneReliquaryInfoList
         get() = equipList.mapNotNull { if (it is ItemData.Equip.Reliquary) it.toSceneReliquaryInfoProto() else null }
 
@@ -304,7 +298,6 @@ internal class AvatarProtoImpl(
             entity.energySkill.id to entity.data.energySkillLevel
         )
 
-
     override fun toAvatarInfoProto(): AvatarInfo =
         avatarInfo {
             avatarId = entity.data.avatarId
@@ -334,7 +327,6 @@ internal class AvatarProtoImpl(
             entity.data.costumeId?.let { costumeId = it }
             excelInfo = protoExcelInfo
         }
-
 
     override fun SceneEntityInfoKt.Dsl.toProto() {
         avatar = sceneAvatarInfo {
@@ -366,13 +358,13 @@ internal class AvatarProtoImpl(
             // animHash
         }
     }
-
-
 }
 
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun Avatar.impl(): AbstractAvatar {
     contract { returns() implies (this@impl is AbstractAvatar) }
-    check(this is AbstractAvatar) { "A Avatar instance is not instance of AbstractAvatar. Your instance: ${this::class.qualifiedOrSimple}" }
+    check(this is AbstractAvatar) {
+        "A Avatar instance is not instance of AbstractAvatar. Your instance: ${this::class.qualifiedOrSimple}"
+    }
     return this
 }

@@ -52,18 +52,16 @@ interface SceneEntity {
     val curSpeed: Float
 
     val entityProto: SceneEntityProto<*>
-
 }
 
-interface SceneEntityProto<TEntity: SceneEntity> {
+interface SceneEntityProto<TEntity : SceneEntity> {
 
     val entity: TEntity
 
     fun toProto(): SceneEntityInfo
-
 }
 
-abstract class AbstractSceneEntityProto<TEntity: SceneEntity> : SceneEntityProto<TEntity> {
+abstract class AbstractSceneEntityProto<TEntity : SceneEntity> : SceneEntityProto<TEntity> {
 
     open val motionInfo: MotionInfo
         get() = motionInfo {
@@ -104,7 +102,6 @@ abstract class AbstractSceneEntityProto<TEntity: SceneEntity> : SceneEntityProto
     open val tagList = OptionalContainer(arrayListOf<String>())
     open val serverBuffList = OptionalContainer(arrayListOf<ServerBuff>())
 
-
     override fun toProto(): SceneEntityInfo {
         val t = this
         return sceneEntityInfo {
@@ -128,13 +125,11 @@ abstract class AbstractSceneEntityProto<TEntity: SceneEntity> : SceneEntityProto
     }
 
     abstract fun SceneEntityInfoKt.Dsl.toProto()
-
 }
 
 interface GuidEntity {
 
     fun getNextGuid(): Long
-
 }
 
 // TODO: Unknown
@@ -144,15 +139,14 @@ class EntityAuthorityInfoProto(bornPos: Position) {
 
     fun toProto() =
         entityAuthorityInfo {
-            abilityInfo = abilitySyncStateInfo {  }
-            rendererChangedInfo = entityRendererChangedInfo {  }
+            abilityInfo = abilitySyncStateInfo { }
+            rendererChangedInfo = entityRendererChangedInfo { }
             aiInfo = sceneEntityAiInfo {
                 isAiOpen = true
                 bornPos = protoPosition
             }
             bornPos = protoPosition
         }
-
 }
 
 abstract class SceneEntityBase : SceneEntity {
@@ -173,8 +167,6 @@ abstract class SceneEntityBase : SceneEntity {
     override val curAttack: Float = 0f
     override val curDefense: Float = 0f
     override val curSpeed: Float = 0f
-
-
 }
 
 abstract class SceneGadgetEntityBase : SceneEntityBase() {
@@ -199,15 +191,14 @@ abstract class SceneGadgetEntityBase : SceneEntityBase() {
     open val interactId = OptionalContainer(0)
     open val markFlag = OptionalContainer(0)
     open val propOwnerEntityId = OptionalContainer(0)
-    open val platform = OptionalContainer(platformInfo {  })
+    open val platform = OptionalContainer(platformInfo { })
     open val interactUidList = OptionalContainer(arrayListOf<Int>())
     open val draftId = OptionalContainer(0)
     open val gadgetTalkState = OptionalContainer(0)
-    open val playInfo = OptionalContainer(gadgetPlayInfo {  })
-
+    open val playInfo = OptionalContainer(gadgetPlayInfo { })
 }
 
-abstract class SceneGadgetEntityBaseProto<TEntity: SceneGadgetEntityBase>: AbstractSceneEntityProto<TEntity>() {
+abstract class SceneGadgetEntityBaseProto<TEntity : SceneGadgetEntityBase> : AbstractSceneEntityProto<TEntity>() {
 
     abstract override val entity: TEntity
 
@@ -236,7 +227,6 @@ abstract class SceneGadgetEntityBaseProto<TEntity: SceneGadgetEntityBase>: Abstr
     }
 
     abstract fun SceneGadgetInfoKt.Dsl.toProto()
-
 }
 
 class SceneGadgetItemEntity(
@@ -253,15 +243,13 @@ class SceneGadgetItemEntity(
 
     override val entityProto: SceneEntityProto<*> = SceneGadgetItemEntityProto(this)
 
-
     init {
         bornType.set(GadgetBornType.GADGET_BORN_TYPE_IN_AIR)
         isEnableInteract.set(true)
     }
 
     override fun toString(): String =
-        "SceneGadgetItemEntity[id: $id, position: ${position}, itemExcelData: $itemExcelData, itemData: $itemData]"
-
+        "SceneGadgetItemEntity[id: $id, position: $position, itemExcelData: $itemExcelData, itemData: $itemData]"
 }
 
 class SceneGadgetItemEntityProto(

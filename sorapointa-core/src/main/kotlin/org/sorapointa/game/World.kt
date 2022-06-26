@@ -17,7 +17,6 @@ interface World {
         get() = playerList[owner] ?: error("Could not find world ${toString()} ownerPeerId")
 
     fun getNextEntityId(idType: EntityIdType): Int
-
 }
 
 class WorldImpl(
@@ -44,5 +43,4 @@ class WorldImpl(
 
     override fun toString(): String =
         "World[owner: $owner, sceneList: [${sceneList.joinToString()}]]"
-
 }

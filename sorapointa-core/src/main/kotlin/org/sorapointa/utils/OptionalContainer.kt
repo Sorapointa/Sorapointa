@@ -10,7 +10,6 @@ class OptionalContainer<T>(
     var hasChanged: Boolean = false
         private set
 
-
     fun set(change: T?) {
         change?.also {
             value = it
@@ -23,7 +22,6 @@ class OptionalContainer<T>(
     }
 
     inline fun <R> ifChanged(func: (T) -> R): R? {
-        return if(hasChanged) func(value) else null
+        return if (hasChanged) func(value) else null
     }
-
 }

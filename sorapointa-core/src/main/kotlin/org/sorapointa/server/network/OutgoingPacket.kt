@@ -153,9 +153,7 @@ internal class ServerTimeNotifyPacket : AbstractOutgoingPacket(
         serverTimeNotify {
             serverTime = nowMilliseconds()
         }
-
 }
-
 
 // --- Player ---
 
@@ -270,12 +268,11 @@ internal abstract class PlayerEnterSceneNotifyPacket : PlayerOutgoingPacket(
     }
 
     open fun PlayerEnterSceneNotifyKt.Dsl.buildProto() {
-
     }
 
     class Login(
         override val player: Player
-    ): PlayerEnterSceneNotifyPacket()
+    ) : PlayerEnterSceneNotifyPacket()
 }
 
 internal class GetPlayerSocialDetailRspPacket(
@@ -316,7 +313,6 @@ internal class GetPlayerSocialDetailRspPacket(
         } ?: getPlayerSocialDetailRsp {
             retcode = Retcode.RETCODE_RET_SVR_ERROR.number
         }
-
 }
 
 internal class EnterScenePeerNotifyPacket(
@@ -332,16 +328,15 @@ internal class EnterScenePeerNotifyPacket(
             destSceneId = player.scene.id
             enterSceneToken = player.enterSceneToken
         }
-
 }
 
-internal abstract class EnterSceneReadyRspPacket: PlayerOutgoingPacket(
+internal abstract class EnterSceneReadyRspPacket : PlayerOutgoingPacket(
     PacketId.ENTER_SCENE_READY_RSP
 ) {
 
     class Succ(
         override val player: Player
-    ): EnterSceneReadyRspPacket() {
+    ) : EnterSceneReadyRspPacket() {
 
         override fun Player.buildProto(): GeneratedMessageV3 =
             enterSceneReadyRsp {
@@ -352,24 +347,22 @@ internal abstract class EnterSceneReadyRspPacket: PlayerOutgoingPacket(
     class Fail(
         override val player: Player,
         private val retcode: Retcode
-    ): EnterSceneReadyRspPacket() {
+    ) : EnterSceneReadyRspPacket() {
 
         override fun Player.buildProto(): GeneratedMessageV3 =
             enterSceneReadyRsp {
                 retcode = this@Fail.retcode.number
             }
-
     }
-
 }
 
-internal abstract class SceneInitFinishRspPacket: PlayerOutgoingPacket(
+internal abstract class SceneInitFinishRspPacket : PlayerOutgoingPacket(
     PacketId.SCENE_INIT_FINISH_RSP
 ) {
 
     class Succ(
         override val player: Player
-    ): SceneInitFinishRspPacket() {
+    ) : SceneInitFinishRspPacket() {
 
         override fun Player.buildProto(): GeneratedMessageV3 =
             sceneInitFinishRsp {
@@ -380,15 +373,13 @@ internal abstract class SceneInitFinishRspPacket: PlayerOutgoingPacket(
     class Fail(
         override val player: Player,
         private val retcode: Retcode
-    ): SceneInitFinishRspPacket() {
+    ) : SceneInitFinishRspPacket() {
 
         override fun Player.buildProto(): GeneratedMessageV3 =
             enterSceneReadyRsp {
                 retcode = this@Fail.retcode.number
             }
-
     }
-
 }
 
 // --- Avatar ---

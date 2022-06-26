@@ -53,13 +53,12 @@ interface Inventory {
         count: Int = 1,
         forceRemove: Boolean = false
     ): Boolean
-
 }
 
 class InventoryImpl(
     private val guidEntity: GuidEntity,
     private val data: MutableMap<Long, ItemData>,
-): Inventory {
+) : Inventory {
 
     override fun findItem(guid: Long) =
         data[guid]
@@ -170,7 +169,4 @@ class InventoryImpl(
     }
 
     // TODO: Virtual Item Handle
-
 }
-
-

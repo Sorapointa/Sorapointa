@@ -159,9 +159,7 @@ internal object GetPlayerSocialDetailReqHandler : IncomingPacketHandlerWithRespo
         return newSuspendedTransaction {
             GetPlayerSocialDetailRspPacket(this@handlePacket, packet.uid)
         }
-
     }
-
 }
 
 internal object EnterSceneReadyReqHandler : IncomingPacketHandlerWithResponse
@@ -179,7 +177,6 @@ internal object EnterSceneReadyReqHandler : IncomingPacketHandlerWithResponse
             EnterSceneReadyRspPacket.Succ(this) // has packetHeader
         } else EnterSceneReadyRspPacket.Fail(this, Retcode.RETCODE_RET_ENTER_SCENE_TOKEN_INVALID)
     }
-
 }
 
 internal object SceneInitFinishReqHandler : IncomingPacketHandlerWithResponse
@@ -198,10 +195,9 @@ internal object SceneInitFinishReqHandler : IncomingPacketHandlerWithResponse
             SceneInitFinishRspPacket.Succ(this)
         } else SceneInitFinishRspPacket.Fail(this, Retcode.RETCODE_RET_ENTER_SCENE_TOKEN_INVALID)
     }
-
 }
 
-internal object UnionCmdNotifyHandler: IncomingPacketHandlerWithoutResponse<UnionCmdNotify>(
+internal object UnionCmdNotifyHandler : IncomingPacketHandlerWithoutResponse<UnionCmdNotify>(
     PacketId.UNION_CMD_NOTIFY
 ) {
 
@@ -210,13 +206,8 @@ internal object UnionCmdNotifyHandler: IncomingPacketHandlerWithoutResponse<Unio
     override suspend fun Player.handlePacket(packet: UnionCmdNotify) {
         logger.debug { "Expanding UnionCmdNotify packets..." }
         packet.cmdListList.forEach {
-            val soraPacket = SoraPacket(it.messageId.toUShort(), packetHead {  }, it.body.toByteArray())
+            val soraPacket = SoraPacket(it.messageId.toUShort(), packetHead { }, it.body.toByteArray())
             impl().forwardHandlePacket(soraPacket)
         }
     }
-
 }
-
-
-
-
