@@ -1,8 +1,9 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.ItemType
 
 private val weaponDataLoader = DataLoader<List<WeaponData>>("./ExcelBinOutput/WeaponExcelConfigData.json")
 val weaponData
@@ -13,7 +14,7 @@ data class WeaponData(
     @JsonNames("weaponType", "WeaponType")
     val weaponType: String,
     @JsonNames("rankLevel", "RankLevel")
-    val rankLevel: Int,
+    override val rankLevel: Int,
     @JsonNames("weaponBaseExp", "WeaponBaseExp")
     val weaponBaseExp: Int,
     @JsonNames("skillAffix", "SkillAffix")
@@ -41,7 +42,7 @@ data class WeaponData(
     @JsonNames("destroyReturnMaterialCount", "DestroyReturnMaterialCount")
     val destroyReturnMaterialCount: List<Int>,
     @JsonNames("id", "Id")
-    val id: Int,
+    override val id: Int,
     @JsonNames("nameTextMapHash", "NameTextMapHash")
     val nameTextMapHash: Long,
     @JsonNames("descTextMapHash", "DescTextMapHash")
@@ -49,20 +50,20 @@ data class WeaponData(
     @JsonNames("icon", "Icon")
     val icon: String,
     @JsonNames("itemType", "ItemType")
-    val itemType: String,
+    override val itemType: ItemType,
     @JsonNames("weight", "Weight")
-    val weight: Int,
+    override val weight: Int,
     @JsonNames("rank", "Rank")
-    val rank: Int,
+    override val rank: Int,
     @JsonNames("gadgetId", "GadgetId")
-    val gadgetId: Int,
+    override val gadgetId: Int,
     @JsonNames("awakenMaterial", "AwakenMaterial")
     val awakenMaterial: Int? = null,
     @JsonNames("initialLockState", "InitialLockState")
     val initialLockState: Int? = null,
     @JsonNames("unRotate", "UnRotate")
     val unRotate: Boolean? = null
-) {
+) : ItemExcelData() {
     @Serializable
     data class WeaponProp(
         @JsonNames("propType", "PropType")

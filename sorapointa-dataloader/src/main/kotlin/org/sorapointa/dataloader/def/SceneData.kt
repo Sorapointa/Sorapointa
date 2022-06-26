@@ -1,13 +1,16 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
 
 private val sceneLoader =
     DataLoader<List<SceneData>>("./ExcelBinOutput/SceneExcelConfigData.json")
 
 val sceneData get() = sceneLoader.data
+
+fun findSceneData(id: Int) =
+    sceneData.firstOrNull { it.id == id }
 
 @Serializable
 data class SceneData(

@@ -1,19 +1,19 @@
 package org.sorapointa
 
+import io.ktor.server.application.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import org.sorapointa.command.CommandManager
 import org.sorapointa.dispatch.DispatchServer
 import org.sorapointa.game.Player
+import org.sorapointa.game.impl
 import org.sorapointa.server.ServerNetwork
 import org.sorapointa.utils.ModuleScope
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import io.ktor.server.application.Application
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 
 object Sorapointa {
-
     private var scope = ModuleScope("Sorapointa")
 
     val playerList = ConcurrentLinkedDeque<Player>()
@@ -28,4 +28,13 @@ object Sorapointa {
         ServerNetwork.boot(scope.coroutineContext)
         return DispatchServer.startDispatch(serverScope, config = config)
     }
+
+    suspend fun addPlayer(player: Player) {
+        player.impl().init()
+        playerList.add(player)
+    }
+
+    fun findPlayerById(id: Int) =
+        playerList.firstOrNull { it.uid == id }
+
 }

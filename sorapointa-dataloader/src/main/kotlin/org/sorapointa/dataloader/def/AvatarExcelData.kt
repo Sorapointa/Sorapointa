@@ -3,17 +3,21 @@
 package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.utils.encoding.getHashByPrefixSuffix
 
-private val avatarDataLoader =
-    DataLoader<List<AvatarData>>("./ExcelBinOutput/AvatarExcelConfigData.json")
+private val avatarExcelDataLoader =
+    DataLoader<List<AvatarExcelData>>("./ExcelBinOutput/AvatarExcelConfigData.json")
 
-val avatarDataList get() = avatarDataLoader.data
+val avatarDataList get() = avatarExcelDataLoader.data
+
+fun getAvatarExcelData(id: Int) =
+    avatarDataList.firstOrNull { it.id == id }
 
 @Serializable
-data class AvatarData(
+data class AvatarExcelData(
     @JsonNames("bodyType", "BodyType")
     val bodyType: String,
     @JsonNames("scriptDataPathHashSuffix", "ScriptDataPathHashSuffix")
@@ -119,6 +123,27 @@ data class AvatarData(
     @JsonNames("isRangeAttack", "IsRangeAttack")
     val isRangeAttack: Boolean
 ) {
+
+    val prefabPathHash by lazy {
+        getHashByPrefixSuffix(prefabPathHashPre, prefabPathHashSuffix)
+    }
+
+    val prefabPathRemoteHash by lazy {
+        getHashByPrefixSuffix(prefabPathRemoteHashPre, prefabPathRemoteHashSuffix)
+    }
+
+    val controllerPathHash by lazy {
+        getHashByPrefixSuffix(controllerPathHashPre, controllerPathHashSuffix)
+    }
+
+    val controllerPathRemoteHash by lazy {
+        getHashByPrefixSuffix(controllerPathRemoteHashPre, controllerPathRemoteHashSuffix)
+    }
+
+    val combatConfigHash by lazy {
+        getHashByPrefixSuffix(combatConfigHashPre, combatConfigHashSuffix)
+    }
+
     @Serializable
     data class PropGrowCurve(
         @JsonNames("type", "Type")

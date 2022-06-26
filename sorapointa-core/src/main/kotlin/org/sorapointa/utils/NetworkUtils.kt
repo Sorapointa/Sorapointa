@@ -65,5 +65,5 @@ internal fun ChannelOutboundInvoker.writeAndFlushOrCloseAsync(msg: Any?): Channe
 internal fun buildMetadata(sequenceId: Int) =
     packetHead {
         clientSequenceId = sequenceId
-        sentMs = now().toEpochMilliseconds()
+        sentMs = nowMilliseconds()
     }

@@ -22,6 +22,7 @@ import org.sorapointa.console.setupWebConsoleServer
 import org.sorapointa.data.provider.DatabaseManager
 import org.sorapointa.dataloader.ResourceHolder
 import org.sorapointa.event.EventManager
+import org.sorapointa.task.TaskManager
 import org.sorapointa.utils.*
 import java.io.File
 import kotlin.system.exitProcess
@@ -114,6 +115,7 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
         }
 
         EventManager.init(scope.coroutineContext)
+        TaskManager.init(scope.coroutineContext)
 
         val databaseInitJob = setupDatabase()
         databaseInitJob.join()

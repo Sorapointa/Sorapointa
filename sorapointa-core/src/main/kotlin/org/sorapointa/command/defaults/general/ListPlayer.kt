@@ -11,7 +11,7 @@ class ListPlayer(private val sender: CommandSender) : Command(sender, ListPlayer
         name = "listplayer",
         help = "sora.cmd.listplayer.desc",
         alias = listOf("list"),
-        permissionRequired = 1u
+        permissionRequired = 1
     )
 
     override suspend fun run() {

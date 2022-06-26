@@ -1,8 +1,9 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.ElementType
 
 private val worldAreaDataLoader =
     DataLoader<List<WorldAreaData>>("./ExcelBinOutput/WorldAreaConfigData.json")
@@ -20,5 +21,5 @@ data class WorldAreaData(
     @JsonNames("sceneId", "SceneID", "SceneId")
     val sceneId: Int,
     @JsonNames("elementType", "ElementType")
-    val elementType: String // TODO: To ElementType
+    val elementType: ElementType
 )
