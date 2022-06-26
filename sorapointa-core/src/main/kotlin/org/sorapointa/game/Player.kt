@@ -64,7 +64,6 @@ interface Player : CommandSender {
     fun getNextEntityId(idType: EntityIdType): Int
 
     fun getOrNextEntityId(idType: EntityIdType, guid: Long): Int
-
 }
 
 abstract class AbstractPlayer : Player {
@@ -86,11 +85,9 @@ abstract class AbstractPlayer : Player {
         packet: SoraPacket
     ): Job
 
-
     internal abstract suspend fun close()
 
     internal abstract suspend fun init()
-
 }
 
 interface PlayerStateInterface : WithState<PlayerStateInterface.State> {
@@ -273,22 +270,19 @@ class PlayerImpl internal constructor(
         }
     }
 
-    inner class SceneLoading: PlayerSceneStateInterface {
+    inner class SceneLoading : PlayerSceneStateInterface {
 
         override val state: PlayerSceneStateInterface.State = PlayerSceneStateInterface.State.LOADING
-
     }
 
-    inner class SceneInit: PlayerSceneStateInterface {
+    inner class SceneInit : PlayerSceneStateInterface {
 
         override val state: PlayerSceneStateInterface.State = PlayerSceneStateInterface.State.INIT
-
     }
 
-    inner class SceneLoaded: PlayerSceneStateInterface {
+    inner class SceneLoaded : PlayerSceneStateInterface {
 
         override val state: PlayerSceneStateInterface.State = PlayerSceneStateInterface.State.LOADED
-
     }
 
     override fun toString(): String =
@@ -298,7 +292,6 @@ class PlayerImpl internal constructor(
 internal interface PlayerProto {
 
     val protoPropMap: Map<Int, PropValue>
-
 }
 
 class PlayerProtoImpl(
@@ -337,7 +330,8 @@ class PlayerProtoImpl(
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun Player.impl(): AbstractPlayer {
     contract { returns() implies (this@impl is AbstractPlayer) }
-    check(this is AbstractPlayer)
-    { "A Player instance is not instance of AbstractPlayer. Your instance: ${this::class.qualifiedOrSimple}" }
+    check(this is AbstractPlayer) {
+        "A Player instance is not instance of AbstractPlayer. Your instance: ${this::class.qualifiedOrSimple}"
+    }
     return this
 }

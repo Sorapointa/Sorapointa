@@ -67,7 +67,6 @@ inline infix fun Int.fightProp(value: Float) =
         propValue = value
     }
 
-
 val todayStartTime: Instant
     get() = run {
         val offsetHour = SorapointaConfig.data.offsetHours

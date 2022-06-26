@@ -20,7 +20,6 @@ interface Scene {
     val beginTime: Long
     var time: Int
     var climate: ClimateType
-
 }
 
 class SceneImpl(
@@ -43,5 +42,4 @@ class SceneImpl(
 
     override fun toString(): String =
         "Scene[owner: $owner, playerMap: [$playerMap], entities: $entities]"
-
 }

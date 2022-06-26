@@ -14,7 +14,6 @@ interface IncomingPacketHandler<TPacketReq : GeneratedMessageV3> {
     val cmdId: UShort
 
     fun parsing(data: ByteArray): TPacketReq
-
 }
 
 /**
@@ -24,7 +23,7 @@ interface IncomingPacketHandler<TPacketReq : GeneratedMessageV3> {
 internal abstract class AbstractIncomingPacketHandler
 <TPacketReq : GeneratedMessageV3>(
     override val cmdId: UShort
-): IncomingPacketHandler<TPacketReq> {
+) : IncomingPacketHandler<TPacketReq> {
 
     protected abstract val parser: Parser<TPacketReq>
 

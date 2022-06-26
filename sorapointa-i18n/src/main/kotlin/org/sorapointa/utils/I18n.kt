@@ -36,10 +36,9 @@ interface I18nIManager {
         depth: Int = 1,
         context: CoroutineContext = Dispatchers.IO
     )
-
 }
 
-object I18nManager: I18nIManager {
+object I18nManager : I18nIManager {
     // locale to i18n files
     internal val languageMap = ConcurrentHashMap<Locale, LanguagePack>()
 

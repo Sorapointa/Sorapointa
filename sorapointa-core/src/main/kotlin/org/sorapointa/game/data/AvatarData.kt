@@ -200,7 +200,6 @@ interface AvatarData {
 
     var currentEnergy: Int
     var currentHP: Float
-    
 }
 
 class AvatarDataImpl(id: EntityID<Long>) : Entity<Long>(id), AvatarData {
@@ -223,7 +222,8 @@ class AvatarDataImpl(id: EntityID<Long>) : Entity<Long>(id), AvatarData {
 
         fun create(guid: Long, owner: Player, avatarId: Int): Avatar =
             createAvatarInstance(
-                owner, findById(
+                owner,
+                findById(
                     AvatarDataTable.insertAndGetId {
                         it[id] = guid
                         it[this.ownerId] = owner.uid
@@ -314,31 +314,33 @@ class AvatarDataImpl(id: EntityID<Long>) : Entity<Long>(id), AvatarData {
     override var rockSubHurt by AvatarDataTable.rockSubHurt fightProp FIGHT_PROP_ROCK_SUB_HURT
     override var iceSubHurt by AvatarDataTable.iceSubHurt fightProp FIGHT_PROP_ICE_SUB_HURT
     override var skillCDMinusRatio by AvatarDataTable.skillCDMinusRatio fightProp FIGHT_PROP_SKILL_CD_MINUS_RATIO
-    override var shieldCostMinusRatio by AvatarDataTable.shieldCostMinusRatio fightProp FIGHT_PROP_SHIELD_COST_MINUS_RATIO
+    override var shieldCostMinusRatio
+        by AvatarDataTable.shieldCostMinusRatio fightProp FIGHT_PROP_SHIELD_COST_MINUS_RATIO
 
-    override var currentEnergy by AvatarDataTable.currentEnergy fightProp avatar?.elementType?.curEnergyProp
-    override var currentHP by AvatarDataTable.currentHP fightProp FIGHT_PROP_CUR_HP
+        override var currentEnergy by AvatarDataTable.currentEnergy fightProp avatar?.elementType?.curEnergyProp
+        override var currentHP by AvatarDataTable.currentHP fightProp FIGHT_PROP_CUR_HP
 
-    private infix fun <T : Number> Column<T>.playerProp(playerProp: PlayerProp?) =
-        SQLPropDelegate(this@AvatarDataImpl, this, playerProp) { prop, value ->
-            val avatar = avatar ?: return@SQLPropDelegate
+        private infix fun <T : Number> Column<T>.playerProp(playerProp: PlayerProp?) =
+            SQLPropDelegate(this@AvatarDataImpl, this, playerProp) { prop, value ->
+                val avatar = avatar ?: return@SQLPropDelegate
 
-            avatar.ownerPlayer.impl().sendPacket(
-                AvatarPropNotifyPacket(
-                    avatar = avatar,
-                    propMap = mapOf(prop.value to value.toLong())
+                avatar.ownerPlayer.impl().sendPacket(
+                    AvatarPropNotifyPacket(
+                        avatar = avatar,
+                        propMap = mapOf(prop.value to value.toLong())
+                    )
                 )
-            )
-        }
+            }
 
-    private infix fun <T : Number> Column<T>.fightProp(fightProp: FightProp?) =
-        SQLPropDelegate(this@AvatarDataImpl, this, fightProp) { prop, value ->
-            val avatar = avatar ?: return@SQLPropDelegate
-            avatar.ownerPlayer.impl().sendPacket(
-                AvatarFightPropUpdateNotifyPacket(
-                    avatar = avatar,
-                    propMap = mapOf(prop.value to value.toFloat())
+        private infix fun <T : Number> Column<T>.fightProp(fightProp: FightProp?) =
+            SQLPropDelegate(this@AvatarDataImpl, this, fightProp) { prop, value ->
+                val avatar = avatar ?: return@SQLPropDelegate
+                avatar.ownerPlayer.impl().sendPacket(
+                    AvatarFightPropUpdateNotifyPacket(
+                        avatar = avatar,
+                        propMap = mapOf(prop.value to value.toFloat())
+                    )
                 )
-            )
-        }
-}
+            }
+    }
+    

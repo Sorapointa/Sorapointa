@@ -11,7 +11,7 @@ private val materialDataLoader =
 val materialData get() = materialDataLoader.data
 
 val itemData by lazy {
-   materialData + weaponData + reliquaryData
+    materialData + weaponData + reliquaryData
 }
 
 fun findItemExcelData(id: Int) =

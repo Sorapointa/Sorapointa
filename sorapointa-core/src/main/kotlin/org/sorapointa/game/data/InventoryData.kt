@@ -144,7 +144,6 @@ sealed class ItemData {
                     abilityInfo = abilitySyncStateInfo { isInited = true }
                     // rendererChangedInfo
                 }
-
         }
 
         @Serializable
@@ -190,7 +189,6 @@ sealed class ItemData {
                     level = this@Reliquary.level
                     promoteLevel = this@Reliquary.promoteLevel
                 }
-
         }
     }
 }

@@ -13,16 +13,13 @@ interface OutgoingPacket {
     var metadata: PacketHead?
 
     fun buildProto(): GeneratedMessageV3
-
 }
-
 
 abstract class AbstractOutgoingPacket(
     override val cmdId: UShort,
-): OutgoingPacket {
+) : OutgoingPacket {
 
     override var metadata: PacketHead? = null
-
 }
 
 internal fun OutgoingPacket.toFinalBytePacket(): ByteArray {
