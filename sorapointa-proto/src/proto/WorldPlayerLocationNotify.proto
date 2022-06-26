@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+import "PlayerLocationInfo.proto";
+import "PlayerWorldLocationInfo.proto";
+
+// CmdId: 283
+// EnetChannelId: 0
+// EnetIsReliable: true
+message WorldPlayerLocationNotify {
+	repeated PlayerLocationInfo player_loc_list = 6;
+	repeated PlayerWorldLocationInfo player_world_loc_list = 15;
+}

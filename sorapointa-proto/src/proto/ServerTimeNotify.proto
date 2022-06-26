@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+// CmdId: 82
+// EnetChannelId: 1
+// EnetIsReliable: true
+message ServerTimeNotify {
+	uint64 server_time = 15;
+}

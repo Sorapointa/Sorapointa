@@ -2,10 +2,11 @@ syntax = "proto3";
 
 option java_package = "org.sorapointa.proto";
 
-// CmdId: 341
+// CmdId: 182
 // EnetChannelId: 0
 // EnetIsReliable: true
-message HostPlayerNotify {
-	uint32 host_uid = 10;
-	uint32 host_peer_id = 7;
+message ChangeGameTimeRsp {
+	int32 retcode = 7;
+	uint32 cur_game_time = 1;
+	uint32 extra_days = 2;
 }

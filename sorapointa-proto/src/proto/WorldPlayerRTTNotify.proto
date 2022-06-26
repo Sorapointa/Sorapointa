@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+import "PlayerRTTInfo.proto";
+
+// CmdId: 24
+// EnetChannelId: 0
+// EnetIsReliable: true
+message WorldPlayerRTTNotify {
+	repeated PlayerRTTInfo player_rtt_list = 14;
+}
