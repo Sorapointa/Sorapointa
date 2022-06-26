@@ -1,5 +1,6 @@
 package org.sorapointa
 
+import kotlinx.datetime.TimeZone
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.mamoe.yamlkt.Comment
@@ -16,7 +17,26 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
     @Serializable
     data class Data(
         @Comment("Game server network setting")
-        val networkSetting: NetworkSetting = NetworkSetting()
+        val networkSetting: NetworkSetting = NetworkSetting(),
+        @Comment("Player inventory store limits")
+        val inventoryLimits: InventoryLimits = InventoryLimits(),
+        val offsetHours: Int = 4,
+        @SerialName("timeZone")
+        private val _timeZone: String = TimeZone.currentSystemDefault().toString(),
+    ) {
+
+        val timeZone by lazy {
+            TimeZone.of(_timeZone)
+        }
+    }
+
+    @Serializable
+    data class InventoryLimits(
+        val weapon: Int = 2000,
+        val reliquary: Int = 2000,
+        val material: Int = 2000,
+        val furniture: Int = 2000,
+        val allWeight: Int = 30000
     )
 
     @Serializable

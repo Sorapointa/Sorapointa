@@ -1,13 +1,30 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.ItemType
 
 private val materialDataLoader =
     DataLoader<List<MaterialData>>("./ExcelBinOutput/MaterialExcelConfigData.json")
 
 val materialData get() = materialDataLoader.data
+
+val itemData by lazy {
+   materialData + weaponData + reliquaryData
+}
+
+fun findItemExcelData(id: Int) =
+    itemData.firstOrNull { it.id == id }
+
+sealed class ItemExcelData {
+    abstract val id: Int
+    abstract val itemType: ItemType
+    abstract val gadgetId: Int
+    abstract val weight: Int
+    abstract val rankLevel: Int
+    abstract val rank: Int
+}
 
 @Serializable
 data class MaterialData(
@@ -18,7 +35,7 @@ data class MaterialData(
     @JsonNames("useParam", "UseParam")
     val useParam: List<String>,
     @JsonNames("rankLevel", "RankLevel")
-    val rankLevel: Int,
+    override val rankLevel: Int,
     @JsonNames("effectDescTextMapHash", "EffectDescTextMapHash")
     val effectDescTextMapHash: Long,
     @JsonNames("specialDescTextMapHash", "SpecialDescTextMapHash")
@@ -31,13 +48,13 @@ data class MaterialData(
     val effectName: String,
     @JsonNames("satiationParams", "SatiationParams")
     val satiationParams: List<Int>,
-//    Maybe has no data in json.
+//    Maybe there is no data in json.
 //    @JsonNames("destroyReturnMaterial", "DestroyReturnMaterial")
 //    val destroyReturnMaterial: List<Any>,
 //    @JsonNames("destroyReturnMaterialCount", "DestroyReturnMaterialCount")
 //    val destroyReturnMaterialCount: List<Any>,
     @JsonNames("id", "Id")
-    val id: Int,
+    override val id: Int,
     @JsonNames("nameTextMapHash", "NameTextMapHash")
     val nameTextMapHash: Long,
     @JsonNames("descTextMapHash", "DescTextMapHash")
@@ -45,15 +62,15 @@ data class MaterialData(
     @JsonNames("icon", "Icon")
     val icon: String,
     @JsonNames("itemType", "ItemType")
-    val itemType: String,
+    override val itemType: ItemType,
     @JsonNames("rank", "Rank")
-    val rank: Int,
+    override val rank: Int,
     @JsonNames("effectGadgetID", "EffectGadgetID")
     val effectGadgetID: Int,
     @JsonNames("materialType", "MaterialType")
     val materialType: String,
     @JsonNames("gadgetId", "GadgetId")
-    val gadgetId: Int,
+    override val gadgetId: Int,
     @JsonNames("playGainEffect", "PlayGainEffect")
     val playGainEffect: Boolean,
     @JsonNames("stackLimit", "StackLimit")
@@ -69,7 +86,7 @@ data class MaterialData(
     @JsonNames("destroyRule", "DestroyRule")
     val destroyRule: String,
     @JsonNames("weight", "Weight")
-    val weight: Int,
+    override val weight: Int,
     @JsonNames("isForceGetHint", "IsForceGetHint")
     val isForceGetHint: Boolean,
     @JsonNames("foodQuality", "FoodQuality")
@@ -80,4 +97,4 @@ data class MaterialData(
     val cdGroup: Int,
     @JsonNames("isSplitDrop", "IsSplitDrop")
     val isSplitDrop: Boolean
-)
+) : ItemExcelData()

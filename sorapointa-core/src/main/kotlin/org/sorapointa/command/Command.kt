@@ -31,7 +31,7 @@ abstract class Command(
         val name: String,
         val help: String,
         val alias: List<String> = emptyList(),
-        val permissionRequired: UShort = 0u
+        val permissionRequired: Int = 0
     )
 
     init {

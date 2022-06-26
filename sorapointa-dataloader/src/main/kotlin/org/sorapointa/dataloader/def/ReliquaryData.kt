@@ -1,13 +1,19 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.ItemType
+import org.sorapointa.utils.weightRandom
 
 private val reliquaryLoader =
     DataLoader<List<ReliquaryData>>("./ExcelBinOutput/ReliquaryExcelConfigData.json")
 
 val reliquaryData get() = reliquaryLoader.data
+
+fun findReliquaryExcelData(id: Int) =
+    reliquaryData.firstOrNull { it.id == id }
+        ?: error("Couldn't find reliquaryId:$id reliquary data")
 
 @Serializable
 data class ReliquaryData(
@@ -16,7 +22,7 @@ data class ReliquaryData(
     @JsonNames("showPic", "ShowPic")
     val showPic: String,
     @JsonNames("rankLevel", "RankLevel")
-    val rankLevel: Int,
+    override val rankLevel: Int,
     @JsonNames("mainPropDepotId", "MainPropDepotId")
     val mainPropDepotId: Int,
     @JsonNames("appendPropDepotId", "AppendPropDepotId")
@@ -32,7 +38,7 @@ data class ReliquaryData(
     @JsonNames("destroyReturnMaterialCount", "DestroyReturnMaterialCount")
     val destroyReturnMaterialCount: List<Int>,
     @JsonNames("id", "Id")
-    val id: Int,
+    override val id: Int,
     @JsonNames("nameTextMapHash", "NameTextMapHash")
     val nameTextMapHash: Long,
     @JsonNames("descTextMapHash", "DescTextMapHash")
@@ -40,13 +46,13 @@ data class ReliquaryData(
     @JsonNames("icon", "Icon")
     val icon: String,
     @JsonNames("itemType", "ItemType")
-    val itemType: String,
+    override val itemType: ItemType,
     @JsonNames("weight", "Weight")
-    val weight: Int,
+    override val weight: Int,
     @JsonNames("rank", "Rank")
-    val rank: Int,
+    override val rank: Int,
     @JsonNames("gadgetId", "GadgetId")
-    val gadgetId: Int,
+    override val gadgetId: Int,
     @JsonNames("appendPropNum", "AppendPropNum")
     val appendPropNum: Int,
     @JsonNames("setId", "SetId")
@@ -57,4 +63,21 @@ data class ReliquaryData(
     val destroyRule: String,
     @JsonNames("dropable", "Dropable")
     val dropable: Boolean,
-)
+) : ItemExcelData() {
+
+    val mainProp by lazy {
+        reliquaryMainPropData.firstOrNull { it.propDepotId == mainPropDepotId }
+            ?: error("Couldn't find reliquaryMainDepotId:$mainPropDepotId data")
+    }
+
+    val appendProps by lazy {
+        reliquaryAffix.filter { it.depotId == appendPropDepotId }
+    }
+
+    private val appendPropsWeightedMap by lazy {
+        appendProps.associateWith { it.weight }
+    }
+
+    fun getRandomAppendProps() =
+        appendPropsWeightedMap.weightRandom()
+}

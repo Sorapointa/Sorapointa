@@ -3,9 +3,10 @@
 package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.ElementType
 
 private val avatarSkillDataLoader =
     DataLoader<List<AvatarSkillData>>("./ExcelBinOutput/AvatarSkillExcelConfigData.json")
@@ -49,7 +50,7 @@ data class AvatarSkillData(
     @JsonNames("proudSkillGroupId", "ProudSkillGroupId")
     val proudSkillGroupId: Int,
     @JsonNames("costElemType", "CostElemType")
-    val costElemType: String,
+    val costElemType: ElementType,
     @JsonNames("costElemVal", "CostElemVal")
     val costElemVal: Double,
     @JsonNames("ignoreCDMinusRatio", "IgnoreCDMinusRatio")

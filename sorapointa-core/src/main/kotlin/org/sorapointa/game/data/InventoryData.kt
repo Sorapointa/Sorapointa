@@ -1,91 +1,197 @@
 package org.sorapointa.game.data
 
 import kotlinx.serialization.Serializable
-import org.jetbrains.exposed.dao.Entity
-import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.ReferenceOption
-import org.sorapointa.data.provider.sql.SetTable
+import org.jetbrains.exposed.sql.Table
+import org.sorapointa.data.provider.sql.MapTable
 import org.sorapointa.data.provider.sql.jsonb
-import org.sorapointa.proto.MaterialDeleteInfoKt
+import org.sorapointa.dataloader.def.materialData
+import org.sorapointa.dataloader.def.reliquaryData
+import org.sorapointa.dataloader.def.weaponData
+import org.sorapointa.proto.*
+import org.sorapointa.proto.ItemOuterClass.Item
 import org.sorapointa.proto.MaterialDeleteInfoKt.countDownDelete
 import org.sorapointa.proto.MaterialDeleteInfoKt.dateTimeDelete
 import org.sorapointa.proto.MaterialDeleteInfoKt.delayWeekCountDownDelete
-import org.sorapointa.proto.MaterialDeleteInfoOuterClass
-import org.sorapointa.proto.materialDeleteInfo
 
-internal object InventoryTable : SetTable<UInt, EntityID<ULong>>("inventory") {
-    override val id: Column<EntityID<UInt>> =
+internal object InventoryTable : MapTable<Int, Long, ItemData>("inventory") {
+    override val id: Column<EntityID<Int>> =
         reference("player", PlayerDataTable, onDelete = ReferenceOption.CASCADE)
-    override val value: Column<EntityID<ULong>> =
-        reference("item_unique_id", ItemTable, onDelete = ReferenceOption.CASCADE)
 
-    override val primaryKey: PrimaryKey = PrimaryKey(id, value)
-}
+    override val key: Column<Long> = long("item_guid").uniqueIndex()
 
-internal object ItemTable : IdTable<ULong>("inventory_item") {
-    override val id: Column<EntityID<ULong>> = ulong("item_unique_id").autoIncrement().entityId()
+    override val value: Column<ItemData> = jsonb("item_data")
 
-    val itemData: Column<ItemData> = jsonb("item_data")
-
-    override val primaryKey: PrimaryKey = PrimaryKey(id)
-}
-
-class InventoryItem(id: EntityID<ULong>) : Entity<ULong>(id) {
-    companion object : EntityClass<ULong, InventoryItem>(ItemTable)
-
-    val item by ItemTable.itemData
+    override val primaryKey: Table.PrimaryKey = PrimaryKey(id, key)
 }
 
 @Serializable
 sealed class ItemData {
 
-    abstract val itemId: UInt
-    abstract val guid: ULong
+    abstract val itemId: Int
+    abstract val guid: Long
+
+    fun toProto(): Item =
+        item {
+            val t = this@ItemData
+            itemId = t.itemId
+            guid = t.guid
+            toProto()
+        }
+
+    abstract fun ItemKt.Dsl.toProto()
+
+    @Serializable
+    sealed class CountableItem : ItemData() {
+
+        abstract val count: Int
+    }
 
     @Serializable
     data class Material(
-        override val itemId: UInt,
-        override val guid: ULong,
-        val count: UInt,
-        val deleteInfo: MaterialDeleteInfo
-    ) : ItemData()
+        override val itemId: Int,
+        override val guid: Long,
+        override val count: Int = 1,
+        val deleteInfo: MaterialDeleteInfo? = null
+    ) : CountableItem() {
+
+        val materialExcelData by lazy {
+            materialData.firstOrNull { it.id == itemId } ?: error("Could not find materialId:$itemId data")
+        }
+
+        override fun ItemKt.Dsl.toProto() {
+            val t = this@Material
+            material = material {
+                count = t.count
+                t.deleteInfo?.let { deleteInfo = it.toProto() }
+            }
+        }
+    }
 
     @Serializable
     data class Furniture(
-        override val itemId: UInt,
-        override val guid: ULong,
-        val count: UInt
-    ) : ItemData()
+        override val itemId: Int,
+        override val guid: Long,
+        override val count: Int = 1
+    ) : CountableItem() {
+
+        val furnitureExcelData by lazy {
+            materialData.firstOrNull { it.id == itemId } ?: error("Could not find materialId:$itemId data")
+        }
+
+        override fun ItemKt.Dsl.toProto() {
+            furniture = furniture {
+                count = this@Furniture.count
+            }
+        }
+    }
 
     @Serializable
     sealed class Equip : ItemData() {
         abstract val isLocked: Boolean
 
+        override fun ItemKt.Dsl.toProto() {
+            equip = equip {
+                isLocked = this@Equip.isLocked
+                toProto()
+            }
+        }
+
+        abstract fun EquipKt.Dsl.toProto()
+
         @Serializable
         data class Weapon(
-            override val itemId: UInt,
-            override val guid: ULong,
-            override val isLocked: Boolean,
-            val level: UInt,
-            val exp: UInt,
-            val promoteLevel: UInt,
-            val affixMap: Map<UInt, UInt>
-        ) : Equip()
+            override val itemId: Int,
+            override val guid: Long,
+            override val isLocked: Boolean = false,
+            val level: Int = 1,
+            val exp: Int = 0,
+            val promoteLevel: Int = 0,
+            // Refinement level starts from [0, 4], null for 1-2 star weapons
+            val refinement: Int? = null
+        ) : Equip() {
+
+            val weaponExcelData by lazy {
+                weaponData.firstOrNull { it.id == itemId } ?: error("Could not find weaponId:$itemId data")
+            }
+
+            // itemId: 15509 -> affixId: 115509
+            @kotlinx.serialization.Transient
+            private val refinementAffixId = itemId + 100000
+
+            override fun EquipKt.Dsl.toProto() {
+                val t = this@Weapon
+                weapon = weapon {
+                    level = t.level
+                    exp = t.exp
+                    promoteLevel = t.promoteLevel
+                    refinement?.let { affixMap.put(refinementAffixId, it) }
+                }
+            }
+
+            fun toSceneWeaponInfoProto(entityId: Int) =
+                sceneWeaponInfo {
+                    this.entityId = entityId
+                    gadgetId = weaponExcelData.gadgetId
+                    itemId = this@Weapon.itemId
+                    guid = this@Weapon.guid
+                    level = this@Weapon.level
+                    promoteLevel = this@Weapon.promoteLevel
+                    refinement?.let { affixMap.put(refinementAffixId, it) }
+                    // TODO: Unknown
+                    abilityInfo = abilitySyncStateInfo { isInited = true }
+                    // rendererChangedInfo
+                }
+
+        }
 
         @Serializable
         data class Reliquary(
-            override val itemId: UInt,
-            override val guid: ULong,
-            override val isLocked: Boolean,
-            val level: UInt,
-            val exp: UInt,
-            val promoteLevel: UInt,
-            val mainPropId: UInt,
-            val appendPropIdList: List<UInt>
-        ) : Equip()
+            override val itemId: Int,
+            override val guid: Long,
+            override val isLocked: Boolean = false,
+            val level: Int = 1,
+            val exp: Int = 0,
+            val promoteLevel: Int = 0,
+            val mainPropId: Int,
+            val appendPropIdList: List<Int> = listOf()
+        ) : Equip() {
+
+            val reliquaryExcelData by lazy {
+                reliquaryData.firstOrNull { it.id == itemId } ?: error("Could not find reliquaryId:$itemId data")
+            }
+
+            fun copyOfNewRandomProp() =
+                copy(
+                    appendPropIdList = appendPropIdList
+                        .toMutableList()
+                        .apply {
+                            add(reliquaryExcelData.getRandomAppendProps().id)
+                        }
+                )
+
+            override fun EquipKt.Dsl.toProto() {
+                val t = this@Reliquary
+                reliquary = reliquary {
+                    level = t.level
+                    exp = t.exp
+                    promoteLevel = t.promoteLevel
+                    mainPropId = t.mainPropId
+                    appendPropIdList.addAll(t.appendPropIdList)
+                }
+            }
+
+            fun toSceneReliquaryInfoProto() =
+                sceneReliquaryInfo {
+                    itemId = this@Reliquary.itemId
+                    guid = this@Reliquary.guid
+                    level = this@Reliquary.level
+                    promoteLevel = this@Reliquary.promoteLevel
+                }
+
+        }
     }
 }
 
@@ -105,15 +211,15 @@ sealed class MaterialDeleteInfo {
     @Serializable
     data class CountDownDelete(
         override val hasDeleteConfig: Boolean,
-        val deleteTimeNumMap: Map<UInt, UInt>,
-        val configCountDownTime: UInt
+        val deleteTimeNumMap: Map<Int, Int>,
+        val configCountDownTime: Int
     ) : MaterialDeleteInfo() {
 
         override fun MaterialDeleteInfoKt.Dsl.toProto() {
             val t = this@CountDownDelete
             countDownDelete = countDownDelete {
-                deleteTimeNumMap.putAll(t.deleteTimeNumMap.map { it.key.toInt() to it.value.toInt() }.toMap())
-                configCountDownTime = t.configCountDownTime.toInt()
+                deleteTimeNumMap.putAll(t.deleteTimeNumMap)
+                configCountDownTime = t.configCountDownTime
             }
         }
     }
@@ -121,13 +227,13 @@ sealed class MaterialDeleteInfo {
     @Serializable
     data class DateTimeDelete(
         override val hasDeleteConfig: Boolean,
-        val deleteTime: UInt
+        val deleteTime: Int
     ) : MaterialDeleteInfo() {
 
         override fun MaterialDeleteInfoKt.Dsl.toProto() {
             val t = this@DateTimeDelete
             dateDelete = dateTimeDelete {
-                deleteTime = t.deleteTime.toInt()
+                deleteTime = t.deleteTime
             }
         }
     }
@@ -135,17 +241,17 @@ sealed class MaterialDeleteInfo {
     @Serializable
     data class DelayWeekCountDownDelete(
         override val hasDeleteConfig: Boolean,
-        val deleteTimeNumMap: Map<UInt, UInt>,
-        val configCountDownTime: UInt,
-        val configDelayWeek: UInt
+        val deleteTimeNumMap: Map<Int, Int>,
+        val configCountDownTime: Int,
+        val configDelayWeek: Int
     ) : MaterialDeleteInfo() {
 
         override fun MaterialDeleteInfoKt.Dsl.toProto() {
             val t = this@DelayWeekCountDownDelete
             delayWeekCountDownDelete = delayWeekCountDownDelete {
-                deleteTimeNumMap.putAll(t.deleteTimeNumMap.map { it.key.toInt() to it.value.toInt() }.toMap())
-                configCountDownTime = t.configCountDownTime.toInt()
-                configDelayWeek = t.configDelayWeek.toInt()
+                deleteTimeNumMap.putAll(t.deleteTimeNumMap)
+                configCountDownTime = t.configCountDownTime
+                configDelayWeek = t.configDelayWeek
             }
         }
     }
