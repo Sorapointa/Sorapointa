@@ -16,13 +16,13 @@ data class QueryCurrentRegionData(
 
 @Serializable
 data class RegionListClientCustomConfig(
-    @SerialName("sdkenv") val sdkEnvironment: UShort,
+    @SerialName("sdkenv") val sdkEnvironment: Int,
     @SerialName("showexception") val showException: Boolean,
     val loadPatch: Boolean,
     val regionConfig: String,
-    val regionDispatchType: UShort,
+    val regionDispatchType: Int,
     val videoKey: Long,
-    val downloadMode: UShort
+    val downloadMode: Int
 )
 
 /**
@@ -32,17 +32,17 @@ data class RegionListClientCustomConfig(
  */
 @Serializable
 data class ClientCustomConfig(
-    val codeSwitch: List<UShort>? = null,
-    val coverSwitch: List<UShort>? = null,
+    val codeSwitch: List<Int>? = null,
+    val coverSwitch: List<Int>? = null,
     @SerialName("perf_report_enable") val perfReportEnable: Boolean? = null,
     @SerialName("perf_report_record_url") val perfReportRecordUrl: String? = null,
     @SerialName("perf_report_config_url") val perfReportConfigUrl: String? = null,
-    val photographShareTopics: UShort? = null,
-    val gachaShareTopics: UShort? = null,
-    val photographSharePlatform: UShort? = null,
-    val gachaSharePlatform: UShort? = null,
+    val photographShareTopics: Int? = null,
+    val gachaShareTopics: Int? = null,
+    val photographSharePlatform: Int? = null,
+    val gachaSharePlatform: Int? = null,
     val homeDotPattern: Boolean? = null,
-    val homeItemFilter: UShort? = null,
+    val homeItemFilter: Int? = null,
     val reportNetDelayConfig: ReportNetDelayConfigData? = null
 ) {
     @Serializable
@@ -80,7 +80,7 @@ class ComboConfigData(
         @SerialName("qr_enabled") val qrEnabled: Boolean,
         @SerialName("log_level") val logLevel: String,
         @SerialName("announce_url") val announceUrl: String,
-        @SerialName("push_alias_type") val pushAliasType: UShort,
+        @SerialName("push_alias_type") val pushAliasType: Int,
         @SerialName("disable_ysdk_guard") val disableYsdkGuard: Boolean,
         @SerialName("enable_announce_pic_popup") val enableAnnouncePicPopup: Boolean,
     )
@@ -101,7 +101,7 @@ data class MdkShieldLoadConfigData(
         @SerialName("enable_ps_bind_account") val enablePsBindAccount: Boolean,
         @SerialName("game_key") val gameKey: String,
         val guest: Boolean,
-        val id: UShort,
+        val id: Int,
         val identity: String,
         @SerialName("ignore_versions") val ignoreVersions: String,
         val name: String,
@@ -115,14 +115,14 @@ data class MdkShieldLoadConfigData(
         @Serializable
         data class ThirdPartyLoginConfigsData(
             @SerialName("token_type") val tokenType: String,
-            @SerialName("game_token_expires_in") val gameTokenExpiresIn: UInt
+            @SerialName("game_token_expires_in") val gameTokenExpiresIn: Int
         )
     }
 }
 
 @Serializable
 data class PlatMVersionData(
-    val version: UShort
+    val version: Int
 )
 
 @Serializable
@@ -151,12 +151,12 @@ data class CompareProtocolVersionData(
 
         @Serializable
         data class Protocol(
-            @SerialName("app_id") val appId: UShort,
-            @SerialName("create_time") val createTime: UInt,
-            val id: UShort,
+            @SerialName("app_id") val appId: Int,
+            @SerialName("create_time") val createTime: Int,
+            val id: Int,
             val language: String,
-            val major: UShort,
-            val minimum: UShort,
+            val major: Int,
+            val minimum: Int,
             @SerialName("user_proto") val userProto: String,
             @SerialName("priv_proto") val privProto: String,
             @SerialName("teenager_proto") val teenagerProto: String,
@@ -167,8 +167,8 @@ data class CompareProtocolVersionData(
 
 @Serializable
 data class ComboTokenRequestData(
-    @SerialName("app_id") val appId: UShort,
-    @SerialName("channel_id") val channelId: UShort,
+    @SerialName("app_id") val appId: Int,
+    @SerialName("channel_id") val channelId: Int,
     @SerialName("data") private val _data: String,
     val device: String,
     val sign: String
@@ -180,7 +180,7 @@ data class ComboTokenRequestData(
 
     @Serializable
     data class LoginTokenData(
-        val uid: UInt,
+        val uid: Int,
         val guest: Boolean,
         val token: String,
     )
@@ -203,20 +203,20 @@ data class ComboTokenResponseData(
 
     @Serializable
     data class LoginData(
-        @SerialName("account_type") val accountType: UShort,
+        @SerialName("account_type") val accountType: Int,
         val heartbeat: Boolean = false,
-        @SerialName("combo_id") val comboId: UInt,
+        @SerialName("combo_id") val comboId: Int,
         @SerialName("combo_token") val comboToken: String,
-        @SerialName("open_id") val openId: UInt,
+        @SerialName("open_id") val openId: Int,
         val data: LoginGuestData = LoginGuestData(),
         @SerialName("fatigue_remind") val fatigueRemind: FatigueRemindData? = null,
     ) {
 
         @Serializable
         data class FatigueRemindData(
-            val durations: List<UShort>,
+            val durations: List<Int>,
             val nickname: String,
-            @SerialName("reset_point") val resetPoint: UInt,
+            @SerialName("reset_point") val resetPoint: Int,
         )
 
         @Serializable
@@ -249,7 +249,7 @@ data class LoginResultData(
 
     @Serializable
     data class VerifyAccountData(
-        val uid: UInt,
+        val uid: Int,
         val token: String,
         val name: String? = null,
         val email: String? = null,
@@ -274,6 +274,6 @@ data class LoginResultData(
 
 @Serializable
 data class VerifyTokenRequestData(
-    val uid: UInt,
+    val uid: Int,
     val token: String
 )
