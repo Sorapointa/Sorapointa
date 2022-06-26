@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+import "PropValue.proto";
+
+// CmdId: 135
+// EnetChannelId: 0
+// EnetIsReliable: true
+message PlayerDataNotify {
+	string nick_name = 15;
+	uint64 server_time = 2;
+	bool is_first_login_today = 11;
+	uint32 region_id = 9;
+	map<uint32, PropValue> prop_map = 8;
+}

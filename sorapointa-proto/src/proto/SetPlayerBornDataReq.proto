@@ -2,12 +2,11 @@ syntax = "proto3";
 
 option java_package = "org.sorapointa.proto";
 
-// CmdId: 155
+// CmdId: 198
 // EnetChannelId: 0
 // EnetIsReliable: true
 // IsAllowClient: true
-message PlayerGameTimeNotify {
-	uint32 game_time = 7;
-	uint32 uid = 13;
-	bool is_home = 12;
+message SetPlayerBornDataReq {
+	uint32 avatar_id = 3;
+	string nick_name = 12;
 }

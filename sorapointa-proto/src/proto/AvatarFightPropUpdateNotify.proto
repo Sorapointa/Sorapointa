@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+// CmdId: 1217
+// EnetChannelId: 0
+// EnetIsReliable: true
+message AvatarFightPropUpdateNotify {
+	uint64 avatar_guid = 1;
+	map<uint32, float> fight_prop_map = 6;
+}

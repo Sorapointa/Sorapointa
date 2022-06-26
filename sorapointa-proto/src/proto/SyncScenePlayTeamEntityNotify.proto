@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+import "PlayTeamEntityInfo.proto";
+
+// CmdId: 3096
+// EnetChannelId: 0
+// EnetIsReliable: true
+message SyncScenePlayTeamEntityNotify {
+	uint32 scene_id = 13;
+	repeated PlayTeamEntityInfo entity_info_list = 2;
+}
