@@ -1,8 +1,10 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.FightProp
+import org.sorapointa.dataloader.common.PropGrowCurve
 
 private val monsterDataLoader =
     DataLoader<List<MonsterData>>("./ExcelBinOutput/MonsterExcelConfigData.json")
@@ -16,13 +18,13 @@ data class MonsterData(
     @JsonNames("type", "Type")
     val type: String,
     @JsonNames("scriptDataPathHashSuffix", "ScriptDataPathHashSuffix")
-    val scriptDataPathHashSuffix: Int,
+    val scriptDataPathHashSuffix: Long,
     @JsonNames("scriptDataPathHashPre", "ScriptDataPathHashPre")
     val scriptDataPathHashPre: Int,
     @JsonNames("serverScript", "ServerScript")
     val serverScript: String,
     @JsonNames("combatConfigHashSuffix", "CombatConfigHashSuffix")
-    val combatConfigHashSuffix: Int,
+    val combatConfigHashSuffix: Long,
     @JsonNames("combatConfigHashPre", "CombatConfigHashPre")
     val combatConfigHashPre: Int,
     @JsonNames("affix", "Affix")
@@ -30,13 +32,13 @@ data class MonsterData(
     @JsonNames("ai", "Ai")
     val ai: String,
     @JsonNames("isInvisibleReset", "IsInvisibleReset")
-    val isInvisibleReset: Boolean,
+    val isInvisibleReset: Boolean = false,
     @JsonNames("equips", "Equips")
     val equips: List<Int>,
     @JsonNames("hpDrops", "HpDrops")
-    val hpDrops: List<HpDrop>,
+    private val _hpDrops: List<HpDrop>,
     @JsonNames("killDropId", "KillDropId")
-    val killDropId: Int,
+    val killDropId: Int? = null,
     @JsonNames("excludeWeathers", "ExcludeWeathers")
     val excludeWeathers: String,
     @JsonNames("featureTagGroupID", "FeatureTagGroupID")
@@ -46,31 +48,29 @@ data class MonsterData(
     @JsonNames("skin", "Skin")
     val skin: String,
     @JsonNames("describeId", "DescribeId")
-    val describeId: Int,
-    @JsonNames("combatBGMLevel", "CombatBGMLevel")
-    val combatBGMLevel: Int,
+    val describeId: Int? = null,
     @JsonNames("entityBudgetLevel", "EntityBudgetLevel")
-    val entityBudgetLevel: Int,
+    val entityBudgetLevel: Int? = null,
     @JsonNames("hpBase", "HpBase")
     val hpBase: Double,
     @JsonNames("attackBase", "AttackBase")
-    val attackBase: Double,
+    val attackBase: Double = 0.0,
     @JsonNames("defenseBase", "DefenseBase")
-    val defenseBase: Double,
+    val defenseBase: Double = 0.0,
     @JsonNames("iceSubHurt", "IceSubHurt")
-    val iceSubHurt: Double,
+    val iceSubHurt: Double = 0.0,
     @JsonNames("grassSubHurt", "GrassSubHurt")
-    val grassSubHurt: Double,
+    val grassSubHurt: Double = 0.0,
     @JsonNames("windSubHurt", "WindSubHurt")
-    val windSubHurt: Double,
+    val windSubHurt: Double = 0.0,
     @JsonNames("elecSubHurt", "ElecSubHurt")
-    val elecSubHurt: Double,
+    val elecSubHurt: Double = 0.0,
     @JsonNames("propGrowCurves", "PropGrowCurves")
-    val propGrowCurves: List<PropGrowCurve>,
+    private val _propGrowCurves: List<PropGrowCurve>,
     @JsonNames("physicalSubHurt", "PhysicalSubHurt")
-    val physicalSubHurt: Double,
+    val physicalSubHurt: Double = 0.0,
     @JsonNames("prefabPathRagdollHashSuffix", "PrefabPathRagdollHashSuffix")
-    val prefabPathRagdollHashSuffix: Int,
+    val prefabPathRagdollHashSuffix: Long,
     @JsonNames("prefabPathRagdollHashPre", "PrefabPathRagdollHashPre")
     val prefabPathRagdollHashPre: Int,
     @JsonNames("id", "Id")
@@ -82,11 +82,11 @@ data class MonsterData(
     @JsonNames("prefabPathHashPre", "PrefabPathHashPre")
     val prefabPathHashPre: Int,
     @JsonNames("prefabPathRemoteHashSuffix", "PrefabPathRemoteHashSuffix")
-    val prefabPathRemoteHashSuffix: Int,
+    val prefabPathRemoteHashSuffix: Long,
     @JsonNames("prefabPathRemoteHashPre", "PrefabPathRemoteHashPre")
     val prefabPathRemoteHashPre: Int,
     @JsonNames("controllerPathHashSuffix", "ControllerPathHashSuffix")
-    val controllerPathHashSuffix: Int,
+    val controllerPathHashSuffix: Long,
     @JsonNames("controllerPathHashPre", "ControllerPathHashPre")
     val controllerPathHashPre: Int,
     @JsonNames("controllerPathRemoteHashSuffix", "ControllerPathRemoteHashSuffix")
@@ -98,19 +98,20 @@ data class MonsterData(
     @JsonNames("lODPatternName", "LODPatternName")
     val lODPatternName: String
 ) {
+
+    val hpDrops by lazy {
+        _hpDrops.filter { it.dropId != 0 }
+    }
+
+    val propGrowCurves by lazy {
+        _propGrowCurves.filter { it.type != FightProp.FIGHT_PROP_NONE }
+    }
+
     @Serializable
     data class HpDrop(
         @JsonNames("dropId", "DropId")
-        val dropId: Int,
+        val dropId: Int = 0,
         @JsonNames("hpPercent", "HpPercent")
-        val hpPercent: Double
-    )
-
-    @Serializable
-    data class PropGrowCurve(
-        @JsonNames("type", "Type")
-        val type: String,
-        @JsonNames("growCurve", "GrowCurve")
-        val growCurve: String
+        val hpPercent: Double = 0.0
     )
 }

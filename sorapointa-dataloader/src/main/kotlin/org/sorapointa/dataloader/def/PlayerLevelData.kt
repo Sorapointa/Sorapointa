@@ -1,7 +1,7 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
 
 private val playerLevelLoader =
@@ -14,7 +14,7 @@ data class PlayerLevelData(
     @JsonNames("level", "Level")
     val level: Int,
     @JsonNames("exp", "Exp")
-    val exp: Int,
+    val exp: Int = 0,
     @JsonNames("unlockDescTextMapHash", "UnlockDescTextMapHash")
     val unlockDescTextMapHash: Long
 )

@@ -20,5 +20,5 @@ data class CodexQuestData(
     @JsonNames("sortOrder", "SortOrder")
     val sortOrder: Int,
     @JsonNames("isDisuse", "IsDisuse")
-    val IsDisuse: Boolean
+    val isDisuse: Boolean = false
 )

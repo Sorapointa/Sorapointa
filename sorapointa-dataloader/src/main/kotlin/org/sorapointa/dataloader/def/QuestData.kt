@@ -1,7 +1,7 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
 
 private val questDataLoader =
@@ -20,15 +20,15 @@ data class QuestData(
     @JsonNames("descTextMapHash", "DescTextMapHash")
     val descTextMapHash: Long,
     @JsonNames("finishParent", "FinishParent")
-    val finishParent: Boolean,
+    val finishParent: Boolean = false,
     @JsonNames("isRewind", "IsRewind")
-    val isRewind: Boolean,
+    val isRewind: Boolean = false,
     @JsonNames("acceptCondComb", "AcceptCondComb")
-    val acceptCondComb: LogicType,
+    val acceptCondComb: LogicType = LogicType.LOGIC_NONE,
     @JsonNames("finishCondComb", "FinishCondComb")
-    val finishCondComb: LogicType,
+    val finishCondComb: LogicType = LogicType.LOGIC_NONE,
     @JsonNames("failCondComb", "FailCondComb")
-    val failCondComb: LogicType,
+    val failCondComb: LogicType = LogicType.LOGIC_NONE,
     @JsonNames("acceptCond", "AcceptCond")
     val acceptCond: List<QuestParam>,
     @JsonNames("finishCond", "FinishCond")
@@ -45,21 +45,21 @@ data class QuestData(
     @Serializable
     data class QuestParam(
         @JsonNames("_type", "Type", "type")
-        val type: QuestTrigger,
+        val type: QuestTrigger = QuestTrigger.QUEST_COND_NONE,
         @JsonNames("_param", "Param", "param")
-        val param: List<Int>,
+        val param: List<Int> = listOf(),
         @JsonNames("_count", "Count", "count")
-        val count: Int
+        val count: Int? = null
     )
 
     @Serializable
     data class QuestExecParam(
         @JsonNames("_type", "Type", "type")
-        val type: QuestTrigger,
+        val type: QuestTrigger = QuestTrigger.QUEST_COND_NONE,
         @JsonNames("_param", "Param", "param")
-        val param: List<String>,
+        val param: List<String> = listOf(),
         @JsonNames("_count", "Count", "count")
-        val count: Int
+        val count: Int? = null
     )
 }
 

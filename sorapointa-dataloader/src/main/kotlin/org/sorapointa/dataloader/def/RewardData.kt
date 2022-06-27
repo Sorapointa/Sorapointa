@@ -1,8 +1,9 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.ItemParamData
 
 private val rewardLoader =
     DataLoader<List<RewardData>>("./ExcelBinOutput/RewardExcelConfigData.json")
@@ -14,19 +15,16 @@ data class RewardData(
     @JsonNames("rewardId", "RewardId")
     val rewardId: Int,
     @JsonNames("rewardItemList", "RewardItemList")
-    val rewardItemList: List<RewardItem>,
+    private val _rewardItemList: List<ItemParamData>,
     @JsonNames("scoin", "Scoin")
-    val scoin: Int,
+    val scoin: Int = 0,
     @JsonNames("playerExp", "PlayerExp")
-    val playerExp: Int,
+    val playerExp: Int = 0,
     @JsonNames("hcoin", "Hcoin")
-    val hcoin: Int
+    val hcoin: Int = 0
 ) {
-    @Serializable
-    data class RewardItem(
-        @JsonNames("itemId", "ItemId")
-        val itemId: Int,
-        @JsonNames("itemCount", "ItemCount")
-        val itemCount: Int
-    )
+
+    val rewardItemList by lazy {
+        _rewardItemList.filter { it.id != 0 }
+    }
 }

@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
 import org.sorapointa.dataloader.common.ItemType
+import org.sorapointa.dataloader.common.MaterialDestroyType
 import org.sorapointa.utils.weightRandom
 
 private val reliquaryLoader =
@@ -54,15 +55,15 @@ data class ReliquaryData(
     @JsonNames("gadgetId", "GadgetId")
     override val gadgetId: Int,
     @JsonNames("appendPropNum", "AppendPropNum")
-    val appendPropNum: Int,
+    val appendPropNum: Int = 0,
     @JsonNames("setId", "SetId")
-    val setId: Int,
+    val setId: Int = 0,
     @JsonNames("storyId", "StoryId")
-    val storyId: Int,
+    val storyId: Int = 0,
     @JsonNames("destroyRule", "DestroyRule")
-    val destroyRule: String,
+    val destroyRule: MaterialDestroyType = MaterialDestroyType.DESTROY_NONE,
     @JsonNames("dropable", "Dropable")
-    val dropable: Boolean,
+    val dropable: Boolean = false,
 ) : ItemExcelData() {
 
     val mainProp by lazy {

@@ -17,9 +17,9 @@ data class WorldAreaData(
     @JsonNames("areaID1", "AreaID1", "AreaId1")
     val areaID1: Int,
     @JsonNames("areaID2", "AreaID2", "AreaId2")
-    val areaID2: Int,
+    val areaID2: Int? = null,
     @JsonNames("sceneId", "SceneID", "SceneId")
     val sceneId: Int,
     @JsonNames("elementType", "ElementType")
-    val elementType: ElementType
+    val elementType: ElementType = ElementType.None
 )

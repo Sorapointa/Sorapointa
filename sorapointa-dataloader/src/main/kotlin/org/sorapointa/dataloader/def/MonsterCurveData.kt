@@ -1,7 +1,7 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
 
 private val monsterCurveDataLoader =
@@ -23,6 +23,6 @@ data class MonsterCurveData(
         @JsonNames("arith", "Arith")
         val arith: String,
         @JsonNames("value", "Value")
-        val value: Double
+        val value: Double? = null
     )
 }

@@ -11,16 +11,14 @@ val towerLevelData get() = towerLevelLoader.data
 
 @Serializable
 data class TowerLevelData(
-    @JsonNames("id", "ID", "Id", "iD")
-    val id: Int,
     @JsonNames("levelId", "LevelId")
     val levelId: Int,
     @JsonNames("levelIndex", "LevelIndex")
     val levelIndex: Int,
     @JsonNames("dungeonId", "DungeonId")
     val dungeonId: Int,
-    @JsonNames("param", "Param")
-    val `param`: List<Param>,
+    @JsonNames("cond", "Cond")
+    val condition: List<Param> = listOf(),
     @JsonNames("towerBuffConfigStrList", "TowerBuffConfigStrList")
     val towerBuffConfigStrList: List<String>,
     @JsonNames("firstPassRewardId", "FirstPassRewardId")

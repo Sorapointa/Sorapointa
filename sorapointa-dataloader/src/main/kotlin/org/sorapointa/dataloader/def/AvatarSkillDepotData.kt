@@ -23,7 +23,7 @@ data class AvatarSkillDepotData(
     @JsonNames("id", "Id")
     val id: Int,
     @JsonNames("energySkill", "EnergySkill")
-    private val _energySkill: Int,
+    private val _energySkill: Int? = null,
     @JsonNames("skills", "Skills")
     private val _skills: List<Int>,
     @JsonNames("subSkills", "SubSkills")
@@ -39,9 +39,9 @@ data class AvatarSkillDepotData(
     @JsonNames("skillDepotAbilityGroup", "SkillDepotAbilityGroup")
     val skillDepotAbilityGroup: String,
     @JsonNames("leaderTalent", "LeaderTalent")
-    val leaderTalent: Int,
+    val leaderTalent: Int? = null,
     @JsonNames("attackModeSkill", "AttackModeSkill")
-    val attackModeSkill: Int,
+    val attackModeSkill: Int? = null,
 ) {
 
     val skills by lazy {

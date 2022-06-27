@@ -1,8 +1,9 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.FightProp
 
 private val reliquaryAffixLoader =
     DataLoader<List<ReliquaryAffixData>>("./ExcelBinOutput/ReliquaryAffixExcelConfigData.json")
@@ -18,7 +19,7 @@ data class ReliquaryAffixData(
     @JsonNames("groupId", "GroupId")
     val groupId: Int,
     @JsonNames("propType", "PropType")
-    val propType: String,
+    val propType: FightProp,
     @JsonNames("propValue", "PropValue")
     val propValue: Double,
     @JsonNames("weight", "Weight")

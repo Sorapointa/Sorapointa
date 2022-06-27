@@ -3,9 +3,12 @@
 package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.AddProp
+import org.sorapointa.dataloader.common.FightProp
+import org.sorapointa.dataloader.common.ItemParamData
 
 private val avatarPromoteDataLoader =
     DataLoader<List<AvatarPromoteData>>("./ExcelBinOutput/AvatarPromoteExcelConfigData.json")
@@ -19,31 +22,24 @@ data class AvatarPromoteData(
     @JsonNames("promoteAudio", "PromoteAudio")
     val promoteAudio: String,
     @JsonNames("costItems", "CostItems")
-    val costItems: List<CostItem>,
+    private val _costItems: List<ItemParamData>,
     @JsonNames("unlockMaxLevel", "UnlockMaxLevel")
     val unlockMaxLevel: Int,
     @JsonNames("addProps", "AddProps")
-    val addProps: List<AddProp>,
+    private val _addProps: List<AddProp>,
     @JsonNames("promoteLevel", "PromoteLevel")
-    val promoteLevel: Int,
+    val promoteLevel: Int = 0,
     @JsonNames("scoinCost", "ScoinCost")
-    val scoinCost: Int,
+    val scoinCost: Int = 0,
     @JsonNames("requiredPlayerLevel", "RequiredPlayerLevel")
-    val requiredPlayerLevel: Int
+    val requiredPlayerLevel: Int = 0
 ) {
-    @Serializable
-    data class CostItem(
-        @JsonNames("id", "Id")
-        val id: Int,
-        @JsonNames("count", "Count")
-        val count: Int
-    )
 
-    @Serializable
-    data class AddProp(
-        @JsonNames("propType", "PropType")
-        val propType: String,
-        @JsonNames("value", "Value")
-        val value: Double
-    )
+    val costItem by lazy {
+        _costItems.filter { it.id != 0 }
+    }
+
+    val addProp by lazy {
+        _addProps.filter { it.propType != FightProp.FIGHT_PROP_NONE }
+    }
 }

@@ -503,8 +503,267 @@ enum class AnimatorParamType(override val value: Int) : PropEnum {
     FLOAT(3)
 }
 
+enum class RefreshType(val value: Int) {
+    SHOP_PRECONDITION_NONE(0),
+    SHOP_PRECONDITION_SPECIFY(1),
+    SHOP_PRECONDITION_REST(2),
+    SHOP_PRECONDITION_SHEET_REST(3),
+    SHOP_PRECONDITION_SHEET_TEASURE_MAP_REGION(4),
+    SHOP_PRECONDITION_HOME_LEVEL(5),
+    SHOP_PRECONDITION_QUEST_FINISH(6),
+    SHOP_PRECONDITION_SHEET_FLEUR_FAIR_WATCHER_FINISH(7),
+    SHOP_PRECONDITION_QUEST_FINISH_ALL(8),
+    SHOP_PRECONDITION_QUEST_FINISH_ANY(9)
+}
+
 enum class WorldType(val value: Int) {
     WORLD_NONE(0),
     WORLD_PLAYER(1),
     WORLD_HOME(2)
+}
+
+enum class AnimalCodexType(val value: Int) {
+    CODEX_ANIMAL(0),
+    CODEX_MONSTER(1)
+}
+
+enum class AnimalCodexSubType(val value: Int) {
+    CODEX_SUBTYPE_ELEMENTAL(0),
+    CODEX_SUBTYPE_HILICHURL(1),
+    CODEX_SUBTYPE_ABYSS(2),
+    CODEX_SUBTYPE_FATUI(3),
+    CODEX_SUBTYPE_AUTOMATRON(4),
+    CODEX_SUBTYPE_HUMAN(5),
+    CODEX_SUBTYPE_BEAST(6),
+    CODEX_SUBTYPE_BOSS(7),
+    CODEX_SUBTYPE_AVIARY(8),
+    CODEX_SUBTYPE_ANIMAL(9),
+    CODEX_SUBTYPE_FISH(10),
+    CODEX_SUBTYPE_CRITTER(11)
+}
+
+enum class FoodQualityType(val value: Int) {
+    FOOD_QUALITY_NONE(0),
+    FOOD_QUALITY_STRANGE(1),
+    FOOD_QUALITY_ORDINARY(2),
+    FOOD_QUALITY_DELICIOUS(3)
+}
+
+enum class MaterialDestroyType(val value: Int) {
+    DESTROY_NONE(0),
+    DESTROY_RETURN_MATERIAL(1)
+}
+
+enum class AvatarUseType(val value: Int) {
+    AVATAR_TEST(0),
+    AVATAR_SYNC_TEST(1),
+    AVATAR_FORMAL(2),
+    AVATAR_ABANDON(3)
+}
+
+enum class MaterialType(val value: Int) {
+    MATERIAL_NONE(0),
+    MATERIAL_FOOD(1),
+    MATERIAL_QUEST(2),
+    MATERIAL_EXCHANGE(4),
+    MATERIAL_CONSUME(5),
+    MATERIAL_EXP_FRUIT(6),
+    MATERIAL_AVATAR(7),
+    MATERIAL_ADSORBATE(8),
+    MATERIAL_CRICKET(9),
+    MATERIAL_ELEM_CRYSTAL(10),
+    MATERIAL_WEAPON_EXP_STONE(11),
+    MATERIAL_CHEST(12),
+    MATERIAL_RELIQUARY_MATERIAL(13),
+    MATERIAL_AVATAR_MATERIAL(14),
+    MATERIAL_NOTICE_ADD_HP(15),
+    MATERIAL_SEA_LAMP(16),
+    MATERIAL_SELECTABLE_CHEST(17),
+    MATERIAL_FLYCLOAK(18),
+    MATERIAL_NAMECARD(19),
+    MATERIAL_TALENT(20),
+    MATERIAL_WIDGET(21),
+    MATERIAL_CHEST_BATCH_USE(22),
+    MATERIAL_FAKE_ABSORBATE(23),
+    MATERIAL_CONSUME_BATCH_USE(24),
+    MATERIAL_WOOD(25),
+    MATERIAL_FURNITURE_FORMULA(27),
+    MATERIAL_CHANNELLER_SLAB_BUFF(28),
+    MATERIAL_FURNITURE_SUITE_FORMULA(29),
+    MATERIAL_COSTUME(30),
+    MATERIAL_HOME_SEED(31),
+    MATERIAL_FISH_BAIT(32),
+    MATERIAL_FISH_ROD(33),
+    MATERIAL_SUMO_BUFF(34)
+}
+
+enum class ItemUseTarget(val value: Int) {
+    ITEM_USE_TARGET_NONE(0),
+    ITEM_USE_TARGET_CUR_AVATAR(1),
+    ITEM_USE_TARGET_CUR_TEAM(2),
+    ITEM_USE_TARGET_SPECIFY_AVATAR(3),
+    ITEM_USE_TARGET_SPECIFY_ALIVE_AVATAR(4),
+    ITEM_USE_TARGET_SPECIFY_DEAD_AVATAR(5)
+}
+
+enum class RecipeType(val value: Int) {
+    RECIPE_TYPE_NONE(0),
+    RECIPE_TYPE_COMBINE(1),
+    RECIPE_TYPE_CONVERT(2),
+    RECIPE_TYPE_COMBINE_HOMEWORLD(3)
+}
+
+enum class DungeonStateType(val value: Int) {
+    DUNGEON_STATE_NONE(0),
+    DUNGEON_STATE_RELEASE(1),
+    DUNGEON_STATE_TEST(2)
+}
+
+enum class GrowCurveType(val value: Int) {
+    GROW_CURVE_NONE(0),
+    GROW_CURVE_HP(1),
+    GROW_CURVE_ATTACK(2),
+    GROW_CURVE_STAMINA(3),
+    GROW_CURVE_STRIKE(4),
+    GROW_CURVE_ANTI_STRIKE(5),
+    GROW_CURVE_ANTI_STRIKE1(6),
+    GROW_CURVE_ANTI_STRIKE2(7),
+    GROW_CURVE_ANTI_STRIKE3(8),
+    GROW_CURVE_STRIKE_HURT(9),
+    GROW_CURVE_ELEMENT(10),
+    GROW_CURVE_KILL_EXP(11),
+    GROW_CURVE_DEFENSE(12),
+    GROW_CURVE_ATTACK_BOMB(13),
+    GROW_CURVE_HP_LITTLEMONSTER(14),
+    GROW_CURVE_ELEMENT_MASTERY(15),
+    GROW_CURVE_PROGRESSION(16),
+    GROW_CURVE_DEFENDING(17),
+    GROW_CURVE_MHP(18),
+    GROW_CURVE_MATK(19),
+    GROW_CURVE_TOWERATK(20),
+    GROW_CURVE_HP_S5(21),
+    GROW_CURVE_HP_S4(22),
+    GROW_CURVE_HP_2(23),
+    GROW_CURVE_ATTACK_S5(31),
+    GROW_CURVE_ATTACK_S4(32),
+    GROW_CURVE_ATTACK_S3(33),
+    GROW_CURVE_STRIKE_S5(34),
+    GROW_CURVE_DEFENSE_S5(41),
+    GROW_CURVE_DEFENSE_S4(42),
+    GROW_CURVE_ATTACK_101(1101),
+    GROW_CURVE_ATTACK_102(1102),
+    GROW_CURVE_ATTACK_103(1103),
+    GROW_CURVE_ATTACK_104(1104),
+    GROW_CURVE_ATTACK_105(1105),
+    GROW_CURVE_ATTACK_201(1201),
+    GROW_CURVE_ATTACK_202(1202),
+    GROW_CURVE_ATTACK_203(1203),
+    GROW_CURVE_ATTACK_204(1204),
+    GROW_CURVE_ATTACK_205(1205),
+    GROW_CURVE_ATTACK_301(1301),
+    GROW_CURVE_ATTACK_302(1302),
+    GROW_CURVE_ATTACK_303(1303),
+    GROW_CURVE_ATTACK_304(1304),
+    GROW_CURVE_ATTACK_305(1305),
+    GROW_CURVE_CRITICAL_101(2101),
+    GROW_CURVE_CRITICAL_102(2102),
+    GROW_CURVE_CRITICAL_103(2103),
+    GROW_CURVE_CRITICAL_104(2104),
+    GROW_CURVE_CRITICAL_105(2105),
+    GROW_CURVE_CRITICAL_201(2201),
+    GROW_CURVE_CRITICAL_202(2202),
+    GROW_CURVE_CRITICAL_203(2203),
+    GROW_CURVE_CRITICAL_204(2204),
+    GROW_CURVE_CRITICAL_205(2205),
+    GROW_CURVE_CRITICAL_301(2301),
+    GROW_CURVE_CRITICAL_302(2302),
+    GROW_CURVE_CRITICAL_303(2303),
+    GROW_CURVE_CRITICAL_304(2304),
+    GROW_CURVE_CRITICAL_305(2305)
+}
+
+// DON'T CHANGE THE NAMING STYLE
+enum class EntityType(val value: Int) {
+    None(0),
+    Avatar(1),
+    Monster(2),
+    Bullet(3),
+    AttackPhyisicalUnit(4),
+    AOE(5),
+    Camera(6),
+    EnviroArea(7),
+    Equip(8),
+    MonsterEquip(9),
+    Grass(10),
+    Level(11),
+    NPC(12),
+    TransPointFirst(13),
+    TransPointFirstGadget(14),
+    TransPointSecond(15),
+    TransPointSecondGadget(16),
+    DropItem(17),
+    Field(18),
+    Gadget(19),
+    Water(20),
+    GatherPoint(21),
+    GatherObject(22),
+    AirflowField(23),
+    SpeedupField(24),
+    Gear(25),
+    Chest(26),
+    EnergyBall(27),
+    ElemCrystal(28),
+    Timeline(29),
+    Worktop(30),
+    Team(31),
+    Platform(32),
+    AmberWind(33),
+    EnvAnimal(34),
+    SealGadget(35),
+    Tree(36),
+    Bush(37),
+    QuestGadget(38),
+    Lightning(39),
+    RewardPoint(40),
+    RewardStatue(41),
+    MPLevel(42),
+    WindSeed(43),
+    MpPlayRewardPoint(44),
+    ViewPoint(45),
+    RemoteAvatar(46),
+    GeneralRewardPoint(47),
+    PlayTeam(48),
+    OfferingGadget(49),
+    EyePoint(50),
+    MiracleRing(51),
+    Foundation(52),
+    WidgetGadget(53),
+    Vehicle(54),
+    DangerZone(55),
+    EchoShell(56),
+    HomeGatherObject(57),
+    Projector(58),
+    Screen(59),
+    CustomTile(60),
+    FishPool(61),
+    FishRod(62),
+    CustomGadget(63),
+    RoguelikeOperatorGadget(64),
+    PlaceHolder(99)
+}
+
+enum class FetterCondType(val value: Int) {
+    FETTER_COND_NONE(0),
+    FETTER_COND_FETTER_LEVEL(1),
+    FETTER_COND_AVATAR_LEVEL(2),
+    FETTER_COND_FINISH_DUNGEON(3),
+    FETTER_COND_UNLOCK_TRANS_POINT(4),
+    FETTER_COND_UNLOCK_AREA(5),
+    FETTER_COND_FINISH_QUEST(6),
+    FETTER_COND_AVATAR_PROMOTE_LEVEL(7),
+    FETTER_COND_PLAYER_BIRTHDAY(8),
+    FETTER_COND_AVATAR_BIRTHDAY(9),
+    FETTER_COND_NOT_OPEN(10),
+    FETTER_COND_FINISH_PARENT_QUEST(11),
+    FETTER_COND_UNLOCK_ARENA_BY_CITY_ID(12)
 }

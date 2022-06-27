@@ -1,7 +1,7 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
 
 private val towerFloorLoader =
@@ -15,8 +15,8 @@ data class TowerFloorData(
     val floorId: Int,
     @JsonNames("floorIndex", "FloorIndex")
     val floorIndex: Int,
-    @JsonNames("levelId", "LevelId")
-    val levelId: Int,
+    @JsonNames("levelGroupId", "LevelGroupId")
+    val levelGroupId: Int,
     @JsonNames("overrideMonsterLevel", "OverrideMonsterLevel")
     val overrideMonsterLevel: Int,
     @JsonNames("teamNum", "TeamNum")

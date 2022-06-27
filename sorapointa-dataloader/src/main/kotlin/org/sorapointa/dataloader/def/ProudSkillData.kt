@@ -1,8 +1,9 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.ItemParamData
 
 private val proudSkillLoader =
     DataLoader<List<ProudSkillData>>("./ExcelBinOutput/ProudSkillExcelConfigData.json")
@@ -28,32 +29,24 @@ data class ProudSkillData(
     @JsonNames("icon", "Icon")
     val icon: String,
     @JsonNames("coinCost", "CoinCost")
-    val coinCost: Int,
+    val coinCost: Int = 0,
     @JsonNames("costItems", "CostItems")
-    val costItems: List<CostItem>,
+    private val _costItems: List<ItemParamData>,
     @JsonNames("filterConds", "FilterConds")
     val filterConds: List<String>,
     @JsonNames("breakLevel", "BreakLevel")
-    val breakLevel: Int,
+    val breakLevel: Int = 0,
     @JsonNames("paramDescList", "ParamDescList")
     val paramDescList: List<Long>,
     @JsonNames("lifeEffectParams", "LifeEffectParams")
     val lifeEffectParams: List<String>,
     @JsonNames("openConfig", "OpenConfig")
     val openConfig: String,
-    @JsonNames("addProps", "AddProps")
-    val addProps: List<AddProp>,
     @JsonNames("paramList", "ParamList")
     val paramList: List<Double>
 ) {
-    @Serializable
-    data class CostItem(
-        @JsonNames("id", "Id")
-        val id: Int,
-        @JsonNames("count", "Count")
-        val count: Int
-    )
 
-    @Serializable
-    class AddProp
+    val costItems by lazy {
+        _costItems.filter { it.id != 0 }
+    }
 }
