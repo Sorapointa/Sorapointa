@@ -2,7 +2,9 @@
 
 package org.sorapointa.utils
 
-import io.ktor.utils.io.core.*
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import kotlin.experimental.xor
 
 /**
  * Convert [Int] to [ByteArray]
@@ -22,6 +24,22 @@ fun Int.toByteArray(littleEndian: Boolean = true) = ByteArray(4).also { a ->
  * @param littleEndian convert to LE or BE
  */
 fun UInt.toByteArray(littleEndian: Boolean = true) = toInt().toByteArray(littleEndian)
+
+/**
+ * Convert [ByteArray] to [Int]
+ *
+ * @param byteOrder convert to LE or BE
+ */
+fun ByteArray.toInt(byteOrder: ByteOrder = ByteOrder.LITTLE_ENDIAN) =
+    ByteBuffer.wrap(this).order(byteOrder).int
+
+/**
+ * Convert [ByteArray] to [UInt]
+ *
+ * @param byteOrder convert to LE or BE
+ */
+fun ByteArray.toUInt(byteOrder: ByteOrder = ByteOrder.LITTLE_ENDIAN) =
+    toInt(byteOrder).toUInt()
 
 /**
  * Convert [Long] to [ByteArray]
@@ -47,11 +65,27 @@ fun Long.toByteArray(littleEndian: Boolean = true) = ByteArray(8).also { a ->
 fun ULong.toByteArray(littleEndian: Boolean = true) = toLong().toByteArray(littleEndian)
 
 /**
+ * Convert [ByteArray] to [Int]
+ *
+ * @param byteOrder convert to LE or BE
+ */
+fun ByteArray.toLong(byteOrder: ByteOrder = ByteOrder.LITTLE_ENDIAN) =
+    ByteBuffer.wrap(this).order(byteOrder).long
+
+/**
+ * Convert [ByteArray] to [UInt]
+ *
+ * @param byteOrder convert to LE or BE
+ */
+fun ByteArray.toULong(byteOrder: ByteOrder = ByteOrder.LITTLE_ENDIAN) =
+    toLong(byteOrder).toULong()
+
+/**
  * [UByteArray] xor [UByteArray]
  *
  * @param key xor key
  */
-fun UByteArray.xor(key: UByteArray): UByteArray {
+infix fun UByteArray.xor(key: UByteArray): UByteArray {
     for (i in this.indices) {
         this[i] = this[i] xor key[i % key.size]
     }
@@ -63,43 +97,9 @@ fun UByteArray.xor(key: UByteArray): UByteArray {
  *
  * @param key xor key
  */
-fun ByteArray.xor(key: ByteArray): ByteArray {
+infix fun ByteArray.xor(key: ByteArray): ByteArray {
     for (i in this.indices) {
-        this[i] = (this[i].toInt() xor key[i % key.size].toInt()).toByte()
+        this[i] = this[i] xor key[i % key.size]
     }
     return this
 }
-
-/**
- * Convert entire [UByteArray] to [ULong]
- *
- * @see splitToULongArray
- */
-fun UByteArray.entireToULong(): ULong {
-    require(this.size == 8) { "Size must be 8" }
-    val uints = this.map { it.toULong() }
-    return ((uints[7] and 0xFFuL) shl 56) or
-        ((uints[6] and 0xFFuL) shl 48) or
-        ((uints[5] and 0xFFuL) shl 40) or
-        ((uints[4] and 0xFFuL) shl 32) or
-        ((uints[3] and 0xFFuL) shl 24) or
-        ((uints[2] and 0xFFuL) shl 16) or
-        ((uints[1] and 0xFFuL) shl 8) or
-        (uints[0] and 0xFFuL)
-}
-
-/**
- * [UByteArray] chunked with 8 bytes convert to [ULongArray]
- */
-fun UByteArray.splitToULongArray() =
-    chunked(8) {
-        it.toUByteArray().entireToULong()
-    }.toULongArray()
-
-/**
- * Convert [ByteArray] to [ByteReadPacket]
- */
-fun ByteArray.toReadPacket(): ByteReadPacket =
-    buildPacket {
-        writeFully(this@toReadPacket)
-    }
