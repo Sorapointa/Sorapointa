@@ -7,7 +7,7 @@ import org.sorapointa.proto.PacketHeadOuterClass.PacketHead
 import org.sorapointa.utils.SorapointaInternal
 
 /**
- * Sorapoint Datapacket
+ * Sorapointa Datapacket
  *
  * @see readToSoraPacket
  * @see PacketId you could find all cmd id in there
