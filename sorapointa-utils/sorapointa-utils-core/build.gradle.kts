@@ -3,10 +3,6 @@ plugins {
     `sorapointa-publish`
 }
 
-dependencies {
-    implementation("io.ktor:ktor-utils:_")
-}
-
 val commitHash by lazy {
     val commitHashCommand = "git rev-parse --short HEAD"
     Runtime.getRuntime().exec(commitHashCommand).inputStream.bufferedReader().readLine() ?: "UnkCommit"
