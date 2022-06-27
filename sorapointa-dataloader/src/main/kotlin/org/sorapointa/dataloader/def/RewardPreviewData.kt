@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import org.sorapointa.dataloader.DataLoader
 
 private val rewardPreviewLoader =
-    DataLoader<List<RewardPreviewData>>("./ExcelBinOutput/RewardExcelConfigData.json")
+    DataLoader<List<RewardPreviewData>>("./ExcelBinOutput/RewardPreviewExcelConfigData.json")
 
 val rewardPreviewData get() = rewardPreviewLoader.data
 
