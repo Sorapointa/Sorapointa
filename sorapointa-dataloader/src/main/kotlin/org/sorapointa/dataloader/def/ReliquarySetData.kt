@@ -1,7 +1,7 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
 
 private val reliquarySetLoader =
@@ -18,9 +18,9 @@ data class ReliquarySetData(
     @JsonNames("setNeedNum", "SetNeedNum")
     val setNeedNum: List<Int>,
     @JsonNames("equipAffixId", "EquipAffixId")
-    val equipAffixId: Int,
+    val equipAffixId: Int? = null,
     @JsonNames("containsList", "ContainsList")
     val containsList: List<Int>,
     @JsonNames("disableFilter", "DisableFilter")
-    val disableFilter: Int
+    val disableFilter: Int? = null
 )

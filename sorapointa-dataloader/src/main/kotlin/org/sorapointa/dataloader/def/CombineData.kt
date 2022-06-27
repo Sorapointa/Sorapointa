@@ -3,9 +3,11 @@
 package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.ItemParamData
+import org.sorapointa.dataloader.common.RecipeType
 
 private val combineDataLoader =
     DataLoader<List<CombineData>>("./ExcelBinOutput/CombineExcelConfigData.json")
@@ -16,9 +18,9 @@ data class CombineData(
     @JsonNames("combineId", "CombineId")
     val combineId: Int,
     @JsonNames("playerLevel", "PlayerLevel")
-    val playerLevel: Int,
+    val playerLevel: Int = 0,
     @JsonNames("isDefaultShow", "IsDefaultShow")
-    val isDefaultShow: Boolean,
+    val isDefaultShow: Boolean = false,
     @JsonNames("combineType", "CombineType")
     val combineType: Int,
     @JsonNames("subCombineType", "SubCombineType")
@@ -28,26 +30,21 @@ data class CombineData(
     @JsonNames("resultItemCount", "ResultItemCount")
     val resultItemCount: Int,
     @JsonNames("scoinCost", "ScoinCost")
-    val scoinCost: Int,
-    @JsonNames("randomItems", "RandomItems")
-    val randomItems: List<RandomItem>,
+    val scoinCost: Int = 0,
     @JsonNames("materialItems", "MaterialItems")
-    val materialItems: List<MaterialItem>,
+    private val _materialItems: List<ItemParamData>,
     @JsonNames("effectDescTextMapHash", "EffectDescTextMapHash")
-    val effectDescTextMapHash: Int,
+    val effectDescTextMapHash: Long,
     @JsonNames("recipeType", "RecipeType")
-    val recipeType: String
+    val recipeType: RecipeType = RecipeType.RECIPE_TYPE_NONE
 ) {
-    @Serializable
-    data class RandomItem(
-        @JsonNames("count", "Count")
-        val count: Int
-    )
+
+    val materialItems by lazy {
+        _materialItems.filter { it.id != 0 }
+    }
 
     @Serializable
-    data class MaterialItem(
-        @JsonNames("id", "Id")
-        val id: Int,
+    data class RandomItem(
         @JsonNames("count", "Count")
         val count: Int
     )

@@ -3,6 +3,7 @@ package org.sorapointa.dataloader.def
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.AnimalCodexType
 
 private val codexAnimalDataLoader =
     DataLoader<List<CodexAnimalData>>("./ExcelBinOutput/AnimalCodexExcelConfigData.json")
@@ -14,7 +15,7 @@ data class CodexAnimalData(
     @JsonNames("id", "Id")
     val id: Int,
     @JsonNames("type", "Type")
-    val type: String,
+    val type: AnimalCodexType = AnimalCodexType.CODEX_ANIMAL,
     @JsonNames("describeId", "DescribeId")
     val describeId: Int,
     @JsonNames("sortOrder", "SortOrder")

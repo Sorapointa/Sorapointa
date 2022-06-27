@@ -26,7 +26,7 @@ data class AvatarSkillData(
     @JsonNames("skillIcon", "SkillIcon")
     val skillIcon: String,
     @JsonNames("costStamina", "CostStamina")
-    val costStamina: Double,
+    val costStamina: Double? = null,
     @JsonNames("maxChargeNum", "MaxChargeNum")
     val maxChargeNum: Int,
     @JsonNames("lockShape", "LockShape")
@@ -34,35 +34,29 @@ data class AvatarSkillData(
     @JsonNames("lockWeightParams", "LockWeightParams")
     val lockWeightParams: List<Double>,
     @JsonNames("isAttackCameraLock", "IsAttackCameraLock")
-    val isAttackCameraLock: Boolean,
+    val isAttackCameraLock: Boolean = false,
     @JsonNames("buffIcon", "BuffIcon")
     val buffIcon: String,
     @JsonNames("globalValueKey", "GlobalValueKey")
     val globalValueKey: String,
     @JsonNames("cdTime", "CdTime")
-    val cdTime: Double,
+    val cdTime: Double = 0.0,
     @JsonNames("triggerID", "TriggerID")
-    val triggerID: Int,
-    @JsonNames("dragType", "DragType")
-    val dragType: String,
-    @JsonNames("showIconArrow", "ShowIconArrow")
-    val showIconArrow: Boolean,
+    val triggerID: Int? = null,
     @JsonNames("proudSkillGroupId", "ProudSkillGroupId")
-    val proudSkillGroupId: Int,
+    val proudSkillGroupId: Int? = null,
     @JsonNames("costElemType", "CostElemType")
-    val costElemType: ElementType,
+    val costElemType: ElementType = ElementType.None,
     @JsonNames("costElemVal", "CostElemVal")
-    val costElemVal: Double,
+    val costElemVal: Double = 0.0,
     @JsonNames("ignoreCDMinusRatio", "IgnoreCDMinusRatio")
-    val ignoreCDMinusRatio: Boolean,
+    val ignoreCDMinusRatio: Boolean = false,
     @JsonNames("needStore", "NeedStore")
-    val needStore: Boolean,
-    @JsonNames("needMonitor", "NeedMonitor")
-    val needMonitor: String,
+    val needStore: Boolean = false,
     @JsonNames("defaultLocked", "DefaultLocked")
-    val defaultLocked: Boolean,
+    val defaultLocked: Boolean = false,
     @JsonNames("cdSlot", "CdSlot")
-    val cdSlot: Int,
+    val cdSlot: Int? = null,
     @JsonNames("energyMin", "EnergyMin")
-    val energyMin: Double
+    val energyMin: Double? = null
 )

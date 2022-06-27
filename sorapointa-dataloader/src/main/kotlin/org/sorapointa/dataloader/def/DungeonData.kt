@@ -3,9 +3,11 @@
 package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.DungeonStateType
+import org.sorapointa.dataloader.common.ElementType
 
 private val dungeonDataLoader =
     DataLoader<List<DungeonData>>("./ExcelBinOutput/DungeonExcelConfigData.json")
@@ -19,7 +21,7 @@ data class DungeonData(
     @JsonNames("nameTextMapHash", "NameTextMapHash")
     val nameTextMapHash: Long,
     @JsonNames("displayNameTextMapHash", "DisplayNameTextMapHash")
-    val displayNameTextMapHash: Int,
+    val displayNameTextMapHash: Long,
     @JsonNames("descTextMapHash", "DescTextMapHash")
     val descTextMapHash: Long,
     @JsonNames("type", "Type")
@@ -29,21 +31,21 @@ data class DungeonData(
     @JsonNames("involveType", "InvolveType")
     val involveType: String,
     @JsonNames("showLevel", "ShowLevel")
-    val showLevel: Int,
+    val showLevel: Int? = null,
     @JsonNames("avatarLimitType", "AvatarLimitType")
-    val avatarLimitType: Int,
+    val avatarLimitType: Int? = null,
     @JsonNames("limitLevel", "LimitLevel")
-    val limitLevel: Int,
+    val limitLevel: Int? = null,
     @JsonNames("levelRevise", "LevelRevise")
-    val levelRevise: Int,
+    val levelRevise: Int? = null,
     @JsonNames("passCond", "PassCond")
-    val passCond: Int,
+    val passCond: Int? = null,
     @JsonNames("reviveMaxCount", "ReviveMaxCount")
-    val reviveMaxCount: Int,
+    val reviveMaxCount: Int? = null,
     @JsonNames("dayEnterCount", "DayEnterCount")
-    val dayEnterCount: Int,
+    val dayEnterCount: Int? = null,
     @JsonNames("recommendElementTypes", "RecommendElementTypes")
-    val recommendElementTypes: List<Int>,
+    val recommendElementTypes: List<ElementType>,
     @JsonNames("settleCountdownTime", "SettleCountdownTime")
     val settleCountdownTime: Long,
     @JsonNames("failSettleCountdownTime", "FailSettleCountdownTime")
@@ -59,5 +61,5 @@ data class DungeonData(
     @JsonNames("entryPicPath", "EntryPicPath")
     val entryPicPath: String,
     @JsonNames("stateType", "StateType")
-    val stateType: String
+    val stateType: DungeonStateType = DungeonStateType.DUNGEON_STATE_NONE
 )

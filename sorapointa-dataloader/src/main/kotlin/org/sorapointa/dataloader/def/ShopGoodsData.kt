@@ -1,8 +1,10 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.ItemParamData
+import org.sorapointa.dataloader.common.RefreshType
 
 private val shopGoodsLoader =
     DataLoader<List<ShopGoodsData>>("./ExcelBinOutput/ShopGoodsExcelConfigData.json")
@@ -18,11 +20,11 @@ data class ShopGoodsData(
     @JsonNames("shopType", "ShopType")
     val shopType: Int,
     @JsonNames("itemId", "ItemId")
-    val itemId: Int,
+    val itemId: Int = 0,
     @JsonNames("itemCount", "ItemCount")
     val itemCount: Int,
     @JsonNames("costItems", "CostItems")
-    val costItems: List<CostItem>,
+    private val _costItems: List<ItemParamData>,
     @JsonNames("beginTime", "BeginTime")
     val beginTime: String,
     @JsonNames("endTime", "EndTime")
@@ -39,41 +41,34 @@ data class ShopGoodsData(
     @JsonNames("sortLevel", "SortLevel")
     val sortLevel: Int,
     @JsonNames("buyLimit", "BuyLimit")
-    val buyLimit: Int,
+    val buyLimit: Int? = null,
     @JsonNames("isBuyOnce", "IsBuyOnce")
-    val isBuyOnce: Boolean,
-    @JsonNames("precondition", "Precondition")
-    val precondition: String,
+    val isBuyOnce: Boolean = false,
     @JsonNames("costScoin", "CostScoin")
-    val costScoin: Int,
+    val costScoin: Int = 0,
     @JsonNames("refreshType", "RefreshType")
-    val refreshType: String,
+    val refreshType: RefreshType = RefreshType.SHOP_PRECONDITION_NONE,
     @JsonNames("refreshParam", "RefreshParam")
-    val refreshParam: Int,
+    val refreshParam: Int? = null,
     @JsonNames("subTabId", "SubTabId")
-    val subTabId: Int,
+    val subTabId: Int? = null,
     @JsonNames("costHcoin", "CostHcoin")
-    val costHcoin: Int,
+    val costHcoin: Int = 0,
     @JsonNames("rotateId", "RotateId")
-    val rotateId: Int,
+    val rotateId: Int? = null,
     @JsonNames("discountRate", "DiscountRate")
-    val discountRate: Double,
+    val discountRate: Double? = null,
     @JsonNames("originalPrice", "OriginalPrice")
-    val originalPrice: Int,
-    @JsonNames("preconditionParam", "PreconditionParam")
-    val preconditionParam: Int,
+    val originalPrice: Int? = null,
     @JsonNames("showId", "ShowId")
-    val showId: Int,
+    val showId: Int? = null,
     @JsonNames("costMcoin", "CostMcoin")
-    val costMcoin: Int,
+    val costMcoin: Int = 0,
     @JsonNames("chooseOneGroupId", "ChooseOneGroupId")
-    val chooseOneGroupId: Int
+    val chooseOneGroupId: Int? = null
 ) {
-    @Serializable
-    data class CostItem(
-        @JsonNames("id", "Id")
-        val id: Int,
-        @JsonNames("count", "Count")
-        val count: Int
-    )
+
+    val costItem by lazy {
+        _costItems.filter { it.id != 0 }
+    }
 }

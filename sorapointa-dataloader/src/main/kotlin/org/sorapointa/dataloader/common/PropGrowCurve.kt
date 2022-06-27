@@ -5,6 +5,6 @@ import kotlinx.serialization.json.JsonNames
 
 @Serializable
 data class PropGrowCurve(
-    @JsonNames("type", "Type") val type: String,
-    @JsonNames("growCurve", "GrowCurve") val growCurve: String,
+    @JsonNames("type", "Type") val type: FightProp = FightProp.FIGHT_PROP_NONE,
+    @JsonNames("growCurve", "GrowCurve") val growCurve: GrowCurveType = GrowCurveType.GROW_CURVE_NONE,
 )

@@ -6,7 +6,10 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
-import org.sorapointa.utils.encoding.getHashByPrefixSuffix
+import org.sorapointa.dataloader.common.AvatarUseType
+import org.sorapointa.dataloader.common.FightProp
+import org.sorapointa.dataloader.common.PropGrowCurve
+import org.sorapointa.utils.encoding.combineHash
 
 private val avatarExcelDataLoader =
     DataLoader<List<AvatarExcelData>>("./ExcelBinOutput/AvatarExcelConfigData.json")
@@ -47,9 +50,9 @@ data class AvatarExcelData(
     @JsonNames("imageName", "ImageName")
     val imageName: String,
     @JsonNames("gachaCardNameHashSuffix", "GachaCardNameHashSuffix")
-    val gachaCardNameHashSuffix: Long,
+    val gachaCardNameHashSuffix: Long? = null,
     @JsonNames("gachaImageNameHashSuffix", "GachaImageNameHashSuffix")
-    val gachaImageNameHashSuffix: Long,
+    val gachaImageNameHashSuffix: Long? = null,
     @JsonNames("controllerPathRemoteHashPre", "ControllerPathRemoteHashPre")
     val controllerPathRemoteHashPre: Int,
     @JsonNames("cutsceneShow", "CutsceneShow")
@@ -68,8 +71,6 @@ data class AvatarExcelData(
     val manekinMotionConfig: Int,
     @JsonNames("descTextMapHash", "DescTextMapHash")
     val descTextMapHash: Long,
-    @JsonNames("avatarIdentityType", "AvatarIdentityType")
-    val avatarIdentityType: String,
     @JsonNames("avatarPromoteId", "AvatarPromoteId")
     val avatarPromoteId: Int,
     @JsonNames("avatarPromoteRewardLevelList", "AvatarPromoteRewardLevelList")
@@ -91,7 +92,7 @@ data class AvatarExcelData(
     @JsonNames("criticalHurt", "CriticalHurt")
     val criticalHurt: Double,
     @JsonNames("propGrowCurves", "PropGrowCurves")
-    val propGrowCurves: List<PropGrowCurve>,
+    private val _propGrowCurves: List<PropGrowCurve>,
     @JsonNames("prefabPathRagdollHashSuffix", "PrefabPathRagdollHashSuffix")
     val prefabPathRagdollHashSuffix: Long,
     @JsonNames("prefabPathRagdollHashPre", "PrefabPathRagdollHashPre")
@@ -117,38 +118,32 @@ data class AvatarExcelData(
     @JsonNames("lODPatternName", "LODPatternName")
     val lODPatternName: String,
     @JsonNames("useType", "UseType")
-    val useType: String,
-    @JsonNames("coopPicNameHashSuffix", "CoopPicNameHashSuffix")
-    val coopPicNameHashSuffix: Long,
+    val useType: AvatarUseType = AvatarUseType.AVATAR_TEST,
     @JsonNames("isRangeAttack", "IsRangeAttack")
-    val isRangeAttack: Boolean
+    val isRangeAttack: Boolean = false
 ) {
 
     val prefabPathHash by lazy {
-        getHashByPrefixSuffix(prefabPathHashPre, prefabPathHashSuffix)
+        prefabPathHashPre combineHash prefabPathHashSuffix
     }
 
     val prefabPathRemoteHash by lazy {
-        getHashByPrefixSuffix(prefabPathRemoteHashPre, prefabPathRemoteHashSuffix)
+        prefabPathRemoteHashPre combineHash prefabPathRemoteHashSuffix
     }
 
     val controllerPathHash by lazy {
-        getHashByPrefixSuffix(controllerPathHashPre, controllerPathHashSuffix)
+        controllerPathHashPre combineHash controllerPathHashSuffix
     }
 
     val controllerPathRemoteHash by lazy {
-        getHashByPrefixSuffix(controllerPathRemoteHashPre, controllerPathRemoteHashSuffix)
+        controllerPathRemoteHashPre combineHash controllerPathRemoteHashSuffix
     }
 
     val combatConfigHash by lazy {
-        getHashByPrefixSuffix(combatConfigHashPre, combatConfigHashSuffix)
+        combatConfigHashPre combineHash combatConfigHashSuffix
     }
 
-    @Serializable
-    data class PropGrowCurve(
-        @JsonNames("type", "Type")
-        val type: String,
-        @JsonNames("growCurve", "GrowCurve")
-        val growCurve: String
-    )
+    val propGrowCurves by lazy {
+        _propGrowCurves.filter { it.type != FightProp.FIGHT_PROP_NONE }
+    }
 }

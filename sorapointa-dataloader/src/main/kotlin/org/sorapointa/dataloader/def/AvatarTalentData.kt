@@ -3,8 +3,8 @@
 package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
 
 private val avatarTalentDataLoader =
@@ -23,23 +23,13 @@ data class AvatarTalentData(
     @JsonNames("icon", "Icon")
     val icon: String,
     @JsonNames("prevTalent", "PrevTalent")
-    val prevTalent: Int,
+    val prevTalent: Int? = null,
     @JsonNames("mainCostItemId", "MainCostItemId")
     val mainCostItemId: Int,
     @JsonNames("mainCostItemCount", "MainCostItemCount")
     val mainCostItemCount: Int,
     @JsonNames("openConfig", "OpenConfig")
     val openConfig: String,
-    @JsonNames("addProps", "AddProps")
-    val addProps: List<AddProp>,
     @JsonNames("paramList", "ParamList")
     val paramList: List<Double>
-) {
-    @Serializable
-    data class AddProp(
-        @JsonNames("propType", "PropType")
-        val propType: String,
-        @JsonNames("value", "Value")
-        val value: Double
-    )
-}
+)

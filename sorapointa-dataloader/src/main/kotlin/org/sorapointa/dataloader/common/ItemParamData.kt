@@ -5,6 +5,6 @@ import kotlinx.serialization.json.JsonNames
 
 @Serializable
 data class ItemParamData(
-    @JsonNames("id", "Id") val id: Int,
-    @JsonNames("count", "Count") val count: Int,
+    @JsonNames("id", "Id", "ItemId", "itemId") val id: Int = 0,
+    @JsonNames("count", "Count", "ItemCount", "itemCount") val count: Int = 0,
 )

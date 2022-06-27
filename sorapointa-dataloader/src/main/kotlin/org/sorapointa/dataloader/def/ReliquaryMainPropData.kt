@@ -1,7 +1,7 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
 
 private val reliquaryMainPropLoader =
@@ -20,5 +20,5 @@ data class ReliquaryMainPropData(
     @JsonNames("affixName", "AffixName")
     val affixName: String,
     @JsonNames("weight", "Weight")
-    val weight: Int,
+    val weight: Int? = null,
 )

@@ -29,7 +29,7 @@ data class SceneData(
     @JsonNames("comment", "Comment")
     val comment: String,
     @JsonNames("entityAppearSorted", "EntityAppearSorted")
-    val entityAppearSorted: Int,
+    val entityAppearSorted: Int? = null,
     @JsonNames("maxSpecifiedAvatarNum", "MaxSpecifiedAvatarNum")
-    val maxSpecifiedAvatarNum: Int,
+    val maxSpecifiedAvatarNum: Int? = null,
 )

@@ -18,15 +18,15 @@ data class CodexReliquaryData(
     @JsonNames("level", "Level")
     val level: Int,
     @JsonNames("cupId", "CupId")
-    val cupId: Int,
+    val cupId: Int? = null,
     @JsonNames("leatherId", "LeatherId")
-    val leatherId: Int,
+    val leatherId: Int? = null,
     @JsonNames("capId", "CapId")
     val capId: Int,
     @JsonNames("flowerId", "FlowerId")
-    val flowerId: Int,
+    val flowerId: Int? = null,
     @JsonNames("sandId", "SandId")
-    val sandId: Int,
+    val sandId: Int? = null,
     @JsonNames("sortOrder", "SortOrder")
     val sortOrder: Int
 )

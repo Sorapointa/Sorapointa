@@ -2,10 +2,7 @@ package org.sorapointa.dataloader
 
 import io.github.classgraph.ClassGraph
 import io.github.classgraph.ClassRefTypeSignature
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -16,6 +13,7 @@ import org.sorapointa.dataloader.ResourceHolder.loadAll
 import org.sorapointa.utils.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.coroutineContext
 import kotlin.reflect.KClass
 
 private val logger = KotlinLogging.logger {}
@@ -70,13 +68,17 @@ object ResourceHolder {
      * Load all registered data
      * @see [DataLoader.loadFromStream]
      */
-    suspend fun loadAll() = withContext(Dispatchers.IO) {
-        dataMap.map { (k, v) ->
-            launch {
-                val loaded = v.load()
-                finalizeData(k, loaded)
-            }
-        }.joinAll()
+    suspend fun loadAll() {
+        val job = SupervisorJob(coroutineContext.job)
+        withContext(Dispatchers.IO + job) {
+            dataMap.map { (k, v) ->
+                launch {
+                    val loaded = v.load()
+                    finalizeData(k, loaded)
+                }
+            }.joinAll()
+        }
+        job.complete()
     }
 
     internal fun registerData(dataLoader: DataLoader<Any>) {

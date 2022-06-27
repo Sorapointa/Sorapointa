@@ -3,8 +3,8 @@
 package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
 
 private val avatarCostumeDataLoader =
@@ -29,7 +29,7 @@ data class AvatarCostumeData(
     @JsonNames("sideIconName", "SideIconName")
     val sideIconName: String,
     @JsonNames("hide", "Hide")
-    val hide: Boolean? = null,
+    val hide: Boolean = false,
     @JsonNames("isDefault", "IsDefault")
-    val isDefault: Boolean? = null
+    val isDefault: Boolean = false
 )
