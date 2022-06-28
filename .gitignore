@@ -49,7 +49,7 @@ generated/
 !sorapointa-core/src/test/resources/logback-test.xml
 
 ### Resources ###
-/resources/
+/resources
 
 ### Build Config ###
 local.properties
