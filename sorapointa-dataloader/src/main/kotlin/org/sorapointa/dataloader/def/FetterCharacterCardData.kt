@@ -1,10 +1,7 @@
-@file:OptIn(ExperimentalSerializationApi::class)
-
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import org.sorapointa.dataloader.DataLoader
 
 private val fetterCharacterCardDataLoader =
