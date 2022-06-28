@@ -162,12 +162,14 @@ sealed class ItemData {
                 reliquaryData.firstOrNull { it.id == itemId } ?: error("Could not find reliquaryId:$itemId data")
             }
 
-            fun copyOfNewRandomProp() =
+            fun copyOfNewRandomProp(count: Int = reliquaryExcelData.appendPropNum) =
                 copy(
                     appendPropIdList = appendPropIdList
                         .toMutableList()
                         .apply {
-                            add(reliquaryExcelData.getRandomAppendProps().id)
+                            repeat(count) {
+                                add(reliquaryExcelData.getRandomAppendProps().id)
+                            }
                         }
                 )
 

@@ -28,9 +28,10 @@ object ServerNetwork {
     private lateinit var serverBootstrap: UkcpServerBootstrap
 
     internal fun boot(parentContext: CoroutineContext = EmptyCoroutineContext): Job {
-        logger.info { "Starting Sorapointa Server..." }
         scope = ModuleScope("ServerNetwork", parentContext)
-        val port = SorapointaConfig.data.networkSetting.bindPort
+        val networkSetting = SorapointaConfig.data.networkSetting
+        val port = networkSetting.bindPort
+        logger.info { "Starting Sorapointa Server, binding server port on $port" }
         val job = scope.launch {
             workerGroup = NioEventLoopGroup()
             serverBootstrap = UkcpServerBootstrap()
@@ -40,7 +41,7 @@ object ServerNetwork {
                 .childHandler(ConnectionInitializer(scope))
                 .bind(port)
 
-            val ukcpSetting = SorapointaConfig.data.networkSetting.uKcpSetting
+            val ukcpSetting = networkSetting.uKcpSetting
 
             ChannelOptionHelper
                 .nodelay(
@@ -64,7 +65,6 @@ object ServerNetwork {
                         }
                     }
                 })
-                logger.info { "Bind server port on $port" }
             }.onFailure {
                 workerGroup.shutdownGracefully()
             }
