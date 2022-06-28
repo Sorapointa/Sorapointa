@@ -117,11 +117,9 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
         EventManager.init(scope.coroutineContext)
         TaskManager.init(scope.coroutineContext)
 
-        val databaseInitJob = setupDatabase()
-        databaseInitJob.join()
+        setupDatabase().join()
 
-        ResourceHolder.findAndRegister()
-        ResourceHolder.loadAll()
+        setupDataloader().join()
 
         Sorapointa.init(this, scope.coroutineContext, config)
     }
@@ -152,11 +150,28 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
             }.joinAll()
         }
 
+    private fun setupDataloader(): Job {
+        val job = SupervisorJob(scope.coroutineContext.job)
+        return scope.launch(job) {
+            logger.info { "Loading Sorapointa excel data..." }
+            val count: Int
+            val time = measureTimeMillis {
+                count = ResourceHolder.findAndRegister()
+                ResourceHolder.loadAll()
+            }
+            logger.info { "Loaded $count excel data in $time ms" }
+            job.complete()
+        }
+    }
+
     private fun setupDatabase(): Job =
         scope.launch {
             logger.info { "Loading Sorapointa database..." }
-            DatabaseManager.loadDatabase()
-            DatabaseManager.loadTables(registeredDatabaseTable)
+            val time = measureTimeMillis {
+                DatabaseManager.loadDatabase()
+                DatabaseManager.loadTables(registeredDatabaseTable)
+            }
+            logger.info { "Loaded ${registeredDatabaseTable.size} tables in $time ms" }
         }
 
     private fun setupDefaultsCommand() {

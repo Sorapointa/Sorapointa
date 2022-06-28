@@ -26,7 +26,7 @@ internal object AvatarDataTable : IdTable<Long>("avatar") {
 
     override val id: Column<EntityID<Long>> = long("avatar_guid").entityId()
     val ownerId: Column<EntityID<Int>> =
-        OpenStateSetTable.reference("user_id", PlayerDataTable, onDelete = ReferenceOption.CASCADE)
+        OpenStateSetTable.reference("owner_id", PlayerDataTable, onDelete = ReferenceOption.CASCADE)
     val avatarId: Column<Int> = integer("avatar_id")
     val bornTime: Column<Instant> = timestamp("born_time")
     val costumeId: Column<Int?> = integer("costume_id").nullable()
