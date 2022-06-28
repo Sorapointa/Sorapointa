@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import mu.KotlinLogging
 import net.mamoe.yamlkt.Comment
 import net.mamoe.yamlkt.Yaml
 import org.slf4j.LoggerFactory
@@ -33,6 +34,8 @@ import org.sorapointa.utils.encoding.hex
 import java.io.File
 import kotlin.text.toCharArray
 import kotlin.time.Duration
+
+private val logger = KotlinLogging.logger {}
 
 internal fun main(): Unit = runBlocking {
     DispatchServer.startDispatch(this, isIndependent = true).join()
@@ -104,6 +107,9 @@ object DispatchServer {
         val environment = getEnvironment()
         environment.setupApplication()
         environment.application.apply(config)
+        val dispatchConfig = DispatchConfig.data
+        val url = "http${if (dispatchConfig.useSSL) "s" else ""}://${dispatchConfig.host}:${dispatchConfig.port}"
+        logger.info { "Starting Sorapointa dispatch server, responding at $url" }
         embeddedServer(Netty, environment = environment).start(wait = true)
     }
 }
