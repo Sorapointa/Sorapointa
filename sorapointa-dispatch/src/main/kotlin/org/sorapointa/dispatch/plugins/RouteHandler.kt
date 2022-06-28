@@ -12,6 +12,7 @@ import io.ktor.server.response.*
 import io.ktor.util.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.JsonElement
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.sorapointa.dispatch.DispatchConfig
@@ -34,12 +35,11 @@ import java.util.concurrent.ConcurrentHashMap
 
 private val logger = KotlinLogging.logger {}
 
-private val DOMAIN_SDK_STATIC = "c2RrLXN0YXRpYy5taWhveW8uY29t".decodeBase64String()
-private val DOMAIN_HK4E_SDK = "aGs0ZS1zZGsubWlob3lvLmNvbQ==".decodeBase64String()
+private val DOMAIN_SDK_STATIC = "c2RrLW9zLXN0YXRpYy5ob3lvdmVyc2UuY29t".decodeBase64String()
 private val DOMAIN_HK4E_OS_VERSION = "aGs0ZS1zZGstb3MuaG95b3ZlcnNlLmNvbQ==".decodeBase64String()
-private val DOMAIN_WEB_STATIC = "d2Vic3RhdGljLm1paG95by5jb20=".decodeBase64String()
+private val DOMAIN_WEB_STATIC = "d2Vic3RhdGljLXNlYS5ob3lvdmVyc2UuY29t".decodeBase64String()
 private val ANNOUNCE_URL =
-    "aHR0cHM6Ly93ZWJzdGF0aWMubWlob3lvLmNvbS9oazRlL2Fubm91bmNlbWVudC9pbmRleC5odG1s".decodeBase64String()
+    "aHR0cHM6Ly93ZWJzdGF0aWMtc2VhLmhveW92ZXJzZS5jb20vaGs0ZS9hbm5vdW5jZW1lbnQvaW5kZXguaHRtbA==".decodeBase64String()
 private val QUERY_CURR_DOMAIN = "Y25nZmRpc3BhdGNoLnl1YW5zaGVuLmNvbQ==".decodeBase64String()
 
 private val serverList = DispatchConfig.data.servers.map {
@@ -185,7 +185,7 @@ internal suspend fun ApplicationCall.handleLogin() {
             return@broadcastEvent
         }
         if (pwd.length !in 8..32) {
-            returnErrorMsg("dispatch.login.errqor.length.password")
+            returnErrorMsg("dispatch.login.error.length.password")
             return@broadcastEvent
         }
         newSuspendedTransaction {
@@ -223,7 +223,7 @@ internal suspend fun ApplicationCall.handleComboLogin() {
     }
 
     // TODO: hardcode warning
-    if (!comboTokenRequestData.signCheck(parameters["region"] == "hk4e_cn")) {
+    if (!comboTokenRequestData.signCheck(parameters["region"] == "cn")) {
         returnErrorMsg("dispatch.login.error.sign")
         return
     }
@@ -296,7 +296,7 @@ internal suspend fun ApplicationCall.handleVerify() {
 
 internal suspend fun ApplicationCall.handleLoadConfig() {
     forwardCallWithAll(
-        DOMAIN_SDK_STATIC,
+        DOMAIN_HK4E_OS_VERSION,
         MdkShieldLoadConfigData(
             returnCode = 0, message = "OK",
             data = MdkShieldLoadConfigData.Data(
@@ -341,7 +341,7 @@ internal suspend fun ApplicationCall.handleGetConfig() {
 
 internal suspend fun ApplicationCall.handleGetCompareProtocolVersion() {
     forwardCallWithAll(
-        DOMAIN_HK4E_SDK,
+        DOMAIN_HK4E_OS_VERSION,
         CompareProtocolVersionData(
             returnCode = 0, message = "OK",
             data = CompareProtocolVersionData.Data(
@@ -422,15 +422,18 @@ internal suspend inline fun <reified T : Any> ApplicationCall.forwardCallWithAll
 internal suspend inline fun <reified T> ApplicationCall.forwardCall(
     domain: String
 ): T {
-    val url = "https://$domain${this.request.uri}"
-    logger.debug { "Forwarding request from ${this.request.uri} to $url" }
-    val idUrl = url + this.request.queryParameters.formUrlEncode()
+    val url = "https://${request.headers["original"] ?: domain}${request.uri}"
+    logger.debug { "Forwarding request from ${request.uri} to $url" }
+    val idUrl = url + request.queryParameters.formUrlEncode()
     return forwardCache.getOrPut(idUrl) {
         val call = this
         val request = DispatchServer.client.request {
             url(url)
             host = domain
             method = call.request.httpMethod
+            if (call.request.httpMethod == HttpMethod.Post) {
+                setBody(call.receive<JsonElement>())
+            }
             call.request.userAgent()?.let { userAgent(it) }
             parametersOf(call.request.queryParameters.toMap())
             contentType(ContentType.Application.Json)
