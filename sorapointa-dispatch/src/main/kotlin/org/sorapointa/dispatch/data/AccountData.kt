@@ -32,7 +32,7 @@ object AccountTable : IdTable<Int>("account_table") {
     val comboToken: Column<String?> = varchar("combo_token", 40).nullable()
     val comboTokenGenerationTime: Column<Instant?> = timestamp("combo_token_generation_time").nullable()
     val comboId: Column<Int?> = integer("combo_id").nullable()
-    val dispatchToken: Column<String?> = varchar("dispatch_token", 32).nullable()
+    val dispatchToken: Column<String?> = varchar("dispatch_token", 60).nullable()
     val dispatchTokenGenerationTime: Column<Instant?> = timestamp("dispatch_token_generation_time").nullable()
     val permissionLevel: Column<Int> = integer("permission_level").default(0)
 
