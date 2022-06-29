@@ -29,18 +29,13 @@ fun randomByteArray(length: Int): ByteArray {
 }
 
 /**
- * Random unsigned long
- *
- * [kotlin.random.nextUInt] will produce negative number
- * when convert to [Int]
+ * Random unsigned int in [0, Int_MAX)
  */
 fun randomUInt(): UInt =
     kotlin.random.Random.nextInt(0, Int.MAX_VALUE).toUInt()
 
 /**
- * Random unsigned long
- * [kotlin.random.nextULong] will produce negative number
- * when convert to [Long]
+ * Random unsigned long in [0, Long_MAX)
  */
 fun randomULong(): ULong =
     kotlin.random.Random.nextLong(0, Long.MAX_VALUE).toULong()
