@@ -19,7 +19,7 @@ import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.encoding.hex
 import org.sorapointa.utils.now
 import org.sorapointa.utils.randomByteArray
-import kotlin.random.Random
+import org.sorapointa.utils.randomUInt
 
 private val logger = KotlinLogging.logger {}
 
@@ -151,8 +151,9 @@ class Account(id: EntityID<Int>) : Entity<Int>(id) {
         return token
     }
 
+    // Permanent link to one user account
     internal fun getComboIdOrGenerate(): Int =
-        comboId ?: Random.nextInt().also {
+        comboId ?: randomUInt().toInt().also {
             comboId = it
         }
 
