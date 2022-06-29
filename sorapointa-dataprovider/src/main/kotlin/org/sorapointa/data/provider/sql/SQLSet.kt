@@ -2,7 +2,10 @@ package org.sorapointa.data.provider.sql
 
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.batchInsert
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insert
 
 abstract class SetTable<TID : Comparable<TID>, V>(
     tableName: String
@@ -31,7 +34,7 @@ class SQLDatabaseSet<TID : Comparable<TID>, V>(
         needToUpdate()
         val previous = elements.intersect(values.toSet()).size != elements.size
         setTable.batchInsert(elements) {
-            this[setTable.id] = id
+            this[setTable.id] = this@SQLDatabaseSet.id
             this[setTable.value] = it
         }
         return previous
@@ -41,7 +44,7 @@ class SQLDatabaseSet<TID : Comparable<TID>, V>(
         needToUpdate()
         val previous = !values.contains(element)
         setTable.insert {
-            it[setTable.id] = id
+            it[setTable.id] = this@SQLDatabaseSet.id
             it[setTable.value] = element
         }
         return previous

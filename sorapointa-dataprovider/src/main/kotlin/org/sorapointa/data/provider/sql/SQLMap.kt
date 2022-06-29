@@ -97,7 +97,7 @@ class SQLDatabaseMap<TID : Comparable<TID>, K, V>(
             }
         } ?: run {
             mapTable.insert {
-                it[mapTable.id] = id
+                it[mapTable.id] = this@SQLDatabaseMap.id
                 it[mapTable.key] = key
                 it[mapTable.value] = value
             }
