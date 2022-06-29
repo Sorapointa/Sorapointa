@@ -37,11 +37,11 @@ class SoraPacket(
 
 @SorapointaInternal fun BytePacketBuilder.writeSoraPacket(
     cmdId: UShort,
-    data: GeneratedMessageV3,
+    data: GeneratedMessageV3? = null,
     metadata: PacketHead? = null
 ) {
     val metadataBytes = metadata?.toByteArray() ?: byteArrayOf()
-    val dataBytes = data.toByteArray()
+    val dataBytes = data?.toByteArray() ?: byteArrayOf()
 
     writeUShort(START_MAGIC)
     writeUShort(cmdId)
