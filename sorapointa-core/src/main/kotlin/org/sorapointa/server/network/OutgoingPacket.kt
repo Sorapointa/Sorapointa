@@ -155,6 +155,14 @@ internal class ServerTimeNotifyPacket : AbstractOutgoingPacket(
         }
 }
 
+internal class ServerDisconnectClientNotifyPacket : AbstractOutgoingPacket(
+    PacketId.SERVER_DISCONNECT_CLIENT_NOTIFY
+) {
+
+    override fun buildProto(): GeneratedMessageV3 =
+        serverDisconnectClientNotify { }
+}
+
 // --- Player ---
 
 internal class PlayerDataNotifyPacket(

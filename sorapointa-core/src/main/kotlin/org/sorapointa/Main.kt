@@ -69,6 +69,8 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
         workingDirectory?.let { System.setProperty("user.dir", it.absPath) }
         logger.info { "Sorapointa is working in $globalWorkDirectory" }
 
+        redirectPrint()
+
         when (val m = mode) {
             is Server -> {
                 val server = setupServer {
@@ -89,7 +91,6 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
                 server.join()
             }
             is Client -> {
-                redirectPrint()
                 setupConsoleClient(m.username, m.password, m.wssUrl)
             }
         }
@@ -108,11 +109,7 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
         setupRegisteredConfigs().join()
 
         setupDefaultsCommand()
-        measureTimeMillis {
-            Console.setupCompletion()
-        }.also {
-            logger.debug { "Costed ${it}ms to initialize command completion" }
-        }
+        Console.setupCompletion()
 
         EventManager.init(scope.coroutineContext)
         TaskManager.init(scope.coroutineContext)
@@ -126,8 +123,6 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
 
     private fun setupLocalConsole() = scope.launch {
         val consoleSender = ConsoleCommandSender()
-        Console.initReader()
-        redirectPrint()
         while (isActive) {
             try {
                 CommandManager.invokeCommand(consoleSender, Console.readln()).join()
@@ -154,13 +149,18 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
         val job = SupervisorJob(scope.coroutineContext.job)
         return scope.launch(job) {
             logger.info { "Loading Sorapointa excel data..." }
-            val count: Int
-            val time = measureTimeMillis {
-                count = ResourceHolder.findAndRegister()
-                ResourceHolder.loadAll()
+            runCatching {
+                val count: Int
+                val time = measureTimeMillis {
+                    count = ResourceHolder.findAndRegister()
+                    ResourceHolder.loadAll()
+                }
+                logger.info { "Loaded $count excel data in $time ms" }
+                job.complete()
+            }.onFailure {
+                logger.error(it) { "Could not load sorapointa resources data" }
+                exitProcess(-1)
             }
-            logger.info { "Loaded $count excel data in $time ms" }
-            job.complete()
         }
     }
 
@@ -189,6 +189,7 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
         }
 
     private fun redirectPrint() {
+        Console.initReader()
         when {
             noOut -> Console.redirectToNull()
             !noOut && !noRedirect -> Console.redirectToJLine()

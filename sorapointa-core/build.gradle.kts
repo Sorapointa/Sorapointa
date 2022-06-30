@@ -7,8 +7,6 @@ plugins {
 }
 
 dependencies {
-//    implementation(files("$projectDir/libs/kcp-netty-1.5.0.jar"))
-
     // Project submodules
     implementation(project(":sorapointa-dataloader"))
     implementation(project(":sorapointa-dispatch"))
@@ -24,7 +22,7 @@ dependencies {
 
     // network
     implementation("io.netty:netty-handler:_")
-    implementation("moe.sdl.kcp:kcp-netty:_")
+    implementation("moe.sdl.kcp:grasskcpper:_")
     // Ktor
     implementation("io.ktor:ktor-server-websockets:_")
     // Command
@@ -33,6 +31,7 @@ dependencies {
     implementation("org.jline:jline:_")
     implementation("com.password4j:password4j:_")
     testImplementation(project(":sorapointa-dispatch", "test"))
+    testImplementation(project(":sorapointa-dataprovider", "test"))
 }
 
 configureLangsCopy()

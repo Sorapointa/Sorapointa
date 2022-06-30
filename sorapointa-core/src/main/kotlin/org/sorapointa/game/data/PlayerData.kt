@@ -256,15 +256,18 @@ class PlayerDataImpl(id: EntityID<Int>) : Entity<Int>(id), PlayerData {
     companion object : EntityClass<Int, PlayerDataImpl>(PlayerDataTable) {
 
         internal fun create(id: Int, nickName: String, pickInitAvatarId: Int): PlayerData =
-            PlayerDataImpl.new(id) {
-                this.nickName = nickName
-                this.profilePicture = ProfilePictureData(pickInitAvatarId)
-                this.lastActiveTime = now()
-            }.apply {
+            PlayerDataImpl.findById(
+                PlayerDataTable.insertAndGetId {
+                    it[this.id] = id
+                    it[this.nickName] = nickName
+                    it[profilePicture] = ProfilePictureData(pickInitAvatarId)
+                    it[lastActiveTime] = now()
+                }
+            )?.apply {
                 openStateSet.add(OpenState.OPEN_STATE_NONE)
                 flyCloakSet.add(FlyCloakId.GLIDER)
                 nameCardSet.add(DEFAULT_NAME_CARD)
-            }
+            } ?: error("Could not create player data into database")
     }
 
     override val uid = id.value
@@ -336,7 +339,7 @@ class PlayerDataImpl(id: EntityID<Int>) : Entity<Int>(id), PlayerData {
                     is ProtocolMessageEnum -> value.number.toLong()
                     else -> error("Could not convert $prop value $value to long")
                 }
-                player.impl().sendPacket(
+                player.impl().sendPacketAsync(
                     PlayerPropNotifyPacket(
                         player = player,
                         propMap = mapOf(prop map converted)

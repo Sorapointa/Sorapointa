@@ -20,6 +20,14 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
         val networkSetting: NetworkSetting = NetworkSetting(),
         @Comment("Player inventory store limits")
         val inventoryLimits: InventoryLimits = InventoryLimits(),
+        @Comment(
+            """
+            Run sorapointa with dispatch server, sorapointa allow you to run them separately
+        """
+        )
+        val startWithDispatch: Boolean = true,
+        @Comment("Use current region info for login rsp")
+        val useCurrentRegionForLoginRsp: Boolean = true,
         val offsetHours: Int = 4,
         @SerialName("timeZone")
         private val _timeZone: String = TimeZone.currentSystemDefault().toString(),
@@ -61,9 +69,13 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
     @Serializable
     data class UKcpSetting(
         val noDelay: Boolean = true,
-        val interval: Int = 20,
+        val interval: Int = 40,
         val fastResend: Int = 2,
-        val nocwnd: Boolean = true,
-        val MTU: Int = 1200,
+        val noCongestionWindow: Boolean = true,
+        val MTU: Int = 1400,
+        val sendWindow: Int = 256,
+        val receiveWindow: Int = 256,
+        val timeoutMillis: Long = 30 * 1000, // KCP Timeout > Protocol Ping Timeout
+        val ackNoDelay: Boolean = false
     )
 }

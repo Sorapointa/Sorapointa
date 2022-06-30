@@ -141,7 +141,7 @@ internal fun Application.setupWebConsoleServer() {
                             val success = ConsoleUsers.verify(pkt.username, pwd)
                             verified = success
                             if (success) {
-                                logger.debug { "Successfully verified for user '${pkt.username}'" }
+                                logger.info { "Successfully verified for user '${pkt.username}'" }
                             }
                             Console.consoleUsers.add(remoteSender)
                             sendSerialized<WebConsolePacket>(VerifyResp(success))

@@ -12,7 +12,7 @@ interface OutgoingPacket {
     val cmdId: UShort
     var metadata: PacketHead?
 
-    fun buildProto(): GeneratedMessageV3
+    fun buildProto(): GeneratedMessageV3?
 }
 
 abstract class AbstractOutgoingPacket(
@@ -20,6 +20,8 @@ abstract class AbstractOutgoingPacket(
 ) : OutgoingPacket {
 
     override var metadata: PacketHead? = null
+
+    abstract override fun buildProto(): GeneratedMessageV3
 }
 
 internal fun OutgoingPacket.toFinalBytePacket(): ByteArray {
