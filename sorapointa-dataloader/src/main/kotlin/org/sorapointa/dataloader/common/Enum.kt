@@ -90,7 +90,7 @@ enum class ElementType(
     val curEnergyProp: FightProp,
     val maxEnergyProp: FightProp
 ) {
-    None(0, FightProp.FIGHT_PROP_CUR_FIRE_ENERGY, FightProp.FIGHT_PROP_MAX_FIRE_ENERGY),
+    None(0, FightProp.FIGHT_PROP_NONE, FightProp.FIGHT_PROP_NONE,),
     Fire(1, FightProp.FIGHT_PROP_CUR_FIRE_ENERGY, FightProp.FIGHT_PROP_MAX_FIRE_ENERGY),
     Water(2, FightProp.FIGHT_PROP_CUR_WATER_ENERGY, FightProp.FIGHT_PROP_MAX_WATER_ENERGY),
     Grass(3, FightProp.FIGHT_PROP_CUR_GRASS_ENERGY, FightProp.FIGHT_PROP_MAX_GRASS_ENERGY),

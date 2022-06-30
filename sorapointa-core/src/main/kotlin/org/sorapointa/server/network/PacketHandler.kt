@@ -106,7 +106,13 @@ internal object IncomingPacketFactory {
     private val incomingPacketHandlers = listOf<IncomingSessionPacketHandler<*, *>>(
         GetPlayerTokenReqHandler,
         PingReqHandler,
-        PlayerSetPauseReqHandler
+        PlayerSetPauseReqHandler,
+        PlayerLoginReqHandler,
+        SetPlayerBornDataReqHandler,
+        GetPlayerSocialDetailReqHandler,
+        EnterSceneReadyReqHandler,
+        SceneInitFinishReqHandler,
+        UnionCmdNotifyHandler
     )
 
     suspend inline fun <reified TState : NetworkHandlerStateInterface> TState.tryHandle(

@@ -10,6 +10,8 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.util.*
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonElement
@@ -69,45 +71,54 @@ private suspend fun getQueryRegionListHttpRsp(host: String): QueryRegionListHttp
     }
 }
 
-@SorapointaInternal var currentRegionRsp: QueryCurrRegionHttpRsp? = null
-    private set
+@SorapointaInternal var currentRegionRsp = CompletableDeferred<QueryCurrRegionHttpRsp>()
 
 private val dispatchRSAKey: RSAKey? = DispatchConfig.data.requestSetting.rsaPrivateKey.parseToRSAKey()
 private val dispatchPublicRSAKey: RSAKey? = DispatchConfig.data.requestSetting.rsaPublicKey.parseToRSAKey()
 
+suspend fun getCurrentRegionHttpRsp(call: ApplicationCall? = null): QueryCurrRegionHttpRsp {
+    val requestSetting = DispatchConfig.data.requestSetting
+    return if (requestSetting.forwardQueryCurrentRegion) {
+        val forwardResult = if (!requestSetting.usingCurrentRegionUrlHardcode && call != null) {
+            call.forwardCall(QUERY_CURR_DOMAIN)
+        } else {
+            DispatchServer.client.get(requestSetting.queryCurrentRegionHardcode)
+        }.bodyAsText()
+        if (!requestSetting.v28CurrentRegionForwardFormat || dispatchRSAKey == null) {
+            logger.debug { "QueryCurrentRegion Result: $forwardResult" }
+            QueryCurrRegionHttpRsp.parseFrom(forwardResult.decodeBase64Bytes())
+        } else {
+            val query: QueryCurrentRegionData = networkJson.decodeFromString(forwardResult)
+            logger.debug { "QueryCurrentRegion Result: $query" }
+            with(dispatchRSAKey) {
+                val decryptResult = query.content.decodeBase64Bytes().decrypt()
+                val signVerifyResult = if (requestSetting.enableSignVerify) {
+                    dispatchPublicRSAKey?.run {
+                        decryptResult.signVerify(query.sign.decodeBase64Bytes())
+                    } ?: false
+                } else true // If disable signVerify, return true
+                logger.debug { "QueryCurrentRegion Decrypted Result: ${decryptResult.encodeBase64()}" }
+                if (signVerifyResult) {
+                    QueryCurrRegionHttpRsp.parseFrom(decryptResult)
+                } else {
+                    error("QueryCurrentRegion sign verify failed")
+                }
+            }
+        }
+    } else queryCurrRegionHttpRsp {}
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
 private suspend fun ApplicationCall.forwardQueryCurrentRegionHttpRsp(): QueryCurrRegionHttpRsp {
 
     val requestSetting = DispatchConfig.data.requestSetting
 
-    val queryCurrentRegionHttpRsp = currentRegionRsp ?: run {
-        if (requestSetting.forwardQueryCurrentRegion) {
-            val forwardResult = if (!requestSetting.usingCurrentRegionUrlHardcode) {
-                forwardCall(QUERY_CURR_DOMAIN)
-            } else {
-                DispatchServer.client.get(requestSetting.queryCurrentRegionHardcode)
-            }.bodyAsText()
-            if (!requestSetting.v28CurrentRegionForwardFormat || dispatchRSAKey == null) {
-                logger.debug { "QueryCurrentRegion Result: $forwardResult" }
-                QueryCurrRegionHttpRsp.parseFrom(forwardResult.decodeBase64Bytes())
-            } else {
-                val query: QueryCurrentRegionData = networkJson.decodeFromString(forwardResult)
-                logger.debug { "QueryCurrentRegion Result: $query" }
-                with(dispatchRSAKey) {
-                    val decryptResult = query.content.decodeBase64Bytes().decrypt()
-                    val signVerifyResult = if (requestSetting.enableSignVerify) {
-                        dispatchPublicRSAKey?.run {
-                            decryptResult.signVerify(query.sign.decodeBase64Bytes())
-                        } ?: false
-                    } else true // If disable signVerify, return true
-                    logger.debug { "QueryCurrentRegion Decrypted Result: ${decryptResult.encodeBase64()}" }
-                    if (signVerifyResult) {
-                        QueryCurrRegionHttpRsp.parseFrom(decryptResult)
-                    } else {
-                        error("QueryCurrentRegion sign verify failed")
-                    }
-                }
-            }
-        } else queryCurrRegionHttpRsp {}
+    val queryCurrentRegionHttpRsp = if (currentRegionRsp.isCompleted) {
+        currentRegionRsp.getCompleted()
+    } else {
+        getCurrentRegionHttpRsp(this).also {
+            currentRegionRsp.complete(it)
+        }
     }
 
     val ec2b = newSuspendedTransaction {

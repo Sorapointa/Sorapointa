@@ -1,13 +1,9 @@
 package org.sorapointa.server.network
 
-import io.jpower.kcp.netty.UkcpChannel
 import io.netty.buffer.ByteBuf
-import io.netty.channel.ChannelHandlerContext
-import io.netty.channel.ChannelInboundHandlerAdapter
-import io.netty.channel.ChannelInitializer
-import io.netty.channel.SimpleChannelInboundHandler
-import io.netty.handler.codec.MessageToByteEncoder
-import io.netty.handler.codec.MessageToMessageDecoder
+import io.netty.buffer.Unpooled
+import kcp.highway.KcpListener
+import kcp.highway.Ukcp
 import kotlinx.coroutines.*
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -30,6 +26,7 @@ import org.sorapointa.proto.findCommonNameFromCmdId
 import org.sorapointa.server.network.IncomingPacketFactory.tryHandle
 import org.sorapointa.utils.*
 import org.sorapointa.utils.crypto.MT19937
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -50,11 +47,13 @@ internal interface NetworkHandlerStateInterface : WithState<NetworkHandlerStateI
 }
 
 internal open class NetworkHandler(
-    private val connection: UkcpChannel,
+    private val connection: Ukcp,
     parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
 ) {
 
-    private val scope = ModuleScope("NetworkHandler[${getHost()}]", parentCoroutineContext)
+    val host: String = connection.user().remoteAddress.address.hostAddress
+
+    private val scope = ModuleScope("NetworkHandler[$host]", parentCoroutineContext)
 
     val networkStateController by lazy {
         StateController<_, NetworkHandlerStateInterface, _>(
@@ -82,15 +81,13 @@ internal open class NetworkHandler(
     }
 
     internal suspend fun close() {
+        sendPacket(ServerDisconnectClientNotifyPacket())
         if (connection.isActive) {
             connection.close()
         }
         networkStateController.setState(Closed(this))
         scope.dispose()
     }
-
-    fun getHost(): String =
-        connection.host
 
     suspend fun getKey(): ByteArray? =
         when (val state = networkStateController.getStateInstance()) {
@@ -104,17 +101,29 @@ internal open class NetworkHandler(
         lastPingTime = now()
     }
 
-    open fun sendPacket(
+    open fun sendPacketAsync(
         packet: OutgoingPacket,
         metadata: PacketHead? = null
     ): Job = scope.launch {
-        if (networkStateController.getCurrentState() == NetworkHandlerStateInterface.State.CLOSED) return@launch
+        sendPacket(packet, metadata)
+    }
+
+    open suspend fun sendPacket(
+        packet: OutgoingPacket,
+        metadata: PacketHead? = null
+    ) {
+        if (networkStateController.getCurrentState() == NetworkHandlerStateInterface.State.CLOSED) return
         SendOutgoingPacketEvent(this@NetworkHandler, packet).broadcastEvent {
             if (metadata != null) {
                 packet.metadata = metadata
             }
             logger.debug { "Send: ${findCommonNameFromCmdId(packet.cmdId)} Id: ${packet.cmdId}" }
-            connection.writeAndFlushOrCloseAsync(packet)
+            val bytes = getKey()?.let { key ->
+                packet.toFinalBytePacket().xor(key)
+            }
+            val buf: ByteBuf = Unpooled.wrappedBuffer(bytes)
+            connection.write(buf)
+            buf.release()
         }
     }
 
@@ -124,34 +133,6 @@ internal open class NetworkHandler(
             networkStateController.getStateInstance().handlePacket(packet)
         }
 
-    protected open fun setupConnectionPipeline() {
-        connection.pipeline()
-            .addLast(object : ChannelInboundHandlerAdapter() {
-                @Deprecated("Deprecated in Java")
-                override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
-                    scope.launch {
-                        close()
-                        throw cause
-                    }
-                }
-
-                override fun channelInactive(ctx: ChannelHandlerContext) {
-                    logger.info { "Session [${ctx.channel().remoteAddress()}] has disconnected" }
-                    scope.launch {
-                        close()
-                    }
-                }
-            })
-            .addLast("encoder", OutgoingPacketEncoder(this))
-            .addLast("decoder", IncomingPacketDecoder(this))
-            .addLast(object : SimpleChannelInboundHandler<SoraPacket>() {
-                override fun channelRead0(ctx: ChannelHandlerContext, msg: SoraPacket) {
-                    handlePacket(msg)
-                }
-            })
-        logger.debug { "Session [${connection.remoteAddress()}] has inited" }
-    }
-
     abstract inner class UpdatedKeyState : NetworkHandlerStateInterface {
         abstract val gameKey: ByteArray
     }
@@ -159,8 +140,10 @@ internal open class NetworkHandler(
     abstract inner class SessionHandlePacketState : UpdatedKeyState() {
 
         override suspend fun handlePacket(packet: SoraPacket) {
-            tryHandle(packet)?.also {
-                sendPacket(it)
+            newSuspendedTransaction {
+                tryHandle(packet)?.also {
+                    sendPacket(it)
+                }
             }
         }
     }
@@ -180,12 +163,8 @@ internal open class NetworkHandler(
 
         val dispatchKey: Deferred<ByteArray> = scope.async {
             newSuspendedTransaction {
-                DispatchKeyData.getOrGenerate(getHost()).key
+                DispatchKeyData.getOrGenerate(host).key
             }
-        }
-
-        override suspend fun startState() {
-            setupConnectionPipeline()
         }
 
         suspend fun updateKeyAndBindPlayer(account: Account, seed: ULong) {
@@ -199,9 +178,11 @@ internal open class NetworkHandler(
         }
 
         override suspend fun handlePacket(packet: SoraPacket) {
-            tryHandle(packet)?.also { outgoingPacket ->
-                sendPacket(outgoingPacket).join() // Wait for sending, cuz we need to update key
-                updateSessionState?.also { networkStateController.setState(it) }
+            newSuspendedTransaction {
+                tryHandle(packet)?.also { outgoingPacket ->
+                    sendPacket(outgoingPacket) // Wait for sending, cuz we need to update key
+                    updateSessionState?.also { networkStateController.setState(it) }
+                }
             }
         }
     }
@@ -259,42 +240,48 @@ internal open class NetworkHandler(
     }
 }
 
-internal class ConnectionInitializer(
+// F**K KCP Lib
+private val connectionMap = ConcurrentHashMap<Ukcp, NetworkHandler>()
+
+// NO RUNTIME STATE of this class
+internal class ConnectionListener(
     private val scope: ModuleScope
-) : ChannelInitializer<UkcpChannel>() {
-    private lateinit var networkHandler: NetworkHandler
+) : KcpListener {
 
-    override fun initChannel(ch: UkcpChannel) {
-        logger.info { "New session from [${ch.remoteAddress()}] connected" }
-        networkHandler = NetworkHandler(ch, scope.coroutineContext)
+    override fun onConnected(ukcp: Ukcp) {
+        logger.info { "New session from [${ukcp.user().remoteAddress}] connected" }
+        val handler = NetworkHandler(ukcp, scope.coroutineContext)
+        connectionMap[ukcp] = handler
         runBlocking {
-            networkHandler.init()
+            handler.init()
         }
     }
-}
 
-internal class OutgoingPacketEncoder(
-    private val networkHandler: NetworkHandler
-) : MessageToByteEncoder<OutgoingPacket>(OutgoingPacket::class.java) {
-
-    override fun encode(ctx: ChannelHandlerContext, msg: OutgoingPacket, out: ByteBuf) {
+    override fun handleReceive(byteBuf: ByteBuf, ukcp: Ukcp) {
         runBlocking {
-            networkHandler.getKey()?.let { key ->
-                out.writeBytes(msg.toFinalBytePacket().xor(key))
+            connectionMap[ukcp]?.let { handler ->
+                handler.getKey()?.let { key ->
+                    byteBuf.readToSoraPacket(key) {
+                        handler.handlePacket(it)
+                    }
+                }
             }
         }
     }
-}
 
-internal class IncomingPacketDecoder(
-    private val networkHandler: NetworkHandler
-) : MessageToMessageDecoder<ByteBuf>() {
+    override fun handleException(throwable: Throwable, ukcp: Ukcp) {
+        scope.launch {
+            connectionMap[ukcp]?.close()
+            connectionMap.remove(ukcp)
+            throw throwable
+        }
+    }
 
-    override fun decode(ctx: ChannelHandlerContext, msg: ByteBuf, out: MutableList<Any>) {
-        runBlocking {
-            networkHandler.getKey()?.let { key ->
-                msg.readToSoraPacket(key) { out.add(it) }
-            }
+    override fun handleClose(ukcp: Ukcp) {
+        logger.info { "Session [${ukcp.user().remoteAddress}] has disconnected" }
+        scope.launch {
+            connectionMap[ukcp]?.close()
+            connectionMap.remove(ukcp)
         }
     }
 }

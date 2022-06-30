@@ -1,9 +1,10 @@
 package org.sorapointa.server.network
 
 import com.google.protobuf.Parser
+import kotlinx.coroutines.withTimeout
 import mu.KotlinLogging
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.sorapointa.Sorapointa
+import org.sorapointa.SorapointaConfig
 import org.sorapointa.dispatch.data.Account
 import org.sorapointa.dispatch.plugins.currentRegionRsp
 import org.sorapointa.game.Player
@@ -22,6 +23,7 @@ import org.sorapointa.proto.SetPlayerBornDataReqOuterClass.SetPlayerBornDataReq
 import org.sorapointa.proto.SoraPacket
 import org.sorapointa.proto.UnionCmdNotifyOuterClass.UnionCmdNotify
 import org.sorapointa.proto.packetHead
+import org.sorapointa.proto.queryCurrRegionHttpRsp
 import org.sorapointa.utils.randomULong
 
 private val logger = KotlinLogging.logger {}
@@ -68,13 +70,11 @@ internal object GetPlayerTokenReqHandler : IncomingPreLoginPacketHandler
         packet: GetPlayerTokenReq
     ): GetPlayerTokenRspPacket {
         val uid = packet.accountUid.toInt()
-        val account = newSuspendedTransaction {
-            Account.findById(uid)
-        } ?: return GetPlayerTokenRspPacket.Error(
+        val account = Account.findById(uid) ?: return GetPlayerTokenRspPacket.Error(
             Retcode.RETCODE_RET_ACCOUNT_NOT_EXIST, "user.notfound"
         )
         if (packet.accountToken != account.getComboTokenWithCheck()) return GetPlayerTokenRspPacket.Error(
-            Retcode.RETCODE_RET_ACCOUNT_NOT_EXIST, "auth.error.token"
+            Retcode.RETCODE_RET_TOKEN_ERROR, "auth.error.token"
         )
         Sorapointa.findPlayerById(uid)?.let {
             // TODO: replace it with graceful disconnect
@@ -87,7 +87,7 @@ internal object GetPlayerTokenReqHandler : IncomingPreLoginPacketHandler
         updateKeyAndBindPlayer(account, seed)
 
         return GetPlayerTokenRspPacket.Successful(
-            packet, seed, networkHandler.getHost()
+            packet, seed, networkHandler.host
         )
     }
 }
@@ -103,19 +103,22 @@ internal object PlayerLoginReqHandler : IncomingPreLoginPacketHandler
     override suspend fun NetworkHandler.Login.handlePacket(
         packet: PlayerLoginReq
     ): PlayerLoginRspPacket {
-
-        newSuspendedTransaction {
-            if (playerData != null) {
-                setToOK(createPlayer(playerData))
-            } else {
-                // Still to be `Login` state
-                networkHandler.sendPacket(DoSetPlayerBornDataNotifyPacket())
+        return runCatching {
+            withTimeout(1000) {
+                val curRegion = if (SorapointaConfig.data.useCurrentRegionForLoginRsp) {
+                    currentRegionRsp.await()
+                } else queryCurrRegionHttpRsp {}
+                if (playerData != null) {
+                    setToOK(createPlayer(playerData))
+                } else {
+                    // Still to be `Login` state
+                    networkHandler.sendPacketAsync(DoSetPlayerBornDataNotifyPacket())
+                }
+                curRegion
             }
-        }
-
-        return currentRegionRsp
-            ?.let { PlayerLoginRspPacket.Succ(it) }
-            ?: PlayerLoginRspPacket.Fail(Retcode.RETCODE_RET_SVR_ERROR)
+        }.getOrNull()?.let {
+            PlayerLoginRspPacket.Succ(it)
+        } ?: PlayerLoginRspPacket.Fail(Retcode.RETCODE_RET_SVR_ERROR)
     }
 }
 
@@ -130,16 +133,12 @@ internal object SetPlayerBornDataReqHandler : IncomingPreLoginPacketHandler
         packet: SetPlayerBornDataReq
     ): SetPlayerBornDataRspPacket {
 
-        val player = newSuspendedTransaction {
-            val playerData = PlayerDataImpl.create(account.id.value, packet.nickName, packet.avatarId)
-            createPlayer(playerData).apply {
-                initNewPlayerAvatar(packet.avatarId)
-            }
+        val playerData = PlayerDataImpl.create(account.id.value, packet.nickName, packet.avatarId)
+        val player = createPlayer(playerData).apply {
+            initNewPlayerAvatar(packet.avatarId)
         }
 
-        newSuspendedTransaction {
-            setToOK(player)
-        }
+        setToOK(player)
 
         return SetPlayerBornDataRspPacket()
     }
@@ -156,9 +155,7 @@ internal object GetPlayerSocialDetailReqHandler : IncomingPacketHandlerWithRespo
         packet: GetPlayerSocialDetailReq
     ): GetPlayerSocialDetailRspPacket {
 
-        return newSuspendedTransaction {
-            GetPlayerSocialDetailRspPacket(this@handlePacket, packet.uid)
-        }
+        return GetPlayerSocialDetailRspPacket(this@handlePacket, packet.uid)
     }
 }
 
@@ -173,7 +170,7 @@ internal object EnterSceneReadyReqHandler : IncomingPacketHandlerWithResponse
         packet: EnterSceneReadyReq
     ): EnterSceneReadyRspPacket {
         return if (packet.enterSceneToken == enterSceneToken) {
-            impl().sendPacket(EnterScenePeerNotifyPacket(this)) // doesn't have packetHeader (metadata)
+            impl().sendPacketAsync(EnterScenePeerNotifyPacket(this)) // doesn't have packetHeader (metadata)
             EnterSceneReadyRspPacket.Succ(this) // has packetHeader
         } else EnterSceneReadyRspPacket.Fail(this, Retcode.RETCODE_RET_ENTER_SCENE_TOKEN_INVALID)
     }

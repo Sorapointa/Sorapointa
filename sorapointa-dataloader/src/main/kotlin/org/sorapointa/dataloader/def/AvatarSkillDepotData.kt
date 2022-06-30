@@ -51,7 +51,6 @@ data class AvatarSkillDepotData(
 
     val energySkill by lazy {
         avatarSkillData.firstOrNull { _energySkill == it.id }
-            ?: error("Could not find the avatarDepotId: $id, energy skill")
     }
 
     val normalAttack by lazy {
@@ -61,7 +60,6 @@ data class AvatarSkillDepotData(
 
     val elementSkill by lazy {
         avatarSkillData.firstOrNull { skills.getOrNull(1) == it.id }
-            ?: error("Could not find the avatarDepotId: $id, element skill")
     }
 
     @Serializable

@@ -29,13 +29,13 @@ interface Avatar : SceneEntity {
 
     val normalAttack: AvatarSkillData
 
-    val elementSkill: AvatarSkillData
+    val elementSkill: AvatarSkillData?
 
-    val energySkill: AvatarSkillData
+    val energySkill: AvatarSkillData?
 
     val elementType: ElementType
 
-    val maxEnergy: Int
+    val maxEnergy: Int?
 
     val inherentProudSkillList: List<Int>
 
@@ -111,11 +111,11 @@ class AvatarImpl(
     }
 
     override val elementType: ElementType by lazy {
-        avatarSkillDepotData.energySkill.costElemType
+        avatarSkillDepotData.energySkill?.costElemType ?: ElementType.None
     }
 
     override val maxEnergy by lazy {
-        avatarSkillDepotData.energySkill.costElemVal.toInt()
+        avatarSkillDepotData.energySkill?.costElemVal?.toInt()
     }
 
     override val maxHp
@@ -181,12 +181,14 @@ internal class AvatarProtoImpl(
     override val entity: Avatar
 ) : AbstractSceneEntityProto<Avatar>(), AvatarProto {
 
-    private val protoExcelInfo = avatarExcelInfo {
-        prefabPathHash = entity.avatarExcelData.prefabPathHash
-        prefabPathRemoteHash = entity.avatarExcelData.prefabPathRemoteHash
-        controllerPathHash = entity.avatarExcelData.controllerPathHash
-        controllerPathRemoteHash = entity.avatarExcelData.controllerPathRemoteHash
-        combatConfigHash = entity.avatarExcelData.combatConfigHash
+    private val protoExcelInfo by lazy {
+        avatarExcelInfo {
+            prefabPathHash = entity.avatarExcelData.prefabPathHash
+            prefabPathRemoteHash = entity.avatarExcelData.prefabPathRemoteHash
+            controllerPathHash = entity.avatarExcelData.controllerPathHash
+            controllerPathRemoteHash = entity.avatarExcelData.controllerPathRemoteHash
+            combatConfigHash = entity.avatarExcelData.combatConfigHash
+        }
     }
 
     override val protoPropMap
@@ -225,78 +227,96 @@ internal class AvatarProtoImpl(
         get() = equipList.mapNotNull { if (it is ItemData.Equip.Reliquary) it.toSceneReliquaryInfoProto() else null }
 
     private val protoFightPropMap
-        get() = mapOf(
-            FIGHT_PROP_BASE_HP map entity.data.baseHp,
-            FIGHT_PROP_HP map entity.data.hp,
-            FIGHT_PROP_HP_PERCENT map entity.data.hpPercent,
-            FIGHT_PROP_BASE_ATTACK map entity.data.baseAttack,
-            FIGHT_PROP_ATTACK map entity.data.attack,
-            FIGHT_PROP_ATTACK_PERCENT map entity.data.attackPercent,
-            FIGHT_PROP_BASE_DEFENSE map entity.data.baseDefense,
-            FIGHT_PROP_DEFENSE map entity.data.defense,
-            FIGHT_PROP_DEFENSE_PERCENT map entity.data.defensePercent,
-            FIGHT_PROP_BASE_SPEED map entity.data.baseSpeed,
-            FIGHT_PROP_SPEED_PERCENT map entity.data.speedPercent,
-            FIGHT_PROP_CRITICAL map entity.data.critical,
-            FIGHT_PROP_ANTI_CRITICAL map entity.data.antiCritical,
-            FIGHT_PROP_CRITICAL_HURT map entity.data.criticalHurt,
-            FIGHT_PROP_CHARGE_EFFICIENCY map entity.data.chargeEfficiency,
-            FIGHT_PROP_ADD_HURT map entity.data.addHurt,
-            FIGHT_PROP_SUB_HURT map entity.data.subHurt,
-            FIGHT_PROP_HEAL_ADD map entity.data.healAdd,
-            FIGHT_PROP_HEALED_ADD map entity.data.healedAdd,
-            FIGHT_PROP_ELEMENT_MASTERY map entity.data.elementMastery,
-            FIGHT_PROP_PHYSICAL_SUB_HURT map entity.data.physicalSubHurt,
-            FIGHT_PROP_PHYSICAL_ADD_HURT map entity.data.physicalAddHurt,
-            FIGHT_PROP_DEFENCE_IGNORE_RATIO map entity.data.defenceIgnoreRatio,
-            FIGHT_PROP_DEFENCE_IGNORE_DELTA map entity.data.defenceIgnoreDelta,
-            FIGHT_PROP_FIRE_ADD_HURT map entity.data.fireAddHurt,
-            FIGHT_PROP_ELEC_ADD_HURT map entity.data.electricAddHurt,
-            FIGHT_PROP_WATER_ADD_HURT map entity.data.waterAddHurt,
-            FIGHT_PROP_GRASS_ADD_HURT map entity.data.grassAddHurt,
-            FIGHT_PROP_WIND_ADD_HURT map entity.data.windAddHurt,
-            FIGHT_PROP_ROCK_ADD_HURT map entity.data.rockAddHurt,
-            FIGHT_PROP_ICE_ADD_HURT map entity.data.iceAddHurt,
-            FIGHT_PROP_HIT_HEAD_ADD_HURT map entity.data.hitHeadAddHurt,
-            FIGHT_PROP_FIRE_SUB_HURT map entity.data.fireSubHurt,
-            FIGHT_PROP_ELEC_SUB_HURT map entity.data.electricSubHurt,
-            FIGHT_PROP_WATER_SUB_HURT map entity.data.waterSubHurt,
-            FIGHT_PROP_GRASS_SUB_HURT map entity.data.grassSubHurt,
-            FIGHT_PROP_WIND_SUB_HURT map entity.data.windSubHurt,
-            FIGHT_PROP_ROCK_SUB_HURT map entity.data.rockSubHurt,
-            FIGHT_PROP_ICE_SUB_HURT map entity.data.iceSubHurt,
-            FIGHT_PROP_SKILL_CD_MINUS_RATIO map entity.data.skillCDMinusRatio,
-            FIGHT_PROP_SHIELD_COST_MINUS_RATIO map entity.data.shieldCostMinusRatio,
-            entity.elementType.maxEnergyProp map entity.maxEnergy,
-            entity.elementType.curEnergyProp map entity.data.currentEnergy,
+        get() = buildList {
+            add(FIGHT_PROP_BASE_HP map entity.data.baseHp)
+            add(FIGHT_PROP_HP map entity.data.hp)
+            add(FIGHT_PROP_HP_PERCENT map entity.data.hpPercent)
+            add(FIGHT_PROP_BASE_ATTACK map entity.data.baseAttack)
+            add(FIGHT_PROP_ATTACK map entity.data.attack)
+            add(FIGHT_PROP_ATTACK_PERCENT map entity.data.attackPercent)
+            add(FIGHT_PROP_BASE_DEFENSE map entity.data.baseDefense)
+            add(FIGHT_PROP_DEFENSE map entity.data.defense)
+            add(FIGHT_PROP_DEFENSE_PERCENT map entity.data.defensePercent)
+            add(FIGHT_PROP_BASE_SPEED map entity.data.baseSpeed)
+            add(FIGHT_PROP_SPEED_PERCENT map entity.data.speedPercent)
+            add(FIGHT_PROP_CRITICAL map entity.data.critical)
+            add(FIGHT_PROP_ANTI_CRITICAL map entity.data.antiCritical)
+            add(FIGHT_PROP_CRITICAL_HURT map entity.data.criticalHurt)
+            add(FIGHT_PROP_CHARGE_EFFICIENCY map entity.data.chargeEfficiency)
+            add(FIGHT_PROP_ADD_HURT map entity.data.addHurt)
+            add(FIGHT_PROP_SUB_HURT map entity.data.subHurt)
+            add(FIGHT_PROP_HEAL_ADD map entity.data.healAdd)
+            add(FIGHT_PROP_HEALED_ADD map entity.data.healedAdd)
+            add(FIGHT_PROP_ELEMENT_MASTERY map entity.data.elementMastery)
+            add(FIGHT_PROP_PHYSICAL_SUB_HURT map entity.data.physicalSubHurt)
+            add(FIGHT_PROP_PHYSICAL_ADD_HURT map entity.data.physicalAddHurt)
+            add(FIGHT_PROP_DEFENCE_IGNORE_RATIO map entity.data.defenceIgnoreRatio)
+            add(FIGHT_PROP_DEFENCE_IGNORE_DELTA map entity.data.defenceIgnoreDelta)
+            add(FIGHT_PROP_FIRE_ADD_HURT map entity.data.fireAddHurt)
+            add(FIGHT_PROP_ELEC_ADD_HURT map entity.data.electricAddHurt)
+            add(FIGHT_PROP_WATER_ADD_HURT map entity.data.waterAddHurt)
+            add(FIGHT_PROP_GRASS_ADD_HURT map entity.data.grassAddHurt)
+            add(FIGHT_PROP_WIND_ADD_HURT map entity.data.windAddHurt)
+            add(FIGHT_PROP_ROCK_ADD_HURT map entity.data.rockAddHurt)
+            add(FIGHT_PROP_ICE_ADD_HURT map entity.data.iceAddHurt)
+            add(FIGHT_PROP_HIT_HEAD_ADD_HURT map entity.data.hitHeadAddHurt)
+            add(FIGHT_PROP_FIRE_SUB_HURT map entity.data.fireSubHurt)
+            add(FIGHT_PROP_ELEC_SUB_HURT map entity.data.electricSubHurt)
+            add(FIGHT_PROP_WATER_SUB_HURT map entity.data.waterSubHurt)
+            add(FIGHT_PROP_GRASS_SUB_HURT map entity.data.grassSubHurt)
+            add(FIGHT_PROP_WIND_SUB_HURT map entity.data.windSubHurt)
+            add(FIGHT_PROP_ROCK_SUB_HURT map entity.data.rockSubHurt)
+            add(FIGHT_PROP_ICE_SUB_HURT map entity.data.iceSubHurt)
+            add(FIGHT_PROP_SKILL_CD_MINUS_RATIO map entity.data.skillCDMinusRatio)
+            add(FIGHT_PROP_SHIELD_COST_MINUS_RATIO map entity.data.shieldCostMinusRatio)
+            if (entity.elementType != ElementType.None) {
+                entity.maxEnergy?.let {
+                    add(entity.elementType.maxEnergyProp map it)
+                }
+                add(entity.elementType.curEnergyProp map entity.data.currentEnergy)
+            }
             // Must load maxHp before curHp to make sure curHp <= maxHp
-            FIGHT_PROP_MAX_HP map entity.maxHp,
-            FIGHT_PROP_CUR_HP map entity.data.currentHP,
-            FIGHT_PROP_CUR_ATTACK map entity.curAttack,
-            FIGHT_PROP_CUR_DEFENSE map entity.curDefense,
+            add(FIGHT_PROP_MAX_HP map entity.maxHp)
+            add(FIGHT_PROP_CUR_HP map entity.data.currentHP)
+            add(FIGHT_PROP_CUR_ATTACK map entity.curAttack)
+            add(FIGHT_PROP_CUR_DEFENSE map entity.curDefense)
             FIGHT_PROP_CUR_SPEED map entity.curSpeed
-        ).filter { it.value != 0f }
+        }.toMap().filter { it.value != 0f }
 
     override val fightPropPairList: List<FightPropPairOuterClass.FightPropPair>
         get() = protoFightPropMap.map { it.key fightProp it.value } // crazy hoyo
 
     private val protoSkillMap
-        get() = mapOf(
+        get() = buildMap {
             // TODO: Extra count from constellation, CD time store
-            entity.elementSkill.id to avatarSkillInfo {
-                maxChargeCount = entity.elementSkill.maxChargeNum
-            },
-            entity.energySkill.id to avatarSkillInfo {
-                maxChargeCount = entity.energySkill.maxChargeNum
+            entity.elementSkill?.let {
+                put(
+                    it.id,
+                    avatarSkillInfo {
+                        maxChargeCount = it.maxChargeNum
+                    }
+                )
             }
-        )
+            entity.energySkill?.let {
+                put(
+                    it.id,
+                    avatarSkillInfo {
+                        maxChargeCount = it.maxChargeNum
+                    }
+                )
+            }
+        }
 
     private val protoSkillLevelMap
-        get() = mapOf(
-            entity.normalAttack.id to entity.data.normalAttackLevel,
-            entity.elementSkill.id to entity.data.elementSkillLevel,
-            entity.energySkill.id to entity.data.energySkillLevel
-        )
+        get() = buildMap {
+            put(entity.normalAttack.id, entity.data.normalAttackLevel)
+            entity.elementSkill?.let {
+                put(it.id, entity.data.elementSkillLevel)
+            }
+            entity.energySkill?.let {
+                put(it.id, entity.data.energySkillLevel)
+            }
+        }
 
     override fun toAvatarInfoProto(): AvatarInfo =
         avatarInfo {

@@ -3,8 +3,8 @@ package org.sorapointa.game
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.update
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.joinAll
 import mu.KotlinLogging
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.sorapointa.Sorapointa
 import org.sorapointa.command.CommandSender
 import org.sorapointa.dataloader.common.EntityIdType
@@ -76,10 +76,15 @@ abstract class AbstractPlayer : Player {
 
     internal abstract val playerProto: PlayerProto
 
-    internal abstract fun sendPacket(
+    internal abstract fun sendPacketAsync(
         packet: OutgoingPacket,
         metadata: PacketHeadOuterClass.PacketHead? = null
     ): Job
+
+    internal abstract suspend fun sendPacket(
+        packet: OutgoingPacket,
+        metadata: PacketHeadOuterClass.PacketHead? = null
+    )
 
     internal abstract fun forwardHandlePacket(
         packet: SoraPacket
@@ -213,7 +218,12 @@ class PlayerImpl internal constructor(
     override suspend fun sendMessage(msg: String) {
     }
 
-    override fun sendPacket(
+    override fun sendPacketAsync(
+        packet: OutgoingPacket,
+        metadata: PacketHeadOuterClass.PacketHead?
+    ) = networkHandler.sendPacketAsync(packet)
+
+    override suspend fun sendPacket(
         packet: OutgoingPacket,
         metadata: PacketHeadOuterClass.PacketHead?
     ) = networkHandler.sendPacket(packet)
@@ -232,26 +242,28 @@ class PlayerImpl internal constructor(
         override val state: PlayerStateInterface.State = PlayerStateInterface.State.LOGIN
 
         internal suspend fun onLogin() {
-            // TODO: divide those into separate modules to implement `onLogin`
-            val loginPackets = listOf(
-                PlayerDataNotifyPacket(player),
-                StoreWeightLimitNotifyPacket(),
-                PlayerStoreNotifyPacket(player),
-                AvatarDataNotifyPacket(player),
-                OpenStateUpdateNotifyPacket(player),
-                PlayerEnterSceneNotifyPacket.Login(player),
-            )
-            // TODO: Resin, Quest, Achievement, Activity,
-            //  DailyTask, PlayerLevelReward,
-            //  AvatarExpedition, AvatarSatiation,
-            //  Cook, Combine (Craft), Forge,
-            //  Investigation, Tower, Codex, Widget,
-            //  Home, Announcement(Activity), Shop, Mail
-            loginPackets.map {
-                networkHandler.sendPacket(it)
-            }.joinAll()
+            newSuspendedTransaction {
+                // TODO: divide those into separate modules to implement `onLogin`
+                val loginPackets = listOf(
+                    PlayerDataNotifyPacket(player),
+                    StoreWeightLimitNotifyPacket(),
+                    PlayerStoreNotifyPacket(player),
+                    AvatarDataNotifyPacket(player),
+                    OpenStateUpdateNotifyPacket(player),
+                    PlayerEnterSceneNotifyPacket.Login(player),
+                )
+                // TODO: Resin, Quest, Achievement, Activity,
+                //  DailyTask, PlayerLevelReward,
+                //  AvatarExpedition, AvatarSatiation,
+                //  Cook, Combine (Craft), Forge,
+                //  Investigation, Tower, Codex, Widget,
+                //  Home, Announcement(Activity), Shop, Mail
+                loginPackets.forEach {
+                    networkHandler.sendPacket(it)
+                }
 
-            sceneState.setState(PlayerSceneStateInterface.State.LOADING)
+                sceneState.setState(PlayerSceneStateInterface.State.LOADING)
+            }
         }
     }
 
@@ -286,7 +298,7 @@ class PlayerImpl internal constructor(
     }
 
     override fun toString(): String =
-        "Player[id: $uid, host: ${networkHandler.getHost()}]"
+        "Player[id: $uid, host: ${networkHandler.host}]"
 }
 
 internal interface PlayerProto {
