@@ -23,7 +23,7 @@ import kotlin.reflect.typeOf
 
 @Suppress("MemberVisibilityCanBePrivate")
 internal object Console {
-    private val terminal: Terminal = TerminalBuilder.terminal()
+    internal val terminal: Terminal = TerminalBuilder.terminal()
 
     private var reader: LineReader? = null
 
@@ -33,6 +33,7 @@ internal object Console {
     }
 
     internal fun initReader() {
+        if (reader != null) return
         reader = LineReaderBuilder.builder()
             .appName("Sorapointa")
             .terminal(terminal)
@@ -100,6 +101,7 @@ internal object Console {
     inline fun println(string: String?) = println(any = string)
 
     internal fun redirectToJLine() {
+        if (System.out === JLineRedirector) return
         System.setErr(JLineRedirector)
         System.setOut(JLineRedirector)
     }
