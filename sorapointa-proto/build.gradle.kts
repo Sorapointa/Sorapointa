@@ -16,7 +16,7 @@ ext["no-utils"] = true
 dependencies {
     api("com.google.protobuf:protobuf-java:_")
     api("com.google.protobuf:protobuf-kotlin:_")
-    api("io.ktor:ktor-utils:_")
+    api(Ktor.utils)
 }
 
 protobuf {

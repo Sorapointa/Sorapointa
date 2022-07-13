@@ -22,12 +22,12 @@ dependencies {
     api("io.ktor:ktor-server-status-pages:_")
     api("io.ktor:ktor-server-html-builder:_")
 
-    api("io.ktor:ktor-client-core:_")
-    api("io.ktor:ktor-client-cio:_")
-    api("io.ktor:ktor-client-logging:_")
+    api(Ktor.client.core)
+    api(Ktor.client.cio)
+    api(Ktor.client.logging)
     api("io.ktor:ktor-client-content-negotiation:_")
 
-    api("io.ktor:ktor-network-tls-certificates:_")
+    api(Ktor.network.tlsCertificates)
     api("io.ktor:ktor-serialization-kotlinx-json:_")
 
     implementation("com.password4j:password4j:_")

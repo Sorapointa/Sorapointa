@@ -8,6 +8,9 @@ plugins {
 }
 
 repositories {
+    maven("https://maven.aliyun.com/repository/public")
+    maven("https://maven.aliyun.com/repository/gradle-plugin")
+
     mavenCentral()
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     maven("https://plugins.gradle.org/m2/")
@@ -82,7 +85,7 @@ artifacts {
     add("test", tasks["testArchive"])
 }
 
-tasks.withType<Jar>() {
+tasks.withType<Jar> {
     exclude("main") // duplicated jar root main, very confusing
     exclude("logback-test.xml")
     exclude("*.proto")

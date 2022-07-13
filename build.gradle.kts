@@ -28,7 +28,7 @@ subprojects {
 
 allprojects {
     repositories {
-        mavenCentral()
+        maven("https://maven.aliyun.com/repository/public")
     }
     group = "moe.sdl.sorapointa"
     version = "0.1.0-SNAPSHOT"

@@ -18,6 +18,9 @@ include("sorapointa-utils:sorapointa-utils-time")
 
 pluginManagement {
     repositories {
+        maven("https://maven.aliyun.com/repository/google")
+        maven("https://maven.aliyun.com/repository/gradle-plugin")
+
         google()
         gradlePluginPortal()
     }
