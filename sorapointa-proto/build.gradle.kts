@@ -1,6 +1,7 @@
 @file:Suppress("GradlePackageUpdate")
 
 import com.google.protobuf.gradle.*
+import de.fayard.refreshVersions.core.versionFor
 
 plugins {
     `sorapointa-conventions`
@@ -33,6 +34,10 @@ protobuf {
                 }
             }
         }
+    }
+
+    protoc {
+        artifact = "com.google.protobuf:protoc:${versionFor("version.com.google.protobuf..protoc")}"
     }
 }
 
