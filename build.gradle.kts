@@ -1,3 +1,5 @@
+import org.apache.commons.io.FileUtils
+import org.gradle.internal.os.OperatingSystem
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import java.nio.file.Files
 
@@ -39,6 +41,10 @@ fun installGitHooks() {
     val source = File(project.rootProject.rootDir, ".git-hooks")
     if (target.canonicalFile == source) return
     target.deleteRecursively()
-    Files.createSymbolicLink(target.toPath(), source.toPath())
+    if (OperatingSystem.current().isWindows) {
+        FileUtils.copyDirectory(source, target)
+    } else {
+        Files.createSymbolicLink(target.toPath(), source.toPath())
+    }
 }
 installGitHooks()
