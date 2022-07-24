@@ -59,7 +59,9 @@ sorapointa-core/langs/
 sorapointa-dispatch/langs/
 **/config/
 
-
 ### Database ###
 **/*.db
 *.db-journal
+
+## Kotlin binary compatibility validator
+*.api
