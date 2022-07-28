@@ -2,6 +2,7 @@ package org.sorapointa.server.network
 
 import com.google.protobuf.GeneratedMessageV3
 import io.ktor.util.*
+import org.sorapointa.CoreBundle
 import org.sorapointa.Sorapointa
 import org.sorapointa.SorapointaConfig
 import org.sorapointa.dataloader.common.EnterReason
@@ -21,7 +22,6 @@ import org.sorapointa.proto.PropValueOuterClass.PropValue
 import org.sorapointa.proto.QueryCurrRegionHttpRspOuterClass.QueryCurrRegionHttpRsp
 import org.sorapointa.proto.RetcodeOuterClass.Retcode
 import org.sorapointa.proto.StoreTypeOuterClass.StoreType
-import org.sorapointa.utils.i18n
 import org.sorapointa.utils.nowMilliseconds
 import org.sorapointa.utils.nowSeconds
 import org.sorapointa.utils.randomByteArray
@@ -38,7 +38,7 @@ internal abstract class GetPlayerTokenRspPacket : AbstractOutgoingPacket(
     ) : GetPlayerTokenRspPacket() {
         override fun buildProto(): GeneratedMessageV3 =
             getPlayerTokenRsp {
-                msg = this@Error.msg.i18n()
+                msg = CoreBundle.message(this@Error.msg)
                 retcode = this@Error.retcode.number
             }
     }

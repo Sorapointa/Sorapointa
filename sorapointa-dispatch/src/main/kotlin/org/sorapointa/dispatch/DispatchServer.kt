@@ -97,8 +97,6 @@ object DispatchServer {
             DispatchConfig.save()
             I18nConfig.init()
             I18nConfig.save()
-            extractLanguages(DispatchServer::class)
-            I18nManager.registerLanguagesDirectory(languagesDirectory)
             DatabaseConfig.init()
             DatabaseConfig.save()
             DatabaseManager.loadDatabase()

@@ -53,17 +53,3 @@ fun Project.configureLogbackCopy() {
         testResourceTaskDep("copyLogbackTestXml")
     }
 }
-
-fun Project.configureLangsCopy() {
-    tasks.register("copyLangsResource", Copy::class) {
-        group = "resources"
-        from(
-            rootProject.layout.projectDirectory.dir("langs")
-        )
-        into(project.layout.projectDirectory.dir("src/main/resources/langs"))
-    }
-
-    afterEvaluate {
-        resourceTaskDep("copyLangsResource")
-    }
-}

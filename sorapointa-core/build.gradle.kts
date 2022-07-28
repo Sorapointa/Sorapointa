@@ -34,8 +34,6 @@ dependencies {
     testImplementation(project(":sorapointa-dataprovider", "test"))
 }
 
-configureLangsCopy()
-
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor(0, "seconds")
 }

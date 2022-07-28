@@ -9,8 +9,6 @@ import org.sorapointa.command.CommandManager
 import org.sorapointa.command.CommandNode
 import org.sorapointa.command.CommandSender
 import org.sorapointa.utils.I18nConfig
-import org.sorapointa.utils.I18nManager
-import org.sorapointa.utils.languagesDirectory
 import java.util.*
 import kotlin.system.measureTimeMillis
 
@@ -19,7 +17,6 @@ class HelpTest {
     @BeforeAll
     fun init() = runBlocking {
         I18nConfig.init()
-        I18nManager.registerLanguagesDirectory(languagesDirectory)
         CommandManager.registerCommands(defaultsCommand)
         CommandManager.registerCommands(
             buildList {
@@ -30,9 +27,10 @@ class HelpTest {
         )
     }
 
+    @Suppress("InvalidBundleOrProperty")
     private fun generateEntry() = Command.Entry(
         "abcdefghijklmnopqrstuvwxyz".toList().shuffled().subList(0, (4..10).random()).joinToString(""),
-        help = "abcdefghijklmnopqrstuvwxyz".toList().shuffled().subList(0, (0..5).random()).joinToString("")
+        helpKey = "abcdefghijklmnopqrstuvwxyz".toList().shuffled().subList(0, (0..5).random()).joinToString("")
     )
 
     class TestCommand(sender: CommandSender, private val entry: Entry) : Command(sender, entry) {

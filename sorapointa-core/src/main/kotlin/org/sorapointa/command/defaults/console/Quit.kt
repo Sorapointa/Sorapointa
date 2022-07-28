@@ -7,7 +7,7 @@ import kotlin.system.exitProcess
 class Quit(sender: ConsoleCommandSender) : ConsoleCommand(sender, Quit) {
     companion object : Entry(
         name = "quit",
-        help = "sora.cmd.quit.desc",
+        helpKey = "sora.cmd.quit.desc",
         alias = listOf("exit")
     )
 

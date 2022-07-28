@@ -16,7 +16,10 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonElement
 import mu.KotlinLogging
+import org.jetbrains.annotations.PropertyKey
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.sorapointa.dispatch.BUNDLE
+import org.sorapointa.dispatch.DispatchBundle
 import org.sorapointa.dispatch.DispatchConfig
 import org.sorapointa.dispatch.DispatchServer
 import org.sorapointa.dispatch.data.*
@@ -30,7 +33,6 @@ import org.sorapointa.proto.regionSimpleInfo
 import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.crypto.RSAKey
 import org.sorapointa.utils.crypto.parseToRSAKey
-import org.sorapointa.utils.i18n
 import org.sorapointa.utils.networkJson
 import org.sorapointa.utils.xor
 import java.util.concurrent.ConcurrentHashMap
@@ -175,12 +177,9 @@ internal suspend fun ApplicationCall.handleQueryCurrentRegion() {
 internal suspend fun ApplicationCall.handleLogin() {
     val loginAccountRequestData = receive<LoginAccountRequestData>()
 
-    val returnErrorMsg: suspend (String) -> Unit = { msg ->
-        LoginAccountResponseEvent(
-            this,
-            LoginResultData(-201, msg.i18n())
-        ).respond()
-    }
+    suspend fun returnErrorMsg(@PropertyKey(resourceBundle = BUNDLE) msgKey: String) = LoginAccountResponseEvent(
+        this, LoginResultData(-201, DispatchBundle.message(msgKey))
+    ).respond()
 
     LoginAccountRequestEvent(this, loginAccountRequestData).broadcastEvent {
         // TODO: Introduce a better solution for account system
@@ -226,12 +225,9 @@ internal suspend fun ApplicationCall.handleLogin() {
 internal suspend fun ApplicationCall.handleComboLogin() {
     val comboTokenRequestData = receive<ComboTokenRequestData>()
 
-    val returnErrorMsg: suspend (String) -> Unit = { msg ->
-        ComboTokenResponseEvent(
-            this,
-            ComboTokenResponseData(-201, msg.i18n())
-        ).respond()
-    }
+    suspend fun returnErrorMsg(@PropertyKey(resourceBundle = BUNDLE) msgKey: String) = ComboTokenResponseEvent(
+        this@handleComboLogin, ComboTokenResponseData(-201, DispatchBundle.message(msgKey))
+    ).respond()
 
     // TODO: hardcode warning
     if (!comboTokenRequestData.signCheck(parameters["region"] == "cn")) {
@@ -271,12 +267,9 @@ internal suspend fun ApplicationCall.handleComboLogin() {
 internal suspend fun ApplicationCall.handleVerify() {
     val verifyData = receive<VerifyTokenRequestData>()
 
-    val returnErrorMsg: suspend (String) -> Unit = { msg ->
-        LoginAccountResponseEvent(
-            this@handleVerify,
-            LoginResultData(-201, msg.i18n())
-        ).respond()
-    }
+    suspend fun returnErrorMsg(@PropertyKey(resourceBundle = BUNDLE) msgKey: String) = LoginAccountResponseEvent(
+        this@handleVerify, LoginResultData(-201, DispatchBundle.message(msgKey))
+    ).respond()
 
     newSuspendedTransaction {
         val account = Account.findById(verifyData.uid)

@@ -105,7 +105,6 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
     }
 
     private fun setupServer(config: (Application) -> Unit = {}) = scope.launch {
-        loadLanguages()
         setupRegisteredConfigs().join()
 
         setupDefaultsCommand()
@@ -179,14 +178,6 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
         val registered = defaultsCommand.joinToString(", ") { it.entry.name }
         logger.info { "Registered defaults command, total ${defaultsCommand.size}: $registered" }
     }
-
-    private fun loadLanguages(): Job =
-        scope.launch {
-            logger.info { "Loading languages..." }
-            extractLanguages(SorapointaMain::class)
-            I18nManager.registerLanguagesDirectory(languagesDirectory)
-            logger.info { "Loaded languages: ${I18nManager.supportedLanguages.joinToString { it.toLanguageTag() }}" }
-        }
 
     private fun redirectPrint() {
         Console.initReader()

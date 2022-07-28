@@ -7,26 +7,26 @@ import moe.sdl.yac.parameters.options.convert
 import moe.sdl.yac.parameters.options.default
 import moe.sdl.yac.parameters.options.option
 import moe.sdl.yac.parameters.types.int
+import org.sorapointa.CoreBundle
 import org.sorapointa.command.Command
 import org.sorapointa.command.CommandManager
 import org.sorapointa.command.CommandSender
-import org.sorapointa.utils.i18n
 
 class Help(private val sender: CommandSender) : Command(sender, Help) {
     companion object : Entry(
         name = "help",
-        help = "sora.cmd.help.desc",
+        helpKey = "sora.cmd.help.desc",
         alias = listOf("?")
     )
 
     private val pageNum by argument(
-        name = "sora.cmd.help.arg.pagenum.name".i18n(locale = sender),
-        help = "sora.cmd.help.arg.pagenum.desc".i18n(locale = sender)
+        name = CoreBundle.message("sora.cmd.help.arg.page.num.name", locale = sender.locale),
+        help = CoreBundle.message("sora.cmd.help.arg.page.num.desc", locale = sender.locale)
     ).int().default(1)
 
     private val pageSize by option(
         "--page-size", "-s",
-        help = "sora.cmd.help.opt.pagesize.desc".i18n(locale = sender),
+        help = CoreBundle.message("sora.cmd.help.opt.page.size.desc", locale = sender.locale)
     ).int().convert {
         it.coerceIn(1..50)
     }.default(10)
@@ -37,24 +37,24 @@ class Help(private val sender: CommandSender) : Command(sender, Help) {
         val pageItems = cmdList.chunked(pageSize)
         // Throw exception when the page number exceed.
         if (pageNum !in 1..pageItems.size) {
-            throw UsageError("sora.cmd.help.arg.pagenum.exceed".i18n(locale = sender))
+            throw UsageError(CoreBundle.message("sora.cmd.help.arg.page.num.exceed", locale = sender.locale))
         }
 
         // Build the message and send to the sender
         sender.sendMessage(
             buildString {
-                append("sora.cmd.help.msg.page".i18n(pageNum, pageItems.size))
+                append(CoreBundle.message("sora.cmd.help.msg.page", pageNum, pageItems.size))
                 val entries = pageItems[pageNum - 1]
                 val maxLen = entries.map { it.name }.maxOf { it.length }
                 entries.forEach {
                     append(it.name.padEnd(maxLen, ' '))
                     append(" >> ")
-                    if (it.help.isNotBlank()) {
-                        append(it.help.i18n())
-                    } else append("sora.cmd.help.msg.emptydesc".i18n(locale = sender))
+                    if (it.helpKey.isNotBlank()) {
+                        append(CoreBundle.message(it.helpKey))
+                    } else append(CoreBundle.message("sora.cmd.help.msg.empty.desc", locale = sender.locale))
                     appendLine()
                 }
-                append("sora.cmd.help.msg.more".i18n())
+                append(CoreBundle.message("sora.cmd.help.msg.more"))
             }
         )
     }
