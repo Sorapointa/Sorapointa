@@ -7,7 +7,7 @@ import org.sorapointa.command.defaults.general.*
 val defaultsCommand: List<AbstractCommandNode<*>> = listOf(
     CommandNode(Help) { sender -> Help(sender) },
     CommandNode(ListPlayer) { sender -> ListPlayer(sender) },
-    CommandNode(Locale) { sender -> Locale(sender) },
+    CommandNode(LocaleCommand) { sender -> LocaleCommand(sender) },
     CommandNode(Version) { sender -> Version(sender) },
     ConsoleCommandNode(Quit) { sender -> Quit(sender) },
     ConsoleCommandNode(ConsoleUser) { sender -> ConsoleUser(sender) },

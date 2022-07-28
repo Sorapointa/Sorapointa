@@ -1,124 +1,24 @@
 package org.sorapointa.utils
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import net.mamoe.yamlkt.Comment
 import net.mamoe.yamlkt.Yaml
 import org.sorapointa.data.provider.DataFilePersist
 import java.io.File
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.coroutines.CoroutineContext
 
-private val logger = mu.KotlinLogging.logger { }
+internal val globalLocale: Locale get() = I18nConfig.data.globalLocale
 
-// ends with .lang.yaml
-private val languageFileRegex by lazy {
-    Regex("""^.+\.lang\.yaml$""", RegexOption.IGNORE_CASE)
-}
+internal val DEFAULT_LOCALE: Locale = Locale.ENGLISH
 
-interface I18nIManager {
-
-    fun registerLanguage(languagePack: LanguagePack)
-
-    suspend fun registerLanguage(languageFile: File)
-
-    suspend fun registerLanguagesDirectory(
-        directory: File,
-        match: Regex = languageFileRegex,
-        depth: Int = 1,
-        context: CoroutineContext = Dispatchers.IO
-    )
-}
-
-object I18nManager : I18nIManager {
-    // locale to i18n files
-    internal val languageMap = ConcurrentHashMap<Locale, LanguagePack>()
-
-    val supportedLanguages: List<Locale>
-        get() = languageMap.keys().toList()
-
-    override fun registerLanguage(languagePack: LanguagePack) {
-        val locale = languagePack.locale
-        if (languageMap.containsKey(locale)) {
-            logger.warn { "Language pack $locale already exists, overwriting it." }
-        }
-        languageMap[locale] = languagePack
-    }
-
-    /**
-     * Register language pack from file
-     * @param languageFile the file store [LanguagePack]
-     */
-    override suspend fun registerLanguage(languageFile: File) {
-        runCatching {
-            if (!languageFile.exists()) throw NoSuchFileException(languageFile)
-            val langPack = DataFilePersist(languageFile, LanguagePack.EMPTY, format = Yaml).apply { init() }.data
-            if (langPack == LanguagePack.EMPTY) {
-                logger.error { "Failed to load language pack ${languageFile.absPath}" }
-                return@runCatching
-            }
-            registerLanguage(langPack)
-        }.onFailure {
-            when (it) {
-                is SerializationException ->
-                    logger.error(it) { "Failed to register language file: ${languageFile.absPath}" }
-                is NoSuchFileException ->
-                    logger.error(it) { "Language pack file ${it.file.absPath} do not exist" }
-                else -> throw it
-            }
-        }
-    }
-
-    /**
-     * @param directory languages dir to register up
-     * @param match regex for matching entire filename and extension
-     * @param depth directory walk depth
-     * @throws [IllegalStateException] when [directory] is empty or not exists
-     */
-    override suspend fun registerLanguagesDirectory(
-        directory: File,
-        match: Regex,
-        depth: Int,
-        context: CoroutineContext
-    ) = withContext(context) {
-        check(directory.exists()) { "Directory doesn't exist: ${directory.absPath}" }
-        check(directory.isDirectory) { "File not a directory: ${directory.absPath}" }
-        directory.walk().maxDepth(depth).asFlow()
-            .filter(File::isFile)
-            .filter { match.matches(it.name) }
-            .map {
-                launch { registerLanguage(it) }
-            }.collect(::joinAll)
-    }
-}
-
-/**
- * @property locale what language locale the pack is
- * @property strings language key to value
- * @see I18nManager
- */
-@Serializable
-data class LanguagePack(
-    @Serializable(LocaleSerializer::class)
-    val locale: Locale,
-
-    // language key to value
-    // Samples:
-    // "command.help.desc" -> "A command for looking up command usage"
-    // "command.help.notfound" -> "Input {0} not a validate command"
-    val strings: Map<String, String>,
-) {
-    companion object {
-        val EMPTY = LanguagePack(EMPTY_LOCALE, emptyMap())
-    }
+interface LocaleAble {
+    val locale: Locale?
 }
 
 @SorapointaInternal
@@ -151,47 +51,11 @@ object I18nConfig : DataFilePersist<I18nConfig.Config>(
     )
 }
 
-inline val globalLocale: Locale
-    get() = I18nConfig.data.globalLocale
+internal object LocaleSerializer : KSerializer<Locale> {
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("Locale", PrimitiveKind.STRING)
 
-internal val DEFAULT_LOCALE: Locale = Locale.ENGLISH
+    override fun deserialize(decoder: Decoder): Locale = Locale.forLanguageTag(decoder.decodeString())
 
-internal val FALLBACK_LOCALE: Locale = Locale.ENGLISH
-
-/**
- * @receiver i18n key, dot-styled path, like 'sorapointa.command.help.usage'
- * @param args all args to pass to placeholder
- * @return replaced string
- * @see I18nManager
- */
-fun String.i18n(vararg args: Any?, locale: Locale? = null): String {
-    val selected =
-        I18nManager.supportedLanguages.byPriority(listOfNotNull(locale, globalLocale, FALLBACK_LOCALE))
-
-    // Add more information for writing language file
-    if (logger.isDebugEnabled) {
-        if (locale != null && I18nManager.languageMap[locale] == null) {
-            logger.debug { "Missing i18n user locale $locale for key '$this'" }
-        }
-        if (I18nManager.languageMap[globalLocale] == null) {
-            logger.debug { "Missing i18n global locale $globalLocale for key '$this'" }
-        }
-        if (FALLBACK_LOCALE != globalLocale && I18nManager.languageMap[FALLBACK_LOCALE] == null) {
-            logger.debug { "Missing i18n fallback locale $globalLocale for key '$this'" }
-        }
-    }
-
-    return I18nManager.languageMap[selected]?.strings?.get(this)?.replaceWithOrder(*args) ?: this
+    override fun serialize(encoder: Encoder, value: Locale) = encoder.encodeString(value.toLanguageTag())
 }
-
-/**
- * An object with locale value
- *
- * @property locale the locale object holds
- */
-interface LocaleAble {
-    val locale: Locale?
-}
-
-fun String.i18n(vararg args: Any?, locale: LocaleAble?): String =
-    i18n(args = args, locale = locale?.locale)

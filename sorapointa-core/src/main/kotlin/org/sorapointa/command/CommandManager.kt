@@ -7,9 +7,9 @@ import moe.sdl.yac.core.CommandResult.Error
 import moe.sdl.yac.core.CommandResult.Success
 import moe.sdl.yac.core.PrintHelpMessage
 import moe.sdl.yac.core.parseToArgs
+import org.sorapointa.CoreBundle
 import org.sorapointa.game.Player
 import org.sorapointa.utils.ModuleScope
-import org.sorapointa.utils.i18n
 import org.sorapointa.utils.suggestTypo
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
@@ -83,7 +83,9 @@ object CommandManager {
         rawMsg: String,
     ): Job = commandScope.launch {
         if (rawMsg.isEmpty()) {
-            sender.sendMessage("sora.cmd.manager.invoke.empty".i18n(locale = sender))
+            sender.sendMessage(
+                CoreBundle.message("sora.cmd.manager.invoke.empty", locale = sender.locale)
+            )
             return@launch
         }
 
@@ -93,16 +95,25 @@ object CommandManager {
         val cmd = cmdMap[mainCommand] ?: aliasMap[mainCommand] ?: run {
             val mainTypo = suggestTypo(mainCommand, cmdMap.keys.toList())
             if (mainTypo == null) {
-                sender.sendMessage("sora.cmd.manager.invoke.error".i18n(mainCommand, locale = sender))
+                sender.sendMessage(
+                    CoreBundle.message("sora.cmd.manager.invoke.error", mainCommand, locale = sender.locale)
+                )
             } else {
-                sender.sendMessage("sora.cmd.manager.invoke.typosuggest".i18n(mainCommand, mainTypo, locale = sender))
+                sender.sendMessage(
+                    CoreBundle.message(
+                        "sora.cmd.manager.invoke.typo.suggest",
+                        mainCommand, mainTypo, locale = sender.locale
+                    )
+                )
             }
             return@launch
         }
 
         val result: CommandResult = run {
             if (sender is Player && sender.account.permissionLevel < cmd.entry.permissionRequired) {
-                return@run Error(null, userMessage = "sora.cmd.nopermission".i18n(locale = sender))
+                return@run Error(
+                    null, userMessage = CoreBundle.message("sora.cmd.no.permission", locale = sender.locale)
+                )
             }
             when (cmd) {
                 is CommandNode -> {
@@ -113,7 +124,7 @@ object CommandManager {
                     if (sender is ConsoleCommandSender) {
                         cmd.creator(sender).execute(args)
                     } else {
-                        Error(null, userMessage = "sora.cmd.nopermission".i18n(locale = sender))
+                        Error(null, userMessage = CoreBundle.message("sora.cmd.no.permission", locale = sender.locale))
                     }
                 }
 
@@ -121,11 +132,11 @@ object CommandManager {
                     if (sender is Player) {
                         cmd.creator(sender).execute(args)
                     } else {
-                        Error(null, userMessage = "sora.cmd.isnotplayer".i18n(locale = sender))
+                        Error(null, userMessage = CoreBundle.message("sora.cmd.is.not.player", locale = sender.locale))
                     }
                 }
 
-                else -> Error(null, userMessage = "server.error".i18n(locale = sender))
+                else -> Error(null, userMessage = CoreBundle.message("server.error", locale = sender.locale))
             }
         }
 
@@ -134,7 +145,11 @@ object CommandManager {
                 val msg = buildString {
                     append(result.userMessage)
                     if (result.cause is PrintHelpMessage && cmd.entry.alias.isNotEmpty()) {
-                        append("sora.cmd.manager.alias".i18n(cmd.entry.alias.joinToString(), locale = sender))
+                        append(
+                            CoreBundle.message(
+                                "sora.cmd.manager.alias", cmd.entry.alias.joinToString(), locale = sender.locale
+                            )
+                        )
                     }
                 }
                 sender.sendMessage(msg)
