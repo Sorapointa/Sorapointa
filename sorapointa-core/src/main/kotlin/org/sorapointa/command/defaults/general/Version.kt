@@ -10,7 +10,7 @@ class Version(private val sender: CommandSender) : Command(sender, Version) {
 
     companion object : Entry(
         name = "version",
-        help = "sora.cmd.version.desc",
+        helpKey = "sora.cmd.version.desc",
     )
 
     override suspend fun run() {
