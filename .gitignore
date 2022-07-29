@@ -6,7 +6,8 @@ build/
 !**/src/test/**/build/
 
 ### IntelliJ IDEA ###
-/.idea
+/.idea/**/*
+!/.idea/encodings.xml
 
 ### Eclipse ###
 .apt_generated
