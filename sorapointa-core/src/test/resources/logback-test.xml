@@ -1,24 +1,17 @@
-<!--Please edit this file in Sorapointa Core, other copy would be overwritten-->
-<configuration>
+<!--Please edit this file on Sorapointa Core, other copy would be overwritten-->
+<configuration debug="true">
+    <!--Test logback only need stdout-->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <withJansi>true</withJansi>
-        <encoder>
-            <pattern>%d{MM-dd'T'HH:mm:ss} - %highlight(%.-1level) [%thread] %green([%class]) >>> %highlight(%msg) %n</pattern>
+        <encoder class="org.sorapointa.utils.logging.PatternLayoutNoLambda">
+            <pattern>%d{MM-dd'T'HH:mm:ss} - %highlight(%.-1le) [%t] %green([%lo{40}]) >>> %highlight(%m) %n%rEx{full}</pattern>
         </encoder>
     </appender>
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>./logs/%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <maxFileSize>50MB</maxFileSize>
-            <maxHistory>15</maxHistory>
-            <totalSizeCap>1GB</totalSizeCap>
-        </rollingPolicy>
-        <encoder>
-            <pattern>%d{MM-dd'T'HH:mm:ss} - %highlight(%.-1level) [%thread] %green([%class]) >>> %highlight(%msg) %n</pattern>
-        </encoder>
-    </appender>
-    <root level="debug">
+    <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE"/>
     </root>
+    <!--Sub-loggers, the name is NOT same as package path-->
+    <logger name="Exposed" level="DEBUG"/>
+    <logger name="ktor" level="DEBUG"/>
+    <logger name="com.zaxxer.hikari" level="DEBUG"/>
 </configuration>

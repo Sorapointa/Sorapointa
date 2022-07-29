@@ -19,6 +19,7 @@ import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TaskManagerTest {
+
     @BeforeAll
     fun init() = runTest(TestOption.SKIP_CI) {
         initTestDataProvider()

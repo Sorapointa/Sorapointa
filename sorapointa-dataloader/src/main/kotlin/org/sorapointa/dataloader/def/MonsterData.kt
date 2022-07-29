@@ -1,63 +1,117 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
+import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.FightProp
+import org.sorapointa.dataloader.common.PropGrowCurve
+
+private val monsterDataLoader =
+    DataLoader<List<MonsterData>>("./ExcelBinOutput/MonsterExcelConfigData.json")
+
+val monsterData get() = monsterDataLoader.data
 
 @Serializable
 data class MonsterData(
-    @SerialName("MonsterName") val monsterName: String,
-    @SerialName("Type") val type: String,
-    @SerialName("ScriptDataPathHashSuffix") val scriptDataPathHashSuffix: Int,
-    @SerialName("ScriptDataPathHashPre") val scriptDataPathHashPre: Int,
-    @SerialName("ServerScript") val serverScript: String,
-    @SerialName("CombatConfigHashSuffix") val combatConfigHashSuffix: Int,
-    @SerialName("CombatConfigHashPre") val combatConfigHashPre: Int,
-    @SerialName("Affix") val affix: List<Int>,
-    @SerialName("Ai") val ai: String,
-    @SerialName("IsInvisibleReset") val isInvisibleReset: Boolean,
-    @SerialName("Equips") val equips: List<Int>,
-    @SerialName("HpDrops") val hpDrops: List<HpDrop>,
-    @SerialName("KillDropId") val killDropId: Int,
-    @SerialName("ExcludeWeathers") val excludeWeathers: String,
-    @SerialName("FeatureTagGroupID") val featureTagGroupID: Int,
-    @SerialName("MpPropID") val mpPropID: Int,
-    @SerialName("Skin") val skin: String,
-    @SerialName("DescribeId") val describeId: Int,
-    @SerialName("CombatBGMLevel") val combatBGMLevel: Int,
-    @SerialName("EntityBudgetLevel") val entityBudgetLevel: Int,
-    @SerialName("HpBase") val hpBase: Double,
-    @SerialName("AttackBase") val attackBase: Double,
-    @SerialName("DefenseBase") val defenseBase: Double,
-    @SerialName("IceSubHurt") val iceSubHurt: Double,
-    @SerialName("GrassSubHurt") val grassSubHurt: Double,
-    @SerialName("WindSubHurt") val windSubHurt: Double,
-    @SerialName("ElecSubHurt") val elecSubHurt: Double,
-    @SerialName("PropGrowCurves") val propGrowCurves: List<PropGrowCurve>,
-    @SerialName("PhysicalSubHurt") val physicalSubHurt: Double,
-    @SerialName("PrefabPathRagdollHashSuffix") val prefabPathRagdollHashSuffix: Int,
-    @SerialName("PrefabPathRagdollHashPre") val prefabPathRagdollHashPre: Int,
-    @SerialName("Id") val id: Int,
-    @SerialName("NameTextMapHash") val nameTextMapHash: Long,
-    @SerialName("PrefabPathHashSuffix") val prefabPathHashSuffix: Long,
-    @SerialName("PrefabPathHashPre") val prefabPathHashPre: Int,
-    @SerialName("PrefabPathRemoteHashSuffix") val prefabPathRemoteHashSuffix: Int,
-    @SerialName("PrefabPathRemoteHashPre") val prefabPathRemoteHashPre: Int,
-    @SerialName("ControllerPathHashSuffix") val controllerPathHashSuffix: Int,
-    @SerialName("ControllerPathHashPre") val controllerPathHashPre: Int,
-    @SerialName("ControllerPathRemoteHashSuffix") val controllerPathRemoteHashSuffix: Long,
-    @SerialName("ControllerPathRemoteHashPre") val controllerPathRemoteHashPre: Int,
-    @SerialName("CampID") val campID: Int,
-    @SerialName("LODPatternName") val lODPatternName: String
+    @JsonNames("monsterName", "MonsterName")
+    val monsterName: String,
+    @JsonNames("type", "Type")
+    val type: String,
+    @JsonNames("scriptDataPathHashSuffix", "ScriptDataPathHashSuffix")
+    val scriptDataPathHashSuffix: Long,
+    @JsonNames("scriptDataPathHashPre", "ScriptDataPathHashPre")
+    val scriptDataPathHashPre: Int,
+    @JsonNames("serverScript", "ServerScript")
+    val serverScript: String,
+    @JsonNames("combatConfigHashSuffix", "CombatConfigHashSuffix")
+    val combatConfigHashSuffix: Long,
+    @JsonNames("combatConfigHashPre", "CombatConfigHashPre")
+    val combatConfigHashPre: Int,
+    @JsonNames("affix", "Affix")
+    val affix: List<Int>,
+    @JsonNames("ai", "Ai")
+    val ai: String,
+    @JsonNames("isInvisibleReset", "IsInvisibleReset")
+    val isInvisibleReset: Boolean = false,
+    @JsonNames("equips", "Equips")
+    val equips: List<Int>,
+    @JsonNames("hpDrops", "HpDrops")
+    private val _hpDrops: List<HpDrop>,
+    @JsonNames("killDropId", "KillDropId")
+    val killDropId: Int? = null,
+    @JsonNames("excludeWeathers", "ExcludeWeathers")
+    val excludeWeathers: String,
+    @JsonNames("featureTagGroupID", "FeatureTagGroupID")
+    val featureTagGroupID: Int,
+    @JsonNames("mpPropID", "MpPropID")
+    val mpPropID: Int,
+    @JsonNames("skin", "Skin")
+    val skin: String,
+    @JsonNames("describeId", "DescribeId")
+    val describeId: Int? = null,
+    @JsonNames("entityBudgetLevel", "EntityBudgetLevel")
+    val entityBudgetLevel: Int? = null,
+    @JsonNames("hpBase", "HpBase")
+    val hpBase: Double,
+    @JsonNames("attackBase", "AttackBase")
+    val attackBase: Double = 0.0,
+    @JsonNames("defenseBase", "DefenseBase")
+    val defenseBase: Double = 0.0,
+    @JsonNames("iceSubHurt", "IceSubHurt")
+    val iceSubHurt: Double = 0.0,
+    @JsonNames("grassSubHurt", "GrassSubHurt")
+    val grassSubHurt: Double = 0.0,
+    @JsonNames("windSubHurt", "WindSubHurt")
+    val windSubHurt: Double = 0.0,
+    @JsonNames("elecSubHurt", "ElecSubHurt")
+    val elecSubHurt: Double = 0.0,
+    @JsonNames("propGrowCurves", "PropGrowCurves")
+    private val _propGrowCurves: List<PropGrowCurve>,
+    @JsonNames("physicalSubHurt", "PhysicalSubHurt")
+    val physicalSubHurt: Double = 0.0,
+    @JsonNames("prefabPathRagdollHashSuffix", "PrefabPathRagdollHashSuffix")
+    val prefabPathRagdollHashSuffix: Long,
+    @JsonNames("prefabPathRagdollHashPre", "PrefabPathRagdollHashPre")
+    val prefabPathRagdollHashPre: Int,
+    @JsonNames("id", "Id")
+    val id: Int,
+    @JsonNames("nameTextMapHash", "NameTextMapHash")
+    val nameTextMapHash: Long,
+    @JsonNames("prefabPathHashSuffix", "PrefabPathHashSuffix")
+    val prefabPathHashSuffix: Long,
+    @JsonNames("prefabPathHashPre", "PrefabPathHashPre")
+    val prefabPathHashPre: Int,
+    @JsonNames("prefabPathRemoteHashSuffix", "PrefabPathRemoteHashSuffix")
+    val prefabPathRemoteHashSuffix: Long,
+    @JsonNames("prefabPathRemoteHashPre", "PrefabPathRemoteHashPre")
+    val prefabPathRemoteHashPre: Int,
+    @JsonNames("controllerPathHashSuffix", "ControllerPathHashSuffix")
+    val controllerPathHashSuffix: Long,
+    @JsonNames("controllerPathHashPre", "ControllerPathHashPre")
+    val controllerPathHashPre: Int,
+    @JsonNames("controllerPathRemoteHashSuffix", "ControllerPathRemoteHashSuffix")
+    val controllerPathRemoteHashSuffix: Long,
+    @JsonNames("controllerPathRemoteHashPre", "ControllerPathRemoteHashPre")
+    val controllerPathRemoteHashPre: Int,
+    @JsonNames("campID", "CampID")
+    val campID: Int,
+    @JsonNames("lODPatternName", "LODPatternName")
+    val lODPatternName: String
 ) {
-    @Serializable
-    data class HpDrop(
-        @SerialName("DropId") val dropId: Int,
-        @SerialName("HpPercent") val hpPercent: Double
-    )
+
+    val hpDrops by lazy {
+        _hpDrops.filter { it.dropId != 0 }
+    }
+
+    val propGrowCurves by lazy {
+        _propGrowCurves.filter { it.type != FightProp.FIGHT_PROP_NONE }
+    }
 
     @Serializable
-    data class PropGrowCurve(
-        @SerialName("Type") val type: String,
-        @SerialName("GrowCurve") val growCurve: String
+    data class HpDrop(
+        @JsonNames("dropId", "DropId")
+        val dropId: Int = 0,
+        @JsonNames("hpPercent", "HpPercent")
+        val hpPercent: Double = 0.0
     )
 }

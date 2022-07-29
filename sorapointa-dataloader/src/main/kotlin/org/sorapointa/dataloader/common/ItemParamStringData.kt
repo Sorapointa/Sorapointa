@@ -1,9 +1,10 @@
 package org.sorapointa.dataloader.common
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class ItemParamStringData(
-    @SerialName("Id") val id: Int,
-    @SerialName("Count") val count: String,
+    @JsonNames("id", "Id") val id: Int,
+    @JsonNames("count", "Count") val count: String,
 )

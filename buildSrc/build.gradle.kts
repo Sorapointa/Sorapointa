@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     `kotlin-dsl`
 }
@@ -11,8 +9,9 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0")
     implementation("com.github.gmazzo:gradle-buildconfig-plugin:3.0.3")
+    implementation("gradle.plugin.com.github.johnrengelman:shadow:7.1.2")
 }
 
 sourceSets {
@@ -34,13 +33,8 @@ sourceSets {
     }
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.apply {
-        jvmTarget = "17"
+kotlin {
+    jvmToolchain {
+        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(17))
     }
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
 }

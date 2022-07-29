@@ -1,8 +1,11 @@
+@file:Suppress("GradlePackageUpdate")
+
 import com.github.gmazzo.gradle.plugins.BuildConfigSourceSet
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
 plugins {
-    id("sorapointa-conventions")
+    `sorapointa-conventions`
+    `sorapointa-publish`
 }
 
 val props = getRootProjectLocalProps()
@@ -12,6 +15,8 @@ val defaultDatabaseType: String? = props["database.default"]
 val databaseCompileList: String? = props["database.driver.list"]
 
 dependencies {
+    implementation(project(":sorapointa-utils:sorapointa-utils-serialization"))
+
     implementation("org.jetbrains.kotlin:kotlin-reflect:_")
 
     implementation(KotlinX.serialization.json)
@@ -33,16 +38,14 @@ dependencies {
         implementation("org.xerial:sqlite-jdbc:_")
     }
 
-    if (databaseCompileList.contains("postgresql")) {
-        implementation("org.postgresql:postgresql:_")
-    }
+    implementation("org.postgresql:postgresql:_")
 }
 
 fun BuildConfigSourceSet.dbType(name: String, value: String) =
     buildConfigField("org.sorapointa.data.provider.DatabaseType", name, "DatabaseType.$value")
 
 buildConfig {
-    packageName("$group.config")
+    packageName("org.sorapointa.config")
     className("DbMeta")
     useKotlinOutput()
     dbType(

@@ -1,33 +1,59 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
+import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.ElementType
+
+private val avatarSkillDataLoader =
+    DataLoader<List<AvatarSkillData>>("./ExcelBinOutput/AvatarSkillExcelConfigData.json")
+
+val avatarSkillData get() = avatarSkillDataLoader.data
 
 @Serializable
 data class AvatarSkillData(
-    @SerialName("Id") val id: Int,
-    @SerialName("NameTextMapHash") val nameTextMapHash: Long,
-    @SerialName("AbilityName") val abilityName: String,
-    @SerialName("DescTextMapHash") val descTextMapHash: Long,
-    @SerialName("SkillIcon") val skillIcon: String,
-    @SerialName("CostStamina") val costStamina: Double,
-    @SerialName("MaxChargeNum") val maxChargeNum: Int,
-    @SerialName("LockShape") val lockShape: String,
-    @SerialName("LockWeightParams") val lockWeightParams: List<Double>,
-    @SerialName("IsAttackCameraLock") val isAttackCameraLock: Boolean,
-    @SerialName("BuffIcon") val buffIcon: String,
-    @SerialName("GlobalValueKey") val globalValueKey: String,
-    @SerialName("CdTime") val cdTime: Double,
-    @SerialName("TriggerID") val triggerID: Int,
-    @SerialName("DragType") val dragType: String,
-    @SerialName("ShowIconArrow") val showIconArrow: Boolean,
-    @SerialName("ProudSkillGroupId") val proudSkillGroupId: Int,
-    @SerialName("CostElemType") val costElemType: String,
-    @SerialName("CostElemVal") val costElemVal: Double,
-    @SerialName("IgnoreCDMinusRatio") val ignoreCDMinusRatio: Boolean,
-    @SerialName("NeedStore") val needStore: Boolean,
-    @SerialName("NeedMonitor") val needMonitor: String,
-    @SerialName("DefaultLocked") val defaultLocked: Boolean,
-    @SerialName("CdSlot") val cdSlot: Int,
-    @SerialName("EnergyMin") val energyMin: Double
+    @JsonNames("id", "Id")
+    val id: Int,
+    @JsonNames("nameTextMapHash", "NameTextMapHash")
+    val nameTextMapHash: Long,
+    @JsonNames("abilityName", "AbilityName")
+    val abilityName: String,
+    @JsonNames("descTextMapHash", "DescTextMapHash")
+    val descTextMapHash: Long,
+    @JsonNames("skillIcon", "SkillIcon")
+    val skillIcon: String,
+    @JsonNames("costStamina", "CostStamina")
+    val costStamina: Double? = null,
+    @JsonNames("maxChargeNum", "MaxChargeNum")
+    val maxChargeNum: Int,
+    @JsonNames("lockShape", "LockShape")
+    val lockShape: String,
+    @JsonNames("lockWeightParams", "LockWeightParams")
+    val lockWeightParams: List<Double>,
+    @JsonNames("isAttackCameraLock", "IsAttackCameraLock")
+    val isAttackCameraLock: Boolean = false,
+    @JsonNames("buffIcon", "BuffIcon")
+    val buffIcon: String,
+    @JsonNames("globalValueKey", "GlobalValueKey")
+    val globalValueKey: String,
+    @JsonNames("cdTime", "CdTime")
+    val cdTime: Double = 0.0,
+    @JsonNames("triggerID", "TriggerID")
+    val triggerID: Int? = null,
+    @JsonNames("proudSkillGroupId", "ProudSkillGroupId")
+    val proudSkillGroupId: Int? = null,
+    @JsonNames("costElemType", "CostElemType")
+    val costElemType: ElementType = ElementType.None,
+    @JsonNames("costElemVal", "CostElemVal")
+    val costElemVal: Double = 0.0,
+    @JsonNames("ignoreCDMinusRatio", "IgnoreCDMinusRatio")
+    val ignoreCDMinusRatio: Boolean = false,
+    @JsonNames("needStore", "NeedStore")
+    val needStore: Boolean = false,
+    @JsonNames("defaultLocked", "DefaultLocked")
+    val defaultLocked: Boolean = false,
+    @JsonNames("cdSlot", "CdSlot")
+    val cdSlot: Int? = null,
+    @JsonNames("energyMin", "EnergyMin")
+    val energyMin: Double? = null
 )

@@ -1,17 +1,28 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import org.sorapointa.dataloader.DataLoader
+
+private val weaponCurveLoader =
+    DataLoader<List<WeaponCurveData>>("./ExcelBinOutput/WeaponCurveExcelConfigData.json")
+
+val weaponCurveData get() = weaponCurveLoader.data
 
 @Serializable
 data class WeaponCurveData(
-    @SerialName("Level") val level: Int,
-    @SerialName("CurveInfos") val curveInfos: List<CurveInfo>
+    @JsonNames("level", "Level")
+    val level: Int,
+    @JsonNames("curveInfos", "CurveInfos")
+    val curveInfos: List<CurveInfo>
 ) {
     @Serializable
     data class CurveInfo(
-        @SerialName("Type") val type: String,
-        @SerialName("Arith") val arith: String,
-        @SerialName("Value") val value: Double
+        @JsonNames("type", "Type")
+        val type: String,
+        @JsonNames("arith", "Arith")
+        val arith: String,
+        @JsonNames("value", "Value")
+        val value: Double
     )
 }

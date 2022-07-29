@@ -58,4 +58,8 @@ object DatabaseManager {
     fun <T : Table> loadTables(vararg table: T) = transaction(database) {
         SchemaUtils.createMissingTablesAndColumns(*table)
     }
+
+    fun loadTables(table: List<Table>) = transaction(database) {
+        SchemaUtils.createMissingTablesAndColumns(*(table.toTypedArray()))
+    }
 }

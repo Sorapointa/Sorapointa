@@ -1,13 +1,18 @@
+@file:Suppress("unused")
+
 package org.sorapointa.event
 
 import kotlinx.atomicfu.atomic
-import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import mu.KotlinLogging
+import net.mamoe.yamlkt.Comment
+import net.mamoe.yamlkt.Yaml
 import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.utils.ModuleScope
 import org.sorapointa.utils.configDirectory
@@ -25,13 +30,11 @@ private val logger = KotlinLogging.logger {}
  */
 object EventManager {
 
-    private var eventScope = ModuleScope(logger, "EventManager")
+    private var eventScope = ModuleScope("EventManager")
 
     private val registeredListener = ConcurrentLinkedQueue<PriorityEntry>()
-    private val registeredBlockListener = ConcurrentLinkedQueue<PriorityBlockEntry>()
-//    private val destinationChannel = ConcurrentHashMap<EventPriority, Channel<Event>>()
-
-//    private val listeners = ConcurrentLinkedQueue<Job>()
+    private val registeredBlockListener = ConcurrentLinkedQueue<PriorityEntry>()
+    private val registeredChannelListener = ConcurrentLinkedQueue<PriorityChannelEntry>()
 
     private val blockListenerTimeout
         get() = EventManagerConfig.data.blockListenerTimeout
@@ -45,15 +48,13 @@ object EventManager {
      *
      * You could **NOT CANCEL** or **INTERCEPT** any event in parallel listener.
      *
-     * @param priority, optional, set the priority of this listener
+     * @param priority optional, set the priority of this listener
      * @return [Flow]
      */
     fun getEventFlow(
         priority: EventPriority = EventPriority.NORMAL,
     ): Flow<Event> {
-        val channel = getInitChannel()
-        registeredListener.first { it.priority == priority }.channels.add(channel)
-        return channel.receiveAsFlow()
+        return registeredChannelListener.first { it.priority == priority }.channel.receiveAsFlow()
     }
 
     /**
@@ -62,45 +63,14 @@ object EventManager {
      *
      * You could **NOT CANCEL** or **INTERCEPT** any event in parallel listener.
      *
-     * @param priority, optional, set the priority of this listener
-     * @param listener, lambda block of your listener with the all event of parameter
+     * @param priority optional, set the priority of this listener
+     * @param listener lambda block of your listener with the all event of parameter
      */
     fun registerEventListener(
         priority: EventPriority = EventPriority.NORMAL,
         listener: suspend (Event) -> Unit
     ) {
-        val channel = getInitChannel()
-        registeredListener.first { it.priority == priority }.channels.add(channel)
-
-        eventScope.launch {
-            channel.receiveAsFlow().collect {
-                listener(it)
-            }
-        }.invokeOnCompletion {
-            this.registeredListener.first { it.priority == priority }.channels.remove(channel)
-        }
-    }
-
-    /**
-     * Register a parallel listener
-     * All registered listeners will be called in parallel.
-     *
-     * You could NOT CANCEL or INTERCEPT any event in parallel listener.
-     *
-     * Generic type [T] is what event would you listen.
-     *
-     * @param priority, optional, set the priority of this listener
-     * @param listener, lambda block of your listener with the specific event of parameter
-     */
-    inline fun <reified T : Event> registerListener(
-        priority: EventPriority = EventPriority.NORMAL,
-        crossinline listener: suspend (T) -> Unit
-    ) {
-        registerEventListener(priority) {
-            if (it is T) {
-                listener(it)
-            }
-        }
+        registeredListener.first { it.priority == priority }.listeners.add(listener)
     }
 
     /**
@@ -109,8 +79,8 @@ object EventManager {
      *
      * You could cancel or intercept listened event in serial listener.
      *
-     * @param priority, optional, set the priority of this listener
-     * @param listener, lambda block of your listener with all type of event of parameter
+     * @param priority optional, set the priority of this listener
+     * @param listener lambda block of your listener with all type of event of parameter
      */
     fun registerBlockEventListener(
         priority: EventPriority = EventPriority.NORMAL,
@@ -120,59 +90,38 @@ object EventManager {
     }
 
     /**
-     * Register a block listener
-     * All registered block listeners will be called in serial.
-     *
-     * You could cancel or intercept listened event in serial listener.
-     *
-     * Generic type [T] is what event would you listen.
-     *
-     * @param priority, optional, set the priority of this listener
-     * @param listener, lambda block of your listener with the specific event of parameter
-     */
-    inline fun <reified T : Event> registerBlockListener(
-        priority: EventPriority = EventPriority.NORMAL,
-        crossinline listener: suspend (T) -> Unit
-    ) {
-        registerBlockEventListener(priority) {
-            if (it is T) {
-                listener(it)
-            }
-        }
-    }
-
-    /**
      * Broadcast event, and return the cancel state of this event
      *
-     * @param event, the event will be broadcasted
-     * @return [Boolean], that represents the cancel state of this event
+     * @param event the event will be broadcasted
+     * @return [Boolean] that represents the cancel state of this event
      */
 
     suspend fun broadcastEvent(event: Event): Boolean {
         var isCancelled by atomic(false)
         var isIntercepted by atomic(false)
         val eventName = event::class.simpleName
-        logger.debug { "Try to broadcast event $eventName" }
-        registeredListener.forEach { (priority, channels) ->
+        logger.trace { "Try to broadcast event $eventName" }
+        registeredListener.forEach { (priority, pListener) ->
             eventScope.launch {
-                channels.forEach { channel ->
-                    channel.send(event)
+                pListener.forEach { listener ->
+                    listener(event)
                 }
+                registeredChannelListener
+                    .first { it.priority == priority }.channel
+                    .send(event)
             }
             val blockListeners = registeredBlockListener.first { it.priority == priority }.listeners
             if (blockListeners.size > 0) {
                 withTimeout(waitingAllBlockListenersTimeout) {
-                    blockListeners.asFlow().map { listener ->
+                    blockListeners.map { listener ->
                         eventScope.launch {
                             withTimeout(blockListenerTimeout) {
                                 listener(event)
                             }
-                            isIntercepted = event.isIntercepted
-                            if (event is CancelableEvent) isCancelled = event.isCancelled
+                            isIntercepted = event.isIntercepted || isIntercepted
+                            if (event is CancelableEvent) isCancelled = event.isCancelled || isCancelled
                         }
-                    }.collect {
-                        it.join()
-                    }
+                    }.joinAll()
                 }
             }
             if (isIntercepted) {
@@ -180,45 +129,8 @@ object EventManager {
                 return isCancelled
             }
         }
-        logger.debug { "Broadcasted event $eventName, cancel state: $isCancelled" }
+        if (isCancelled) logger.debug { "Broadcasted event $eventName, has been cancelled" }
         return isCancelled
-    }
-
-    /**
-     * Broadcast event in a quick way
-     * @param ifNotCancel lambda block with the action if broadcasted event has **NOT** been cancelled
-     */
-    suspend inline fun <T : Event> T.broadcastEvent(ifNotCancel: (T) -> Unit) {
-        val isCancelled = broadcastEvent(this)
-        if (!isCancelled) ifNotCancel(this)
-    }
-
-    /**
-     * Broadcast event in a quick way
-     * @param ifCancelled lambda block with the action if broadcasted event has been cancelled
-     */
-    suspend inline fun <T : Event> T.broadcastEventIfCancelled(ifCancelled: (T) -> Unit) {
-        val isCancelled = broadcastEvent(this)
-        if (isCancelled) ifCancelled(this)
-    }
-
-    /**
-     * Broadcast event in a quick way
-     * @param ifNotCancel lambda block with the action if broadcasted event has **NOT** been cancelled
-     */
-    suspend inline fun <T : Event> T.broadcastEvent(
-        ifNotCancel: (T) -> Unit,
-        ifCancelled: (T) -> Unit
-    ) {
-        val isCancelled = broadcastEvent(this)
-        if (!isCancelled) ifNotCancel(this) else ifCancelled(this)
-    }
-
-    /**
-     * Broadcast event in quick way
-     */
-    suspend inline fun <T : Event> T.broadcast() {
-        broadcastEvent(this)
     }
 
     /**
@@ -228,7 +140,7 @@ object EventManager {
      * This method **IS NOT** thread-safe
      */
     fun init(parentContext: CoroutineContext = EmptyCoroutineContext) {
-        eventScope = ModuleScope(logger, "EventManager", parentContext)
+        eventScope = ModuleScope("EventManager", parentContext)
         initAllListeners()
     }
 
@@ -242,7 +154,8 @@ object EventManager {
         registeredBlockListener.clear()
         EventPriority.values().forEach {
             registeredListener.add(PriorityEntry(it, ConcurrentLinkedQueue()))
-            registeredBlockListener.add(PriorityBlockEntry(it, ConcurrentLinkedQueue()))
+            registeredBlockListener.add(PriorityEntry(it, ConcurrentLinkedQueue()))
+            registeredChannelListener.add(PriorityChannelEntry(it, getInitChannel()))
         }
     }
 
@@ -253,23 +166,146 @@ object EventManager {
     private fun getInitChannel() = Channel<Event>(64)
 }
 
+/**
+ * Register a parallel temp listener to capture
+ * the next event that conform with the requirement of `filter`
+ *
+ * You could NOT CANCEL or INTERCEPT any event in parallel listener.
+ *
+ * Generic type [T] is what event would you listen.
+ *
+ * Use `inline` with `listener` would lose precise stacktrace for exception
+ *
+ * @param timeoutMs timeout time in milliseconds.
+ * @param priority optional, set the priority of this listener
+ * @param filter lambda block of your filter for specific event detail
+ * @return [Event] return a caputered event
+ */
+suspend inline fun <reified T : Event> nextEvent(
+    timeoutMs: Long = 1000,
+    priority: EventPriority = EventPriority.NORMAL,
+    noinline filter: (T) -> Boolean = { true },
+) = withTimeout(timeoutMs) {
+    EventManager.getEventFlow(priority).firstOrNull { if (it is T) filter(it) else false }
+}
+
+/**
+ * Register a parallel listener
+ * All registered listeners will be called in parallel.
+ *
+ * You could NOT CANCEL or INTERCEPT any event in parallel listener.
+ *
+ * Generic type [T] is what event would you listen.
+ *
+ * Use `inline` with `listener` would lose precise stacktrace for exception
+ *
+ * @param priority optional, set the priority of this listener
+ * @param listener lambda block of your listener with the specific event of parameter
+ */
+inline fun <reified T : Event> registerListener(
+    priority: EventPriority = EventPriority.NORMAL,
+    noinline listener: suspend (T) -> Unit
+) {
+    EventManager.registerEventListener(priority) {
+        if (it is T) {
+            listener(it)
+        }
+    }
+}
+
+/**
+ * Register a block listener
+ * All registered block listeners will be called in serial.
+ *
+ * You could cancel or intercept listened event in serial listener.
+ *
+ * Generic type [T] is what event would you listen.
+ *
+ * Use `inline` with `listener` would lose precise stacktrace for exception
+ *
+ * @param priority optional, set the priority of this listener
+ * @param listener lambda block of your listener with the specific event of parameter
+ */
+inline fun <reified T : Event> registerBlockListener(
+    priority: EventPriority = EventPriority.NORMAL,
+    noinline listener: suspend (T) -> Unit
+) {
+    EventManager.registerBlockEventListener(priority) {
+        if (it is T) {
+            listener(it)
+        }
+    }
+}
+
+/**
+ * Broadcast event in a quick way
+ *
+ * Use `inline` would lose precise stacktrace for exception
+ *
+ * @param ifNotCancel lambda block with the action if broadcasted event has **NOT** been cancelled
+ */
+suspend inline fun <T : Event, R> T.broadcastEvent(
+    noinline ifNotCancel: suspend (T) -> R
+): R? {
+    val isCancelled = EventManager.broadcastEvent(this)
+    return if (!isCancelled) ifNotCancel(this) else null
+}
+
+/**
+ * Broadcast event in a quick way
+ *
+ * Use `inline` for lambda function would lose precise stacktrace for exception
+ *
+ * @param ifCancelled lambda block with the action if broadcasted event has been cancelled
+ */
+suspend inline fun <T : Event, R> T.broadcastEventIfCancelled(
+    noinline ifCancelled: suspend (T) -> R
+): R? {
+    val isCancelled = EventManager.broadcastEvent(this)
+    return if (isCancelled) ifCancelled(this) else null
+}
+
+/**
+ * Broadcast event in a quick way
+ *
+ * Use `inline` for lambda function would lose precise stacktrace for exception
+ *
+ * @param ifNotCancel lambda block with the action if broadcasted event has **NOT** been cancelled
+ */
+suspend inline fun <T : Event, R> T.broadcastEvent(
+    noinline ifNotCancel: suspend (T) -> R,
+    noinline ifCancelled: suspend (T) -> R
+): R {
+    val isCancelled = EventManager.broadcastEvent(this)
+    return if (!isCancelled) ifNotCancel(this) else ifCancelled(this)
+}
+
+/**
+ * Broadcast event in quick way
+ */
+suspend inline fun <T : Event> T.broadcast() {
+    EventManager.broadcastEvent(this)
+}
+
 object EventManagerConfig : DataFilePersist<EventManagerConfig.Data>(
-    File(configDirectory, "eventManagerConfig.json"), Data()
+    File(configDirectory, "eventManagerConfig.yaml"), Data(), Yaml,
 ) {
 
     @kotlinx.serialization.Serializable
     data class Data(
+        @Comment("Single event listener timeout in ms")
         val blockListenerTimeout: Long = 1000 * 30L,
+        @Comment("All event listeners timeout in ms")
         val waitingAllBlockListenersTimeout: Long = 3 * blockListenerTimeout
     )
 }
 
 internal data class PriorityEntry(
     val priority: EventPriority,
-    val channels: ConcurrentLinkedQueue<Channel<Event>>
+    val listeners: ConcurrentLinkedQueue<suspend (Event) -> Unit>
 )
 
-internal data class PriorityBlockEntry(
+internal data class PriorityChannelEntry(
     val priority: EventPriority,
-    val listeners: ConcurrentLinkedQueue<suspend (Event) -> Unit>
+    val channel: Channel<Event>
 )

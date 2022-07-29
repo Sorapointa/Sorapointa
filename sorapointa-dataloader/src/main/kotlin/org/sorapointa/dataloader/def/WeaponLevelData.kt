@@ -1,10 +1,18 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import org.sorapointa.dataloader.DataLoader
+
+private val weaponLevelLoader =
+    DataLoader<List<WeaponLevelData>>("./ExcelBinOutput/WeaponLevelExcelConfigData.json")
+
+val weaponLevelData get() = weaponLevelLoader.data
 
 @Serializable
 data class WeaponLevelData(
-    @SerialName("Level") val level: Int,
-    @SerialName("RequiredExps") val requiredExps: List<Int>
+    @JsonNames("level", "Level")
+    val level: Int,
+    @JsonNames("requiredExps", "RequiredExps")
+    val requiredExps: List<Int>
 )

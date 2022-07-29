@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+// CmdId: 279
+// EnetChannelId: 0
+// EnetIsReliable: true
+// IsAllowClient: true
+message EnterSceneDoneReq {
+	uint32 enter_scene_token = 13;
+}

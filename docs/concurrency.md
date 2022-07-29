@@ -66,10 +66,11 @@ it is necessary ensure that the operations of the object is atomic.
 ## Requirements for Thread Safety
 
 Fix as many thread-safety issues as possible that can be fixed easily,
-such as using the atomic delegation, ConcurrencyHashMap
+such as using the atomic delegation, ConcurrentHashMap
 and other built-in atomic objects.
 If all built-in atomic methods are no longer enough for your needs,
 try using the simple Mutex.
+(Please follow the guideline for properly using the Mutex)
 
 But before using Mutex or more complex thread-safe mechanism,
 first think about whether I can accept the risk of problems occurring
@@ -83,6 +84,17 @@ the resulting data changes are acceptable,
 the resulting performance loss is acceptable,
 and the program will not crash with errors.
 
+## Lock
+
+In Kotlin Coroutine, some types of lock (such as Mutex) that is thread-bind,
+would easily cause the deadlock issue.
+
+We highly recommend you to use `withReentrantLock` method located in `sorapointa-utils` module,
+to keep the mutex lock consistentency in the coroutine context.
+
+Please refer to [Phantom of the Coroutine](https://elizarov.medium.com/phantom-of-the-coroutine-afc63b03a131)
+
+
 ## Structured Concurrency
 
 The code is cooperative and use structured concurrency to
@@ -90,5 +102,14 @@ ensure that all concurrent processes do not leak and are manageable.
 
 In Sorapointa, we use ModuleScope to
 ensure that the task structure between concurrent processes is proper.
+
+In general，please don't implement `CoroutineScope` interface to make coroutine to be structured concurrency,
+and also don't add context in the parameter of `launch` method.
+For specific reasons, please refer to, [Kotlin CoroutineScope Documentation](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/)，
+[Why your class probably should not implement CoroutineScope](https://proandroiddev.com/why-your-class-probably-shouldnt-implement-coroutinescope-eb34f722e510)，
+[Structured Concurrency Anniversary](https://elizarov.medium.com/structured-concurrency-anniversary-f2cc748b2401)，
+[Legacy Convention of CoroutineScope](https://maxkim.eu/things-every-kotlin-developer-should-know-about-coroutines-part-2-coroutinescope)
+
+In short, it's an outdated approach.
 
 You can write cooperative code by referring to TaskManager, EventManager, etc.

@@ -1,18 +1,29 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
+import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.AddProp
+import org.sorapointa.dataloader.common.FightProp
+
+private val reliquaryLevelLoader =
+    DataLoader<List<ReliquaryLevelData>>("./ExcelBinOutput/ReliquaryLevelExcelConfigData.json")
+
+val reliquaryLevelData get() = reliquaryLevelLoader.data
 
 @Serializable
 data class ReliquaryLevelData(
-    @SerialName("Level") val level: Int,
-    @SerialName("AddProps") val addProps: List<AddProp>,
-    @SerialName("Rank") val rank: Int,
-    @SerialName("Exp") val exp: Int
+    @JsonNames("level", "Level")
+    val level: Int,
+    @JsonNames("addProps", "AddProps")
+    private val _addProps: List<AddProp>,
+    @JsonNames("rank", "Rank")
+    val rank: Int = 0,
+    @JsonNames("exp", "Exp")
+    val exp: Int = 0
 ) {
-    @Serializable
-    data class AddProp(
-        @SerialName("PropType") val propType: String,
-        @SerialName("Value") val value: Double
-    )
+
+    val addProp by lazy {
+        _addProps.filter { it.propType != FightProp.FIGHT_PROP_NONE }
+    }
 }

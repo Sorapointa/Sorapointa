@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm")
     id("com.github.gmazzo.buildconfig")
+    id("com.github.johnrengelman.shadow")
     java
 }
 
@@ -11,8 +12,6 @@ repositories {
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     maven("https://plugins.gradle.org/m2/")
 }
-
-group = "org.sorapointa"
 
 dependencies {
     constraints {
@@ -26,9 +25,12 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:_")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
 
-    if (project.name != "sorapointa-utils") {
-        implementation(project(":sorapointa-utils"))
-        testImplementation(project(":sorapointa-utils", "test"))
+    if (!project.name.startsWith("sorapointa-utils")) {
+        val noUtils = project.getExtraBoolean("no-utils")
+        if (noUtils != true) {
+            implementation(project(":sorapointa-utils:sorapointa-utils-core"))
+            testImplementation(project(":sorapointa-utils:sorapointa-utils-core", "test"))
+        }
     }
 
     testImplementation(kotlin("test"))
@@ -61,9 +63,10 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 configurations {
@@ -77,4 +80,10 @@ tasks.register<Jar>("testArchive") {
 
 artifacts {
     add("test", tasks["testArchive"])
+}
+
+tasks.withType<Jar>() {
+    exclude("main") // duplicated jar root main, very confusing
+    exclude("logback-test.xml")
+    exclude("*.proto")
 }

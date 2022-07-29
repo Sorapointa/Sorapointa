@@ -3,6 +3,7 @@ package org.sorapointa.data.provider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.StringFormat
 import java.io.File
 import kotlin.reflect.KClass
 import kotlin.reflect.full.hasAnnotation
@@ -21,6 +22,8 @@ interface FilePersist<T : Any> {
     val file: File
 
     val scope: CoroutineScope
+
+    val format: StringFormat
 
     /**
      * Initialize file persist

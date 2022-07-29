@@ -1,10 +1,11 @@
 package org.sorapointa.dataloader.custom
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 
 // TODO: 2022/5/8 ?
-@kotlinx.serialization.Serializable
+@Serializable
 data class AbilityEmbryoEntry(
-    @SerialName("name") val name: String,
-    @SerialName("abilities") val abilities: List<String>, // Array
+    @JsonNames("name", "Name") val name: String,
+    @JsonNames("abilities", "Abilities") val abilities: List<String>, // Array
 )

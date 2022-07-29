@@ -1,21 +1,40 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
+import org.sorapointa.dataloader.DataLoader
+
+private val npcLoader =
+    DataLoader<List<NpcData>>("./ExcelBinOutput/NpcExcelConfigData.json")
+
+val npcData get() = npcLoader.data
 
 @Serializable
 data class NpcData(
-    @SerialName("JsonName") val jsonName: String,
-    @SerialName("Alias") val alias: String,
-    @SerialName("ScriptDataPath") val scriptDataPath: String,
-    @SerialName("LuaDataPath") val luaDataPath: String,
-    @SerialName("DyePart") val dyePart: String,
-    @SerialName("BillboardIcon") val billboardIcon: String,
-    @SerialName("TemplateEmotionPath") val templateEmotionPath: String,
-    @SerialName("Id") val id: Int,
-    @SerialName("NameTextMapHash") val nameTextMapHash: Long,
-    @SerialName("PrefabPathHashSuffix") val prefabPathHashSuffix: Long,
-    @SerialName("PrefabPathHashPre") val prefabPathHashPre: Int,
-    @SerialName("CampID") val campID: Int,
-    @SerialName("LODPatternName") val lODPatternName: String
+    @JsonNames("jsonName", "JsonName")
+    val jsonName: String,
+    @JsonNames("alias", "Alias")
+    val alias: String,
+    @JsonNames("scriptDataPath", "ScriptDataPath")
+    val scriptDataPath: String,
+    @JsonNames("luaDataPath", "LuaDataPath")
+    val luaDataPath: String,
+    @JsonNames("dyePart", "DyePart")
+    val dyePart: String,
+    @JsonNames("billboardIcon", "BillboardIcon")
+    val billboardIcon: String,
+    @JsonNames("templateEmotionPath", "TemplateEmotionPath")
+    val templateEmotionPath: String,
+    @JsonNames("id", "Id")
+    val id: Int,
+    @JsonNames("nameTextMapHash", "NameTextMapHash")
+    val nameTextMapHash: Long,
+    @JsonNames("prefabPathHashSuffix", "PrefabPathHashSuffix")
+    val prefabPathHashSuffix: Long,
+    @JsonNames("prefabPathHashPre", "PrefabPathHashPre")
+    val prefabPathHashPre: Int,
+    @JsonNames("campID", "CampID")
+    val campID: Int,
+    @JsonNames("lODPatternName", "LODPatternName")
+    val lODPatternName: String
 )

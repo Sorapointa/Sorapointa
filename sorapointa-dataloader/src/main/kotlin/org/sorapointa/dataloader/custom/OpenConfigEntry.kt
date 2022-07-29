@@ -1,18 +1,19 @@
 package org.sorapointa.dataloader.custom
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 
 // TODO: 2022/5/8 ?
-@kotlinx.serialization.Serializable
+@Serializable
 data class OpenConfigEntry(
-    @SerialName("name") val name: String,
-    @SerialName("addAbilities") val addAbilities: List<String>, // Array
-    @SerialName("extraTalentIndex") val extraTalentIndex: Int,
-    @SerialName("skillPointModifiers") val skillPointModifiers: List<SkillPointModifier>
+    @JsonNames("name", "Name") val name: String,
+    @JsonNames("addAbilities", "AddAbilities") val addAbilities: List<String>, // Array
+    @JsonNames("extraTalentIndex", "ExtraTalentIndex") val extraTalentIndex: Int,
+    @JsonNames("skillPointModifiers", "SkillPointModifiers") val skillPointModifiers: List<SkillPointModifier>
 ) {
-    @kotlinx.serialization.Serializable
+    @Serializable
     data class SkillPointModifier(
-        @SerialName("skillId") val skillId: Int,
-        @SerialName("delta") val delta: Int,
+        @JsonNames("skillId", "SkillId") val skillId: Int,
+        @JsonNames("delta", "Delta") val delta: Int,
     )
 }

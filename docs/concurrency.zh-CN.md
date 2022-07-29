@@ -8,7 +8,7 @@ Sorapointa 项目大量使用了协程与多线程技术，请时刻注意检查
 
 如果一定要共享可修改数据，请使用线程安全的数据结构 ，如 Atomic，Sorapointa 使用了 AtomicFU 框架封装了 Java 的原子方法
 
-关于 AtmoicFU，参考 [AtomicFU 指南](docs/kotlin-atomicfu.zh-CN.md)
+关于 AtmoicFU，参考 [AtomicFU 指南](/docs/kotlin-atomicfu.zh-CN.md)
 
 但是对于集合，我们一般使用 `ConcurrentHashMap` 或同样类似的线程安全的数据结构
 
@@ -47,8 +47,9 @@ if (!map.containsKey(123)) {
 ## 对于线程安全的要求
 
 对能简单修复的线程安全问题尽量予以修复，比如 使用 `atomic` 代理，
-使用 `ConcurrencyHashMap` 以及其内置的其他原子方法，
+使用 `ConcurrentHashMap` 以及其内置的其他原子方法，
 如果内置的所有原子方法已经不足以满足你的需求，可以尝试使用简单的 `Mutex`
+（请遵循指导在协程下正确使用 `Mutex`）
 
 但是在使用 `Mutex` 或更复杂的线程安全机制前， 
 首先思考，我是否能接受发生问题的风险（如原石操作是很敏感的，
@@ -57,6 +58,13 @@ if (!map.containsKey(123)) {
 
 成本可接受指的是，造成的数据变更可接受，造成的性能损耗可接受，程序不会报错崩溃
 
+## 关于锁
+
+在 Kotlin 协程中，与线程绑定的锁会容易造成死锁问题（比如 `Mutex`），
+建议使用 `sorapointa-utils` 模块中拓展的 `withReentrantLock` 方法，以确保锁的上下文一致性。
+
+可以参考，[Phantom of the Coroutine](https://elizarov.medium.com/phantom-of-the-coroutine-afc63b03a131)
+
 ## 结构化并发
 
 代码应该是合作式的，并使用结构化并发确保所有的协程不会泄漏与可被管理
@@ -64,5 +72,13 @@ if (!map.containsKey(123)) {
 在 Sorapointa 中，我们使用了 `ModuleScope` 以确保正确建立协程之间的任务结构
 
 你可以参照 `TaskManager`，`EventManager` 等，写出合作式的代码
+
+通常情况下，请不要实现 `CoroutineScope` 接口以实现结构化并发，也不要往 `launch` 方法中添加上下文。
+具体原因可以参考，[Kotlin CoroutineScope 文档](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/)，
+[为什么你不应该实现 CoroutineScope 接口](https://proandroiddev.com/why-your-class-probably-shouldnt-implement-coroutinescope-eb34f722e510)，
+[结构化并发周年庆 - Roman Elizarov](https://elizarov.medium.com/structured-concurrency-anniversary-f2cc748b2401)，
+[CoroutineScope 的 Legacy Convention](https://maxkim.eu/things-every-kotlin-developer-should-know-about-coroutines-part-2-coroutinescope)
+
+简而言之，这是一种过时了的方法。
 
 了解更多，关于 [结构化并发](https://kotlinlang.org/docs/composing-suspending-functions.html#structured-concurrency-with-async)

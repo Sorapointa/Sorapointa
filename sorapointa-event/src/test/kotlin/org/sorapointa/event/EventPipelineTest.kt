@@ -5,6 +5,7 @@ import kotlinx.coroutines.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -65,17 +66,17 @@ class EventPipelineTest {
             error("unreachable code")
         }
 
-        var counter by atomic(0)
+        val counter = atomic(0)
 
         EventManager.registerBlockEventListener {
             it.intercept()
-            counter++
+            counter.getAndIncrement()
         }
 
         EventManager.registerBlockEventListener(EventPriority.HIGHEST) {
             if (it is CancelableEvent) {
                 it.cancel()
-                counter++
+                counter.getAndIncrement()
             }
         }
 
@@ -84,13 +85,13 @@ class EventPipelineTest {
                 repeat(10) {
                     val event = TestEvent3()
                     val status = EventManager.broadcastEvent(event)
-                    counter++
+                    counter.getAndIncrement()
                     assertEquals(true, status)
                 }
             }
         }.joinAll()
 
-        assertEquals(3 * 100 * 10, counter)
+        assertEquals(3 * 100 * 10, counter.value)
     }
 
     @Test
@@ -104,7 +105,7 @@ class EventPipelineTest {
 
         EventManager.init(parentScope.coroutineContext)
 
-        var runCount by atomic(0)
+        val runCount = atomic(0)
 
         EventManager.registerEventListener {
             delay(100)
@@ -112,8 +113,8 @@ class EventPipelineTest {
         }
 
         EventManager.registerEventListener(EventPriority.LOWEST) {
-            delay(500)
-            runCount++
+            delay(300)
+            runCount += 1
         }
 
         EventManager.registerBlockEventListener {
@@ -122,21 +123,49 @@ class EventPipelineTest {
         }
 
         EventManager.registerBlockEventListener(EventPriority.LOWEST) {
-            delay(500)
-            runCount++
+            delay(300)
+            runCount += 1
         }
 
         parentScope.launch {
-            delay(500)
-            runCount++
+            delay(300)
+            runCount += 1
         }
 
         EventManager.broadcastEvent(TestEvent1())
 
-        assertEquals(3, runCount)
+        delay(500)
+
+        assertEquals(3, runCount.value)
 
         EventManager.initAllListeners()
+    }
 
-        delay(300)
+    @Test
+    fun `next event test`(): Unit = runBlocking {
+
+        val e1 = async { nextEvent<TestEvent2> { it.isCancelled } }
+        val e2 = async { nextEvent<TestEvent3> { it.isCancelled } }
+
+        val job = launch {
+            e2.await()
+            assertThrows<TimeoutCancellationException> {
+                runBlocking {
+                    e1.await()
+                }
+            }
+        }
+
+        EventManager.registerBlockEventListener(EventPriority.HIGH) {
+            if (it is CancelableEvent) {
+                it.cancel()
+            }
+        }
+
+        delay(500)
+
+        EventManager.broadcastEvent(TestEvent3())
+
+        job.join()
     }
 }

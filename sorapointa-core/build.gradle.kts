@@ -1,21 +1,37 @@
+@file:Suppress("GradlePackageUpdate")
+
 plugins {
-    id("sorapointa-conventions")
+    `sorapointa-conventions`
+    `sorapointa-publish`
     application
 }
 
 dependencies {
     // Project submodules
-    implementation(project(":sorapointa-dataprovider"))
+    implementation(project(":sorapointa-dataloader"))
     implementation(project(":sorapointa-dispatch"))
-    implementation(project(":sorapointa-event"))
-    implementation(project(":sorapointa-i18n"))
-    implementation(project(":sorapointa-kcp"))
-    implementation(project(":sorapointa-proto"))
+    api(project(":sorapointa-dataprovider"))
+    api(project(":sorapointa-event"))
+    api(project(":sorapointa-i18n"))
+    api(project(":sorapointa-proto"))
+    api(project(":sorapointa-task"))
+    api(project(":sorapointa-utils:sorapointa-utils-all"))
 
+    // KotlinX
+    api("org.jetbrains.kotlinx:atomicfu:_")
+
+    // network
+    implementation("io.netty:netty-handler:_")
+    implementation("moe.sdl.kcp:grasskcpper:_")
+    // Ktor
+    implementation("io.ktor:ktor-server-websockets:_")
     // Command
-    implementation("moe.sdl.yac:core:_")
+    api("moe.sdl.yac:core:_")
     // Console
     implementation("org.jline:jline:_")
+    implementation("com.password4j:password4j:_")
+    testImplementation(project(":sorapointa-dispatch", "test"))
+    testImplementation(project(":sorapointa-dataprovider", "test"))
 }
 
 configurations.all {

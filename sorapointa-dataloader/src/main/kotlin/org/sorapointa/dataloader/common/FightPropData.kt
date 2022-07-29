@@ -1,12 +1,13 @@
 package org.sorapointa.dataloader.common
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class FightPropData(
-    @SerialName("PropType") val propType: String,
+    @JsonNames("propType", "PropType") val propType: String,
     val prop: FightProperty, // TODO: 2022/5/8 ?
-    @SerialName("Value") val value: Float,
+    @JsonNames("value", "Value") val value: Float,
 ) {
     enum class FightProperty
 }

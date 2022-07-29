@@ -51,7 +51,7 @@ class AccountTest {
 
 ```kotlin
 @TestInstance(Lifecycle.PER_CLASS)
-class DatabaseTest() {
+class DatabaseTest {
   @BeforeAll
   fun initDatabase() {
     // 初始化
@@ -67,7 +67,7 @@ class DatabaseTest() {
 2.
 
 ```kotlin
-class DatabaseTest() {
+class DatabaseTest {
   companion object {
     @BeforeAll
     @JvmStatic
@@ -125,3 +125,8 @@ runTest(TestOption.SKIP_CI) {
   assertEquals(10000, 10000)
 }
 ```
+
+
+### 关于高并发测试
+
+- 请不要在 IDE 的 `Debug` 模式下运行高并发测试，这容易导致 `OutOfMemory` 和未知原因的死锁

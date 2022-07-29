@@ -1,42 +1,76 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
+import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.ItemType
+
+private val weaponDataLoader = DataLoader<List<WeaponData>>("./ExcelBinOutput/WeaponExcelConfigData.json")
+val weaponData
+    get() = weaponDataLoader.data
 
 @Serializable
 data class WeaponData(
-    @SerialName("WeaponType") val weaponType: String,
-    @SerialName("RankLevel") val rankLevel: Int,
-    @SerialName("WeaponBaseExp") val weaponBaseExp: Int,
-    @SerialName("SkillAffix") val skillAffix: List<Int>,
-    @SerialName("WeaponProp") val weaponProp: List<WeaponProp>,
-    @SerialName("AwakenTexture") val awakenTexture: String,
-    @SerialName("AwakenLightMapTexture") val awakenLightMapTexture: String,
-    @SerialName("AwakenIcon") val awakenIcon: String,
-    @SerialName("WeaponPromoteId") val weaponPromoteId: Int,
-    @SerialName("StoryId") val storyId: Int,
-    @SerialName("AwakenCosts") val awakenCosts: List<Int>,
-    @SerialName("GachaCardNameHashSuffix") val gachaCardNameHashSuffix: Long,
-    @SerialName("ChargeEfficiency") val chargeEfficiency: Int,
-    @SerialName("DestroyRule") val destroyRule: String,
-    @SerialName("DestroyReturnMaterial") val destroyReturnMaterial: List<Int>,
-    @SerialName("DestroyReturnMaterialCount") val destroyReturnMaterialCount: List<Int>,
-    @SerialName("Id") val id: Int,
-    @SerialName("NameTextMapHash") val nameTextMapHash: Long,
-    @SerialName("DescTextMapHash") val descTextMapHash: Long,
-    @SerialName("Icon") val icon: String,
-    @SerialName("ItemType") val itemType: String,
-    @SerialName("Weight") val weight: Int,
-    @SerialName("Rank") val rank: Int,
-    @SerialName("GadgetId") val gadgetId: Int,
-    @SerialName("AwakenMaterial") val awakenMaterial: Int,
-    @SerialName("InitialLockState") val initialLockState: Int,
-    @SerialName("UnRotate") val unRotate: Boolean
-) {
+    @JsonNames("weaponType", "WeaponType")
+    val weaponType: String,
+    @JsonNames("rankLevel", "RankLevel")
+    override val rankLevel: Int,
+    @JsonNames("weaponBaseExp", "WeaponBaseExp")
+    val weaponBaseExp: Int,
+    @JsonNames("skillAffix", "SkillAffix")
+    val skillAffix: List<Int>,
+    @JsonNames("weaponProp", "WeaponProp")
+    val weaponProp: List<WeaponProp>,
+    @JsonNames("awakenTexture", "AwakenTexture")
+    val awakenTexture: String,
+    @JsonNames("awakenLightMapTexture", "AwakenLightMapTexture")
+    val awakenLightMapTexture: String,
+    @JsonNames("awakenIcon", "AwakenIcon")
+    val awakenIcon: String,
+    @JsonNames("weaponPromoteId", "WeaponPromoteId")
+    val weaponPromoteId: Int,
+    @JsonNames("storyId", "StoryId")
+    val storyId: Int? = null,
+    @JsonNames("awakenCosts", "AwakenCosts")
+    val awakenCosts: List<Int>,
+    @JsonNames("gachaCardNameHashSuffix", "GachaCardNameHashSuffix")
+    val gachaCardNameHashSuffix: Long,
+    @JsonNames("destroyRule", "DestroyRule")
+    val destroyRule: String? = null,
+    @JsonNames("destroyReturnMaterial", "DestroyReturnMaterial")
+    val destroyReturnMaterial: List<Int>,
+    @JsonNames("destroyReturnMaterialCount", "DestroyReturnMaterialCount")
+    val destroyReturnMaterialCount: List<Int>,
+    @JsonNames("id", "Id")
+    override val id: Int,
+    @JsonNames("nameTextMapHash", "NameTextMapHash")
+    val nameTextMapHash: Long,
+    @JsonNames("descTextMapHash", "DescTextMapHash")
+    val descTextMapHash: Long,
+    @JsonNames("icon", "Icon")
+    val icon: String,
+    @JsonNames("itemType", "ItemType")
+    override val itemType: ItemType,
+    @JsonNames("weight", "Weight")
+    override val weight: Int,
+    @JsonNames("rank", "Rank")
+    override val rank: Int,
+    @JsonNames("gadgetId", "GadgetId")
+    override val gadgetId: Int,
+    @JsonNames("awakenMaterial", "AwakenMaterial")
+    val awakenMaterial: Int? = null,
+    @JsonNames("initialLockState", "InitialLockState")
+    val initialLockState: Int? = null,
+    @JsonNames("unRotate", "UnRotate")
+    val unRotate: Boolean? = null
+) : ItemExcelData() {
     @Serializable
     data class WeaponProp(
-        @SerialName("PropType") val propType: String,
-        @SerialName("InitValue") val initValue: Double,
-        @SerialName("Type") val type: String
+        @JsonNames("propType", "PropType")
+        val propType: String? = null,
+        @JsonNames("initValue", "InitValue")
+        val initValue: Double? = null,
+        @JsonNames("type", "Type")
+        val type: String
     )
 }

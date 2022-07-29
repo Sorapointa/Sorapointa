@@ -1,19 +1,23 @@
-import com.google.protobuf.gradle.builtins
-import com.google.protobuf.gradle.generateProtoTasks
-import com.google.protobuf.gradle.id
-import com.google.protobuf.gradle.ofSourceSet
-import com.google.protobuf.gradle.proto
-import com.google.protobuf.gradle.protobuf
+@file:Suppress("GradlePackageUpdate")
+
+import com.google.protobuf.gradle.*
+import de.fayard.refreshVersions.core.versionFor
 
 plugins {
-    id("sorapointa-conventions")
+    `sorapointa-conventions`
+    `sorapointa-publish`
     id("com.google.protobuf")
     idea
 }
 
+val prop = getRootProjectLocalProps()
+
+ext["no-utils"] = true
+
 dependencies {
     api("com.google.protobuf:protobuf-java:_")
     api("com.google.protobuf:protobuf-kotlin:_")
+    api("io.ktor:ktor-utils:_")
 }
 
 protobuf {
@@ -24,7 +28,16 @@ protobuf {
             task.builtins {
                 id("kotlin") {}
             }
+            if (prop["proto.fullCompile"] == "true") {
+                task.doFirst {
+                    delete(task.outputs)
+                }
+            }
         }
+    }
+
+    protoc {
+        artifact = "com.google.protobuf:protoc:${versionFor("version.com.google.protobuf..protoc")}"
     }
 }
 
@@ -43,4 +56,8 @@ idea {
     module {
         sourceDirs.plus(file("src/proto"))
     }
+}
+
+tasks.withType<Javadoc> {
+    exclude("**/*OuterClass*")
 }

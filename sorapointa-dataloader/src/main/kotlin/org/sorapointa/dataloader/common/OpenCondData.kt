@@ -1,9 +1,10 @@
 package org.sorapointa.dataloader.common
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class OpenCondData(
-    @SerialName("CondType") val condType: String,
-    @SerialName("ParamList") val paramList: List<Int>,
+    @JsonNames("condType", "CondType") val condType: String,
+    @JsonNames("paramList", "ParamList") val paramList: List<Int>,
 )

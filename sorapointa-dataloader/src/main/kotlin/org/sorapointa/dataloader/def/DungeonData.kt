@@ -1,31 +1,62 @@
 package org.sorapointa.dataloader.def
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
+import org.sorapointa.dataloader.DataLoader
+import org.sorapointa.dataloader.common.DungeonStateType
+import org.sorapointa.dataloader.common.ElementType
+
+private val dungeonDataLoader =
+    DataLoader<List<DungeonData>>("./ExcelBinOutput/DungeonExcelConfigData.json")
+
+val dungeonData get() = dungeonDataLoader.data
 
 @Serializable
 data class DungeonData(
-    @SerialName("Id") val id: Int,
-    @SerialName("NameTextMapHash") val nameTextMapHash: Long,
-    @SerialName("DisplayNameTextMapHash") val displayNameTextMapHash: Int,
-    @SerialName("DescTextMapHash") val descTextMapHash: Long,
-    @SerialName("Type") val type: String,
-    @SerialName("SceneId") val sceneId: Int,
-    @SerialName("InvolveType") val involveType: String,
-    @SerialName("ShowLevel") val showLevel: Int,
-    @SerialName("AvatarLimitType") val avatarLimitType: Int,
-    @SerialName("LimitLevel") val limitLevel: Int,
-    @SerialName("LevelRevise") val levelRevise: Int,
-    @SerialName("PassCond") val passCond: Int,
-    @SerialName("ReviveMaxCount") val reviveMaxCount: Int,
-    @SerialName("DayEnterCount") val dayEnterCount: Int,
-    @SerialName("RecommendElementTypes") val recommendElementTypes: List<Int>,
-    @SerialName("SettleCountdownTime") val settleCountdownTime: Long,
-    @SerialName("FailSettleCountdownTime") val failSettleCountdownTime: Int,
-    @SerialName("QuitSettleCountdownTime") val quitSettleCountdownTime: Int,
-    @SerialName("SettleShows") val settleShows: List<String>,
-    @SerialName("LevelConfigMap") val levelConfigMap: Map<Int, Int>,
-    @SerialName("CityID") val cityID: Int,
-    @SerialName("EntryPicPath") val entryPicPath: String,
-    @SerialName("StateType") val stateType: String
+    @JsonNames("id", "Id")
+    val id: Int,
+    @JsonNames("nameTextMapHash", "NameTextMapHash")
+    val nameTextMapHash: Long,
+    @JsonNames("displayNameTextMapHash", "DisplayNameTextMapHash")
+    val displayNameTextMapHash: Long,
+    @JsonNames("descTextMapHash", "DescTextMapHash")
+    val descTextMapHash: Long,
+    @JsonNames("type", "Type")
+    val type: String,
+    @JsonNames("sceneId", "SceneId")
+    val sceneId: Int,
+    @JsonNames("involveType", "InvolveType")
+    val involveType: String,
+    @JsonNames("showLevel", "ShowLevel")
+    val showLevel: Int? = null,
+    @JsonNames("avatarLimitType", "AvatarLimitType")
+    val avatarLimitType: Int? = null,
+    @JsonNames("limitLevel", "LimitLevel")
+    val limitLevel: Int? = null,
+    @JsonNames("levelRevise", "LevelRevise")
+    val levelRevise: Int? = null,
+    @JsonNames("passCond", "PassCond")
+    val passCond: Int? = null,
+    @JsonNames("reviveMaxCount", "ReviveMaxCount")
+    val reviveMaxCount: Int? = null,
+    @JsonNames("dayEnterCount", "DayEnterCount")
+    val dayEnterCount: Int? = null,
+    @JsonNames("recommendElementTypes", "RecommendElementTypes")
+    val recommendElementTypes: List<ElementType>,
+    @JsonNames("settleCountdownTime", "SettleCountdownTime")
+    val settleCountdownTime: Long,
+    @JsonNames("failSettleCountdownTime", "FailSettleCountdownTime")
+    val failSettleCountdownTime: Int,
+    @JsonNames("quitSettleCountdownTime", "QuitSettleCountdownTime")
+    val quitSettleCountdownTime: Int,
+    @JsonNames("settleShows", "SettleShows")
+    val settleShows: List<String>,
+    @JsonNames("levelConfigMap", "LevelConfigMap")
+    val levelConfigMap: Map<Int, Int>,
+    @JsonNames("cityID", "CityID")
+    val cityID: Int,
+    @JsonNames("entryPicPath", "EntryPicPath")
+    val entryPicPath: String,
+    @JsonNames("stateType", "StateType")
+    val stateType: DungeonStateType = DungeonStateType.DUNGEON_STATE_NONE
 )

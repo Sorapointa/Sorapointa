@@ -1,5 +1,7 @@
 # Core 模块
 
+[English](README.zh-CN.md)
+
 ## 命令系统
 
 命令系统基于 [**Yac**](https://githubfast.com/Colerar/Yac) ([**clikt**](https://ajalt.github.io/clikt/) 的变体)，

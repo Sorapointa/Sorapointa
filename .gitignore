@@ -6,7 +6,8 @@ build/
 !**/src/test/**/build/
 
 ### IntelliJ IDEA ###
-/.idea
+/.idea/**/*
+!/.idea/encodings.xml
 
 ### Eclipse ###
 .apt_generated
@@ -44,15 +45,22 @@ generated/
 *.log
 **/src/main/resources/logback.xml
 **/src/test/resources/logback-test.xml
+**/src/main/resources/langs/
 !sorapointa-core/src/main/resources/logback.xml
 !sorapointa-core/src/test/resources/logback-test.xml
 
 ### Resources ###
-/resources/
+/resources
 
-### Config ###
+### Build Config ###
 local.properties
 
+### Sorapointa Config & Generated Files ###
+sorapointa-core/langs/
+sorapointa-dispatch/langs/
+**/config/
+
+
 ### Database ###
-*.db
+**/*.db
 *.db-journal

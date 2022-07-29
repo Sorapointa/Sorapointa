@@ -1,90 +1,39 @@
 package org.sorapointa.utils
 
-import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import java.util.*
 import kotlin.test.assertEquals
 
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class I18nTest {
-    @BeforeEach
-    fun reloadI18nConfig(): Unit = runBlocking {
-        I18nManager.languageMap.clear()
-        I18nConfig.init()
+    private val dutchLocale get() = Locale.forLanguageTag("nl")
+
+    @Test
+    fun `test simple string lookup`() {
+        assertEquals("This is a simple test", TestBundle.message("sora.test.simple"))
     }
 
     @Test
-    fun `placeholder should be replaced`() = runBlocking {
-        I18nManager.registerLanguage(
-            LanguagePack(
-                Locale.ENGLISH,
-                strings = mapOf(
-                    "sora.test.placeholder" to "Test {0} {1}"
-                )
-            ),
-        )
-        assertEquals("Test 1 2", "sora.test.placeholder".i18n("1", "2", locale = Locale.ENGLISH))
+    fun `test simple string lookup with language override`() {
+        assertEquals("Dit is een simpele test", TestBundle.message("sora.test.simple", locale = dutchLocale))
     }
 
     @Test
-    fun lookupString() {
-        I18nManager.registerLanguage(
-            LanguagePack(
-                Locale.ENGLISH,
-                strings = mapOf(
-                    "sora.test" to "Test"
-                )
-            ),
-        )
-        assertEquals("Test", "sora.test".i18n(locale = Locale.ENGLISH))
+    fun `test string lookup for bundle that doesn't exist`() {
+        assertEquals("This is a simple test", TestBundle.message("sora.test.simple", locale = Locale.ENGLISH))
     }
 
     @Test
-    fun `variants fallback to main`() {
-        I18nManager.registerLanguage(
-            LanguagePack(
-                Locale.CHINESE,
-                strings = mapOf(
-                    "sora.test.fallback.variant" to "测试"
-                )
-            ),
-        )
-        assertEquals("测试", "sora.test.fallback.variant".i18n(locale = Locale.CHINA))
+    fun `test string lookup for string that doesn't exist in overridden locale bundle`() {
+        assertEquals("This string is in default", TestBundle.message("sora.test.english.only", locale = dutchLocale))
     }
 
     @Test
-    fun `fallback to global`() {
-        val testGlobal = Locale.ITALIAN
-
-        I18nConfig.updateData { I18nConfig.Config(testGlobal) }
-        I18nManager.registerLanguage(
-            LanguagePack(
-                testGlobal,
-                strings = mapOf(
-                    "sora.test.fallback.global" to "global"
-                )
-            ),
-        )
-
-        assertEquals("global", "sora.test.fallback.global".i18n(locale = Locale.CHINA))
+    fun `test parameterized string lookup`() {
+        assertEquals("This is a parameterized test 1 test", TestBundle.message("sora.test.parameterized", 1, "test"))
     }
 
     @Test
-    fun `fallback to default`() {
-        val testGlobal = Locale.ITALIAN
-
-        I18nConfig.updateData { I18nConfig.Config(testGlobal) }
-        I18nManager.registerLanguage(
-            LanguagePack(
-                DEFAULT_LOCALE,
-                strings = mapOf(
-                    "sora.test.fallback.default" to "default"
-                )
-            ),
-        )
-
-        assertEquals("default", "sora.test.fallback.default".i18n(locale = Locale.CHINA))
+    fun `test available locales is equal to available bundles`() {
+        assertEquals(TestBundle.availableLocales(), setOf(Locale.ENGLISH, dutchLocale)) // default locale is English
     }
 }

@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-option java_package = "org.sorapointa.proto";
-
-message GetMailItemReq {
-  repeated uint32 mail_id_list = 1;
-}
