@@ -8,6 +8,7 @@ on:
       - '**.kt'
       - '**.kts'
       - '**.proto'
+      - '.github/workflows/*.yml'
   pull_request:
     branches:
       - '*'
@@ -15,6 +16,7 @@ on:
       - '**.kt'
       - '**.kts'
       - '**.proto'
+      - '.github/workflows/*.yml'
 
 jobs:
 
