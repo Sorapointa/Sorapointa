@@ -16,6 +16,8 @@ import org.sorapointa.command.CommandManager
 import org.sorapointa.command.ConsoleCommandSender
 import org.sorapointa.command.defaults.defaultsCommand
 import org.sorapointa.config.*
+import org.sorapointa.config.registeredConfig
+import org.sorapointa.config.registeredDatabaseTable
 import org.sorapointa.console.Console
 import org.sorapointa.console.setupConsoleClient
 import org.sorapointa.console.setupWebConsoleServer
@@ -23,7 +25,10 @@ import org.sorapointa.data.provider.DatabaseManager
 import org.sorapointa.dataloader.ResourceHolder
 import org.sorapointa.event.EventManager
 import org.sorapointa.task.TaskManager
-import org.sorapointa.utils.*
+import org.sorapointa.utils.ModuleScope
+import org.sorapointa.utils.absPath
+import org.sorapointa.utils.addShutdownHook
+import org.sorapointa.utils.globalWorkDirectory
 import java.io.File
 import kotlin.system.exitProcess
 import kotlin.system.measureTimeMillis

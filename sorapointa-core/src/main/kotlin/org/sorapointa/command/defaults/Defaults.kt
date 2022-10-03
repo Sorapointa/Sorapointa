@@ -1,8 +1,14 @@
 package org.sorapointa.command.defaults
 
-import org.sorapointa.command.*
-import org.sorapointa.command.defaults.console.*
-import org.sorapointa.command.defaults.general.*
+import org.sorapointa.command.AbstractCommandNode
+import org.sorapointa.command.CommandNode
+import org.sorapointa.command.ConsoleCommandNode
+import org.sorapointa.command.defaults.console.ConsoleUser
+import org.sorapointa.command.defaults.console.Quit
+import org.sorapointa.command.defaults.general.Help
+import org.sorapointa.command.defaults.general.ListPlayer
+import org.sorapointa.command.defaults.general.LocaleCommand
+import org.sorapointa.command.defaults.general.Version
 
 val defaultsCommand: List<AbstractCommandNode<*>> = listOf(
     CommandNode(Help) { sender -> Help(sender) },
