@@ -28,6 +28,10 @@ import org.sorapointa.dispatch.data.ClientCustomConfig
 import org.sorapointa.dispatch.data.DispatchKeyDataTable
 import org.sorapointa.dispatch.data.RegionListClientCustomConfig
 import org.sorapointa.dispatch.plugins.*
+import org.sorapointa.dispatch.plugins.configureHTTP
+import org.sorapointa.dispatch.plugins.configureMonitoring
+import org.sorapointa.dispatch.plugins.configureRouting
+import org.sorapointa.dispatch.plugins.configureStatusPage
 import org.sorapointa.dispatch.utils.KeyProvider
 import org.sorapointa.utils.*
 import org.sorapointa.utils.encoding.hex

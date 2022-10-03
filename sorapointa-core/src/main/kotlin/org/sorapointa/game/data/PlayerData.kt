@@ -236,11 +236,9 @@ interface PlayerData : GuidEntity {
 
     val friendList: List<Int>
 
-    val daysSinceLastLogin
-        get() = (now() - lastActiveTime).inWholeDays
+    val daysSinceLastLogin get() = (now() - lastActiveTime).inWholeDays
 
-    val isFirstLoginToday
-        get() = lastActiveTime < todayStartTime
+    val isFirstLoginToday get() = lastActiveTime < todayStartTime
 
     override fun getNextGuid(): Long {
         val nextGuid = ++guidCounter
@@ -291,6 +289,7 @@ class PlayerDataImpl(id: EntityID<Int>) : Entity<Int>(id), PlayerData {
 
     override var sceneId by PlayerDataTable.sceneId
 
+    /* ktlint-disable max-line-length */
     override var maxSpringVolume by PlayerDataTable.maxSpringVolume playerProp PROP_MAX_SPRING_VOLUME
     override var curSpringVolume by PlayerDataTable.curSpringVolume playerProp PROP_CUR_SPRING_VOLUME
     override var isSpringAutoUse by PlayerDataTable.isSpringAutoUse playerProp PROP_IS_SPRING_AUTO_USE
@@ -313,98 +312,96 @@ class PlayerDataImpl(id: EntityID<Int>) : Entity<Int>(id), PlayerData {
     override var isHasFirstShare by PlayerDataTable.isHasFirstShare playerProp PROP_IS_HAS_FIRST_SHARE
     override var playerForgePoint by PlayerDataTable.playerForgePoint playerProp PROP_PLAYER_FORGE_POINT
     override var worldLevelAdjustCD by PlayerDataTable.worldLevelAdjustCD playerProp PROP_PLAYER_WORLD_LEVEL_ADJUST_CD
-    override var legendaryDailyTaskSum
-        by PlayerDataTable.legendaryDailyTaskSum playerProp PROP_PLAYER_LEGENDARY_DAILY_TASK_NUM
-        override var homeCoin by PlayerDataTable.homeCoin playerProp PROP_PLAYER_HOME_COIN
+    override var legendaryDailyTaskSum by PlayerDataTable.legendaryDailyTaskSum playerProp PROP_PLAYER_LEGENDARY_DAILY_TASK_NUM
+    override var homeCoin by PlayerDataTable.homeCoin playerProp PROP_PLAYER_HOME_COIN
+    /* ktlint-enable max-line-length */
 
-        override val inventory = SQLDatabaseMap(id, InventoryTable)
-        override val openStateSet = SQLDatabaseSet(id, OpenStateSetTable)
-        override val flyCloakSet = SQLDatabaseSet(id, FlyCloakSetTable)
-        override val nameCardSet = SQLDatabaseSet(id, NameCardSetTable)
-        override val costumeSet = SQLDatabaseSet(id, CostumeSetTable)
-        override val friendList
-            get() = PlayerFriendRelationTable.findPlayerFriendList(uid)
+    override val inventory = SQLDatabaseMap(id, InventoryTable)
+    override val openStateSet = SQLDatabaseSet(id, OpenStateSetTable)
+    override val flyCloakSet = SQLDatabaseSet(id, FlyCloakSetTable)
+    override val nameCardSet = SQLDatabaseSet(id, NameCardSetTable)
+    override val costumeSet = SQLDatabaseSet(id, CostumeSetTable)
+    override val friendList
+        get() = PlayerFriendRelationTable.findPlayerFriendList(uid)
 
-        override fun getNextGuid(): Long {
-            val nextGuid = ++guidCounter
-            return (id.value.toLong() shl 32) + nextGuid
-        }
-
-        private infix fun <T> Column<T>.playerProp(playerProp: PlayerProp?) =
-            SQLPropDelegate(this@PlayerDataImpl, this, playerProp) { prop, value ->
-                val player = player ?: return@SQLPropDelegate
-                val converted = when (value) {
-                    is Number -> value.toLong()
-                    is Boolean -> value.toInt().toLong()
-                    is ProtocolMessageEnum -> value.number.toLong()
-                    else -> error("Could not convert $prop value $value to long")
-                }
-                player.impl().sendPacketAsync(
-                    PlayerPropNotifyPacket(
-                        player = player,
-                        propMap = mapOf(prop map converted)
-                    )
-                )
-            }
+    override fun getNextGuid(): Long {
+        val nextGuid = ++guidCounter
+        return (id.value.toLong() shl 32) + nextGuid
     }
 
-    @Suppress("NOTHING_TO_INLINE")
-    inline fun CompoundAvatarTeamData(initAvatarGuid: Long = 0) =
-        CompoundAvatarTeamData(
-            teamMap = hashMapOf(
-                1 to CompoundAvatarTeamData.AvatarTeamData(
-                    teamName = "Default",
-                    avatarGuidList = listOf(initAvatarGuid)
+    private infix fun <T> Column<T>.playerProp(playerProp: PlayerProp?) =
+        SQLPropDelegate(this@PlayerDataImpl, this, playerProp) { prop, value ->
+            val player = player ?: return@SQLPropDelegate
+            val converted = when (value) {
+                is Number -> value.toLong()
+                is Boolean -> value.toInt().toLong()
+                is ProtocolMessageEnum -> value.number.toLong()
+                else -> error("Could not convert $prop value $value to long")
+            }
+            player.impl().sendPacketAsync(
+                PlayerPropNotifyPacket(
+                    player = player,
+                    propMap = mapOf(prop map converted)
                 )
             )
+        }
+}
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun CompoundAvatarTeamData(initAvatarGuid: Long = 0) = CompoundAvatarTeamData(
+    teamMap = hashMapOf(
+        1 to CompoundAvatarTeamData.AvatarTeamData(
+            teamName = "Default",
+            avatarGuidList = listOf(initAvatarGuid)
         )
+    )
+)
 
-    @Serializable
-    data class CompoundAvatarTeamData(
-        val teamMap: Map<Int, AvatarTeamData>,
-    ) {
+@Serializable
+data class CompoundAvatarTeamData(
+    val teamMap: Map<Int, AvatarTeamData>,
+) {
 
-        val protoTeamMap by lazy {
-            teamMap.map { it.key to it.value.toProto() }.toMap()
-        }
-
-        @Serializable
-        data class AvatarTeamData(
-            val teamName: String,
-            val avatarGuidList: List<Long>
-        ) {
-
-            fun toProto() =
-                avatarTeam {
-                    teamName = this@AvatarTeamData.teamName
-                    avatarGuidList.addAll(this@AvatarTeamData.avatarGuidList)
-                }
-        }
+    val protoTeamMap by lazy {
+        teamMap.map { it.key to it.value.toProto() }.toMap()
     }
 
     @Serializable
-    data class ProfilePictureData(
-        val avatarId: Int,
-        val costumeId: Int? = null
+    data class AvatarTeamData(
+        val teamName: String,
+        val avatarGuidList: List<Long>
     ) {
 
         fun toProto() =
-            profilePicture {
-                avatarId = this@ProfilePictureData.avatarId
-                costumeId = this@ProfilePictureData.costumeId ?: 0
+            avatarTeam {
+                teamName = this@AvatarTeamData.teamName
+                avatarGuidList.addAll(this@AvatarTeamData.avatarGuidList)
             }
     }
+}
 
-    @Serializable
-    data class PlayerBirthday(
-        val month: Int,
-        val day: Int
-    ) {
+@Serializable
+data class ProfilePictureData(
+    val avatarId: Int,
+    val costumeId: Int? = null
+) {
 
-        fun toProto() =
-            birthday {
-                month = this@PlayerBirthday.month
-                day = this@PlayerBirthday.day
-            }
-    }
-    
+    fun toProto() =
+        profilePicture {
+            avatarId = this@ProfilePictureData.avatarId
+            costumeId = this@ProfilePictureData.costumeId ?: 0
+        }
+}
+
+@Serializable
+data class PlayerBirthday(
+    val month: Int,
+    val day: Int
+) {
+
+    fun toProto() =
+        birthday {
+            month = this@PlayerBirthday.month
+            day = this@PlayerBirthday.day
+        }
+}
