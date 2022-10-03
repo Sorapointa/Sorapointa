@@ -1,6 +1,7 @@
 name: Test
 
 on:
+  workflow_dispatch:
   push:
     branches: [ master ]
     paths:
@@ -18,9 +19,7 @@ on:
 jobs:
 
   build:
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
 
@@ -28,10 +27,11 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'adopt'
 
-      - name: Check
-        uses: gradle/gradle-build-action@v2
+      - uses: burrunan/gradle-cache-action@v1
+        name: Checker
         with:
+          job-id: checker
           arguments: ktlintCheck test
-          gradle-version: 7.4.2
+          gradle-version: wrapper
