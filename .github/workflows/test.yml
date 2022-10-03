@@ -30,14 +30,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Format Check
+      - name: Check
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: ktlintCheck
-          gradle-version: 7.4.2
-
-      - name: Test Check
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: test
+          arguments: ktlintCheck test
           gradle-version: 7.4.2
