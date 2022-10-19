@@ -1,7 +1,4 @@
-import org.apache.commons.io.FileUtils
-import org.gradle.internal.os.OperatingSystem
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
-import java.nio.file.Files
 
 plugins {
     kotlin("plugin.serialization") apply false
@@ -36,15 +33,4 @@ allprojects {
     version = "0.1.0-SNAPSHOT"
 }
 
-fun installGitHooks() {
-    val target = File(project.rootProject.rootDir, ".git/hooks")
-    val source = File(project.rootProject.rootDir, ".git-hooks")
-    if (target.canonicalFile == source) return
-    target.deleteRecursively()
-    if (OperatingSystem.current().isWindows) {
-        FileUtils.copyDirectory(source, target)
-    } else {
-        Files.createSymbolicLink(target.toPath(), source.toPath())
-    }
-}
 installGitHooks()
