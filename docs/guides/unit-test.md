@@ -1,6 +1,6 @@
 # JUnit Guideline
 
-[简体中文](unittest.zh-CN.md)
+[简体中文](unit-test.zh-CN.md)
 
 [JUnit Official User Guide](https://junit.org/junit5/docs/current/user-guide/)
 

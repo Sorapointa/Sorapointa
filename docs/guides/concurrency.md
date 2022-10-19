@@ -13,7 +13,7 @@ If you must share mutable data,
 use a thread-safe data structure such as Atomic, 
 Sorapointa has already used the AtomicFU framework.
 
-About AtmoicFU，please refers to [AtomicFU Guideline](kotlin-atomicfu.md)
+About AtomicFU，please refers to [AtomicFU Guideline](kotlin-atomicfu.md)
 
 But for collections, 
 we usually use `ConcurrentHashMap` or some similar thread-safe data structures
@@ -74,7 +74,7 @@ try using the simple Mutex.
 
 But before using Mutex or more complex thread-safe mechanism,
 first think about whether I can accept the risk of problems occurring
-(e.g., the primogem operation is very sensitive to
+(e.g., the [Primogem](https://genshin-impact.fandom.com/wiki/Primogem)-related operation is very sensitive to
 But repeatedly rewriting insertDefault
 or repeatedly starting some coroutines because of high concurrency.
 This cost is affordable.)
@@ -90,7 +90,7 @@ In Kotlin Coroutine, some types of lock (such as Mutex) that is thread-bind,
 would easily cause the deadlock issue.
 
 We highly recommend you to use `withReentrantLock` method located in `sorapointa-utils` module,
-to keep the mutex lock consistentency in the coroutine context.
+to keep the mutex lock consistency in the coroutine context.
 
 Please refer to [Phantom of the Coroutine](https://elizarov.medium.com/phantom-of-the-coroutine-afc63b03a131)
 

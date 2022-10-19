@@ -24,55 +24,56 @@ alt="Apache 2.0 Open Source License"/></a><a
 href="https://s01.oss.sonatype.org/content/repositories/snapshots/moe/sdl/sorapointa/"><img 
 src="https://img.shields.io/nexus/s/moe.sdl.sorapointa/sorapointa-core?logo=apache-maven&label=Maven%20Dev&server=https%3A%2F%2Fs01.oss.sonatype.org&style=for-the-badge" 
 alt="Maven Developer"/></a>
-
-<div align="center"><a href="https://discord.gg/MRadGNhqce"><img alt="Discord - Sorapointa" src="https://img.shields.io/discord/976764233029140550?label=Discord&logo=discord&style=for-the-badge"></a></div>
+</p>
 
 <!--Content-->
 
-English | [简体中文](README.zh-CN.MD)
+[English](README.md) | 简体中文
 
-**WIP**: This project is under active development, you can take a part in contributing, but most of the features is
-unavailable.
+**WIP**: 该项目正被积极开发，你可以参与贡献，但大多数功能不可用。
 
-## Name
+## 名称
 
-As you see, our project name is **Sorapointa**. This name was inspired from Java well-known `NullPointerException`.
-We translated `NullPointer` to Japanese and phoneticized it in English.
+如你所见，我们的项目名为 **Sorapointa**。这来自于 `Java` 中闻名的 `NullPointerException`。
+我们将 `NullPointer` 日语化再以英语拟音，得到了这个名字。
 
-Sorapointa is aim to reduce runtime-error, write readable, easy-to-maintain code。So, **Sorapointa avoid Sorapointa**.
+Sorapointa 旨在减少运行时错误，编写可读性高、易于维护的代码。因此，**Sorapointa 避免 Sorapointa**。
 
-Sorapointa can be written as the Chinese equivalent of "空想家", but in any case, please read it as <ruby>Sorapointa<rt>
-ソラポインタ</rt></ruby>
+Sorapointa 可以写成对应的汉字「空想家」，但无论如何，请你读作 <ruby>Sorapointa<rt>ソラポインタ</rt></ruby>
 
 ## Build
 
-Requirement:
+需要:
 
 - JDK 17
 
 ```shell
 ./gradlew shadowJar
-# if you want to run test
+# 如果你想运行测试
 ./gradlew test
 ```
 
-### Available Build Configs
+### 可用的构建选项
 
-Create `local.properties` in project root and edit it. Config uses Java `.properties` format.
+在项目根目录创建 `local.properties` 并编辑。配置使用 Java `.properties` 格式。
 
-| key                    | description                     | available value        |
-|------------------------|---------------------------------|------------------------|
-| `database.default`     | default database for new config | `SQLITE`, `POSTGRESQL` |
-| `database.driver.list` | database drivers to build       | `SQLITE`, `POSTGRESQL` |
-| `proto.fullCompile`    | do full compile for proto       | `true`                 |
+| key                    | 描述                     | 可用值                    |
+|------------------------|-------------------------|------------------------|
+| `database.default`     | 为新配置填充的默认数据库    | `SQLITE`, `POSTGRESQL` |
+| `database.driver.list` | 构建将提供的数据库驱动列表  | `SQLITE`, `POSTGRESQL` |
+| `proto.fullCompile`    | 为 proto 开启全量编译     | `true`                 |
 
-Example:
+示例：
 
 ```properties
 database.default=SQLITE
 database.driver.list=SQLITE,POSTGRESQL
 proto.fullCompile=true
 ```
+
+## Contributing
+
+参见：[CONTRIBUTING](CONTRIBUTING.zh-CN.md)，以及对应模块的 README。
 
 ## Thanks
 

@@ -17,7 +17,6 @@
 - 一般而言**活跃分支**指的是 `dev` 开发分支
 - 在**活跃分支**上进行修改必须通过其他分支提交 PR 并通过所有的 CI 检查
 
-
 ### Push 规范
 
 - 若您希望在**活跃分支**上提交您的修改，则**必须通过其他分支**提交 PR 并**通过所有的 CI 检查**
@@ -33,7 +32,6 @@
 - 将 PR 合并时，应该酌情使用不同的合并方式
   - 如大修改，一般考虑 `merge` 或者 `squash`
   - 小修改一般考虑 `rebase`
-
 
 ### 关于不兼容性修改与同步上游更新
 
@@ -54,29 +52,23 @@
   - `类型` 字段无论用缩写或全称都可行。
 - 用 `#issue 编号` 提及相关的 issue，便于跟踪
 
-  可以使用 IDEA Git Message 插件自动生成
+可以使用 [IDEA Conventional Commits](https://plugins.jetbrains.com/plugin/13389-conventional-commit)
+插件智能补全:
 
-  [![](https://user-images.githubusercontent.com/25319400/165979933-7481d332-9171-4ee1-8d37-078187f152a0.png)](https://plugins.jetbrains.com/plugin/13477-git-commit-message-helper)
+[![](https://user-images.githubusercontent.com/62297254/196744218-e6bad849-5307-4761-a8b6-baa147c1852b.png)](https://plugins.jetbrains.com/plugin/13389-conventional-commit)
 
-  另可参考：[Commit Message 和 Change Log 编写指南](https://www.ruanyifeng.com/blog/2016/01/commit_message_change_log.html)
+另可参考:
 
+- [约定式提交 v1.0.0](https://www.conventionalcommits.org/zh-hans/v1.0.0/)
+- [Commit Message 和 Change Log 编写指南](https://www.ruanyifeng.com/blog/2016/01/commit_message_change_log.html)
 
-## 单元测试(建议)
+## 更多文档
 
-[关于单元测试](docs/unittest.md)
-
-- 尽量写单测保证代码可靠性。
-- 与此同时，如果你提交的 PR 无法通过 CI 中的单元测试，将无法并入活跃分支
-
-## 并发安全
-
-请查看 [AtomicFU 指南](docs/kotlin-atomicfu.zh-CN.md) 以及 [关于并发安全](docs/concurrency.zh-CN.md)
-
-## 数据库安全
-
-请查看 [关于数据库操作安全](docs/database.zh-CN.md)
-
-## 其他…
-
-请查看 [docs](docs) 
-
+- [关于单元测试](guides/unit-test.zh-CN.md)
+  - 尽量写单测保证代码可靠性。
+  - 与此同时，如果你提交的 PR 无法通过 CI 中的单元测试，将无法并入活跃分支
+- 关于并发安全
+  - [AtomicFU 指南](guides/kotlin-atomicfu.zh-CN.md)
+  - [关于并发安全](guides/concurrency.zh-CN.md)
+- [关于数据库操作安全](guides/database.zh-CN.md)
+- 其他: 请参见 [guides](./guides)
