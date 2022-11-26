@@ -99,8 +99,7 @@ object EventManager {
     suspend fun broadcastEvent(event: Event): Boolean {
         var isCancelled by atomic(false)
         var isIntercepted by atomic(false)
-        val eventName = event::class.simpleName
-        logger.trace { "Try to broadcast event $eventName" }
+        logger.trace { "Try to broadcast event ${event::class.simpleName}" }
         registeredListener.forEach { (priority, pListener) ->
             eventScope.launch {
                 pListener.forEach { listener ->
@@ -125,11 +124,11 @@ object EventManager {
                 }
             }
             if (isIntercepted) {
-                logger.debug { "Event $eventName has been intercepted" }
+                logger.debug { "Event ${event::class.simpleName} has been intercepted" }
                 return isCancelled
             }
         }
-        if (isCancelled) logger.debug { "Broadcasted event $eventName, has been cancelled" }
+        if (isCancelled) logger.debug { "Broadcasted event ${event::class.simpleName}, has been cancelled" }
         return isCancelled
     }
 
