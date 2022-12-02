@@ -6,5 +6,5 @@ plugins {
 
 dependencies {
     api(KotlinX.serialization.json)
-    api("net.mamoe.yamlkt:yamlkt:_")
+    api("com.charleskorn.kaml:kaml:_")
 }

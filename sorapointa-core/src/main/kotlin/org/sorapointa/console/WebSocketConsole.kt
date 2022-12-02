@@ -60,8 +60,7 @@ internal object CommandEndResp : WebConsolePacket()
 internal class MessageNotify(val message: String) : WebConsolePacket()
 
 internal object ConsoleUsers : DataFilePersist<ConsoleUsers.Data>(
-    File(configDirectory, "consoleUsers.json"),
-    Data()
+    File(configDirectory, "consoleUsers.json"), Data(), Data.serializer(),
 ) {
     @Serializable
     data class Data(

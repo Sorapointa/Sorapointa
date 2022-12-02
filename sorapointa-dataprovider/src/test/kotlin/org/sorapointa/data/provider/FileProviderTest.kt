@@ -2,6 +2,7 @@ package org.sorapointa.data.provider
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.serializer
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.sorapointa.utils.prettyJson
@@ -22,7 +23,7 @@ class FileProviderTest {
 
         val file = File("./tmp/read-only-provider-test.json")
         file.apply { if (exists()) delete() }
-        val config = DataFilePersist(file, TestConfig())
+        val config = DataFilePersist(file, TestConfig(), serializer())
         config.init()
         println(config.data)
     }
@@ -38,7 +39,7 @@ class FileProviderTest {
         val file = File("./tmp/auto-save-provider-test.json")
         file.apply { if (exists()) delete() }
         val config = AutoSaveFilePersist(
-            file, TestConfig(),
+            file, TestConfig(), serializer(),
             saveInterval = 30.toDuration(DurationUnit.MILLISECONDS),
         )
         config.init()
@@ -61,7 +62,12 @@ class FileProviderTest {
 
         val file = File("./tmp/auto-save-provider-test.json")
         file.apply { if (exists()) delete() }
-        val config = AutoLoadFilePersist(file, AutoLoadData(), scanInterval = 30.toDuration(DurationUnit.MILLISECONDS))
+        val config = AutoLoadFilePersist(
+            file,
+            AutoLoadData(),
+            serializer(),
+            scanInterval = 30.toDuration(DurationUnit.MILLISECONDS)
+        )
         config.init()
         println(config.data)
         val writeJson = """

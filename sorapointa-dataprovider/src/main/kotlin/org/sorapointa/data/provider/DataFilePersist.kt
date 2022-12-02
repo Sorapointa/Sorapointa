@@ -1,16 +1,12 @@
 package org.sorapointa.data.provider
 
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.update
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.StringFormat
-import kotlinx.serialization.serializer
 import org.sorapointa.utils.*
 import java.io.File
-import kotlin.reflect.full.createType
 
 private val logger = mu.KotlinLogging.logger { }
 
@@ -20,31 +16,21 @@ private val logger = mu.KotlinLogging.logger { }
  * @param default the default value
  * @see FilePersist
  */
-@Suppress("UNCHECKED_CAST", "MemberVisibilityCanBePrivate")
+@Suppress("MemberVisibilityCanBePrivate")
 open class DataFilePersist<T : Any>(
     final override val file: File,
     default: T,
+    protected val serializer: KSerializer<T>,
     override val format: StringFormat = prettyJson,
     final override val scope: CoroutineScope =
-        ModuleScope("DataFilePersist", dispatcher = Dispatchers.IO)
+        ModuleScope("DataFilePersist", dispatcher = Dispatchers.IO),
 ) : FilePersist<T> {
-
     protected val clazz = default::class
-
-    protected val serializer: KSerializer<Any?> = serializer(clazz.createType())
 
     protected val mutex = Mutex()
 
-    @Suppress("PropertyName")
-    @SorapointaInternal val _data = atomic(default)
-
-    final override val data: T by _data
-
-    init {
-        clazz.requireSerializable()
-    }
-
-    inline fun updateData(update: (T) -> T) = _data.update(update)
+    @Volatile
+    final override var data: T = default
 
     override suspend fun init(): Unit =
         withContext(scope.coroutineContext) {
@@ -72,11 +58,8 @@ open class DataFilePersist<T : Any>(
             }
             mutex.withLock {
                 val json = file.readTextBuffered()
-                val t = (
-                    format.decodeFromString(serializer, json) as? T
-                        ?: error("Failed to cast Any? to ${clazz.qualifiedOrSimple}")
-                    )
-                updateData { t }
+                val t = format.decodeFromString(serializer, json)
+                data = t
                 t.also {
                     logger.debug { "Loaded data: ${it::class.qualifiedOrSimple}" }
                     logger.trace { "Data content $it" }

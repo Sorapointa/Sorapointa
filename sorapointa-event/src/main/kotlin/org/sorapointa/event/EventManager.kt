@@ -2,6 +2,7 @@
 
 package org.sorapointa.event
 
+import com.charleskorn.kaml.YamlComment
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -11,11 +12,10 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import mu.KotlinLogging
-import net.mamoe.yamlkt.Comment
-import net.mamoe.yamlkt.Yaml
 import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.utils.ModuleScope
 import org.sorapointa.utils.configDirectory
+import org.sorapointa.utils.lenientYaml
 import java.io.File
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.coroutines.CoroutineContext
@@ -287,14 +287,14 @@ suspend inline fun <T : Event> T.broadcast() {
 }
 
 object EventManagerConfig : DataFilePersist<EventManagerConfig.Data>(
-    File(configDirectory, "eventManagerConfig.yaml"), Data(), Yaml,
+    File(configDirectory, "eventManagerConfig.yaml"), Data(), Data.serializer(), lenientYaml,
 ) {
 
     @kotlinx.serialization.Serializable
     data class Data(
-        @Comment("Single event listener timeout in ms")
+        @YamlComment("Single event listener timeout in ms")
         val blockListenerTimeout: Long = 1000 * 30L,
-        @Comment("All event listeners timeout in ms")
+        @YamlComment("All event listeners timeout in ms")
         val waitingAllBlockListenersTimeout: Long = 3 * blockListenerTimeout
     )
 }
