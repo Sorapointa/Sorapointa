@@ -1,6 +1,7 @@
 package org.sorapointa.utils
 
 import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.YamlConfiguration
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import org.junit.jupiter.api.Test
@@ -19,15 +20,17 @@ class YamlCompatible {
             val yyyyy: String = "123123",
         )
 
-        val before = Yaml.default.encodeToString(Field1.serializer(), Field1())
+        Yaml(configuration = YamlConfiguration())
+
+        val before = lenientYaml.encodeToString(Field1.serializer(), Field1())
 
         println(before)
 
-        val after = Yaml.default.decodeFromString<Field2>(before)
+        val after = lenientYaml.decodeFromString<Field2>(before)
 
         println(after)
 
-        val reEncode = Yaml.default.encodeToString(Field2.serializer(), after)
+        val reEncode = lenientYaml.encodeToString(Field2.serializer(), after)
 
         println(reEncode)
     }
@@ -44,6 +47,6 @@ class YamlCompatible {
             yyyyy: 123123
         """.trimIndent()
 
-        Yaml.default.decodeFromString(Field1.serializer(), input).also(::println)
+        lenientYaml.decodeFromString(Field1.serializer(), input).also(::println)
     }
 }

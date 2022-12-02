@@ -1,12 +1,12 @@
 package org.sorapointa.data.provider
 
-import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlComment
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.sorapointa.config.DbMeta
 import org.sorapointa.utils.absPath
 import org.sorapointa.utils.configDirectory
+import org.sorapointa.utils.lenientYaml
 import org.sorapointa.utils.resolveWorkDirectory
 import java.io.File
 import java.sql.Connection.*
@@ -35,7 +35,7 @@ enum class DatabaseType {
 }
 
 object DatabaseConfig : DataFilePersist<DatabaseConfig.Data>(
-    File(configDirectory, "databaseConfig.yaml"), Data(), Data.serializer(), Yaml.default,
+    File(configDirectory, "databaseConfig.yaml"), Data(), Data.serializer(), lenientYaml,
 ) {
     @Serializable
     data class Data(

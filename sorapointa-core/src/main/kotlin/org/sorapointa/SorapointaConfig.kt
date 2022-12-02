@@ -1,17 +1,17 @@
 package org.sorapointa
 
-import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlComment
 import kotlinx.datetime.TimeZone
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.utils.configDirectory
+import org.sorapointa.utils.lenientYaml
 import java.io.File
 import kotlin.time.Duration
 
 object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
-    File(configDirectory, "sorapointaConfig.yaml"), Data(), Data.serializer(), Yaml.default
+    File(configDirectory, "sorapointaConfig.yaml"), Data(), Data.serializer(), lenientYaml
 ) {
 
     @Serializable

@@ -1,6 +1,5 @@
 package org.sorapointa.dispatch
 
-import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlComment
 import com.password4j.types.Argon2
 import io.ktor.client.*
@@ -123,7 +122,7 @@ private val QUERY_CURR_RSA_PUB_KEY =
 
 @SorapointaInternal
 object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
-    File(configDirectory, "dispatchConfig.yaml"), Data(), Data.serializer(), Yaml.default,
+    File(configDirectory, "dispatchConfig.yaml"), Data(), Data.serializer(), lenientYaml,
 ) {
 
     @Serializable

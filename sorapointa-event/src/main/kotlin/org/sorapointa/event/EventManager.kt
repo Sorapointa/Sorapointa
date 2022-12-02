@@ -2,7 +2,6 @@
 
 package org.sorapointa.event
 
-import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlComment
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.channels.Channel
@@ -16,6 +15,7 @@ import mu.KotlinLogging
 import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.utils.ModuleScope
 import org.sorapointa.utils.configDirectory
+import org.sorapointa.utils.lenientYaml
 import java.io.File
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.coroutines.CoroutineContext
@@ -287,7 +287,7 @@ suspend inline fun <T : Event> T.broadcast() {
 }
 
 object EventManagerConfig : DataFilePersist<EventManagerConfig.Data>(
-    File(configDirectory, "eventManagerConfig.yaml"), Data(), Data.serializer(), Yaml.default,
+    File(configDirectory, "eventManagerConfig.yaml"), Data(), Data.serializer(), lenientYaml,
 ) {
 
     @kotlinx.serialization.Serializable

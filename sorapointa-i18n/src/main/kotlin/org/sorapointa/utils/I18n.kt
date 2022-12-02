@@ -1,6 +1,5 @@
 package org.sorapointa.utils
 
-import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlComment
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -23,7 +22,7 @@ interface LocaleAble {
 
 @SorapointaInternal
 object I18nConfig : DataFilePersist<I18nConfig.Config>(
-    File(configDirectory, "i18n.yaml"), Config(), Config.serializer(), Yaml.default,
+    File(configDirectory, "i18n.yaml"), Config(), Config.serializer(), lenientYaml,
 ) {
     @Serializable
     data class Config(
