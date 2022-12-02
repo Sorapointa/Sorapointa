@@ -1,12 +1,9 @@
 package org.sorapointa.data.provider
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.StringFormat
 import java.io.File
-import kotlin.reflect.KClass
-import kotlin.reflect.full.hasAnnotation
 
 /**
  * Local file data persist storage
@@ -45,11 +42,4 @@ interface FilePersist<T : Any> {
      * Some subclasses can automatically save data, for example [AutoSaveFilePersist]
      */
     suspend fun save(saveData: T = data!!)
-}
-
-internal fun KClass<*>.isSerializable() =
-    hasAnnotation<Serializable>() || hasAnnotation<Contextual>()
-
-internal fun KClass<*>.requireSerializable() {
-    require(isSerializable()) { "Class $qualifiedName is not @Serializable or @Contextual" }
 }

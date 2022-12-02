@@ -19,7 +19,6 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-reflect:_")
 
-    implementation(KotlinX.serialization.json)
     implementation("org.jetbrains.kotlinx:atomicfu:_")
     // Database
     api("org.jetbrains.exposed:exposed-core:_")

@@ -1,32 +1,28 @@
 package org.sorapointa
 
+import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.YamlComment
 import kotlinx.datetime.TimeZone
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.mamoe.yamlkt.Comment
-import net.mamoe.yamlkt.Yaml
 import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.utils.configDirectory
 import java.io.File
 import kotlin.time.Duration
 
 object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
-    File(configDirectory, "sorapointaConfig.yaml"), Data(), format = Yaml
+    File(configDirectory, "sorapointaConfig.yaml"), Data(), Data.serializer(), Yaml.default
 ) {
 
     @Serializable
     data class Data(
-        @Comment("Game server network setting")
+        @YamlComment("Game server network setting")
         val networkSetting: NetworkSetting = NetworkSetting(),
-        @Comment("Player inventory store limits")
+        @YamlComment("Player inventory store limits")
         val inventoryLimits: InventoryLimits = InventoryLimits(),
-        @Comment(
-            """
-            Run sorapointa with dispatch server, sorapointa allow you to run them separately
-        """
-        )
+        @YamlComment("Run sorapointa with dispatch server, sorapointa allow you to run them separately")
         val startWithDispatch: Boolean = true,
-        @Comment("Use current region info for login rsp")
+        @YamlComment("Use current region info for login rsp")
         val useCurrentRegionForLoginRsp: Boolean = true,
         val offsetHours: Int = 4,
         @SerialName("timeZone")
@@ -49,16 +45,14 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
 
     @Serializable
     data class NetworkSetting(
-        @Comment("Game server bind port")
+        @YamlComment("Game server bind port")
         val bindPort: Int = 22101,
-        @Comment("Auto disconnect session if client dosen't send `PingReq` in specified time")
+        @YamlComment("Auto disconnect session if client dosen't send `PingReq` in specified time")
         @SerialName("pingTimeout")
         private val _pingTimeout: String = "20s",
-        @Comment(
-            """
-            Game server kcp setting, don't change those settings if you don't know about KCP
-            See more: https://github.com/skywind3000/kcp
-        """
+        @YamlComment(
+            "Game server kcp setting, don't change those settings if you don't know about KCP",
+            "See more: https://github.com/skywind3000/kcp",
         )
         val uKcpSetting: UKcpSetting = UKcpSetting()
     ) {

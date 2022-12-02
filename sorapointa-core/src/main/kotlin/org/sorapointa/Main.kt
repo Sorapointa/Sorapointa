@@ -141,12 +141,15 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
     private fun setupRegisteredConfigs(): Job =
         scope.launch {
             logger.info { "Loading Sorapointa configs..." }
-            registeredConfig.map {
-                launch {
-                    it.init()
-                    it.save()
-                }
-            }.joinAll()
+            val ms = measureTimeMillis {
+                registeredConfig.map {
+                    launch {
+                        it.init()
+                        it.save()
+                    }
+                }.joinAll()
+            }
+            logger.info { "Costed $ms ms for loading all configs" }
         }
 
     private fun setupDataloader(): Job {
