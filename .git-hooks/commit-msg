@@ -6,7 +6,7 @@ INPUT_FILE=$1
 
 START_LINE=$(head -n1 "$INPUT_FILE")
 
-PATTERN="^(#[0-9]+ )?(feat(ure)?|fix|docs|style|refactor|ci|chore|pref|build|test|revert)(\(.+\))?: .+$"
+PATTERN="^(#[0-9]+ )?(feat(ure)?|fix|docs|style|refactor|ci|chore|perf|build|test|revert)(\(.+\))?: .+$"
 
 if [ "${#START_LINE}" -gt "72" ]; then
   echo "Message too long! Assert length <= 72."
