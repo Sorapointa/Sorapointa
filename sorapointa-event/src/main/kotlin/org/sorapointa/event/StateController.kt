@@ -41,7 +41,7 @@ interface WithState<out T : Enum<*>> {
     val state: T
 
     /**
-     * This method would be called when this state starts
+     * This method will be called when this state starts
      *
      * @see StateController.setState
      */
@@ -49,7 +49,7 @@ interface WithState<out T : Enum<*>> {
     }
 
     /**
-     * This method would be called when this state ends
+     * This method will be called when this state ends
      *
      * @see StateController.setState
      */
@@ -62,7 +62,7 @@ interface WithState<out T : Enum<*>> {
  *
  * Generic [TState] is an enum included all states of this controller,
  * [TInterfaceWithState] is your custom implementation of [WithState] interface,
- * [TClassWithState] is your parent state that would
+ * [TClassWithState] is your parent state that will
  * be a receiver in state observer, and interceptor lambda.
  *
  * You should call [StateController.init] to make sure
@@ -139,7 +139,7 @@ interface WithState<out T : Enum<*>> {
  *
  *
  * @param scope [ModuleScope] will provide a coroutine scope during the state transfering
- * @param parentStateClass is your parent state that would
+ * @param parentStateClass is your parent state that will
  * be a receiver in state observer, and interceptor lambda
  * @see WithState
  */

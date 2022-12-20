@@ -38,7 +38,7 @@ interface CancelableEvent : Event {
      * will return to the call site of `broadcastEvent()` method.
      *
      * You must make sure you are cancelling a cancellable event,
-     * otherwise, it would throw an exception
+     * otherwise, it will throw an exception
      *
      * @see [EventManager.broadcastEvent]
      */
@@ -82,7 +82,7 @@ abstract class AbstractEvent : Event {
      * will return to the call site of `broadcastEvent()` method.
      *
      * You must make sure you are cancelling a cancellable event,
-     * otherwise, it would throw an exception
+     * otherwise, it will throw an exception
      *
      * @see [EventManager.broadcastEvent]
      */
@@ -95,7 +95,7 @@ abstract class AbstractEvent : Event {
 /**
  * Event broadcast priority
  * Decreasing priority from left to right
- * Same priority event listeners would be called in parallel.
+ * Same priority event listeners will be called in parallel.
  *
  * @see [EventManager.broadcastEvent]
  */

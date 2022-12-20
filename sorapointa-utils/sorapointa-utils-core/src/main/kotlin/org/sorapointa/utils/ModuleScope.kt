@@ -18,7 +18,7 @@ private val logger = KotlinLogging.logger {}
  *
  * @property parentJob specified [Job] with parent coroutine context [Job]
  *
- * @param moduleName coroutine name, and name also would appear
+ * @param moduleName coroutine name, and name also will appear
  * @param parentContext parent scope [CoroutineContext]
  * @param dispatcher custom [CoroutineDispatcher]
  * @param exceptionHandler custom expcetion handler lambda

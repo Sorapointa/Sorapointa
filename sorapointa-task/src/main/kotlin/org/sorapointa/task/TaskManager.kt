@@ -47,7 +47,7 @@ interface ITaskManager {
     /**
      * Register a task
      *
-     * @return If this job has been registered already, it would return null
+     * @return If this job has been registered already, it will return null
      */
     fun registerTask(
         id: String,
@@ -58,7 +58,7 @@ interface ITaskManager {
     /**
      * Register a task
      *
-     * @return If this job has been registered already, it would return null
+     * @return If this job has been registered already, it will return null
      */
     fun registerTask(
         id: String,
@@ -118,7 +118,7 @@ object TaskManager : ITaskManager {
     /**
      * Register a task
      *
-     * @return If this job has been registered already, it would return null
+     * @return If this job has been registered already, it will return null
      */
     override fun registerTask(
         id: String,
@@ -129,7 +129,7 @@ object TaskManager : ITaskManager {
     /**
      * Register a task
      *
-     * @return If this job has been registered already, it would return null
+     * @return If this job has been registered already, it will return null
      */
     override fun registerTask(
         id: String,

@@ -44,9 +44,9 @@ object EventManager {
 
     /**
      * Get original event flow from broadcasting
-     * Flow would receive the event data in parallel
+     * Flow will receive the event data in parallel
      *
-     * You could **NOT CANCEL** or **INTERCEPT** any event in parallel listener.
+     * You **CANNOT CANCEL** or **INTERCEPT** any event in parallel listener.
      *
      * @param priority optional, set the priority of this listener
      * @return [Flow]
@@ -61,7 +61,7 @@ object EventManager {
      * Register a parallel listener
      * All registered listeners will be called in parallel.
      *
-     * You could **NOT CANCEL** or **INTERCEPT** any event in parallel listener.
+     * You **CANNOT CANCEL** or **INTERCEPT** any event in parallel listener.
      *
      * @param priority optional, set the priority of this listener
      * @param listener lambda block of your listener with the all event of parameter
@@ -92,7 +92,7 @@ object EventManager {
     /**
      * Broadcast event, and return the cancel state of this event
      *
-     * @param event the event will be broadcasted
+     * @param event the event will be broadcast
      * @return [Boolean] that represents the cancel state of this event
      */
 
@@ -128,7 +128,7 @@ object EventManager {
                 return isCancelled
             }
         }
-        if (isCancelled) logger.debug { "Broadcasted event ${event::class.simpleName}, has been cancelled" }
+        if (isCancelled) logger.debug { "broadcast event ${event::class.simpleName}, has been cancelled" }
         return isCancelled
     }
 
@@ -169,11 +169,11 @@ object EventManager {
  * Register a parallel temp listener to capture
  * the next event that conform with the requirement of `filter`
  *
- * You could NOT CANCEL or INTERCEPT any event in parallel listener.
+ * You CANNOT CANCEL or INTERCEPT any event in a parallel listener.
  *
- * Generic type [T] is what event would you listen.
+ * The generic type [T] specifies the type of event you want to listen for.
  *
- * Use `inline` with `listener` would lose precise stacktrace for exception
+ * Use `inline` with `listener` will lose precise stacktrace for exception
  *
  * @param timeoutMs timeout time in milliseconds.
  * @param priority optional, set the priority of this listener
@@ -192,11 +192,11 @@ suspend inline fun <reified T : Event> nextEvent(
  * Register a parallel listener
  * All registered listeners will be called in parallel.
  *
- * You could NOT CANCEL or INTERCEPT any event in parallel listener.
+ * You CANNOT CANCEL or INTERCEPT any event in a parallel listener.
  *
- * Generic type [T] is what event would you listen.
+ * The generic type [T] specifies the type of event you want to listen for.
  *
- * Use `inline` with `listener` would lose precise stacktrace for exception
+ * Use `inline` with `listener` will lose precise stacktrace for exception
  *
  * @param priority optional, set the priority of this listener
  * @param listener lambda block of your listener with the specific event of parameter
@@ -216,11 +216,11 @@ inline fun <reified T : Event> registerListener(
  * Register a block listener
  * All registered block listeners will be called in serial.
  *
- * You could cancel or intercept listened event in serial listener.
+ * You could cancel or intercept listened event in a serial listener.
  *
- * Generic type [T] is what event would you listen.
+ * The generic type [T] specifies the type of event you want to listen for.
  *
- * Use `inline` with `listener` would lose precise stacktrace for exception
+ * Use `inline` with `listener` will lose precise stacktrace for exception
  *
  * @param priority optional, set the priority of this listener
  * @param listener lambda block of your listener with the specific event of parameter
@@ -239,9 +239,9 @@ inline fun <reified T : Event> registerBlockListener(
 /**
  * Broadcast event in a quick way
  *
- * Use `inline` would lose precise stacktrace for exception
+ * Use `inline` will lose precise stacktrace for exception
  *
- * @param ifNotCancel lambda block with the action if broadcasted event has **NOT** been cancelled
+ * @param ifNotCancel lambda block with the action if broadcast event has **NOT** been cancelled
  */
 suspend inline fun <T : Event, R> T.broadcastEvent(
     noinline ifNotCancel: suspend (T) -> R
@@ -253,9 +253,9 @@ suspend inline fun <T : Event, R> T.broadcastEvent(
 /**
  * Broadcast event in a quick way
  *
- * Use `inline` for lambda function would lose precise stacktrace for exception
+ * Use `inline` for lambda function will lose precise stacktrace for exception
  *
- * @param ifCancelled lambda block with the action if broadcasted event has been cancelled
+ * @param ifCancelled lambda block with the action if broadcast event has been cancelled
  */
 suspend inline fun <T : Event, R> T.broadcastEventIfCancelled(
     noinline ifCancelled: suspend (T) -> R
@@ -267,9 +267,9 @@ suspend inline fun <T : Event, R> T.broadcastEventIfCancelled(
 /**
  * Broadcast event in a quick way
  *
- * Use `inline` for lambda function would lose precise stacktrace for exception
+ * Use `inline` for lambda function will lose precise stacktrace for exception
  *
- * @param ifNotCancel lambda block with the action if broadcasted event has **NOT** been cancelled
+ * @param ifNotCancel lambda block with the action if broadcast event has **NOT** been cancelled
  */
 suspend inline fun <T : Event, R> T.broadcastEvent(
     noinline ifNotCancel: suspend (T) -> R,
@@ -280,7 +280,7 @@ suspend inline fun <T : Event, R> T.broadcastEvent(
 }
 
 /**
- * Broadcast event in quick way
+ * Broadcast event in a quick way
  */
 suspend inline fun <T : Event> T.broadcast() {
     EventManager.broadcastEvent(this)
