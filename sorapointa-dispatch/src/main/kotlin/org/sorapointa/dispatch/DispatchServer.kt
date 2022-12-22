@@ -217,13 +217,11 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
             "If dispatch server try to forward 2.8 or higher version,",
             "dispatch server will use this RSA public key to verify signature of data",
         )
-        @SerialName("v2.8RSAPublicKey")
         val rsaPublicKey: String = QUERY_CURR_RSA_PUB_KEY,
         @YamlComment(
             "If dispatch server try to forward 2.8 or higher version,",
             "dispatch server will use this RSA key to decrypt the forwarding result.",
         )
-        @SerialName("v2.8RSAPrivateKey")
         val rsaPrivateKey: String = QUERY_CURR_RSA_KEY,
     )
 
@@ -269,7 +267,10 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
 
     @Serializable
     data class Certification(
-        val keyStoreFilePath: String = File(configDirectory, KeyProvider.DEFAULT_CERT_NAME).absPath,
+        val keyStoreFilePath: String = File(
+            configDirectory,
+            KeyProvider.DEFAULT_CERT_NAME + KeyProvider.defaultKeyStoreFileExtension
+        ).absPath,
         val keyStore: String = "JKS",
         val keyAlias: String = KeyProvider.DEFAULT_ALIAS,
         val keyStorePassword: String = KeyProvider.DEFAULT_KEY_STORE_PASSWORD,

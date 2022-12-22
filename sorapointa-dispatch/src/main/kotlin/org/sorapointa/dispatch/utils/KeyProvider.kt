@@ -5,17 +5,21 @@ import io.ktor.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.sorapointa.dispatch.DispatchConfig
+import org.sorapointa.utils.isWindows
 import java.io.File
 import java.security.KeyStore
 import kotlin.text.toCharArray
 
 object KeyProvider {
 
-    const val DEFAULT_CERT_NAME = "sorapointa-cert.jks"
+    const val DEFAULT_CERT_NAME = "sorapointa-cert"
     const val DEFAULT_ALIAS = "sorapointa-dispatch-cert"
     const val DEFAULT_CERT_PASSWORD = "sorapointa-dispatch-private"
     const val DEFAULT_KEY_STORE_PASSWORD = "sorapointa-dispatch"
     private const val DEFAULT_EXPIRED_DAYS = 365 * 10L // 10 Years
+
+    private val defaultKeyStoreType = if (isWindows) "PKCS12" else "JKS"
+    val defaultKeyStoreFileExtension = if (isWindows) ".pfx" else ".jks"
 
     private val ANIME_URL_1 = "Ki5taWhveW8uY29t".decodeBase64String()
     private val ANIME_URL_2 = "Ki55dWFuc2hlbi5jb20=".decodeBase64String()
@@ -30,6 +34,7 @@ object KeyProvider {
             val keyStorePassword: String = DEFAULT_KEY_STORE_PASSWORD
             val expiredDays: Long = DEFAULT_EXPIRED_DAYS
             val generatedKeyStore = buildKeyStore {
+                keyStore = defaultKeyStoreType
                 certificate(alias) {
                     hash = HashAlgorithm.SHA256
                     sign = SignatureAlgorithm.RSA
@@ -45,7 +50,7 @@ object KeyProvider {
                 File(keyStoreFile.parentFile, keyStoreFile.nameWithoutExtension + ".cert"), alias
             )
             dispatchConfig.certification = DispatchConfig.Certification(
-                keyStore = "JKS",
+                keyStore = defaultKeyStoreType,
                 keyAlias = alias,
                 keyStorePassword = keyStorePassword,
                 privateKeyPassword = privateKeyPassword
@@ -58,8 +63,9 @@ object KeyProvider {
     }
 
     private fun fromCertFile(certFile: File, password: String): KeyStore {
-        val store = KeyStore.getInstance("JKS")!!
-        store.load(certFile.inputStream(), password.toCharArray())
-        return store
+        return KeyStore.getInstance(DispatchConfig.data.certification.keyStore)?.let {
+            it.load(certFile.inputStream(), password.toCharArray())
+            it
+        } ?: throw IllegalStateException("Failed to load key store")
     }
 }
