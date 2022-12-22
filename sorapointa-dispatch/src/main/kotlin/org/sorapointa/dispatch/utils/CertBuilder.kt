@@ -94,6 +94,9 @@ internal class CertificateBuilder {
  * Builder for key store
  */
 internal class KeyStoreBuilder internal constructor() {
+
+    var keyStore: String = "JKS"
+
     private val certificates = mutableMapOf<String, CertificateInfo>()
 
     /**
@@ -105,7 +108,8 @@ internal class KeyStoreBuilder internal constructor() {
     }
 
     internal fun build(): KeyStore {
-        val store = KeyStore.getInstance("JKS")!!
+        val store = KeyStore.getInstance(keyStore)
+            ?: error("Key store $keyStore is not supported")
         store.load(null, null)
 
         certificates.forEach { (alias, info) ->
