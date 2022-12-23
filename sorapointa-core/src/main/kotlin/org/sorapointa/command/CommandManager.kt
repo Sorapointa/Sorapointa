@@ -82,7 +82,7 @@ object CommandManager {
         sender: CommandSender,
         rawMsg: String,
     ): Job = commandScope.launch {
-        if (rawMsg.isEmpty()) {
+        if (rawMsg.isBlank()) {
             sender.sendMessage(
                 CoreBundle.message("sora.cmd.manager.invoke.empty", locale = sender.locale)
             )
