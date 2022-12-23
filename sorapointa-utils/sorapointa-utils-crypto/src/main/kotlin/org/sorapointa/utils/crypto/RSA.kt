@@ -40,13 +40,13 @@ class RSAKey(
 
     suspend fun ByteArray.encrypt(): ByteArray = withContext(Dispatchers.Default) {
         cipher.init(Cipher.ENCRYPT_MODE, publicKey)
-        chunkCipher()
+        chunkCipher(keySize / 8 - 11)
     }
 
     suspend fun ByteArray.decrypt(): ByteArray = withContext(Dispatchers.Default) {
         privateKey?.let {
             cipher.init(Cipher.DECRYPT_MODE, privateKey)
-            chunkCipher()
+            chunkCipher(keySize / 8)
         } ?: error("Component of private key, `d`, has not been given in constructor")
     }
 
@@ -64,9 +64,8 @@ class RSAKey(
         } ?: error("Component of private key, `d`, has not been given in constructor")
     }
 
-    private fun ByteArray.chunkCipher(): ByteArray {
+    private fun ByteArray.chunkCipher(chunkSize: Int): ByteArray {
         val packet = this.toReadPacket()
-        val chunkSize = keySize / 8
         return buildPacket {
             while (packet.canRead()) {
                 val readSize = if (packet.remaining > chunkSize) chunkSize else packet.remaining.toInt()

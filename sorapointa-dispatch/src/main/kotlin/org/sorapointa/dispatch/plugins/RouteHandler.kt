@@ -24,6 +24,7 @@ import org.sorapointa.dispatch.DispatchConfig
 import org.sorapointa.dispatch.DispatchServer
 import org.sorapointa.dispatch.data.*
 import org.sorapointa.dispatch.events.*
+import org.sorapointa.dispatch.utils.KeyProvider
 import org.sorapointa.event.broadcastEvent
 import org.sorapointa.proto.QueryCurrRegionHttpRspOuterClass.QueryCurrRegionHttpRsp
 import org.sorapointa.proto.QueryRegionListHttpRspOuterClass.QueryRegionListHttpRsp
@@ -75,8 +76,41 @@ private suspend fun getQueryRegionListHttpRsp(host: String): QueryRegionListHttp
 
 @SorapointaInternal var currentRegionRsp = CompletableDeferred<QueryCurrRegionHttpRsp>()
 
-private val dispatchRSAKey: RSAKey? = DispatchConfig.data.requestSetting.rsaPrivateKey.parseToRSAKey()
-private val dispatchPublicRSAKey: RSAKey? = DispatchConfig.data.requestSetting.rsaPublicKey.parseToRSAKey()
+private val dispatchRSAKey: RSAKey? by lazy {
+    val setting = DispatchConfig.data.requestSetting
+    if (setting.enableCustomKey) {
+        setting.customRSAPrivateKey.parseToRSAKey()
+    } else {
+        KeyProvider.queryCurrRSAKeySet[setting.useKeyId]?.privateKey?.parseToRSAKey()
+    }
+}
+
+private val dispatchPublicRSAKey: RSAKey? by lazy {
+    val setting = DispatchConfig.data.requestSetting
+    if (setting.enableCustomKey) {
+        setting.customRSAPublicKey.parseToRSAKey()
+    } else {
+        KeyProvider.queryCurrRSAKeySet[setting.useKeyId]?.publicKey?.parseToRSAKey()
+    }
+}
+
+val signingKey: RSAKey? by lazy {
+    val setting = DispatchConfig.data.requestSetting
+    if (setting.enableCustomSignKey) {
+        setting.customSignPrivateKey.parseToRSAKey()
+    } else {
+        KeyProvider.signKeySet.privateKey.parseToRSAKey()
+    }
+}
+
+val signingPublicKey: RSAKey? by lazy {
+    val setting = DispatchConfig.data.requestSetting
+    if (setting.enableCustomSignKey) {
+        setting.customSignPublicKey.parseToRSAKey()
+    } else {
+        KeyProvider.signKeySet.publicKey.parseToRSAKey()
+    }
+}
 
 suspend fun getCurrentRegionHttpRsp(call: ApplicationCall? = null): QueryCurrRegionHttpRsp {
     val requestSetting = DispatchConfig.data.requestSetting
@@ -86,13 +120,13 @@ suspend fun getCurrentRegionHttpRsp(call: ApplicationCall? = null): QueryCurrReg
         } else {
             DispatchServer.client.get(requestSetting.queryCurrentRegionHardcode)
         }.bodyAsText()
-        if (!requestSetting.v28CurrentRegionForwardFormat || dispatchRSAKey == null) {
+        if (!requestSetting.v28CurrentRegionForwardFormat) {
             logger.debug { "QueryCurrentRegion Result: $forwardResult" }
             QueryCurrRegionHttpRsp.parseFrom(forwardResult.decodeBase64Bytes())
         } else {
             val query: QueryCurrentRegionData = networkJson.decodeFromString(forwardResult)
             logger.debug { "QueryCurrentRegion Result: $query" }
-            with(dispatchRSAKey) {
+            dispatchRSAKey?.run {
                 val decryptResult = query.content.decodeBase64Bytes().decrypt()
                 val signVerifyResult = if (requestSetting.enableSignVerify) {
                     dispatchPublicRSAKey?.run {
@@ -105,7 +139,7 @@ suspend fun getCurrentRegionHttpRsp(call: ApplicationCall? = null): QueryCurrReg
                 } else {
                     error("QueryCurrentRegion sign verify failed")
                 }
-            }
+            } ?: error("Dispatch RSA Key is null or not valid")
         }
     } else queryCurrRegionHttpRsp {}
 }
@@ -161,15 +195,19 @@ internal suspend fun ApplicationCall.handleQueryCurrentRegion() {
     logger.info { "Client ${request.local.host} has queried current region" }
     val packet = this.forwardQueryCurrentRegionHttpRsp()
     QueryCurrentRegionEvent(this, packet).broadcastEvent {
-        // We don't need to sign if client has been hooked
-        // And we would not to implement this sign algorithm,
-        // because it's related with injecting new RSA key,
-        // but that is uncessary for now.
-        val data = it.data.toByteArray().encodeBase64()
+        val data = it.data.toByteArray()
         if (DispatchConfig.data.requestSetting.v28CurrentRegionForwardFormat) {
-            respond(QueryCurrentRegionData(data))
+            var sign = "c29yYXBvaW50YQ==" // Some magic string if we don't need sign
+            if (DispatchConfig.data.requestSetting.enableSignature) {
+                signingKey?.apply {
+                    sign = data.sign().encodeBase64()
+                } ?: error("Sign RSA Key is null or not valid")
+            }
+            dispatchRSAKey?.apply {
+                respond(QueryCurrentRegionData(data.encrypt().encodeBase64(), sign))
+            } ?: error("Dispatch RSA Key is null or not valid")
         } else {
-            respondText(data)
+            respondText(data.encodeBase64())
         }
     }
 }
