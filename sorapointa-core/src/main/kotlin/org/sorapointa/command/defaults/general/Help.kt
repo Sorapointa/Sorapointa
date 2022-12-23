@@ -43,7 +43,7 @@ class Help(private val sender: CommandSender) : Command(sender, Help) {
         // Build the message and send to the sender
         sender.sendMessage(
             buildString {
-                append(CoreBundle.message("sora.cmd.help.msg.page", pageNum, pageItems.size))
+                appendLine(CoreBundle.message("sora.cmd.help.msg.page", pageNum, pageItems.size))
                 val entries = pageItems[pageNum - 1]
                 val maxLen = entries.map { it.name }.maxOf { it.length }
                 entries.forEach {
