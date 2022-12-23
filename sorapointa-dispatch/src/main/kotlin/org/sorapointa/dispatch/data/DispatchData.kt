@@ -11,7 +11,7 @@ import org.sorapointa.utils.sha256sign
 @Serializable
 data class QueryCurrentRegionData(
     val content: String,
-    val sign: String = "c29yYXBvaW50YQ==" // magic, don't change it
+    val sign: String
 )
 
 @Serializable
