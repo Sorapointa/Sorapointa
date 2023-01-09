@@ -116,16 +116,12 @@ suspend fun getCurrentRegionHttpRsp(call: ApplicationCall? = null): QueryCurrReg
         return QueryCurrRegionHttpRsp()
     }
 
-    val forwardResult = if (call != null) {
-        val url = if (requestSetting.usingCurrentRegionUrlHardcode) {
-            QUERY_CURR_DOMAIN
-        } else {
-            requestSetting.queryCurrentRegionHardcode
-        }
-        call.forwardCall(url)
+    val forwardResult = if (call != null && !requestSetting.usingCurrentRegionUrlHardcode) {
+        call.forwardCall(QUERY_CURR_DOMAIN)
     } else {
+        // hardcodeUrl will include all the parameters
         // sp-core needs an original dispatch CurRegHttpRsp to get some info in GetPlayerTokenRsp
-        // If sp-core is running alone, we can not get any call or forward info
+        // If sp-core is running alone, there is no call or any forward info
         DispatchServer.client.get(requestSetting.queryCurrentRegionHardcode)
     }.bodyAsText()
 

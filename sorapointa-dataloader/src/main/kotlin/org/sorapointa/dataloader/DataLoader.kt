@@ -71,11 +71,10 @@ object ResourceHolder {
     suspend fun loadAll() {
         val scope = ModuleScope("ResourceLoader", coroutineContext)
         dataMap.map { (k, v) ->
-            val job = scope.launch {
+            scope.launch {
                 val loaded = v.load()
                 finalizeData(k, loaded)
             }
-            job
         }.joinAll()
     }
 
