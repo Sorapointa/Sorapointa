@@ -6,4 +6,5 @@ plugins {
 dependencies {
     api(project(":sorapointa-utils:sorapointa-utils-core"))
     implementation(libs.ktor.utils)
+    testImplementation(libs.bundles.log)
 }

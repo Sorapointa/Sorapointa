@@ -9,13 +9,10 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.kotlin.gradle.plugin) {
-        exclude("com.squareup:kotlinpoet")
-    }
-    implementation("com.squareup:kotlinpoet:1.12.0")
-    implementation("com.github.gmazzo:gradle-buildconfig-plugin:3.1.+")
-    implementation("gradle.plugin.com.github.johnrengelman:shadow:7.1.+")
-    implementation("org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.18.5")
+    implementation(libs.kotlin.gradle.plugin)
+    implementation(libs.build.kotlinpoet)
+    implementation(libs.build.buildconfig)
+    implementation(libs.build.shadow)
 }
 
 sourceSets {
