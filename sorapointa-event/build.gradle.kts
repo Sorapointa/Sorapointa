@@ -7,8 +7,12 @@ plugins {
 
 dependencies {
     implementation(project(":sorapointa-dataprovider"))
+    implementation(project(":sorapointa-utils:sorapointa-utils-core"))
     implementation(project(":sorapointa-utils:sorapointa-utils-serialization"))
 
-    implementation(KotlinX.serialization.json)
-    implementation("org.jetbrains.kotlinx:atomicfu:_")
+    implementation(libs.bundles.log)
+
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.atomicfu)
 }

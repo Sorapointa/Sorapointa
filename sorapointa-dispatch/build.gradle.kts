@@ -14,27 +14,30 @@ dependencies {
     implementation(project(":sorapointa-proto"))
     implementation(project(":sorapointa-utils:sorapointa-utils-all"))
 
-    api("io.ktor:ktor-server-core-jvm:_")
-    api("io.ktor:ktor-server-content-negotiation-jvm:_")
-    api("io.ktor:ktor-server-call-logging-jvm:_")
-    api("io.ktor:ktor-server-compression-jvm:_")
-    api("io.ktor:ktor-server-netty-jvm:_")
-    api("io.ktor:ktor-server-status-pages:_")
-    api("io.ktor:ktor-server-html-builder:_")
+    api(libs.bundles.log)
+    api(libs.kotlinx.coroutines.core)
 
-    api("io.ktor:ktor-client-core:_")
-    api("io.ktor:ktor-client-cio:_")
-    api("io.ktor:ktor-client-logging:_")
-    api("io.ktor:ktor-client-content-negotiation:_")
+    api(libs.ktor.server.core)
+    api(libs.ktor.server.content.negotiation)
+    api(libs.ktor.server.logging)
+    api(libs.ktor.server.compression)
+    api(libs.ktor.server.netty)
+    api(libs.ktor.server.status.page)
+    api(libs.ktor.server.html)
 
-    api("io.ktor:ktor-network-tls-certificates:_")
-    api("io.ktor:ktor-serialization-kotlinx-json:_")
+    api(libs.ktor.client.core)
+    api(libs.ktor.client.cio)
+    api(libs.ktor.client.logging)
+    api(libs.ktor.client.content.negotiation)
 
-    implementation("com.password4j:password4j:_")
+    api(libs.ktor.network.cert)
+    api(libs.ktor.serialization.kotlinx.json)
 
-    api("io.ktor:ktor-server-tests-jvm:_")
-    api(project(":sorapointa-dataprovider", "test"))
-    api("org.jetbrains.kotlinx:atomicfu:_")
+    implementation(libs.password4j)
+    implementation(libs.atomicfu)
+
+    testImplementation(libs.ktor.server.tests)
+    testImplementation(project(":sorapointa-dataprovider", "test"))
 }
 
 application {

@@ -1,6 +1,6 @@
 package org.sorapointa.game.data
 
-import com.google.protobuf.ProtocolMessageEnum
+import com.squareup.wire.WireEnum
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.dao.Entity
@@ -20,10 +20,10 @@ import org.sorapointa.dataloader.common.PlayerProp.*
 import org.sorapointa.game.GuidEntity
 import org.sorapointa.game.Player
 import org.sorapointa.game.impl
-import org.sorapointa.proto.MpSettingTypeOuterClass.MpSettingType
-import org.sorapointa.proto.avatarTeam
-import org.sorapointa.proto.birthday
-import org.sorapointa.proto.profilePicture
+import org.sorapointa.proto.AvatarTeam
+import org.sorapointa.proto.Birthday
+import org.sorapointa.proto.MpSettingType
+import org.sorapointa.proto.ProfilePicture
 import org.sorapointa.server.network.PlayerPropNotifyPacket
 import org.sorapointa.utils.*
 import java.util.*
@@ -335,7 +335,7 @@ class PlayerDataImpl(id: EntityID<Int>) : Entity<Int>(id), PlayerData {
             val converted = when (value) {
                 is Number -> value.toLong()
                 is Boolean -> value.toInt().toLong()
-                is ProtocolMessageEnum -> value.number.toLong()
+                is WireEnum -> value.value.toLong()
                 else -> error("Could not convert $prop value $value to long")
             }
             player.impl().sendPacketAsync(
@@ -372,11 +372,10 @@ data class CompoundAvatarTeamData(
         val avatarGuidList: List<Long>
     ) {
 
-        fun toProto() =
-            avatarTeam {
-                teamName = this@AvatarTeamData.teamName
-                avatarGuidList.addAll(this@AvatarTeamData.avatarGuidList)
-            }
+        fun toProto(): AvatarTeam = AvatarTeam(
+            team_name = teamName,
+            avatar_guid_list = avatarGuidList,
+        )
     }
 }
 
@@ -387,10 +386,10 @@ data class ProfilePictureData(
 ) {
 
     fun toProto() =
-        profilePicture {
-            avatarId = this@ProfilePictureData.avatarId
-            costumeId = this@ProfilePictureData.costumeId ?: 0
-        }
+        ProfilePicture(
+            avatar_id = avatarId,
+            costume_id = costumeId ?: 0,
+        )
 }
 
 @Serializable
@@ -398,10 +397,5 @@ data class PlayerBirthday(
     val month: Int,
     val day: Int
 ) {
-
-    fun toProto() =
-        birthday {
-            month = this@PlayerBirthday.month
-            day = this@PlayerBirthday.day
-        }
+    fun toProto() = Birthday(month = month, day = day)
 }

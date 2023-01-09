@@ -8,13 +8,16 @@ plugins {
 
 dependencies {
     implementation(project(":sorapointa-dataprovider"))
+    implementation(project(":sorapointa-utils:sorapointa-utils-core"))
     implementation(project(":sorapointa-utils:sorapointa-utils-time"))
 
-    implementation(KotlinX.coroutines.core)
-    implementation(KotlinX.serialization.core)
+    implementation(libs.bundles.log)
 
-    implementation("com.cronutils:cron-utils:_")
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.serialization.core)
+
+    implementation(libs.cron.utils)
 
     testImplementation(project(":sorapointa-dataprovider", "test"))
-    testImplementation("org.jetbrains.kotlinx:atomicfu:_")
+    testImplementation(libs.atomicfu)
 }

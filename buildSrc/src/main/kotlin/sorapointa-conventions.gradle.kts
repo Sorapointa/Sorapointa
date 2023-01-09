@@ -21,18 +21,6 @@ dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    implementation("io.github.microutils:kotlin-logging-jvm:_")
-    implementation("ch.qos.logback:logback-classic:_")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
-
-    if (!project.name.startsWith("sorapointa-utils")) {
-        val noUtils = project.getExtraBoolean("no-utils")
-        if (noUtils != true) {
-            implementation(project(":sorapointa-utils:sorapointa-utils-core"))
-            testImplementation(project(":sorapointa-utils:sorapointa-utils-core", "test"))
-        }
-    }
-
     testImplementation(kotlin("test"))
 }
 

@@ -2,32 +2,23 @@ package org.sorapointa.proto
 
 import io.ktor.utils.io.core.*
 import org.junit.jupiter.api.Test
-import org.sorapointa.proto.GetPlayerTokenReqOuterClass.GetPlayerTokenReq
 import kotlin.random.Random
 import kotlin.test.assertEquals
 
 class ProtoTest {
     @Test
     fun proto() {
-        abilityAppliedAbility {
-            abilityName = abilityString {
-                str = "114514"
-            }
-            abilityOverride = abilityString {
-                hash = 114514
-            }
-            overrideMap.apply {
-                add(
-                    abilityScalarValueEntry {
-                        floatValue = 1.3f
-                        key = abilityString {
-                            str = "1919810"
-                        }
-                    }
+        AbilityAppliedAbility(
+            ability_name = AbilityString(str = "114514"),
+            ability_override = AbilityString(hash = 114514),
+            override_map = listOf(
+                AbilityScalarValueEntry(
+                    float_value = 1.3f,
+                    key = AbilityString(str = "1919810")
                 )
-            }
-            instancedAbilityId = 100
-        }.toByteString()
+            ),
+            instanced_ability_id = 100,
+        )
     }
 
     @Test
@@ -42,13 +33,14 @@ class ProtoTest {
         val soraPacket = buildPacket {
             writeSoraPacket(
                 cmdId,
-                getPlayerTokenReq { uid = randomInt },
-                packetHead { clientSequenceId = randomInt }
+                GetPlayerTokenReq.ADAPTER,
+                GetPlayerTokenReq(uid = randomInt),
+                PacketHead(client_sequence_id = randomInt),
             )
         }.readToSoraPacket()
 
         assertEquals(PacketId.GET_PLAYER_TOKEN_REQ, soraPacket.cmdId)
-        assertEquals(randomInt, soraPacket.metadata.clientSequenceId)
-        assertEquals(randomInt, GetPlayerTokenReq.parseFrom(soraPacket.data).uid)
+        assertEquals(randomInt, soraPacket.metadata.client_sequence_id)
+        assertEquals(randomInt, GetPlayerTokenReq.ADAPTER.decode(soraPacket.data).uid)
     }
 }

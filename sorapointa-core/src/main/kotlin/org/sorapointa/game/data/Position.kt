@@ -1,7 +1,7 @@
 package org.sorapointa.game.data
 
 import kotlinx.serialization.Serializable
-import org.sorapointa.proto.vector
+import org.sorapointa.proto.Vector
 import kotlin.math.sqrt
 
 @Suppress("NOTHING_TO_INLINE")
@@ -94,12 +94,7 @@ data class Position(
         return d.square() <= r * r
     }
 
-    fun toProto() =
-        vector {
-            x = this@Position.x
-            y = this@Position.y
-            z = this@Position.z
-        }
+    fun toProto() = Vector(x = x, y = y, z = z)
 
     override fun toString(): String =
         "Position[$x, $y, $z]"

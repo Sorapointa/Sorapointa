@@ -5,7 +5,7 @@ plugins {
 }
 
 dependencies {
-    api(KotlinX.serialization.json)
-    api(KotlinX.datetime)
-    implementation("io.ktor:ktor-utils:_")
+    api(libs.kotlinx.serialization.json)
+    api(libs.kotlinx.datetime)
+    implementation(libs.ktor.utils)
 }

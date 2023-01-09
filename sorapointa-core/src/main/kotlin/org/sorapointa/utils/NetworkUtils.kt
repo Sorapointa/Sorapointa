@@ -3,9 +3,9 @@ package org.sorapointa.utils
 import io.ktor.utils.io.core.*
 import io.netty.buffer.ByteBuf
 import mu.KotlinLogging
+import org.sorapointa.proto.PacketHead
 import org.sorapointa.proto.START_MAGIC
 import org.sorapointa.proto.SoraPacket
-import org.sorapointa.proto.packetHead
 import org.sorapointa.proto.readToSoraPacket
 import org.sorapointa.utils.encoding.hex
 
@@ -33,7 +33,7 @@ internal fun ByteBuf.readToSoraPacket(
 }
 
 internal fun buildMetadata(sequenceId: Int) =
-    packetHead {
-        clientSequenceId = sequenceId
-        sentMs = nowMilliseconds()
-    }
+    PacketHead(
+        client_sequence_id = sequenceId,
+        sent_ms = nowMilliseconds(),
+    )

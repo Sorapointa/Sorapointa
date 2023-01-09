@@ -9,9 +9,10 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
-    implementation("com.github.gmazzo:gradle-buildconfig-plugin:3.0.3")
-    implementation("gradle.plugin.com.github.johnrengelman:shadow:7.1.2")
+    implementation(libs.kotlin.gradle.plugin)
+    implementation(libs.build.kotlinpoet)
+    implementation(libs.build.buildconfig)
+    implementation(libs.build.shadow)
 }
 
 sourceSets {
@@ -35,6 +36,6 @@ sourceSets {
 
 kotlin {
     jvmToolchain {
-        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(17))
+        this.languageVersion.set(JavaLanguageVersion.of(17))
     }
 }

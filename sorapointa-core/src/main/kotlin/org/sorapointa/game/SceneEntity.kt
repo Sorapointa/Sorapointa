@@ -9,17 +9,6 @@ import org.sorapointa.game.data.DEFAULT_PEER_ID
 import org.sorapointa.game.data.ItemData
 import org.sorapointa.game.data.Position
 import org.sorapointa.proto.*
-import org.sorapointa.proto.AnimatorParameterValueInfoPairOuterClass.AnimatorParameterValueInfoPair
-import org.sorapointa.proto.EntityAuthorityInfoOuterClass.EntityAuthorityInfo
-import org.sorapointa.proto.EntityClientDataOuterClass.EntityClientData
-import org.sorapointa.proto.EntityEnvironmentInfoOuterClass.EntityEnvironmentInfo
-import org.sorapointa.proto.FightPropPairOuterClass.FightPropPair
-import org.sorapointa.proto.GadgetBornTypeOuterClass.GadgetBornType
-import org.sorapointa.proto.MotionInfoOuterClass.MotionInfo
-import org.sorapointa.proto.PropPairOuterClass.PropPair
-import org.sorapointa.proto.ProtEntityTypeOuterClass.ProtEntityType
-import org.sorapointa.proto.SceneEntityInfoOuterClass.SceneEntityInfo
-import org.sorapointa.proto.ServerBuffOuterClass.ServerBuff
 import org.sorapointa.utils.OptionalContainer
 import org.sorapointa.utils.pair
 
@@ -64,12 +53,12 @@ interface SceneEntityProto<TEntity : SceneEntity> {
 abstract class AbstractSceneEntityProto<TEntity : SceneEntity> : SceneEntityProto<TEntity> {
 
     open val motionInfo: MotionInfo
-        get() = motionInfo {
-            pos = entity.position.toProto()
-            rot = entity.rotation.toProto()
-            speed = entity.speed.value.toProto()
+        get() = MotionInfo(
+            pos = entity.position.toProto(),
+            rot = entity.rotation.toProto(),
+            speed = entity.speed.value.toProto(),
             // TODO: Unknown a lots of fields
-        }
+        )
 
     open val propPairList: List<PropPair>
         get() = listOf(
@@ -87,10 +76,10 @@ abstract class AbstractSceneEntityProto<TEntity : SceneEntity> : SceneEntityProt
 
     // TODO: Unknown
     open val animatorParameterPairList: List<AnimatorParameterValueInfoPair> =
-        listOf(animatorParameterValueInfoPair { nameId = 0 })
+        listOf(AnimatorParameterValueInfoPair())
 
     // TODO: Unknown, maybe used for sync data
-    open val entityClientData: EntityClientData = entityClientData { }
+    open val entityClientData: EntityClientData = EntityClientData()
 
     open val entityEnvironmentInfoList = OptionalContainer(arrayListOf<EntityEnvironmentInfo>())
 
@@ -104,27 +93,26 @@ abstract class AbstractSceneEntityProto<TEntity : SceneEntity> : SceneEntityProt
 
     override fun toProto(): SceneEntityInfo {
         val t = this
-        return sceneEntityInfo {
-            entityType = entity.entityType
-            entityId = entity.id
+        return SceneEntityInfo(
+            entity_type = entity.entityType,
+            entity_id = entity.id,
             // name
-            motionInfo = t.motionInfo
-            propList.addAll(propPairList)
-            fightPropList.addAll(fightPropPairList)
-            lifeState = entity.lifeState.value
-            animatorParaList.addAll(animatorParameterPairList)
-            entity.lastMoveSceneTimeMs.ifChanged { lastMoveSceneTimeMs = it }
-            entity.lastMoveReliableSeq.ifChanged { lastMoveReliableSeq = it }
-            entityClientData = t.entityClientData
-            t.entityEnvironmentInfoList.ifChanged { entityEnvironmentInfoList.addAll(it) }
-            entityAuthorityInfo = t.entityAuthorityInfo
-            t.tagList.ifChanged { tagList.addAll(it) }
-            t.serverBuffList.ifChanged { serverBuffList.addAll(it) }
-            toProto()
-        }
+            motion_info = t.motionInfo,
+            prop_list = propPairList,
+            fight_prop_list = fightPropPairList,
+            life_state = entity.lifeState.value,
+            animator_para_list = animatorParameterPairList,
+            last_move_scene_time_ms = entity.lastMoveSceneTimeMs.changedOrDefault(),
+            last_move_reliable_seq = entity.lastMoveReliableSeq.changedOrDefault(),
+            entity_client_data = t.entityClientData,
+            entity_environment_info_list = t.entityEnvironmentInfoList.changedOrDefault(),
+            entity_authority_info = t.entityAuthorityInfo,
+            tag_list = tagList.changedOrDefault(),
+            server_buff_list = serverBuffList.changedOrDefault(),
+        ).toProto()
     }
 
-    abstract fun SceneEntityInfoKt.Dsl.toProto()
+    abstract fun SceneEntityInfo.toProto(): SceneEntityInfo
 }
 
 interface GuidEntity {
@@ -138,15 +126,15 @@ class EntityAuthorityInfoProto(bornPos: Position) {
     private val protoPosition = bornPos.toProto()
 
     fun toProto() =
-        entityAuthorityInfo {
-            abilityInfo = abilitySyncStateInfo { }
-            rendererChangedInfo = entityRendererChangedInfo { }
-            aiInfo = sceneEntityAiInfo {
-                isAiOpen = true
-                bornPos = protoPosition
-            }
-            bornPos = protoPosition
-        }
+        EntityAuthorityInfo(
+            ability_info = AbilitySyncStateInfo(),
+            renderer_changed_info = EntityRendererChangedInfo(),
+            ai_info = SceneEntityAiInfo(
+                is_ai_open = true,
+                born_pos = protoPosition,
+            ),
+            born_pos = protoPosition,
+        )
 }
 
 abstract class SceneEntityBase : SceneEntity {
@@ -191,11 +179,11 @@ abstract class SceneGadgetEntityBase : SceneEntityBase() {
     open val interactId = OptionalContainer(0)
     open val markFlag = OptionalContainer(0)
     open val propOwnerEntityId = OptionalContainer(0)
-    open val platform = OptionalContainer(platformInfo { })
+    open val platform = OptionalContainer(PlatformInfo())
     open val interactUidList = OptionalContainer(arrayListOf<Int>())
     open val draftId = OptionalContainer(0)
     open val gadgetTalkState = OptionalContainer(0)
-    open val playInfo = OptionalContainer(gadgetPlayInfo { })
+    open val playInfo = OptionalContainer(GadgetPlayInfo())
 }
 
 abstract class SceneGadgetEntityBaseProto<TEntity : SceneGadgetEntityBase> : AbstractSceneEntityProto<TEntity>() {
@@ -203,30 +191,31 @@ abstract class SceneGadgetEntityBaseProto<TEntity : SceneGadgetEntityBase> : Abs
     abstract override val entity: TEntity
 
     @Suppress("DuplicatedCode")
-    override fun SceneEntityInfoKt.Dsl.toProto() {
-        gadget = sceneGadgetInfo {
-            gadgetId = entity.gadgetId
-            entity.groupId.ifChanged { groupId = it }
-            entity.configId.ifChanged { configId = it }
-            entity.ownerEntityId.ifChanged { ownerEntityId = it }
-            entity.bornType.ifChanged { bornType = it }
-            entity.gadgetState.ifChanged { gadgetState = it }
-            entity.gadgetType.ifChanged { gadgetType = it }
-            entity.isShowCutscene.ifChanged { isShowCutscene = it }
-            authorityPeerId = entity.authorityPeerId
-            entity.isEnableInteract.ifChanged { isEnableInteract = it }
-            entity.interactId.ifChanged { interactId = it }
-            entity.markFlag.ifChanged { markFlag = it }
-            entity.propOwnerEntityId.ifChanged { propOwnerEntityId = it }
-            entity.platform.ifChanged { platform = it }
-            entity.interactUidList.ifChanged { interactUidList.addAll(it) }
-            entity.draftId.ifChanged { draftId = it }
-            entity.gadgetTalkState.ifChanged { gadgetTalkState = it }
-            entity.playInfo.ifChanged { playInfo = it }
-        }
+    override fun SceneEntityInfo.toProto(): SceneEntityInfo {
+        val gadget = SceneGadgetInfo(
+            gadget_id = entity.gadgetId,
+            group_id = entity.groupId.changedOrDefault(),
+            config_id = entity.configId.changedOrDefault(),
+            owner_entity_id = entity.ownerEntityId.changedOrDefault(),
+            born_type = entity.bornType.changedOrDefault(),
+            gadget_state = entity.gadgetState.changedOrDefault(),
+            gadget_type = entity.gadgetType.changedOrDefault(),
+            is_show_cutscene = entity.isShowCutscene.changedOrDefault(),
+            authority_peer_id = entity.authorityPeerId,
+            is_enable_interact = entity.isEnableInteract.changedOrDefault(),
+            interact_id = entity.interactId.changedOrDefault(),
+            mark_flag = entity.markFlag.changedOrDefault(),
+            prop_owner_entity_id = entity.propOwnerEntityId.changedOrDefault(),
+            platform = entity.platform.changedOrDefault(),
+            interact_uid_list = entity.interactUidList.changedOrDefault(),
+            draft_id = entity.draftId.changedOrDefault(),
+            gadget_talk_state = entity.gadgetTalkState.changedOrDefault(),
+            play_info = entity.playInfo.changedOrDefault(),
+        )
+        return copy(gadget = gadget)
     }
 
-    abstract fun SceneGadgetInfoKt.Dsl.toProto()
+    abstract fun SceneGadgetInfo.toProto(): SceneGadgetInfo
 }
 
 class SceneGadgetItemEntity(
@@ -256,7 +245,6 @@ class SceneGadgetItemEntityProto(
     override val entity: SceneGadgetItemEntity
 ) : SceneGadgetEntityBaseProto<SceneGadgetItemEntity>() {
 
-    override fun SceneGadgetInfoKt.Dsl.toProto() {
-        trifleItem = entity.itemData.toProto()
-    }
+    override fun SceneGadgetInfo.toProto(): SceneGadgetInfo =
+        copy(trifle_item = entity.itemData.toProto())
 }
