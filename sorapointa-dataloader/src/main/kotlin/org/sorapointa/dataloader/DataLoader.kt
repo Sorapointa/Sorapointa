@@ -69,16 +69,14 @@ object ResourceHolder {
      * @see [DataLoader.loadFromStream]
      */
     suspend fun loadAll() {
-        val job = SupervisorJob(coroutineContext.job)
-        withContext(Dispatchers.IO + job) {
-            dataMap.map { (k, v) ->
-                launch {
-                    val loaded = v.load()
-                    finalizeData(k, loaded)
-                }
-            }.joinAll()
-        }
-        job.complete()
+        val scope = ModuleScope("ResourceLoader", coroutineContext)
+        dataMap.map { (k, v) ->
+            val job = scope.launch {
+                val loaded = v.load()
+                finalizeData(k, loaded)
+            }
+            job
+        }.joinAll()
     }
 
     internal fun registerData(dataLoader: DataLoader<Any>) {
