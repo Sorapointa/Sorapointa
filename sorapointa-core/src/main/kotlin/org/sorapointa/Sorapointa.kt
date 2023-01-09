@@ -32,6 +32,10 @@ object Sorapointa {
         return if (SorapointaConfig.data.startWithDispatch) {
             DispatchServer.startDispatch(serverScope, config = config)
         } else {
+            // If we don't start with dispatch server,
+            // we will need some CurRegHttpRsp data for future processing.
+            // And since we don't have original request from player client, or sth,
+            // so we can only use the hardcode URL in
             scope.launch {
                 currentRegionRsp.complete(getCurrentRegionHttpRsp())
             }

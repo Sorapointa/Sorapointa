@@ -14,7 +14,7 @@ class RSAKeyTest {
         /* ktlint-enable max-line-length */
         val testStr = "test rsa key"
         with(key!!) { // Should not be null
-            assertEquals(testStr, testStr.toByteArray().encrypt().decrypt().toString(Charset.defaultCharset()))
+            assertEquals(testStr, decrypt(encrypt(testStr.toByteArray())).toString(Charset.defaultCharset()))
         }
     }
 

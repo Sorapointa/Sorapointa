@@ -38,28 +38,28 @@ class RSAKey(
     private val publicSpec = RSAPublicKeySpec(modulus, exponent)
     private val publicKey = factory.generatePublic(publicSpec)
 
-    suspend fun ByteArray.encrypt(): ByteArray = withContext(Dispatchers.Default) {
+    suspend fun encrypt(bytes: ByteArray): ByteArray = withContext(Dispatchers.Default) {
         cipher.init(Cipher.ENCRYPT_MODE, publicKey)
-        chunkCipher(keySize / 8 - 11)
+        bytes.chunkCipher(this@RSAKey.keySize / 8 - 11)
     }
 
-    suspend fun ByteArray.decrypt(): ByteArray = withContext(Dispatchers.Default) {
+    suspend fun decrypt(bytes: ByteArray): ByteArray = withContext(Dispatchers.Default) {
         privateKey?.let {
             cipher.init(Cipher.DECRYPT_MODE, privateKey)
-            chunkCipher(keySize / 8)
+            bytes.chunkCipher(this@RSAKey.keySize / 8)
         } ?: error("Component of private key, `d`, has not been given in constructor")
     }
 
-    suspend fun ByteArray.signVerify(sign: ByteArray): Boolean = withContext(Dispatchers.Default) {
+    suspend fun signVerify(bytes: ByteArray, sign: ByteArray): Boolean = withContext(Dispatchers.Default) {
         signature.initVerify(publicKey)
-        signature.update(this@signVerify)
+        signature.update(bytes)
         signature.verify(sign)
     }
 
-    suspend fun ByteArray.sign(): ByteArray = withContext(Dispatchers.Default) {
+    suspend fun sign(bytes: ByteArray): ByteArray = withContext(Dispatchers.Default) {
         privateKey?.let {
             signature.initSign(it)
-            signature.update(this@sign)
+            signature.update(bytes)
             signature.sign()
         } ?: error("Component of private key, `d`, has not been given in constructor")
     }

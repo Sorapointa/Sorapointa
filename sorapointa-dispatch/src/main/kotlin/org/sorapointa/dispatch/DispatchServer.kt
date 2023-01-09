@@ -200,8 +200,8 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
         )
         val queryCurrentRegionHardcode: String = "",
         val currentRegionContainsCustomClientConfig: Boolean = true,
-        @YamlComment("Response `query_cur_region` in client 2.8 or higher version format")
-        val v28CurrentRegionForwardFormat: Boolean = true,
+        @YamlComment("Response `query_cur_region` in the old 2.7 and lower version format")
+        val oldCurrentRegionFormat: Boolean = false,
         @YamlComment("`query_cur_region` RSA sign verify")
         val enableSignVerify: Boolean = true,
         @YamlComment("Sign the changed `query_cur_region` response by following RSA private key")

@@ -114,34 +114,46 @@ val signingPublicKey: RSAKey? by lazy {
 
 suspend fun getCurrentRegionHttpRsp(call: ApplicationCall? = null): QueryCurrRegionHttpRsp {
     val requestSetting = DispatchConfig.data.requestSetting
-    return if (requestSetting.forwardQueryCurrentRegion) {
-        val forwardResult = if (!requestSetting.usingCurrentRegionUrlHardcode && call != null) {
-            call.forwardCall(QUERY_CURR_DOMAIN)
+
+    if (!requestSetting.forwardQueryCurrentRegion) {
+        // If dispatch doesn't enable forward
+        return queryCurrRegionHttpRsp {}
+    }
+
+    val forwardResult = if (call != null) {
+        val url = if (requestSetting.usingCurrentRegionUrlHardcode) {
+            QUERY_CURR_DOMAIN
         } else {
-            DispatchServer.client.get(requestSetting.queryCurrentRegionHardcode)
-        }.bodyAsText()
-        if (!requestSetting.v28CurrentRegionForwardFormat) {
-            logger.debug { "QueryCurrentRegion Result: $forwardResult" }
-            QueryCurrRegionHttpRsp.parseFrom(forwardResult.decodeBase64Bytes())
-        } else {
-            val query: QueryCurrentRegionData = networkJson.decodeFromString(forwardResult)
-            logger.debug { "QueryCurrentRegion Result: $query" }
-            dispatchRSAKey?.run {
-                val decryptResult = query.content.decodeBase64Bytes().decrypt()
-                val signVerifyResult = if (requestSetting.enableSignVerify) {
-                    dispatchPublicRSAKey?.run {
-                        decryptResult.signVerify(query.sign.decodeBase64Bytes())
-                    } ?: false
-                } else true // If disable signVerify, return true
-                logger.debug { "QueryCurrentRegion Decrypted Result: ${decryptResult.encodeBase64()}" }
-                if (signVerifyResult) {
-                    QueryCurrRegionHttpRsp.parseFrom(decryptResult)
-                } else {
-                    error("QueryCurrentRegion sign verify failed")
-                }
-            } ?: error("Dispatch RSA Key is null or not valid")
+            requestSetting.queryCurrentRegionHardcode
         }
-    } else queryCurrRegionHttpRsp {}
+        call.forwardCall(url)
+    } else {
+        // sp-core needs an original dispatch CurRegHttpRsp to get some info in GetPlayerTokenRsp
+        // If sp-core is running alone, we can not get any call or forward info
+        DispatchServer.client.get(requestSetting.queryCurrentRegionHardcode)
+    }.bodyAsText()
+
+    if (requestSetting.oldCurrentRegionFormat) {
+        logger.debug { "QueryCurrentRegion Result: $forwardResult" }
+        // parse to proto directly
+        return QueryCurrRegionHttpRsp.parseFrom(forwardResult.decodeBase64Bytes())
+    }
+
+    // v28 format: {content: xxx (Encrypted CurRegion proto), sign: xxx}
+    val query: QueryCurrentRegionData = networkJson.decodeFromString(forwardResult)
+    logger.debug { "QueryCurrentRegion Result: $query" }
+
+    val decryptResult = dispatchRSAKey?.decrypt(query.content.decodeBase64Bytes()) // decrypted protobuf
+        ?: error("Dispatch RSA Key is null or not valid")
+
+    if (requestSetting.enableSignVerify) {
+        dispatchPublicRSAKey?.signVerify(decryptResult, query.sign.decodeBase64Bytes())
+            ?: error("QueryCurrentRegion sign verify failed")
+    }
+
+    logger.debug { "QueryCurrentRegion Decrypted Result: ${decryptResult.encodeBase64()}" }
+
+    return QueryCurrRegionHttpRsp.parseFrom(decryptResult)
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -196,19 +208,25 @@ internal suspend fun ApplicationCall.handleQueryCurrentRegion() {
     val packet = this.forwardQueryCurrentRegionHttpRsp()
     QueryCurrentRegionEvent(this, packet).broadcastEvent {
         val data = it.data.toByteArray()
-        if (DispatchConfig.data.requestSetting.v28CurrentRegionForwardFormat) {
-            var sign = "c29yYXBvaW50YQ==" // Some magic string if we don't need sign
-            if (DispatchConfig.data.requestSetting.enableSignature) {
-                signingKey?.apply {
-                    sign = data.sign().encodeBase64()
-                } ?: error("Sign RSA Key is null or not valid")
-            }
-            dispatchRSAKey?.apply {
-                respond(QueryCurrentRegionData(data.encrypt().encodeBase64(), sign))
-            } ?: error("Dispatch RSA Key is null or not valid")
-        } else {
+
+        if (DispatchConfig.data.requestSetting.oldCurrentRegionFormat) {
             respondText(data.encodeBase64())
+            return@broadcastEvent
         }
+
+        val sign = if (DispatchConfig.data.requestSetting.enableSignature) {
+            signingKey?.sign(data)?.encodeBase64()
+                ?: error("Sign RSA Key is null or not valid")
+        } else {
+            // default sign is base64 encoding of "sorapointa", it's a meaningless string
+            // some patch of game client will check this sign whether it can be correctly decoded
+            // if not, sign verification will fail
+            "c29yYXBvaW50YQ=="
+        }
+
+        val content = dispatchRSAKey?.encrypt(data)?.encodeBase64()
+            ?: error("Dispatch RSA Key is null or not valid")
+        respond(QueryCurrentRegionData(content, sign))
     }
 }
 
@@ -226,6 +244,7 @@ internal suspend fun ApplicationCall.handleLogin() {
             returnErrorMsg("dispatch.login.error.split")
             return@broadcastEvent
         }
+
         val name = split[0]
         val pwd = split[1]
         if (name.length !in 3..16) {
@@ -236,6 +255,7 @@ internal suspend fun ApplicationCall.handleLogin() {
             returnErrorMsg("dispatch.login.error.length.password")
             return@broadcastEvent
         }
+
         newSuspendedTransaction {
             val account = Account.findOrCreate(name, pwd)
             if (!account.checkPassword(pwd)) {
@@ -466,7 +486,7 @@ internal suspend inline fun <reified T> ApplicationCall.forwardCall(
 ): T {
     val url = "https://${request.headers["original"] ?: domain}${request.uri}"
     logger.debug { "Forwarding request from ${request.uri} to $url" }
-    val idUrl = url + request.queryParameters.formUrlEncode()
+    val idUrl = url + request.queryParameters.formUrlEncode() // identify url for cache
     return forwardCache.getOrPut(idUrl) {
         val call = this
         val request = DispatchServer.client.request {
