@@ -44,10 +44,11 @@ class RSAKey(
     }
 
     suspend fun decrypt(bytes: ByteArray): ByteArray = withContext(Dispatchers.Default) {
-        privateKey?.let {
-            cipher.init(Cipher.DECRYPT_MODE, privateKey)
-            bytes.chunkCipher(this@RSAKey.keySize / 8)
-        } ?: error("Component of private key, `d`, has not been given in constructor")
+        if (privateKey == null) {
+            error("Component of private key, `d`, has not been given in constructor")
+        }
+        cipher.init(Cipher.DECRYPT_MODE, privateKey)
+        bytes.chunkCipher(this@RSAKey.keySize / 8)
     }
 
     suspend fun signVerify(bytes: ByteArray, sign: ByteArray): Boolean = withContext(Dispatchers.Default) {
@@ -57,11 +58,12 @@ class RSAKey(
     }
 
     suspend fun sign(bytes: ByteArray): ByteArray = withContext(Dispatchers.Default) {
-        privateKey?.let {
-            signature.initSign(it)
-            signature.update(bytes)
-            signature.sign()
-        } ?: error("Component of private key, `d`, has not been given in constructor")
+        if (privateKey == null) {
+            error("Component of private key, `d`, has not been given in constructor")
+        }
+        signature.initSign(privateKey)
+        signature.update(bytes)
+        signature.sign()
     }
 
     private fun ByteArray.chunkCipher(chunkSize: Int): ByteArray {
