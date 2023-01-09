@@ -97,11 +97,11 @@ internal abstract class PlayerLoginRspPacket : AbstractOutgoingPacket<PlayerLogi
                 client_silence_data_version = regionInfo?.client_silence_data_version ?: 0,
                 client_data_version = regionInfo?.client_data_version ?: 0,
                 client_version_suffix = regionInfo?.client_version_suffix ?: "",
-                client_silence_md_5 = regionInfo?.client_silence_data_md_5 ?: "",
+                client_silence_md5 = regionInfo?.client_silence_data_md5 ?: "",
                 register_cps = REGISTRY_CPS, // may be server provider
                 res_version_config = regionInfo?.res_version_config,
                 country_code = "US", // TODO: Hardcode
-                client_md_5 = regionInfo?.client_data_md_5 ?: "",
+                client_md5 = regionInfo?.client_data_md5 ?: "",
                 // TODO: Unknown - totalTickTime
                 is_sc_open = false, // Anti-cheat?
                 client_silence_version_suffix = regionInfo?.client_silence_version_suffix ?: "",
@@ -305,14 +305,14 @@ internal class GetPlayerSocialDetailRspPacket(
 ) {
     override fun Player.buildProto(): GetPlayerSocialDetailRsp {
         val data = PlayerDataImpl.findById(targetUid)
-            ?: return GetPlayerSocialDetailRsp(retcode = Retcode.RETCODE_RET_SVR_ERROR.value)
+            ?: return GetPlayerSocialDetailRsp(retcode = Retcode.RET_SVR_ERROR.value)
 
         val onlinePlayer = Sorapointa.findPlayerById(this@GetPlayerSocialDetailRspPacket.targetUid)
         val isMpModeAvailable = onlinePlayer?.isMpModeAvailable ?: false
         val onlineState = if (onlinePlayer != null) {
             FriendOnlineState.FRIEND_ONLINE_STATE_ONLINE
         } else {
-            FriendOnlineState.FRIEND_ONLINE_STATE_FREIEND_DISCONNECT
+            FriendOnlineState.FRIEND_ONLINE_STATE_DISCONNECT
         }
 
         val social = SocialDetail(

@@ -55,10 +55,10 @@ internal object GetPlayerTokenReqHandler : IncomingPreLoginPacketHandler
     ): GetPlayerTokenRspPacket {
         val uid = packet.account_uid.toInt()
         val account = Account.findById(uid) ?: return GetPlayerTokenRspPacket.Error(
-            Retcode.RETCODE_RET_ACCOUNT_NOT_EXIST, "user.notfound"
+            Retcode.RET_ACCOUNT_NOT_EXIST, "user.notfound"
         )
         if (packet.account_token != account.getComboTokenWithCheck()) return GetPlayerTokenRspPacket.Error(
-            Retcode.RETCODE_RET_TOKEN_ERROR, "auth.error.token"
+            Retcode.RET_TOKEN_ERROR, "auth.error.token"
         )
         Sorapointa.findPlayerById(uid)?.let {
             // TODO: replace it with graceful disconnect
@@ -100,7 +100,7 @@ internal object PlayerLoginReqHandler : IncomingPreLoginPacketHandler
             }
         }.getOrNull()?.let {
             PlayerLoginRspPacket.Succ(it)
-        } ?: PlayerLoginRspPacket.Fail(Retcode.RETCODE_RET_SVR_ERROR)
+        } ?: PlayerLoginRspPacket.Fail(Retcode.RET_SVR_ERROR)
     }
 }
 
@@ -154,7 +154,7 @@ internal object EnterSceneReadyReqHandler : IncomingPacketHandlerWithResponse
         return if (packet.enter_scene_token == enterSceneToken) {
             impl().sendPacketAsync(EnterScenePeerNotifyPacket(this)) // doesn't have packetHeader (metadata)
             EnterSceneReadyRspPacket.Succ(this) // has packetHeader
-        } else EnterSceneReadyRspPacket.Fail(this, Retcode.RETCODE_RET_ENTER_SCENE_TOKEN_INVALID)
+        } else EnterSceneReadyRspPacket.Fail(this, Retcode.RET_ENTER_SCENE_TOKEN_INVALID)
     }
 }
 
@@ -172,7 +172,7 @@ internal object SceneInitFinishReqHandler : IncomingPacketHandlerWithResponse
             // TODO: divide those into separate modules
 
             SceneInitFinishRspPacket.Succ(this)
-        } else SceneInitFinishRspPacket.Fail(this, Retcode.RETCODE_RET_ENTER_SCENE_TOKEN_INVALID)
+        } else SceneInitFinishRspPacket.Fail(this, Retcode.RET_ENTER_SCENE_TOKEN_INVALID)
     }
 }
 
