@@ -9,9 +9,7 @@ import kotlinx.datetime.toLocalDateTime
 import org.sorapointa.SorapointaConfig
 import org.sorapointa.dataloader.common.FightProp
 import org.sorapointa.dataloader.common.PlayerProp
-import org.sorapointa.proto.fightPropPair
-import org.sorapointa.proto.propPair
-import org.sorapointa.proto.propValue
+import org.sorapointa.proto.*
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -28,20 +26,20 @@ inline infix fun PlayerProp.value(value: Int) =
     this@value.value(value.toLong())
 
 inline infix fun PlayerProp.value(value: Long) =
-    propValue {
-        type = this@value.value
-        ival = value
-        val_ = value
-    }
+    PropValue(
+        type = this@value.value,
+        ival = value,
+        val_ = value,
+    )
 
 inline infix fun PlayerProp.pair(value: Int) =
     pair(value.toLong())
 
 inline infix fun PlayerProp.pair(value: Long) =
-    propPair {
-        type = this@pair.value
-        propValue = this@pair.value(value)
-    }
+    PropPair(
+        type = this@pair.value,
+        prop_value = this@pair.value(value),
+    )
 
 inline infix fun FightProp.map(value: Int) =
     map(value.toFloat())
@@ -53,19 +51,19 @@ inline infix fun FightProp.pair(value: Int) =
     pair(value.toFloat())
 
 inline infix fun FightProp.pair(value: Float) =
-    fightPropPair {
-        propType = this@pair.value
-        propValue = value
-    }
+    FightPropPair(
+        prop_type = this@pair.value,
+        prop_value = value,
+    )
 
 inline infix fun Int.fightProp(value: Int) =
     fightProp(value.toFloat())
 
 inline infix fun Int.fightProp(value: Float) =
-    fightPropPair {
-        propType = this@fightProp
-        propValue = value
-    }
+    FightPropPair(
+        prop_type = this@fightProp,
+        prop_value = value,
+    )
 
 val todayStartTime: Instant
     get() = run {

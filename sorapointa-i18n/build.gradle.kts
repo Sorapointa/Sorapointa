@@ -6,5 +6,6 @@ plugins {
 
 dependencies {
     implementation(project(":sorapointa-dataprovider"))
+    implementation(project(":sorapointa-utils:sorapointa-utils-core"))
     implementation(project(":sorapointa-utils:sorapointa-utils-serialization"))
 }

@@ -1,5 +1,6 @@
 package org.sorapointa.server.network
 
+import com.squareup.wire.Message
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import kcp.highway.KcpListener
@@ -20,7 +21,7 @@ import org.sorapointa.game.PlayerImpl
 import org.sorapointa.game.data.PlayerData
 import org.sorapointa.game.data.PlayerDataImpl
 import org.sorapointa.game.impl
-import org.sorapointa.proto.PacketHeadOuterClass.PacketHead
+import org.sorapointa.proto.PacketHead
 import org.sorapointa.proto.SoraPacket
 import org.sorapointa.proto.findCommonNameFromCmdId
 import org.sorapointa.server.network.IncomingPacketFactory.tryHandle
@@ -101,15 +102,15 @@ internal open class NetworkHandler(
         lastPingTime = now()
     }
 
-    open fun sendPacketAsync(
-        packet: OutgoingPacket,
+    open fun <T : Message<*, *>> sendPacketAsync(
+        packet: OutgoingPacket<T>,
         metadata: PacketHead? = null
     ): Job = scope.launch {
         sendPacket(packet, metadata)
     }
 
-    open suspend fun sendPacket(
-        packet: OutgoingPacket,
+    open suspend fun <T : Message<*, *>> sendPacket(
+        packet: OutgoingPacket<T>,
         metadata: PacketHead? = null
     ) {
         if (networkStateController.getCurrentState() == NetworkHandlerStateInterface.State.CLOSED) return
@@ -178,11 +179,10 @@ internal open class NetworkHandler(
         }
 
         override suspend fun handlePacket(packet: SoraPacket) {
+            val outgoingPacket = tryHandle(packet) ?: return
             newSuspendedTransaction {
-                tryHandle(packet)?.also { outgoingPacket ->
-                    sendPacket(outgoingPacket) // Wait for sending, cuz we need to update key
-                    updateSessionState?.also { networkStateController.setState(it) }
-                }
+                sendPacket(outgoingPacket) // Wait for sending, cuz we need to update key
+                updateSessionState?.also { networkStateController.setState(it) }
             }
         }
     }

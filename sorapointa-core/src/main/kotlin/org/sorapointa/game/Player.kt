@@ -1,5 +1,6 @@
 package org.sorapointa.game
 
+import com.squareup.wire.Message
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.update
 import kotlinx.coroutines.Job
@@ -17,8 +18,8 @@ import org.sorapointa.game.data.AvatarDataImpl
 import org.sorapointa.game.data.CompoundAvatarTeamData
 import org.sorapointa.game.data.PlayerData
 import org.sorapointa.game.data.PlayerDataImpl
-import org.sorapointa.proto.PacketHeadOuterClass
-import org.sorapointa.proto.PropValueOuterClass.PropValue
+import org.sorapointa.proto.PacketHead
+import org.sorapointa.proto.PropValue
 import org.sorapointa.proto.SoraPacket
 import org.sorapointa.server.network.*
 import org.sorapointa.utils.*
@@ -76,14 +77,14 @@ abstract class AbstractPlayer : Player {
 
     internal abstract val playerProto: PlayerProto
 
-    internal abstract fun sendPacketAsync(
-        packet: OutgoingPacket,
-        metadata: PacketHeadOuterClass.PacketHead? = null
+    internal abstract fun <T : Message<*, *>> sendPacketAsync(
+        packet: OutgoingPacket<T>,
+        metadata: PacketHead? = null
     ): Job
 
-    internal abstract suspend fun sendPacket(
-        packet: OutgoingPacket,
-        metadata: PacketHeadOuterClass.PacketHead? = null
+    internal abstract suspend fun <T : Message<*, *>> sendPacket(
+        packet: OutgoingPacket<T>,
+        metadata: PacketHead? = null
     )
 
     internal abstract fun forwardHandlePacket(
@@ -96,7 +97,6 @@ abstract class AbstractPlayer : Player {
 }
 
 interface PlayerStateInterface : WithState<PlayerStateInterface.State> {
-
     enum class State {
         LOGIN,
         OK,
@@ -218,14 +218,14 @@ class PlayerImpl internal constructor(
     override suspend fun sendMessage(msg: String) {
     }
 
-    override fun sendPacketAsync(
-        packet: OutgoingPacket,
-        metadata: PacketHeadOuterClass.PacketHead?
-    ) = networkHandler.sendPacketAsync(packet)
+    override fun <T : Message<*, *>> sendPacketAsync(
+        packet: OutgoingPacket<T>,
+        metadata: PacketHead?,
+    ): Job = networkHandler.sendPacketAsync(packet)
 
-    override suspend fun sendPacket(
-        packet: OutgoingPacket,
-        metadata: PacketHeadOuterClass.PacketHead?
+    override suspend fun <T : Message<*, *>> sendPacket(
+        packet: OutgoingPacket<T>,
+        metadata: PacketHead?,
     ) = networkHandler.sendPacket(packet)
 
     override fun forwardHandlePacket(
@@ -325,7 +325,7 @@ class PlayerProtoImpl(
             PlayerProp.PROP_EXP map player.data.exp,
             PlayerProp.PROP_PLAYER_HCOIN map player.data.primoGem,
             PlayerProp.PROP_PLAYER_SCOIN map player.data.mora,
-            PlayerProp.PROP_PLAYER_MP_SETTING_TYPE map player.data.mpSettingType.number,
+            PlayerProp.PROP_PLAYER_MP_SETTING_TYPE map player.data.mpSettingType.value,
             PlayerProp.PROP_IS_MP_MODE_AVAILABLE map player.data.isMpModeAvailable.toInt(),
             PlayerProp.PROP_PLAYER_WORLD_LEVEL map player.data.worldLevel,
             PlayerProp.PROP_PLAYER_RESIN map player.data.playerResin,

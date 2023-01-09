@@ -18,18 +18,19 @@ dependencies {
     api(project(":sorapointa-utils:sorapointa-utils-all"))
 
     // KotlinX
-    api("org.jetbrains.kotlinx:atomicfu:_")
+    implementation(libs.atomicfu)
 
     // network
-    implementation("io.netty:netty-handler:_")
-    implementation("moe.sdl.kcp:grasskcpper:_")
+    implementation(libs.netty)
+    implementation(libs.kcp)
     // Ktor
-    implementation("io.ktor:ktor-server-websockets:_")
+    implementation(libs.ktor.server.wss)
     // Command
-    api("moe.sdl.yac:core:_")
+    api(libs.yac)
     // Console
-    implementation("org.jline:jline:_")
-    implementation("com.password4j:password4j:_")
+    implementation(libs.jline)
+    implementation(libs.password4j)
+
     testImplementation(project(":sorapointa-dispatch", "test"))
     testImplementation(project(":sorapointa-dataprovider", "test"))
 }

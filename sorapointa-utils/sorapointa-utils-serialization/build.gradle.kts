@@ -5,6 +5,6 @@ plugins {
 }
 
 dependencies {
-    api(KotlinX.serialization.json)
-    api("com.charleskorn.kaml:kaml:_")
+    api(libs.kotlinx.serialization.json)
+    api(libs.kaml)
 }

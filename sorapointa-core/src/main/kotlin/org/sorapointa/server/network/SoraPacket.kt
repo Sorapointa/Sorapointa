@@ -1,60 +1,61 @@
 package org.sorapointa.server.network
 
-import com.google.protobuf.GeneratedMessageV3
+import com.squareup.wire.Message
+import com.squareup.wire.ProtoAdapter
 import io.ktor.utils.io.core.*
 import org.sorapointa.game.Avatar
 import org.sorapointa.game.Player
-import org.sorapointa.proto.PacketHeadOuterClass.PacketHead
+import org.sorapointa.proto.PacketHead
 import org.sorapointa.proto.writeSoraPacket
 
-interface OutgoingPacket {
+interface OutgoingPacket<T : Message<*, *>> {
 
     val cmdId: UShort
     var metadata: PacketHead?
-
-    fun buildProto(): GeneratedMessageV3?
+    val adapter: ProtoAdapter<T>
+    fun buildProto(): T
 }
 
-abstract class AbstractOutgoingPacket(
+abstract class AbstractOutgoingPacket<T : Message<*, *>>(
     override val cmdId: UShort,
-) : OutgoingPacket {
+) : OutgoingPacket<T> {
 
     override var metadata: PacketHead? = null
 
-    abstract override fun buildProto(): GeneratedMessageV3
+    abstract override fun buildProto(): T
 }
 
-internal fun OutgoingPacket.toFinalBytePacket(): ByteArray {
+internal fun <T : Message<*, *>> OutgoingPacket<T>.toFinalBytePacket(): ByteArray {
     val packet = this
     return buildPacket {
-        writeSoraPacket(packet.cmdId, packet.buildProto(), packet.metadata)
+        writeSoraPacket(packet.cmdId, packet.adapter, packet.buildProto(), packet.metadata)
     }.readBytes()
 }
 
-internal abstract class PlayerOutgoingPacket(
+internal abstract class PlayerOutgoingPacket<T : Message<*, *>>(
     cmdId: UShort
-) : AbstractOutgoingPacket(cmdId) {
+) : AbstractOutgoingPacket<T>(cmdId) {
 
     protected abstract val player: Player
 
-    override fun buildProto(): GeneratedMessageV3 =
+    override fun buildProto(): T =
         with(player) {
             buildProto()
         }
 
-    abstract fun Player.buildProto(): GeneratedMessageV3
+    abstract fun Player.buildProto(): T
 }
 
-internal abstract class AvatarOutgoingPacket(
+internal abstract class AvatarOutgoingPacket<T : Message<*, *>>(
     cmdId: UShort
-) : AbstractOutgoingPacket(cmdId) {
+) : AbstractOutgoingPacket<T>(cmdId) {
 
     abstract val avatar: Avatar
 
-    override fun buildProto(): GeneratedMessageV3 =
+    override fun buildProto(): T =
         with(avatar) {
             buildProto()
         }
 
-    abstract fun Avatar.buildProto(): GeneratedMessageV3
+    abstract fun Avatar.buildProto(): T
 }

@@ -3,7 +3,6 @@ package org.sorapointa.utils
 class OptionalContainer<T>(
     private val defaultValue: T
 ) {
-
     var value: T = defaultValue
         private set
 
@@ -21,7 +20,9 @@ class OptionalContainer<T>(
         this.value = defaultValue
     }
 
-    inline fun <R> ifChanged(func: (T) -> R): R? {
-        return if (hasChanged) func(value) else null
+    inline fun ifChanged(func: (T) -> Unit) {
+        if (hasChanged) func(value)
     }
+
+    fun changedOrDefault(): T = if (hasChanged) value else defaultValue
 }

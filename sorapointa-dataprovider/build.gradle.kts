@@ -15,17 +15,19 @@ val defaultDatabaseType: String? = props["database.default"]
 val databaseCompileList: String? = props["database.driver.list"]
 
 dependencies {
+    implementation(project(":sorapointa-utils:sorapointa-utils-core"))
     implementation(project(":sorapointa-utils:sorapointa-utils-serialization"))
 
-    implementation("org.jetbrains.kotlin:kotlin-reflect:_")
+    implementation(libs.bundles.log)
+    implementation(libs.kotlin.reflect)
+    implementation(libs.atomicfu)
 
-    implementation("org.jetbrains.kotlinx:atomicfu:_")
     // Database
-    api("org.jetbrains.exposed:exposed-core:_")
-    api("org.jetbrains.exposed:exposed-dao:_")
-    api("org.jetbrains.exposed:exposed-jdbc:_")
-    api("org.jetbrains.exposed:exposed-kotlin-datetime:_")
-    implementation("com.zaxxer:HikariCP:_")
+    api(libs.exposed.core)
+    api(libs.exposed.dao)
+    api(libs.exposed.jdbc)
+    api(libs.exposed.kotlin.datetime)
+    implementation(libs.hikaricp)
 
     val databaseCompileList =
         databaseCompileList?.split(',')
@@ -34,10 +36,10 @@ dependencies {
             ?: listOf("sqlite")
 
     if (databaseCompileList.contains("sqlite")) {
-        implementation("org.xerial:sqlite-jdbc:_")
+        implementation(libs.sqlite)
     }
 
-    implementation("org.postgresql:postgresql:_")
+    implementation(libs.postgresql)
 }
 
 fun BuildConfigSourceSet.dbType(name: String, value: String) =

@@ -6,8 +6,8 @@ import io.ktor.server.application.*
 import org.sorapointa.dispatch.data.*
 import org.sorapointa.event.AbstractEvent
 import org.sorapointa.event.CancelableEvent
-import org.sorapointa.proto.QueryCurrRegionHttpRspOuterClass.QueryCurrRegionHttpRsp
-import org.sorapointa.proto.QueryRegionListHttpRspOuterClass.QueryRegionListHttpRsp
+import org.sorapointa.proto.QueryCurrRegionHttpRsp
+import org.sorapointa.proto.QueryRegionListHttpRsp
 
 abstract class DispatchEvent : AbstractEvent() {
 

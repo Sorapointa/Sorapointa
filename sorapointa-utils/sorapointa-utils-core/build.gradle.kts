@@ -3,6 +3,12 @@ plugins {
     `sorapointa-publish`
 }
 
+dependencies {
+    implementation(libs.microutils.logging)
+    implementation(libs.logback)
+    implementation(libs.kotlinx.coroutines.core)
+}
+
 val commitHash by lazy {
     val commitHashCommand = "git rev-parse --short HEAD"
     Runtime.getRuntime().exec(commitHashCommand).inputStream.bufferedReader().readLine() ?: "UnkCommit"

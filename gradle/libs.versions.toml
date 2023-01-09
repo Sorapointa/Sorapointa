@@ -1,0 +1,69 @@
+[versions]
+kotlin = "1.7.20"
+ktor = "2.1.2"
+exposed = "0.39.2"
+
+[plugins]
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "10.3.0" }
+abi-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.11.1" }
+wire = { id = "com.squareup.wire", version = "4.4.3" }
+
+[libraries]
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+
+kotlinx-serialization-core = "org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.1"
+kotlinx-serialization-json = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
+kaml = "com.charleskorn.kaml:kaml:0.49.0"
+
+kotlinx-coroutines-core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
+
+microutils-logging = "io.github.microutils:kotlin-logging-jvm:3.0.0"
+logback = "ch.qos.logback:logback-classic:1.4.3"
+
+atomicfu = "org.jetbrains.kotlinx:atomicfu:0.18.3"
+netty = "io.netty:netty-handler:4.1.82.Final"
+kcp = "moe.sdl.kcp:grasskcpper:2.0.0"
+yac = "moe.sdl.yac:core:1.0.0"
+jline = "org.jline:jline:3.21.0"
+password4j = "com.password4j:password4j:1.6.0"
+classgraph = "io.github.classgraph:classgraph:4.8.149"
+
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
+exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed" }
+
+hikaricp = "com.zaxxer:HikariCP:5.0.1"
+
+sqlite = "org.xerial:sqlite-jdbc:3.39.3.0"
+postgresql = "org.postgresql:postgresql:42.5.0"
+
+ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
+ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor" }
+ktor-server-logging = { module = "io.ktor:ktor-server-call-logging-jvm", version.ref = "ktor" }
+ktor-server-compression = { module = "io.ktor:ktor-server-compression-jvm", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
+ktor-server-status-page = { module = "io.ktor:ktor-server-status-pages", version.ref = "ktor" }
+ktor-server-html = { module = "io.ktor:ktor-server-html-builder", version.ref = "ktor" }
+ktor-server-wss = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
+
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+
+ktor-network-cert = { module = "io.ktor:ktor-network-tls-certificates", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+
+ktor-server-tests = { module = "io.ktor:ktor-server-tests-jvm", version.ref = "ktor" }
+
+ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
+
+cron-utils = "com.cronutils:cron-utils:9.2.0"
+wire-runtime = "com.squareup.wire:wire-runtime:4.4.3"
+
+[bundles]
+log = ["microutils-logging", "logback"]

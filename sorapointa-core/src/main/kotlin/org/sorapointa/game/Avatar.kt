@@ -10,8 +10,6 @@ import org.sorapointa.game.data.AvatarData
 import org.sorapointa.game.data.ItemData
 import org.sorapointa.game.data.Position
 import org.sorapointa.proto.*
-import org.sorapointa.proto.AvatarInfoOuterClass.AvatarInfo
-import org.sorapointa.proto.PropValueOuterClass.PropValue
 import org.sorapointa.utils.*
 import kotlin.contracts.contract
 
@@ -84,7 +82,7 @@ class AvatarImpl(
 
     override val position: Position = ownerPlayer.data.position
 
-    override val entityType = ProtEntityTypeOuterClass.ProtEntityType.PROT_ENTITY_TYPE_AVATAR
+    override val entityType = ProtEntityType.PROT_ENTITY_TYPE_AVATAR
 
     override val avatarProto: AvatarProto = AvatarProtoImpl(this)
 
@@ -174,25 +172,25 @@ internal interface AvatarProto : SceneEntityProto<Avatar> {
 }
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun Map<Int, PropValue>.toFlattenPropMap() =
-    map { it.key to it.value.`val` }.toMap()
+inline fun Map<Int, PropValue>.toFlattenPropMap(): Map<Int, Long> =
+    map { it.key to it.value.val_ }.toMap()
 
 internal class AvatarProtoImpl(
     override val entity: Avatar
 ) : AbstractSceneEntityProto<Avatar>(), AvatarProto {
 
     private val protoExcelInfo by lazy {
-        avatarExcelInfo {
-            prefabPathHash = entity.avatarExcelData.prefabPathHash
-            prefabPathRemoteHash = entity.avatarExcelData.prefabPathRemoteHash
-            controllerPathHash = entity.avatarExcelData.controllerPathHash
-            controllerPathRemoteHash = entity.avatarExcelData.controllerPathRemoteHash
-            combatConfigHash = entity.avatarExcelData.combatConfigHash
-        }
+        AvatarExcelInfo(
+            prefab_path_hash = entity.avatarExcelData.prefabPathHash,
+            prefab_path_remote_hash = entity.avatarExcelData.prefabPathRemoteHash,
+            controller_path_hash = entity.avatarExcelData.controllerPathHash,
+            controller_path_remote_hash = entity.avatarExcelData.controllerPathRemoteHash,
+            combat_config_hash = entity.avatarExcelData.combatConfigHash,
+        )
     }
 
     override val protoPropMap
-        get() = mapOf(
+        get() = mapOf<Int, PropValue>(
             PlayerProp.PROP_LEVEL map entity.data.level,
             PlayerProp.PROP_EXP map entity.data.exp,
             PlayerProp.PROP_BREAK_LEVEL map entity.data.promoteLevel,
@@ -283,27 +281,17 @@ internal class AvatarProtoImpl(
             FIGHT_PROP_CUR_SPEED map entity.curSpeed
         }.toMap().filter { it.value != 0f }
 
-    override val fightPropPairList: List<FightPropPairOuterClass.FightPropPair>
+    override val fightPropPairList: List<FightPropPair>
         get() = protoFightPropMap.map { it.key fightProp it.value } // crazy hoyo
 
     private val protoSkillMap
         get() = buildMap {
             // TODO: Extra count from constellation, CD time store
             entity.elementSkill?.let {
-                put(
-                    it.id,
-                    avatarSkillInfo {
-                        maxChargeCount = it.maxChargeNum
-                    }
-                )
+                put(it.id, AvatarSkillInfo(max_charge_count = it.maxChargeNum))
             }
             entity.energySkill?.let {
-                put(
-                    it.id,
-                    avatarSkillInfo {
-                        maxChargeCount = it.maxChargeNum
-                    }
-                )
+                put(it.id, AvatarSkillInfo(max_charge_count = it.maxChargeNum))
             }
         }
 
@@ -318,65 +306,65 @@ internal class AvatarProtoImpl(
             }
         }
 
-    override fun toAvatarInfoProto(): AvatarInfo =
-        avatarInfo {
-            avatarId = entity.data.avatarId
-            guid = entity.data.guid
-            propMap.putAll(protoPropMap)
-            lifeState = entity.data.lifeState.value
-            equipGuidList.addAll(protoEquipGuidList)
-            talentIdList.addAll(entity.talentList)
-            fightPropMap.putAll(protoFightPropMap)
-            skillMap.putAll(protoSkillMap)
-            skillDepotId = entity.data.skillDepotId
-            // TODO: Fetter system
-            // Official server packet doesn't have `coreProudSkillLevel` field
-            coreProudSkillLevel = entity.data.constellationLevel
-            inherentProudSkillList.addAll(entity.inherentProudSkillList)
-            skillLevelMap.putAll(protoSkillLevelMap)
-            // TODO: Proud skill extra level map
-            // TODO: isFocus is whether one of teammate of selected team
-            avatarType = entity.avatarType.value
-            // TODO: Team resonance
-            wearingFlycloakId = entity.data.wearingFlyCloakId.id
-            // Still don't know what is `equip_affix_list` in this packet
-            // It seems related to weapon passive skill and cd time
-            // 比如西风和祭礼系列武器的被动冷却时间 - 持久化数据库存储，就像 protoSkillMap
-            bornTime = entity.data.bornTime.epochSeconds.toInt()
-            // TODO: `pending_promote_reward_list`
-            entity.data.costumeId?.let { costumeId = it }
-            excelInfo = protoExcelInfo
-        }
+    override fun toAvatarInfoProto(): AvatarInfo = AvatarInfo(
+        avatar_id = entity.data.avatarId,
+        guid = entity.data.guid,
+        prop_map = protoPropMap,
+        life_state = entity.data.lifeState.value,
+        equip_guid_list = protoEquipGuidList,
+        talent_id_list = entity.talentList,
+        fight_prop_map = protoFightPropMap,
+        skill_map = protoSkillMap,
+        skill_depot_id = entity.data.skillDepotId,
+        // TODO: Fetter system
+        // Official server packet doesn't have `coreProudSkillLevel` field
+        core_proud_skill_level = entity.data.constellationLevel,
+        inherent_proud_skill_list = entity.inherentProudSkillList,
+        skill_level_map = protoSkillLevelMap,
+        // TODO: Proud skill extra level map
+        // TODO: isFocus is whether one of teammate of selected team
+        avatar_type = entity.avatarType.value,
+        // TODO: Team resonance
+        wearing_flycloak_id = entity.data.wearingFlyCloakId.id,
+        // Still don't know what is `equip_affix_list` in this packet
+        // It seems related to weapon passive skill and cd time
+        // 比如西风和祭礼系列武器的被动冷却时间 - 持久化数据库存储，就像 protoSkillMap
+        born_time = entity.data.bornTime.epochSeconds.toInt(),
+        // TODO: `pending_promote_reward_list`
+        costume_id = entity.data.costumeId ?: 0,
+        excel_info = protoExcelInfo,
+    )
 
-    override fun SceneEntityInfoKt.Dsl.toProto() {
-        avatar = sceneAvatarInfo {
-            uid = entity.ownerPlayer.uid
-            avatarId = entity.data.avatarId
-            guid = entity.data.guid
-            peerId = entity.ownerPlayer.peerId
-            equipIdList.addAll(protoEquipIdList)
-            skillDepotId = entity.data.skillDepotId
-            talentIdList.addAll(entity.talentList)
-            entity.equipWeapon?.also { weaponData ->
-                entity.equipWeaponEntityId?.also { entityId ->
-                    weapon = weaponData.toSceneWeaponInfoProto(entityId)
-                }
-            }
-            reliquaryList.addAll(protoSceneReliquaryInfoList)
-            coreProudSkillLevel = entity.data.constellationLevel
-            inherentProudSkillList.addAll(entity.inherentProudSkillList)
-            skillLevelMap.putAll(protoSkillLevelMap)
+    override fun SceneEntityInfo.toProto(): SceneEntityInfo {
+        val weapon = if (entity.equipWeapon != null && entity.equipWeaponEntityId != null) {
+            entity.equipWeapon!!.toSceneWeaponInfoProto(entity.equipWeaponEntityId!!)
+        } else avatar?.weapon
+
+        val avatar = SceneAvatarInfo(
+            uid = entity.ownerPlayer.uid,
+            avatar_id = entity.data.avatarId,
+            guid = entity.data.guid,
+            peer_id = entity.ownerPlayer.peerId,
+            equip_id_list = protoEquipIdList,
+            skill_depot_id = entity.data.skillDepotId,
+            talent_id_list = entity.talentList,
+            weapon = weapon,
+            reliquary_list = protoSceneReliquaryInfoList,
+            core_proud_skill_level = entity.data.constellationLevel,
+            inherent_proud_skill_list = entity.inherentProudSkillList,
+            skill_level_map = protoSkillLevelMap,
             // TODO: Proud skill extra level map
             // TODO: Server Buff List
             // TODO: Team resonance
-            wearingFlycloakId = entity.data.wearingFlyCloakId.id
-            bornTime = entity.data.bornTime.epochSeconds.toInt()
+            wearing_flycloak_id = entity.data.wearingFlyCloakId.id,
+            born_time = entity.data.bornTime.epochSeconds.toInt(),
             // TODO: `pending_promote_reward_list`
-            entity.data.costumeId?.let { costumeId = it }
+            costume_id = entity.data.costumeId ?: 0,
             // curVehicleInfo
-            excelInfo = protoExcelInfo
+            excel_info = protoExcelInfo,
             // animHash
-        }
+        )
+        return copy(avatar = avatar)
     }
 }
 

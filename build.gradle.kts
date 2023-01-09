@@ -1,10 +1,15 @@
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 plugins {
-    kotlin("plugin.serialization") apply false
     kotlin("jvm") apply false
-    id("org.jlleitschuh.gradle.ktlint")
-    id("org.jetbrains.kotlinx.binary-compatibility-validator")
+    java
+    // NOT AN ERROR, see: https://youtrack.jetbrains.com/issue/KTIJ-19369
+    // You can install a plugin to suppress it:
+    // https://plugins.jetbrains.com/plugin/18949-gradle-libs-error-suppressor
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.abi.validator)
+    alias(libs.plugins.wire) apply false
 }
 
 subprojects {

@@ -1,6 +1,5 @@
 package org.sorapointa.dispatch.plugins
 
-import com.google.protobuf.kotlin.toByteString
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -15,7 +14,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonElement
-import mu.KotlinLogging
+import okio.ByteString.Companion.toByteString
 import org.jetbrains.annotations.PropertyKey
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.sorapointa.dispatch.BUNDLE
@@ -26,11 +25,7 @@ import org.sorapointa.dispatch.data.*
 import org.sorapointa.dispatch.events.*
 import org.sorapointa.dispatch.utils.KeyProvider
 import org.sorapointa.event.broadcastEvent
-import org.sorapointa.proto.QueryCurrRegionHttpRspOuterClass.QueryCurrRegionHttpRsp
-import org.sorapointa.proto.QueryRegionListHttpRspOuterClass.QueryRegionListHttpRsp
-import org.sorapointa.proto.queryCurrRegionHttpRsp
-import org.sorapointa.proto.queryRegionListHttpRsp
-import org.sorapointa.proto.regionSimpleInfo
+import org.sorapointa.proto.*
 import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.crypto.RSAKey
 import org.sorapointa.utils.crypto.parseToRSAKey
@@ -38,7 +33,7 @@ import org.sorapointa.utils.networkJson
 import org.sorapointa.utils.xor
 import java.util.concurrent.ConcurrentHashMap
 
-private val logger = KotlinLogging.logger {}
+private val logger = mu.KotlinLogging.logger {}
 
 private val DOMAIN_SDK_STATIC = "c2RrLW9zLXN0YXRpYy5ob3lvdmVyc2UuY29t".decodeBase64String()
 private val DOMAIN_HK4E_OS_VERSION = "aGs0ZS1zZGstb3MuaG95b3ZlcnNlLmNvbQ==".decodeBase64String()
@@ -48,12 +43,12 @@ private val ANNOUNCE_URL =
 private val QUERY_CURR_DOMAIN = "Y25nZmRpc3BhdGNoLnl1YW5zaGVuLmNvbQ==".decodeBase64String()
 
 private val serverList = DispatchConfig.data.servers.map {
-    regionSimpleInfo {
-        name = it.serverName
-        title = it.title
-        type = it.serverType
-        dispatchUrl = "https://${it.dispatchDomain}/query_cur_region"
-    }
+    RegionSimpleInfo(
+        name = it.serverName,
+        title = it.title,
+        type = it.serverType,
+        dispatch_url = "https://${it.dispatchDomain}/query_cur_region",
+    )
 }
 
 private suspend fun getQueryRegionListHttpRsp(host: String): QueryRegionListHttpRsp {
@@ -64,17 +59,18 @@ private suspend fun getQueryRegionListHttpRsp(host: String): QueryRegionListHttp
     val dispatchSeed = ec2b.seed
     val dispatchKey = ec2b.key
 
-    return queryRegionListHttpRsp {
-        regionList.addAll(serverList)
-        clientSecretKey = dispatchSeed.toByteString()
-        enableLoginPc = true
-        clientCustomConfigEncrypted = networkJson.encodeToString(
+    return QueryRegionListHttpRsp(
+        region_list = serverList,
+        client_secret_key = dispatchSeed.toByteString(),
+        enable_login_pc = true,
+        client_custom_config_encrypted = networkJson.encodeToString(
             DispatchConfig.data.regionListClientCustomConfig
-        ).toByteArray().xor(dispatchKey).toByteString()
-    }
+        ).toByteArray().xor(dispatchKey).toByteString(),
+    )
 }
 
-@SorapointaInternal var currentRegionRsp = CompletableDeferred<QueryCurrRegionHttpRsp>()
+@SorapointaInternal
+var currentRegionRsp = CompletableDeferred<QueryCurrRegionHttpRsp>()
 
 private val dispatchRSAKey: RSAKey? by lazy {
     val setting = DispatchConfig.data.requestSetting
@@ -117,7 +113,7 @@ suspend fun getCurrentRegionHttpRsp(call: ApplicationCall? = null): QueryCurrReg
 
     if (!requestSetting.forwardQueryCurrentRegion) {
         // If dispatch doesn't enable forward
-        return queryCurrRegionHttpRsp {}
+        return QueryCurrRegionHttpRsp()
     }
 
     val forwardResult = if (call != null) {
@@ -136,7 +132,7 @@ suspend fun getCurrentRegionHttpRsp(call: ApplicationCall? = null): QueryCurrReg
     if (requestSetting.oldCurrentRegionFormat) {
         logger.debug { "QueryCurrentRegion Result: $forwardResult" }
         // parse to proto directly
-        return QueryCurrRegionHttpRsp.parseFrom(forwardResult.decodeBase64Bytes())
+        return QueryCurrRegionHttpRsp.ADAPTER.decode(forwardResult.decodeBase64Bytes())
     }
 
     // v28 format: {content: xxx (Encrypted CurRegion proto), sign: xxx}
@@ -153,7 +149,7 @@ suspend fun getCurrentRegionHttpRsp(call: ApplicationCall? = null): QueryCurrReg
 
     logger.debug { "QueryCurrentRegion Decrypted Result: ${decryptResult.encodeBase64()}" }
 
-    return QueryCurrRegionHttpRsp.parseFrom(decryptResult)
+    return QueryCurrRegionHttpRsp.ADAPTER.decode(decryptResult)
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -176,22 +172,23 @@ private suspend fun ApplicationCall.forwardQueryCurrentRegionHttpRsp(): QueryCur
     val dispatchSeed = ec2b.seed
     val dispatchKey = ec2b.key
 
-    return queryCurrentRegionHttpRsp.toBuilder()
-        .setRegionInfo(
-            queryCurrentRegionHttpRsp.regionInfo.toBuilder()
-                .setGateserverIp(DispatchConfig.data.gateServerIp)
-                .setGateserverPort(DispatchConfig.data.gateServerPort)
-                .setSecretKey(dispatchSeed.toByteString())
-                .build()
-        ).apply {
-            if (requestSetting.currentRegionContainsCustomClientConfig) {
-                this.regionCustomConfigEncrypted = networkJson.encodeToString(
-                    DispatchConfig.data.clientCustomConfig
-                ).toByteArray().xor(dispatchKey).toByteString()
-            }
-        }
-        .setClientSecretKey(dispatchSeed.toByteString())
-        .build()
+    val regionCustomConfig = if (requestSetting.currentRegionContainsCustomClientConfig) {
+        networkJson.encodeToString(
+            DispatchConfig.data.clientCustomConfig
+        ).toByteArray().xor(dispatchKey).toByteString()
+    } else {
+        queryCurrentRegionHttpRsp.region_custom_config_encrypted
+    }
+
+    return queryCurrentRegionHttpRsp.copy(
+        region_info = queryCurrentRegionHttpRsp.region_info?.copy(
+            gateserver_ip = DispatchConfig.data.gateServerIp,
+            gateserver_port = DispatchConfig.data.gateServerPort,
+            secret_key = dispatchSeed.toByteString(),
+        ),
+        region_custom_config_encrypted = regionCustomConfig,
+        client_secret_key = dispatchSeed.toByteString()
+    )
 }
 
 // --- Route Handler ---
@@ -199,7 +196,7 @@ private suspend fun ApplicationCall.forwardQueryCurrentRegionHttpRsp(): QueryCur
 internal suspend fun ApplicationCall.handleQueryRegionList() {
     logger.info { "Client $host has queried region list" }
     QueryRegionListEvent(this, getQueryRegionListHttpRsp(host)).broadcastEvent {
-        respondText(it.data.toByteArray().encodeBase64())
+        respondText(QueryRegionListHttpRsp.ADAPTER.encode(it.data).encodeBase64())
     }
 }
 
@@ -207,7 +204,7 @@ internal suspend fun ApplicationCall.handleQueryCurrentRegion() {
     logger.info { "Client ${request.local.host} has queried current region" }
     val packet = this.forwardQueryCurrentRegionHttpRsp()
     QueryCurrentRegionEvent(this, packet).broadcastEvent {
-        val data = it.data.toByteArray()
+        val data = QueryCurrRegionHttpRsp.ADAPTER.encode(it.data)
 
         if (DispatchConfig.data.requestSetting.oldCurrentRegionFormat) {
             respondText(data.encodeBase64())

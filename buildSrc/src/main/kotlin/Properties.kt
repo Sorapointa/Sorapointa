@@ -1,5 +1,5 @@
-import gradle.kotlin.dsl.accessors._9ee6941c65ba2f24339c75cc9cde03b1.ext
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.extra
 import java.util.*
 
 fun Project.getRootProjectLocalProps(): Map<String, String> {
@@ -15,6 +15,8 @@ fun Project.getRootProjectLocalProps(): Map<String, String> {
     } else emptyMap()
 }
 
-fun Project.getExtraString(name: String) = kotlin.runCatching { ext[name]?.toString() }.getOrNull()
 
-fun Project.getExtraBoolean(name: String) = kotlin.runCatching { ext[name] as Boolean }.getOrNull()
+
+fun Project.getExtraString(name: String) = runCatching { this.extra[name]?.toString() }.getOrNull()
+
+fun Project.getExtraBoolean(name: String) = runCatching { this.extra[name] as Boolean }.getOrNull()

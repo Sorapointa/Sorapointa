@@ -7,11 +7,11 @@ plugins {
 }
 
 dependencies {
+    implementation(libs.bundles.log)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(project(":sorapointa-utils:sorapointa-utils-core"))
     implementation(project(":sorapointa-utils:sorapointa-utils-serialization"))
-
-    implementation(KotlinX.serialization.json)
-    implementation("org.jetbrains.kotlinx:atomicfu:_")
-    implementation("io.github.classgraph:classgraph:_")
+    implementation(libs.classgraph)
 }
 
 tasks.withType<KotlinCompile> {

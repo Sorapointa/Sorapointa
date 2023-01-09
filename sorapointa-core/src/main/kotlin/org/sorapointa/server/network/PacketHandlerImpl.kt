@@ -1,6 +1,6 @@
 package org.sorapointa.server.network
 
-import com.google.protobuf.Parser
+import com.squareup.wire.ProtoAdapter
 import kotlinx.coroutines.withTimeout
 import mu.KotlinLogging
 import org.sorapointa.Sorapointa
@@ -10,20 +10,7 @@ import org.sorapointa.dispatch.plugins.currentRegionRsp
 import org.sorapointa.game.Player
 import org.sorapointa.game.data.PlayerDataImpl
 import org.sorapointa.game.impl
-import org.sorapointa.proto.EnterSceneReadyReqOuterClass.EnterSceneReadyReq
-import org.sorapointa.proto.GetPlayerSocialDetailReqOuterClass.GetPlayerSocialDetailReq
-import org.sorapointa.proto.GetPlayerTokenReqOuterClass.GetPlayerTokenReq
-import org.sorapointa.proto.PacketId
-import org.sorapointa.proto.PingReqOuterClass.PingReq
-import org.sorapointa.proto.PlayerLoginReqOuterClass.PlayerLoginReq
-import org.sorapointa.proto.PlayerSetPauseReqOuterClass.PlayerSetPauseReq
-import org.sorapointa.proto.RetcodeOuterClass.Retcode
-import org.sorapointa.proto.SceneInitFinishReqOuterClass.SceneInitFinishReq
-import org.sorapointa.proto.SetPlayerBornDataReqOuterClass.SetPlayerBornDataReq
-import org.sorapointa.proto.SoraPacket
-import org.sorapointa.proto.UnionCmdNotifyOuterClass.UnionCmdNotify
-import org.sorapointa.proto.packetHead
-import org.sorapointa.proto.queryCurrRegionHttpRsp
+import org.sorapointa.proto.*
 import org.sorapointa.utils.randomULong
 
 private val logger = KotlinLogging.logger {}
@@ -33,12 +20,12 @@ internal object PingReqHandler : IncomingPreLoginPacketHandler
     PacketId.PING_REQ
 ) {
 
-    override val parser: Parser<PingReq> = PingReq.parser()
+    override val adapter: ProtoAdapter<PingReq> = PingReq.ADAPTER
 
     override suspend fun NetworkHandlerStateInterface.handlePacket(
         packet: PingReq
     ): PingRspPacket {
-        networkHandler.updatePingTime(packet.clientTime)
+        networkHandler.updatePingTime(packet.client_time)
         return PingRspPacket(packet)
     }
 }
@@ -47,8 +34,7 @@ internal object PlayerSetPauseReqHandler : IncomingPreLoginPacketHandler
 <PlayerSetPauseReq, PlayerSetPauseRspPacket, NetworkHandlerStateInterface>(
     PacketId.PLAYER_SET_PAUSE_REQ
 ) {
-
-    override val parser: Parser<PlayerSetPauseReq> = PlayerSetPauseReq.parser()
+    override val adapter: ProtoAdapter<PlayerSetPauseReq> = PlayerSetPauseReq.ADAPTER
 
     override suspend fun NetworkHandlerStateInterface.handlePacket(
         packet: PlayerSetPauseReq
@@ -62,18 +48,16 @@ internal object GetPlayerTokenReqHandler : IncomingPreLoginPacketHandler
 <GetPlayerTokenReq, GetPlayerTokenRspPacket, NetworkHandler.WaitToken>(
     PacketId.GET_PLAYER_TOKEN_REQ
 ) {
-
-    override val parser: Parser<GetPlayerTokenReq> =
-        GetPlayerTokenReq.parser()
+    override val adapter: ProtoAdapter<GetPlayerTokenReq> = GetPlayerTokenReq.ADAPTER
 
     override suspend fun NetworkHandler.WaitToken.handlePacket(
         packet: GetPlayerTokenReq
     ): GetPlayerTokenRspPacket {
-        val uid = packet.accountUid.toInt()
+        val uid = packet.account_uid.toInt()
         val account = Account.findById(uid) ?: return GetPlayerTokenRspPacket.Error(
             Retcode.RETCODE_RET_ACCOUNT_NOT_EXIST, "user.notfound"
         )
-        if (packet.accountToken != account.getComboTokenWithCheck()) return GetPlayerTokenRspPacket.Error(
+        if (packet.account_token != account.getComboTokenWithCheck()) return GetPlayerTokenRspPacket.Error(
             Retcode.RETCODE_RET_TOKEN_ERROR, "auth.error.token"
         )
         Sorapointa.findPlayerById(uid)?.let {
@@ -96,9 +80,7 @@ internal object PlayerLoginReqHandler : IncomingPreLoginPacketHandler
 <PlayerLoginReq, PlayerLoginRspPacket, NetworkHandler.Login>(
     PacketId.PLAYER_LOGIN_REQ
 ) {
-
-    override val parser: Parser<PlayerLoginReq> =
-        PlayerLoginReq.parser()
+    override val adapter: ProtoAdapter<PlayerLoginReq> = PlayerLoginReq.ADAPTER
 
     override suspend fun NetworkHandler.Login.handlePacket(
         packet: PlayerLoginReq
@@ -107,7 +89,7 @@ internal object PlayerLoginReqHandler : IncomingPreLoginPacketHandler
             withTimeout(1000) {
                 val curRegion = if (SorapointaConfig.data.useCurrentRegionForLoginRsp) {
                     currentRegionRsp.await()
-                } else queryCurrRegionHttpRsp {}
+                } else QueryCurrRegionHttpRsp()
                 if (playerData != null) {
                     setToOK(createPlayer(playerData))
                 } else {
@@ -127,15 +109,15 @@ internal object SetPlayerBornDataReqHandler : IncomingPreLoginPacketHandler
     PacketId.SET_PLAYER_BORN_DATA_REQ
 ) {
 
-    override val parser: Parser<SetPlayerBornDataReq> = SetPlayerBornDataReq.parser()
+    override val adapter: ProtoAdapter<SetPlayerBornDataReq> = SetPlayerBornDataReq.ADAPTER
 
     override suspend fun NetworkHandler.Login.handlePacket(
         packet: SetPlayerBornDataReq
     ): SetPlayerBornDataRspPacket {
 
-        val playerData = PlayerDataImpl.create(account.id.value, packet.nickName, packet.avatarId)
+        val playerData = PlayerDataImpl.create(account.id.value, packet.nick_name, packet.avatar_id)
         val player = createPlayer(playerData).apply {
-            initNewPlayerAvatar(packet.avatarId)
+            initNewPlayerAvatar(packet.avatar_id)
         }
 
         setToOK(player)
@@ -149,7 +131,7 @@ internal object GetPlayerSocialDetailReqHandler : IncomingPacketHandlerWithRespo
     PacketId.GET_PLAYER_SOCIAL_DETAIL_REQ
 ) {
 
-    override val parser: Parser<GetPlayerSocialDetailReq> = GetPlayerSocialDetailReq.parser()
+    override val adapter: ProtoAdapter<GetPlayerSocialDetailReq> = GetPlayerSocialDetailReq.ADAPTER
 
     override suspend fun Player.handlePacket(
         packet: GetPlayerSocialDetailReq
@@ -164,12 +146,12 @@ internal object EnterSceneReadyReqHandler : IncomingPacketHandlerWithResponse
     PacketId.ENTER_SCENE_READY_REQ
 ) {
 
-    override val parser: Parser<EnterSceneReadyReq> = EnterSceneReadyReq.parser()
+    override val adapter: ProtoAdapter<EnterSceneReadyReq> = EnterSceneReadyReq.ADAPTER
 
     override suspend fun Player.handlePacket(
         packet: EnterSceneReadyReq
     ): EnterSceneReadyRspPacket {
-        return if (packet.enterSceneToken == enterSceneToken) {
+        return if (packet.enter_scene_token == enterSceneToken) {
             impl().sendPacketAsync(EnterScenePeerNotifyPacket(this)) // doesn't have packetHeader (metadata)
             EnterSceneReadyRspPacket.Succ(this) // has packetHeader
         } else EnterSceneReadyRspPacket.Fail(this, Retcode.RETCODE_RET_ENTER_SCENE_TOKEN_INVALID)
@@ -181,12 +163,12 @@ internal object SceneInitFinishReqHandler : IncomingPacketHandlerWithResponse
     PacketId.ENTER_SCENE_READY_REQ
 ) {
 
-    override val parser: Parser<SceneInitFinishReq> = SceneInitFinishReq.parser()
+    override val adapter: ProtoAdapter<SceneInitFinishReq> = SceneInitFinishReq.ADAPTER
 
     override suspend fun Player.handlePacket(
         packet: SceneInitFinishReq
     ): SceneInitFinishRspPacket {
-        return if (packet.enterSceneToken == enterSceneToken) {
+        return if (packet.enter_scene_token == enterSceneToken) {
             // TODO: divide those into separate modules
 
             SceneInitFinishRspPacket.Succ(this)
@@ -198,12 +180,12 @@ internal object UnionCmdNotifyHandler : IncomingPacketHandlerWithoutResponse<Uni
     PacketId.UNION_CMD_NOTIFY
 ) {
 
-    override val parser: Parser<UnionCmdNotify> = UnionCmdNotify.parser()
+    override val adapter: ProtoAdapter<UnionCmdNotify> = UnionCmdNotify.ADAPTER
 
     override suspend fun Player.handlePacket(packet: UnionCmdNotify) {
         logger.debug { "Expanding UnionCmdNotify packets..." }
-        packet.cmdListList.forEach {
-            val soraPacket = SoraPacket(it.messageId.toUShort(), packetHead { }, it.body.toByteArray())
+        packet.cmd_list.forEach {
+            val soraPacket = SoraPacket(it.message_id.toUShort(), PacketHead(), it.body.toByteArray())
             impl().forwardHandlePacket(soraPacket)
         }
     }
