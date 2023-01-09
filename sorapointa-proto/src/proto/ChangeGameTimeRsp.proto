@@ -2,11 +2,16 @@ syntax = "proto3";
 
 option java_package = "org.sorapointa.proto";
 
-// CmdId: 182
-// EnetChannelId: 0
-// EnetIsReliable: true
 message ChangeGameTimeRsp {
-	int32 retcode = 7;
-	uint32 cur_game_time = 1;
-	uint32 extra_days = 2;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 157;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  int32 retcode = 10;
+  uint32 extra_days = 2;
+  uint32 cur_game_time = 8;
 }

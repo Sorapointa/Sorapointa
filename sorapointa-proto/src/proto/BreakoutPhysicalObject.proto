@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+import "BreakoutBrickInfo.proto";
+import "BreakoutPhysicalObjectModifier.proto";
+import "BreakoutVector2.proto";
+
+option java_package = "org.sorapointa.proto";
+
+message BreakoutPhysicalObject {
+  uint32 id = 1;
+  uint32 index = 2;
+  bool is_active = 3;
+  BreakoutVector2 pos = 4;
+  BreakoutVector2 move_dir = 5;
+  int32 speed = 6;
+  uint32 init_peer_id = 7;
+  uint32 state = 8;
+  uint32 element_type = 9;
+  uint32 element_reaction_buff = 10;
+  repeated BreakoutPhysicalObjectModifier modifier_list = 11;
+  int32 total_rotation = 12;
+  repeated BreakoutBrickInfo info_list = 13;
+  uint32 last_hit_peer_id = 14;
+  uint32 speed_increase_count = 15;
+  int32 offset = 16;
+}

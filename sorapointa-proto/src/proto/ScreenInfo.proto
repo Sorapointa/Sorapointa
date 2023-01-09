@@ -3,6 +3,6 @@ syntax = "proto3";
 option java_package = "org.sorapointa.proto";
 
 message ScreenInfo {
-	uint32 live_id = 1;
-	uint32 projector_entity_id = 2;
+  uint32 live_id = 1;
+  uint32 projector_entity_id = 2;
 }

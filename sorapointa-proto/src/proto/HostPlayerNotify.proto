@@ -2,10 +2,15 @@ syntax = "proto3";
 
 option java_package = "org.sorapointa.proto";
 
-// CmdId: 341
-// EnetChannelId: 0
-// EnetIsReliable: true
 message HostPlayerNotify {
-	uint32 host_uid = 10;
-	uint32 host_peer_id = 7;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 356;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  uint32 host_peer_id = 12;
+  uint32 host_uid = 14;
 }

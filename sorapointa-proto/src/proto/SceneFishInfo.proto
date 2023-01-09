@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "Vector.proto";
 
+option java_package = "org.sorapointa.proto";
+
 message SceneFishInfo {
-	uint32 fish_id = 1;
-	uint32 fish_pool_entity_id = 2;
-	Vector fish_pool_pos = 3;
-	uint32 fish_pool_gadget_id = 4;
-	uint32 LPNFLHKPHEC = 5;
+  uint32 fish_id = 1;
+  uint32 fish_pool_entity_id = 2;
+  Vector fish_pool_pos = 3;
+  uint32 fish_pool_gadget_id = 4;
+  uint32 last_shock_time = 5;
 }

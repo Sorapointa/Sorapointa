@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+message BreakoutSyncFinishGame {
+  uint64 server_game_time = 8;
+  bool is_win = 1;
+  bool is_stop_gallery = 2;
+}

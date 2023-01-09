@@ -2,10 +2,15 @@ syntax = "proto3";
 
 option java_package = "org.sorapointa.proto";
 
-// CmdId: 3344
-// EnetChannelId: 0
-// EnetIsReliable: true
 message PostEnterSceneRsp {
-	int32 retcode = 13;
-	uint32 enter_scene_token = 15;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 3094;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  int32 retcode = 9;
+  uint32 enter_scene_token = 12;
 }

@@ -1,13 +1,18 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "SocialDetail.proto";
 
-// CmdId: 4082
-// EnetChannelId: 0
-// EnetIsReliable: true
+option java_package = "org.sorapointa.proto";
+
 message GetPlayerSocialDetailRsp {
-	int32 retcode = 2;
-	SocialDetail detail_data = 15;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 4057;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  SocialDetail detail_data = 6;
+  int32 retcode = 14;
 }

@@ -3,8 +3,8 @@ syntax = "proto3";
 option java_package = "org.sorapointa.proto";
 
 message MathQuaternion {
-	float x = 1;
-	float y = 2;
-	float z = 3;
-	float w = 4;
+  float x = 1;
+  float y = 2;
+  float z = 3;
+  float w = 4;
 }

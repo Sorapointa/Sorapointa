@@ -1,18 +1,18 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "MotionState.proto";
 import "Vector.proto";
 
+option java_package = "org.sorapointa.proto";
+
 message MotionInfo {
-	Vector pos = 1;
-	Vector rot = 2;
-	Vector speed = 3;
-	MotionState state = 4;
-	repeated Vector params = 5;
-	Vector ref_pos = 6;
-	uint32 ref_id = 7;
-	uint32 scene_time = 8;
-	uint64 interval_velocity = 9;
+  Vector pos = 1;
+  Vector rot = 2;
+  Vector speed = 3;
+  MotionState state = 4;
+  repeated Vector params = 5;
+  Vector ref_pos = 6;
+  uint32 ref_id = 7;
+  uint32 scene_time = 8;
+  uint64 interval_velocity = 9;
 }

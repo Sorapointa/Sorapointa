@@ -2,11 +2,16 @@ syntax = "proto3";
 
 option java_package = "org.sorapointa.proto";
 
-// CmdId: 262
-// EnetChannelId: 0
-// EnetIsReliable: true
 message SceneTimeNotify {
-	uint32 scene_id = 3;
-	bool is_paused = 5;
-	uint64 scene_time = 14;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 296;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  uint64 scene_time = 10;
+  uint32 scene_id = 14;
+  bool is_paused = 5;
 }

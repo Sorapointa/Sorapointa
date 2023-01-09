@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "VehicleMember.proto";
 
+option java_package = "org.sorapointa.proto";
+
 message VehicleInfo {
-	repeated VehicleMember member_list = 1;
-	uint32 owner_uid = 2;
-	float cur_stamina = 3;
+  repeated VehicleMember member_list = 1;
+  uint32 owner_uid = 2;
+  float cur_stamina = 3;
 }

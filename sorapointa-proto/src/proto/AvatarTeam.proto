@@ -3,6 +3,6 @@ syntax = "proto3";
 option java_package = "org.sorapointa.proto";
 
 message AvatarTeam {
-	repeated uint64 avatar_guid_list = 1;
-	string team_name = 2;
+  repeated uint64 avatar_guid_list = 13;
+  string team_name = 4;
 }

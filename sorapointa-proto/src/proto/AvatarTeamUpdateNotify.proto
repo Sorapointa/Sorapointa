@@ -1,13 +1,18 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "AvatarTeam.proto";
 
-// CmdId: 1713
-// EnetChannelId: 0
-// EnetIsReliable: true
+option java_package = "org.sorapointa.proto";
+
 message AvatarTeamUpdateNotify {
-	map<uint32, AvatarTeam> avatar_team_map = 6;
-	repeated uint64 temp_avatar_guid_list = 9;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 1739;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  map<uint32, AvatarTeam> avatar_team_map = 15;
+  repeated uint64 temp_avatar_guid_list = 10;
 }

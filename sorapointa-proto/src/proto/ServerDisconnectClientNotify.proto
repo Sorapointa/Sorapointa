@@ -2,9 +2,14 @@ syntax = "proto3";
 
 option java_package = "org.sorapointa.proto";
 
-// CmdId: 166
-// EnetChannelId: 0
-// EnetIsReliable: true
 message ServerDisconnectClientNotify {
-	uint32 data = 11;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 152;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  uint32 data = 4;
 }

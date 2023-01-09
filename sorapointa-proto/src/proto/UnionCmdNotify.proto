@@ -1,13 +1,18 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "UnionCmd.proto";
 
-// CmdId: 98
-// EnetChannelId: 0
-// EnetIsReliable: true
-// IsAllowClient: true
+option java_package = "org.sorapointa.proto";
+
 message UnionCmdNotify {
-	repeated UnionCmd cmd_list = 13;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 42;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  //   IS_ALLOW_CLIENT = 1;
+  // }
+
+  repeated UnionCmd cmd_list = 7;
 }

@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+message BreakoutBrickInfo {
+  uint32 hp = 1;
+  uint32 element_type = 2;
+}

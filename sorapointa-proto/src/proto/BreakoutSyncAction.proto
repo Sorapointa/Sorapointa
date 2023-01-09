@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+import "BreakoutAction.proto";
+
+option java_package = "org.sorapointa.proto";
+
+message BreakoutSyncAction {
+  BreakoutAction action = 15;
+}

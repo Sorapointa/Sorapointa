@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+import "BreakoutPhysicalObject.proto";
+
+option java_package = "org.sorapointa.proto";
+
+message BreakoutSpawnPoint {
+  uint32 id = 1;
+  uint32 brick_suite_id = 2;
+  repeated BreakoutPhysicalObject spawned_brick_list = 3;
+}

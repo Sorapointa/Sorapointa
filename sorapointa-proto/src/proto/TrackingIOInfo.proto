@@ -3,11 +3,11 @@ syntax = "proto3";
 option java_package = "org.sorapointa.proto";
 
 message TrackingIOInfo {
-	string appid = 1;
-	string deviceid = 2;
-	string mac = 3;
-	string rydevicetype = 4;
-	string client_tz = 5;
-	string current_caid = 6;
-	string cached_caid = 7;
+  string client_tz = 10;
+  string deviceid = 12;
+  string cached_caid = 7;
+  string rydevicetype = 5;
+  string appid = 2;
+  string current_caid = 9;
+  string mac = 1;
 }

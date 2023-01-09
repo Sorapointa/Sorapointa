@@ -2,12 +2,17 @@ syntax = "proto3";
 
 option java_package = "org.sorapointa.proto";
 
-// CmdId: 257
-// EnetChannelId: 0
-// EnetIsReliable: true
 message EnterScenePeerNotify {
-	uint32 dest_scene_id = 13;
-	uint32 peer_id = 11;
-	uint32 host_peer_id = 6;
-	uint32 enter_scene_token = 15;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 271;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  uint32 enter_scene_token = 7;
+  uint32 host_peer_id = 12;
+  uint32 peer_id = 14;
+  uint32 dest_scene_id = 2;
 }

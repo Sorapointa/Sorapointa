@@ -1,19 +1,24 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "AvatarEnterSceneInfo.proto";
 import "MPLevelEntityInfo.proto";
 import "TeamEnterSceneInfo.proto";
 
-// CmdId: 274
-// EnetChannelId: 0
-// EnetIsReliable: true
-// IsAllowClient: true
+option java_package = "org.sorapointa.proto";
+
 message PlayerEnterSceneInfoNotify {
-	uint32 cur_avatar_entity_id = 8;
-	repeated AvatarEnterSceneInfo avatar_enter_info = 14;
-	TeamEnterSceneInfo team_enter_info = 9;
-	MPLevelEntityInfo mp_level_entity_info = 5;
-	uint32 enter_scene_token = 7;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 241;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  //   IS_ALLOW_CLIENT = 1;
+  // }
+
+  TeamEnterSceneInfo team_enter_info = 6;
+  repeated AvatarEnterSceneInfo avatar_enter_info = 10;
+  uint32 cur_avatar_entity_id = 4;
+  MPLevelEntityInfo mp_level_entity_info = 15;
+  uint32 enter_scene_token = 1;
 }

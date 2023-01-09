@@ -2,12 +2,17 @@ syntax = "proto3";
 
 option java_package = "org.sorapointa.proto";
 
-// CmdId: 149
-// EnetChannelId: 0
-// EnetIsReliable: true
-// IsAllowClient: true
 message ChangeGameTimeReq {
-	uint32 game_time = 9;
-	bool is_force_set = 7;
-	uint32 extra_days = 6;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 178;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  //   IS_ALLOW_CLIENT = 1;
+  // }
+
+  uint32 extra_days = 3;
+  uint32 game_time = 8;
+  bool is_force_set = 2;
 }

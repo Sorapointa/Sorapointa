@@ -1,48 +1,54 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "BlockInfo.proto";
 import "FeatureBlockInfo.proto";
 import "ResVersionConfig.proto";
 import "ShortAbilityHashPair.proto";
 
-// CmdId: 137
-// EnetChannelId: 0
-// EnetIsReliable: true
+option java_package = "org.sorapointa.proto";
+
 message PlayerLoginRsp {
-	int32 retcode = 1;
-	bytes player_data = 6;
-	bool is_new_player = 11;
-	uint32 target_uid = 15;
-	uint64 login_rand = 12;
-	bool is_use_ability_hash = 3;
-	int32 ability_hash_code = 7;
-	map<string, int32> ability_hash_map = 13;
-	uint32 client_data_version = 14;
-	bool is_relogin = 2;
-	uint32 client_silence_data_version = 10;
-	string game_biz = 9;
-	uint32 player_data_version = 8;
-	string client_md_5 = 1706;
-	string client_silence_md_5 = 271;
-	ResVersionConfig res_version_config = 933;
-	map<uint32, BlockInfo> block_info_map = 1156;
-	string client_version_suffix = 1984;
-	string client_silence_version_suffix = 49;
-	repeated ShortAbilityHashPair short_ability_hash_map = 364;
-	bytes sc_info = 2014;
-	bool is_audit = 1545;
-	bool is_sc_open = 1974;
-	string register_cps = 715;
-	repeated FeatureBlockInfo feature_block_info_list = 408;
-	bool is_data_need_relogin = 110;
-	string country_code = 1306;
-	ResVersionConfig next_res_version_config = 749;
-	string next_resource_url = 1744;
-	uint32 target_home_owner_uid = 945;
-	bool is_enable_client_hash_debug = 713;
-	bool is_transfer = 138;
-	double total_tick_time = 1923;
-	string birthday = 1977;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 119;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  uint64 login_rand = 9;
+  bytes player_data = 2;
+  string client_silence_md5 = 16;
+  double total_tick_time = 530;
+  bool is_use_ability_hash = 5;
+  bool is_audit = 930;
+  string birthday = 1387;
+  bool is_new_player = 13;
+  string client_silence_version_suffix = 908;
+  string client_version_suffix = 1845;
+  string next_resource_url = 1324;
+  bool is_enable_client_hash_debug = 196;
+  repeated ShortAbilityHashPair short_ability_hash_map = 1373;
+  bool is_data_need_relogin = 1119;
+  ResVersionConfig res_version_config = 808;
+  uint32 client_silence_data_version = 1;
+  uint32 target_uid = 15;
+  string register_cps = 99;
+  bool is_sc_open = 1522;
+  bool is_relogin = 8;
+  uint32 player_data_version = 14;
+  bytes sc_info = 1888;
+  string country_code = 360;
+  ResVersionConfig next_res_version_config = 1688;
+  bool is_login_rsp_split = 17;
+  map<uint32, BlockInfo> block_info_map = 2018;
+  bool is_transfer = 295;
+  uint32 target_home_owner_uid = 446;
+  string game_biz = 4;
+  map<string, int32> ability_hash_map = 3;
+  int32 ability_hash_code = 12;
+  uint32 client_data_version = 10;
+  string client_md5 = 1299;
+  int32 retcode = 7;
+  repeated FeatureBlockInfo feature_block_info_list = 138;
 }

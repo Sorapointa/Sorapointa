@@ -1,16 +1,21 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "PropChangeReason.proto";
 
-// CmdId: 1249
-// EnetChannelId: 0
-// EnetIsReliable: true
+option java_package = "org.sorapointa.proto";
+
 message AvatarPropChangeReasonNotify {
-	uint64 avatar_guid = 2;
-	uint32 prop_type = 9;
-	float old_value = 8;
-	float cur_value = 15;
-	PropChangeReason reason = 4;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 1278;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  uint32 prop_type = 7;
+  PropChangeReason reason = 15;
+  float cur_value = 14;
+  uint64 avatar_guid = 3;
+  float old_value = 13;
 }

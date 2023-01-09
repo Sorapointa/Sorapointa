@@ -3,6 +3,6 @@ syntax = "proto3";
 option java_package = "org.sorapointa.proto";
 
 message EntityEnvironmentInfo {
-	uint32 json_climate_type = 1;
-	uint32 climate_area_id = 2;
+  uint32 json_climate_type = 1;
+  uint32 climate_area_id = 2;
 }

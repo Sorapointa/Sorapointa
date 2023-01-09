@@ -1,16 +1,16 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "Vector.proto";
 
+option java_package = "org.sorapointa.proto";
+
 message VehicleLocationInfo {
-	uint32 entity_id = 1;
-	uint32 gadget_id = 2;
-	uint32 owner_uid = 3;
-	Vector pos = 4;
-	Vector rot = 5;
-	float cur_hp = 6;
-	float max_hp = 7;
-	repeated uint32 uid_list = 8;
+  Vector rot = 5;
+  uint32 owner_uid = 11;
+  repeated uint32 uid_list = 4;
+  float cur_hp = 2;
+  Vector pos = 9;
+  uint32 gadget_id = 1;
+  uint32 entity_id = 14;
+  float max_hp = 15;
 }

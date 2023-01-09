@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+message BreakoutSyncConnectUidInfo {
+  uint32 uid = 1;
+  repeated uint32 skill_id_list = 2;
+  repeated uint32 skill_level_list = 3;
+}

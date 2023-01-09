@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+import "BreakoutSnapShot.proto";
+
+option java_package = "org.sorapointa.proto";
+
+message BreakoutSyncSnapShot {
+  BreakoutSnapShot snap_shot = 14;
+}

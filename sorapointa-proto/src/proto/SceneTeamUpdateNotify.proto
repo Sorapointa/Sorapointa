@@ -1,13 +1,18 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "SceneTeamAvatar.proto";
 
-// CmdId: 1699
-// EnetChannelId: 0
-// EnetIsReliable: true
+option java_package = "org.sorapointa.proto";
+
 message SceneTeamUpdateNotify {
-	repeated SceneTeamAvatar scene_team_avatar_list = 11;
-	bool is_in_mp = 1;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 1728;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  repeated SceneTeamAvatar scene_team_avatar_list = 11;
+  bool is_in_mp = 7;
 }

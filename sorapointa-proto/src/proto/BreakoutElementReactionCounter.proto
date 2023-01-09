@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+message BreakoutElementReactionCounter {
+  uint32 element_reaction = 1;
+  uint32 count = 2;
+}

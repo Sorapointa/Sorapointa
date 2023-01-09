@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+message CoinCollectOperatorInfo {
+  uint32 level_id = 1;
+}

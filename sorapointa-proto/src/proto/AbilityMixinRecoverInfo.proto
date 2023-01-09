@@ -1,16 +1,18 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
+import "BreakoutSnapShot.proto";
 import "MassivePropSyncInfo.proto";
 
+option java_package = "org.sorapointa.proto";
+
 message AbilityMixinRecoverInfo {
-	uint32 local_id = 3;
-	repeated uint32 data_list = 4;
-	bool is_serverbuff_modifier = 5;
-	repeated MassivePropSyncInfo massive_prop_list = 6;
-	oneof source {
-		uint32 instanced_ability_id = 1;
-		uint32 instanced_modifier_id = 2;
-	}
+  uint32 local_id = 3;
+  repeated uint32 data_list = 4;
+  bool is_serverbuff_modifier = 5;
+  repeated MassivePropSyncInfo massive_prop_list = 6;
+  BreakoutSnapShot breakout_snap_shot = 7;
+  oneof source {
+    uint32 instanced_ability_id = 1;
+    uint32 instanced_modifier_id = 2;
+  }
 }

@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "AbilitySyncStateInfo.proto";
 
+option java_package = "org.sorapointa.proto";
+
 message MPLevelEntityInfo {
-	uint32 entity_id = 1;
-	uint32 authority_peer_id = 2;
-	AbilitySyncStateInfo ability_info = 3;
+  AbilitySyncStateInfo ability_info = 15;
+  uint32 entity_id = 10;
+  uint32 authority_peer_id = 5;
 }

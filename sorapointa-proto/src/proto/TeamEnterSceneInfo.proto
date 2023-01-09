@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "AbilityControlBlock.proto";
 import "AbilitySyncStateInfo.proto";
 
+option java_package = "org.sorapointa.proto";
+
 message TeamEnterSceneInfo {
-	uint32 team_entity_id = 1;
-	AbilitySyncStateInfo team_ability_info = 2;
-	AbilityControlBlock ability_control_block = 3;
+  AbilitySyncStateInfo team_ability_info = 6;
+  AbilityControlBlock ability_control_block = 5;
+  uint32 team_entity_id = 11;
 }

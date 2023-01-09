@@ -3,8 +3,8 @@ syntax = "proto3";
 option java_package = "org.sorapointa.proto";
 
 message AbilityString {
-	oneof type {
-		string str = 1;
-		uint32 hash = 2;
-	}
+  oneof type {
+    string str = 1;
+    uint32 hash = 2;
+  }
 }

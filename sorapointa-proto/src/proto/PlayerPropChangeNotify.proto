@@ -2,10 +2,15 @@ syntax = "proto3";
 
 option java_package = "org.sorapointa.proto";
 
-// CmdId: 186
-// EnetChannelId: 0
-// EnetIsReliable: true
 message PlayerPropChangeNotify {
-	uint32 prop_type = 12;
-	uint32 prop_delta = 11;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 116;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  uint32 prop_delta = 4;
+  uint32 prop_type = 13;
 }

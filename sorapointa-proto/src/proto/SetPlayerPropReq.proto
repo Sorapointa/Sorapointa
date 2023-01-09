@@ -1,13 +1,18 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "PropValue.proto";
 
-// CmdId: 130
-// EnetChannelId: 0
-// EnetIsReliable: true
-// IsAllowClient: true
+option java_package = "org.sorapointa.proto";
+
 message SetPlayerPropReq {
-	repeated PropValue prop_list = 14;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 199;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  //   IS_ALLOW_CLIENT = 1;
+  // }
+
+  repeated PropValue prop_list = 3;
 }

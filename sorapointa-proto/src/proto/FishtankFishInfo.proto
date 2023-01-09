@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+message FishtankFishInfo {
+  float fish_distance_from_water = 1;
+  float fish_scale = 2;
+  float initial_rotation_y = 3;
+}

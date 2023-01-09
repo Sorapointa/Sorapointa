@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "AbilityControlBlock.proto";
 import "AbilitySyncStateInfo.proto";
 import "AvatarInfo.proto";
@@ -9,21 +7,23 @@ import "SceneAvatarInfo.proto";
 import "SceneEntityInfo.proto";
 import "ServerBuff.proto";
 
+option java_package = "org.sorapointa.proto";
+
 message SceneTeamAvatar {
-	uint32 player_uid = 1;
-	uint64 avatar_guid = 2;
-	uint32 scene_id = 3;
-	uint32 entity_id = 4;
-	AvatarInfo avatar_info = 5;
-	SceneAvatarInfo scene_avatar_info = 6;
-	AbilitySyncStateInfo avatar_ability_info = 7;
-	repeated ServerBuff server_buff_list = 8;
-	SceneEntityInfo scene_entity_info = 9;
-	uint64 weapon_guid = 10;
-	uint32 weapon_entity_id = 11;
-	AbilitySyncStateInfo weapon_ability_info = 12;
-	AbilityControlBlock ability_control_block = 13;
-	bool is_reconnect = 14;
-	bool is_player_cur_avatar = 15;
-	bool is_on_scene = 16;
+  SceneAvatarInfo scene_avatar_info = 14;
+  AvatarInfo avatar_info = 15;
+  uint32 entity_id = 10;
+  AbilitySyncStateInfo weapon_ability_info = 6;
+  AbilityControlBlock ability_control_block = 2;
+  bool is_reconnect = 8;
+  AbilitySyncStateInfo avatar_ability_info = 4;
+  uint64 weapon_guid = 12;
+  uint32 player_uid = 1;
+  SceneEntityInfo scene_entity_info = 11;
+  uint32 weapon_entity_id = 5;
+  uint32 scene_id = 9;
+  bool is_on_scene = 625;
+  uint64 avatar_guid = 3;
+  bool is_player_cur_avatar = 13;
+  repeated ServerBuff server_buff_list = 7;
 }
