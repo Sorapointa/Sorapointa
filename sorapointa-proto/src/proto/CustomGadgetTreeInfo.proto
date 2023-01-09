@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "CustomCommonNodeInfo.proto";
 
+option java_package = "org.sorapointa.proto";
+
 message CustomGadgetTreeInfo {
-	repeated CustomCommonNodeInfo node_list = 1;
+  repeated CustomCommonNodeInfo node_list = 1;
 }

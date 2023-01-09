@@ -1,12 +1,19 @@
-syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
+
+syntax = "proto3";
 
 import "PropValue.proto";
 
-// CmdId: 127
-// EnetChannelId: 0
-// EnetIsReliable: true
+option java_package = "org.sorapointa.proto";
+
 message PlayerPropNotify {
-	map<uint32, PropValue> prop_map = 10;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 139;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  map<uint32, PropValue> prop_map = 1;
 }

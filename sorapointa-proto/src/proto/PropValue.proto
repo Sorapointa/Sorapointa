@@ -3,10 +3,10 @@ syntax = "proto3";
 option java_package = "org.sorapointa.proto";
 
 message PropValue {
-	uint32 type = 1;
-	int64 val = 4;
-	oneof value {
-		int64 ival = 2;
-		float fval = 3;
-	}
+  uint32 type = 1;
+  int64 val = 4;
+  oneof value {
+    int64 ival = 2;
+    float fval = 3;
+  }
 }

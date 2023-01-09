@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "Item.proto";
 import "TrialAvatarGrantRecord.proto";
 
+option java_package = "org.sorapointa.proto";
+
 message TrialAvatarInfo {
-	uint32 trial_avatar_id = 1;
-	repeated Item trial_equip_list = 2;
-	TrialAvatarGrantRecord grant_record = 3;
+  uint32 trial_avatar_id = 1;
+  repeated Item trial_equip_list = 2;
+  TrialAvatarGrantRecord grant_record = 3;
 }

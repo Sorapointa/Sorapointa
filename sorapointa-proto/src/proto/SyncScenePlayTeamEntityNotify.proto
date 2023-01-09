@@ -1,13 +1,18 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "PlayTeamEntityInfo.proto";
 
-// CmdId: 3096
-// EnetChannelId: 0
-// EnetIsReliable: true
+option java_package = "org.sorapointa.proto";
+
 message SyncScenePlayTeamEntityNotify {
-	uint32 scene_id = 13;
-	repeated PlayTeamEntityInfo entity_info_list = 2;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 3393;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  uint32 scene_id = 7;
+  repeated PlayTeamEntityInfo entity_info_list = 3;
 }

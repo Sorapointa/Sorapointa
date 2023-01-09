@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "FoundationStatus.proto";
 
+option java_package = "org.sorapointa.proto";
+
 message FoundationInfo {
-	FoundationStatus status = 1;
-	repeated uint32 uid_list = 2;
-	uint32 current_building_id = 3;
-	uint32 begin_build_time_ms = 4;
+  FoundationStatus status = 1;
+  repeated uint32 uid_list = 2;
+  uint32 current_building_id = 3;
+  uint32 locked_by_uid = 4;
 }

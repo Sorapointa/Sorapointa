@@ -3,5 +3,5 @@ syntax = "proto3";
 option java_package = "org.sorapointa.proto";
 
 message EchoShellInfo {
-	uint32 shell_id = 1;
+  uint32 shell_id = 1;
 }

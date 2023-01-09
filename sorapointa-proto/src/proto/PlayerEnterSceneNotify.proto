@@ -1,28 +1,33 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "EnterType.proto";
 import "Vector.proto";
 
-// CmdId: 209
-// EnetChannelId: 0
-// EnetIsReliable: true
+option java_package = "org.sorapointa.proto";
+
 message PlayerEnterSceneNotify {
-	uint32 scene_id = 14;
-	Vector pos = 15;
-	uint64 scene_begin_time = 12;
-	EnterType type = 2;
-	uint32 target_uid = 4;
-	uint32 prev_scene_id = 7;
-	Vector prev_pos = 6;
-	uint32 dungeon_id = 13;
-	uint32 world_level = 3;
-	uint32 enter_scene_token = 9;
-	bool is_first_login_enter_scene = 11;
-	repeated uint32 scene_tag_id_list = 1;
-	bool is_skip_ui = 1430;
-	uint32 enter_reason = 1982;
-	uint32 world_type = 1067;
-	string scene_transaction = 1081;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 279;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  uint32 world_type = 1224;
+  bool is_skip_ui = 32;
+  uint32 world_level = 4;
+  Vector pos = 1;
+  bool is_first_login_enter_scene = 3;
+  uint32 prev_scene_id = 13;
+  uint32 enter_scene_token = 6;
+  uint32 dungeon_id = 2;
+  uint32 scene_id = 11;
+  EnterType type = 12;
+  repeated uint32 scene_tag_id_list = 5;
+  uint64 scene_begin_time = 9;
+  uint32 enter_reason = 287;
+  uint32 target_uid = 8;
+  Vector prev_pos = 10;
+  string scene_transaction = 370;
 }

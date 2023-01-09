@@ -1,15 +1,20 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "Item.proto";
 import "StoreType.proto";
 
-// CmdId: 609
-// EnetChannelId: 0
-// EnetIsReliable: true
+option java_package = "org.sorapointa.proto";
+
 message PlayerStoreNotify {
-	StoreType store_type = 4;
-	repeated Item item_list = 3;
-	uint32 weight_limit = 15;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 679;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  StoreType store_type = 1;
+  uint32 weight_limit = 14;
+  repeated Item item_list = 10;
 }

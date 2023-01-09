@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "WidgetSlotTag.proto";
+
+option java_package = "org.sorapointa.proto";
+
+message WidgetSlotData {
+  uint32 cd_over_time = 15;
+  bool is_active = 3;
+  uint32 material_id = 8;
+  WidgetSlotTag tag = 11;
+}

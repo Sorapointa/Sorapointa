@@ -1,14 +1,14 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "OnlinePlayerInfo.proto";
 
+option java_package = "org.sorapointa.proto";
+
 message ScenePlayerInfo {
-	uint32 uid = 1;
-	uint32 peer_id = 2;
-	string name = 3;
-	bool is_connected = 4;
-	uint32 scene_id = 5;
-	OnlinePlayerInfo online_player_info = 6;
+  uint32 uid = 2;
+  uint32 scene_id = 7;
+  uint32 peer_id = 15;
+  OnlinePlayerInfo online_player_info = 9;
+  bool is_connected = 3;
+  string name = 1;
 }

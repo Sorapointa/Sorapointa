@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "Vector.proto";
 
+option java_package = "org.sorapointa.proto";
+
 message PlayerLocationInfo {
-	uint32 uid = 1;
-	Vector pos = 2;
-	Vector rot = 3;
+  uint32 uid = 7;
+  Vector rot = 13;
+  Vector pos = 3;
 }

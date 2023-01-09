@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option java_package = "org.sorapointa.proto";
+
+message BreakoutPhysicalObjectModifier {
+  uint32 type = 1;
+  uint32 id = 2;
+  int32 param1 = 3;
+  int32 param2 = 4;
+  int32 param3 = 5;
+  int32 param4 = 6;
+  int32 param5 = 7;
+  int32 param6 = 8;
+  bool bool1 = 9;
+  int32 duration = 10;
+  int32 end_time = 11;
+  uint32 combo = 12;
+  uint32 peer_id = 13;
+  uint32 skill_type = 14;
+  uint32 level = 15;
+  uint32 choose_player_count = 16;
+}

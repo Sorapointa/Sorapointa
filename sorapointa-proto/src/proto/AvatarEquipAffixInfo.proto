@@ -3,6 +3,6 @@ syntax = "proto3";
 option java_package = "org.sorapointa.proto";
 
 message AvatarEquipAffixInfo {
-	uint32 equip_affix_id = 1;
-	uint32 left_cd_time = 2;
+  uint32 equip_affix_id = 1;
+  uint32 left_cd_time = 2;
 }

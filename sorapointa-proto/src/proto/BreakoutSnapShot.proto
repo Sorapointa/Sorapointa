@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+import "BreakoutAction.proto";
+import "BreakoutElementReactionCounter.proto";
+import "BreakoutPhysicalObject.proto";
+import "BreakoutSpawnPoint.proto";
+import "BreakoutSyncConnectUidInfo.proto";
+
+option java_package = "org.sorapointa.proto";
+
+message BreakoutSnapShot {
+  uint64 client_game_time = 1;
+  uint64 server_game_time = 2;
+  repeated BreakoutPhysicalObject ball_list = 3;
+  repeated BreakoutPhysicalObject physical_object_list = 4;
+  repeated BreakoutAction action_list = 5;
+  uint32 wave_index = 6;
+  bool is_finish = 7;
+  uint32 score = 8;
+  uint32 combo = 9;
+  uint32 max_combo = 10;
+  uint32 life_count = 11;
+  uint32 wave_suite_index = 12;
+  repeated BreakoutSpawnPoint spawn_point_list = 13;
+  uint32 remaining_boss_hp = 14;
+  repeated BreakoutElementReactionCounter brick_element_reaction_list = 15;
+  repeated BreakoutElementReactionCounter ball_element_reaction_list = 16;
+  repeated BreakoutSyncConnectUidInfo uid_info_list = 17;
+  repeated BreakoutPhysicalObject dynamic_object_list = 18;
+  repeated uint32 id_index_list = 19;
+  int32 raw_client_game_time = 20;
+}

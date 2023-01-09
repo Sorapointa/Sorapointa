@@ -3,6 +3,6 @@ syntax = "proto3";
 option java_package = "org.sorapointa.proto";
 
 message UnionCmd {
-	uint32 message_id = 1;
-	bytes body = 2;
+  bytes body = 3;
+  uint32 message_id = 4;
 }

@@ -3,6 +3,6 @@ syntax = "proto3";
 option java_package = "org.sorapointa.proto";
 
 message GatherGadgetInfo {
-	uint32 item_id = 1;
-	bool is_forbid_guest = 2;
+  uint32 item_id = 1;
+  bool is_forbid_guest = 2;
 }

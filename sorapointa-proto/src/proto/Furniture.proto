@@ -3,5 +3,5 @@ syntax = "proto3";
 option java_package = "org.sorapointa.proto";
 
 message Furniture {
-	uint32 count = 1;
+  uint32 count = 1;
 }

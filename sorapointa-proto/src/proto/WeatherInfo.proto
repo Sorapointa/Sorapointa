@@ -3,5 +3,5 @@ syntax = "proto3";
 option java_package = "org.sorapointa.proto";
 
 message WeatherInfo {
-	uint32 weather_area_id = 1;
+  uint32 weather_area_id = 1;
 }

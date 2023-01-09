@@ -1,55 +1,60 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "AdjustTrackingInfo.proto";
 import "TrackingIOInfo.proto";
 
-// CmdId: 141
-// EnetChannelId: 0
-// EnetIsReliable: true
-// IsAllowClient: true
+option java_package = "org.sorapointa.proto";
+
 message PlayerLoginReq {
-	string token = 5;
-	string client_version = 7;
-	string system_version = 12;
-	string device_name = 3;
-	string device_uuid = 14;
-	uint32 target_uid = 15;
-	uint64 login_rand = 11;
-	bool is_editor = 2;
-	uint32 language_type = 13;
-	uint32 account_type = 1;
-	string account_uid = 8;
-	string platform = 6;
-	string device_info = 4;
-	uint32 platform_type = 10;
-	bool is_guest = 9;
-	uint32 cloud_client_ip = 233;
-	uint32 gm_uid = 1423;
-	string checksum = 485;
-	string online_id = 1974;
-	uint32 client_token = 133;
-	bytes security_cmd_reply = 96;
-	bytes extra_bin_data = 814;
-	string cps = 467;
-	uint32 channel_id = 2028;
-	uint32 sub_channel_id = 1571;
-	string checksum_client_version = 1844;
-	uint32 tag = 843;
-	TrackingIOInfo tracking_io_info = 1882;
-	string country_code = 1060;
-	uint32 client_data_version = 1570;
-	bytes environment_error_code = 1303;
-	uint32 target_home_owner_uid = 1054;
-	string psn_id = 921;
-	string client_verison_hash = 1972;
-	bool is_transfer = 1918;
-	uint32 reg_platform = 167;
-	uint32 target_home_param = 1129;
-	AdjustTrackingInfo adjust_tracking_info = 280;
-	string birthday = 174;
-	string MADLMMNJICA = 135;
-	string CCLJBEJHFOP = 745;
-	uint32 LKCFGDBHHIL = 1881;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 156;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  //   IS_ALLOW_CLIENT = 1;
+  // }
+
+  string device_uuid = 5;
+  uint32 target_uid = 10;
+  bytes extra_bin_data = 2046;
+  string platform = 4;
+  string checksum = 1334;
+  uint32 channel_id = 1565;
+  string client_verison_hash = 2040;
+  uint32 language_type = 11;
+  uint32 client_data_version = 847;
+  uint32 account_type = 7;
+  string security_library_md5 = 868;
+  string online_id = 577;
+  uint32 cloud_client_ip = 82;
+  string device_name = 12;
+  string birthday = 875;
+  uint32 tag = 525;
+  string account_uid = 14;
+  string device_info = 15;
+  uint32 sub_channel_id = 1458;
+  bool is_editor = 1;
+  string token = 8;
+  uint32 reg_platform = 424;
+  string checksum_client_version = 581;
+  uint32 client_port = 85;
+  uint32 target_home_param = 1320;
+  string country_code = 104;
+  uint32 gm_uid = 1790;
+  TrackingIOInfo tracking_io_info = 1713;
+  bool is_transfer = 624;
+  string security_library_version = 828;
+  string client_version = 2;
+  bool is_guest = 13;
+  string system_version = 6;
+  uint32 target_home_owner_uid = 899;
+  string psn_id = 1146;
+  bytes security_cmd_reply = 874;
+  uint32 client_token = 1028;
+  uint64 login_rand = 9;
+  AdjustTrackingInfo adjust_tracking_info = 64;
+  bytes environment_error_code = 256;
+  uint32 platform_type = 3;
+  string cps = 1983;
 }

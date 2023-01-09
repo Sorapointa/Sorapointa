@@ -1,12 +1,17 @@
 syntax = "proto3";
 
-option java_package = "org.sorapointa.proto";
-
 import "PlayerWorldSceneInfo.proto";
 
-// CmdId: 3172
-// EnetChannelId: 0
-// EnetIsReliable: true
+option java_package = "org.sorapointa.proto";
+
 message PlayerWorldSceneInfoListNotify {
-	repeated PlayerWorldSceneInfo info_list = 5;
+  // enum CmdId {
+  //   option allow_alias = true;
+  //   NONE = 0;
+  //   CMD_ID = 3059;
+  //   ENET_CHANNEL_ID = 0;
+  //   ENET_IS_RELIABLE = 1;
+  // }
+
+  repeated PlayerWorldSceneInfo info_list = 2;
 }

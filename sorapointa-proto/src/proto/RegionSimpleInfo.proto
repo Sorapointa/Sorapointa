@@ -3,8 +3,8 @@ syntax = "proto3";
 option java_package = "org.sorapointa.proto";
 
 message RegionSimpleInfo {
-	string name = 1;
-	string title = 2;
-	string type = 3;
-	string dispatch_url = 4;
+  string name = 1;
+  string title = 2;
+  string type = 3;
+  string dispatch_url = 4;
 }
