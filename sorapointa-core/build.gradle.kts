@@ -15,6 +15,7 @@ dependencies {
     api(project(":sorapointa-i18n"))
     api(project(":sorapointa-proto"))
     api(project(":sorapointa-task"))
+    api(project(":sorapointa-crypto"))
     api(project(":sorapointa-utils:sorapointa-utils-all"))
 
     // KotlinX

@@ -3,6 +3,7 @@ package org.sorapointa.config
 import org.jetbrains.exposed.sql.Table
 import org.sorapointa.SorapointaConfig
 import org.sorapointa.console.ConsoleUsers
+import org.sorapointa.crypto.CryptoConfig
 import org.sorapointa.data.provider.DataFilePersist
 import org.sorapointa.data.provider.DatabaseConfig
 import org.sorapointa.dispatch.DispatchConfig
@@ -19,6 +20,7 @@ internal val registeredConfig: List<DataFilePersist<*>> = listOf(
     EventManagerConfig,
     DispatchConfig,
     ConsoleUsers,
+    CryptoConfig,
 )
 
 internal val registeredDatabaseTable: List<Table> = listOf(

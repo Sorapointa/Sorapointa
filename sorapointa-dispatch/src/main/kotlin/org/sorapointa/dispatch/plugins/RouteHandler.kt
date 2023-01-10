@@ -17,18 +17,18 @@ import kotlinx.serialization.json.JsonElement
 import okio.ByteString.Companion.toByteString
 import org.jetbrains.annotations.PropertyKey
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.sorapointa.crypto.clientRsaPrivateKey
+import org.sorapointa.crypto.clientRsaPublicKey
+import org.sorapointa.crypto.signKey
 import org.sorapointa.dispatch.BUNDLE
 import org.sorapointa.dispatch.DispatchBundle
 import org.sorapointa.dispatch.DispatchConfig
 import org.sorapointa.dispatch.DispatchServer
 import org.sorapointa.dispatch.data.*
 import org.sorapointa.dispatch.events.*
-import org.sorapointa.dispatch.utils.KeyProvider
 import org.sorapointa.event.broadcastEvent
 import org.sorapointa.proto.*
 import org.sorapointa.utils.SorapointaInternal
-import org.sorapointa.utils.crypto.RSAKey
-import org.sorapointa.utils.crypto.parseToRSAKey
 import org.sorapointa.utils.networkJson
 import org.sorapointa.utils.xor
 import java.util.concurrent.ConcurrentHashMap
@@ -72,42 +72,6 @@ private suspend fun getQueryRegionListHttpRsp(host: String): QueryRegionListHttp
 @SorapointaInternal
 var currentRegionRsp = CompletableDeferred<QueryCurrRegionHttpRsp>()
 
-private val dispatchRSAKey: RSAKey? by lazy {
-    val setting = DispatchConfig.data.requestSetting
-    if (setting.enableCustomKey) {
-        setting.customRSAPrivateKey.parseToRSAKey()
-    } else {
-        KeyProvider.queryCurrRSAKeySet[setting.useKeyId]?.privateKey?.parseToRSAKey()
-    }
-}
-
-private val dispatchPublicRSAKey: RSAKey? by lazy {
-    val setting = DispatchConfig.data.requestSetting
-    if (setting.enableCustomKey) {
-        setting.customRSAPublicKey.parseToRSAKey()
-    } else {
-        KeyProvider.queryCurrRSAKeySet[setting.useKeyId]?.publicKey?.parseToRSAKey()
-    }
-}
-
-val signingKey: RSAKey? by lazy {
-    val setting = DispatchConfig.data.requestSetting
-    if (setting.enableCustomSignKey) {
-        setting.customSignPrivateKey.parseToRSAKey()
-    } else {
-        KeyProvider.signKeySet.privateKey.parseToRSAKey()
-    }
-}
-
-val signingPublicKey: RSAKey? by lazy {
-    val setting = DispatchConfig.data.requestSetting
-    if (setting.enableCustomSignKey) {
-        setting.customSignPublicKey.parseToRSAKey()
-    } else {
-        KeyProvider.signKeySet.publicKey.parseToRSAKey()
-    }
-}
-
 suspend fun getCurrentRegionHttpRsp(call: ApplicationCall? = null): QueryCurrRegionHttpRsp {
     val requestSetting = DispatchConfig.data.requestSetting
 
@@ -135,11 +99,11 @@ suspend fun getCurrentRegionHttpRsp(call: ApplicationCall? = null): QueryCurrReg
     val query: QueryCurrentRegionData = networkJson.decodeFromString(forwardResult)
     logger.debug { "QueryCurrentRegion Result: $query" }
 
-    val decryptResult = dispatchRSAKey?.decrypt(query.content.decodeBase64Bytes()) // decrypted protobuf
+    val decryptResult = clientRsaPrivateKey?.decrypt(query.content.decodeBase64Bytes()) // decrypted protobuf
         ?: error("Dispatch RSA Key is null or not valid")
 
     if (requestSetting.enableSignVerify) {
-        dispatchPublicRSAKey?.signVerify(decryptResult, query.sign.decodeBase64Bytes())
+        clientRsaPublicKey?.signVerify(decryptResult, query.sign.decodeBase64Bytes())
             ?: error("QueryCurrentRegion sign verify failed")
     }
 
@@ -208,7 +172,7 @@ internal suspend fun ApplicationCall.handleQueryCurrentRegion() {
         }
 
         val sign = if (DispatchConfig.data.requestSetting.enableSignature) {
-            signingKey?.sign(data)?.encodeBase64()
+            signKey?.sign(data)?.encodeBase64()
                 ?: error("Sign RSA Key is null or not valid")
         } else {
             // default sign is base64 encoding of "sorapointa", it's a meaningless string
@@ -217,7 +181,7 @@ internal suspend fun ApplicationCall.handleQueryCurrentRegion() {
             "c29yYXBvaW50YQ=="
         }
 
-        val content = dispatchRSAKey?.encrypt(data)?.encodeBase64()
+        val content = clientRsaPrivateKey?.encrypt(data)?.encodeBase64()
             ?: error("Dispatch RSA Key is null or not valid")
         respond(QueryCurrentRegionData(content, sign))
     }
