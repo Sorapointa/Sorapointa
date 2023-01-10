@@ -6,5 +6,5 @@ import kotlinx.serialization.json.JsonObject
 
 @Serializable
 data class ScenePointConfig(
-    @JsonNames("points", "Points") val points: JsonObject // com.google.gson.JsonObject
+    @JsonNames("points", "Points") val points: JsonObject
 )

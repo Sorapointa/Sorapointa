@@ -153,20 +153,18 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
         }
 
     private fun setupDataloader(): Job {
-        val job = SupervisorJob(scope.coroutineContext.job)
-        return scope.launch(job) {
+        return scope.launch {
             logger.info { "Loading Sorapointa excel data..." }
             runCatching {
                 val count: Int
                 val time = measureTimeMillis {
                     count = ResourceHolder.findAndRegister()
-                    ResourceHolder.loadAll()
+                    ResourceHolder.loadAll(scope.coroutineContext)
                 }
                 logger.info { "Loaded $count excel data in $time ms" }
-                job.complete()
             }.onFailure {
                 logger.error(it) { "Could not load sorapointa resources data" }
-                exitProcess(-1)
+                exitProcess(1)
             }
         }
     }

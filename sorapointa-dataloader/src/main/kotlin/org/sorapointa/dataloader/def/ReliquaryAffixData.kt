@@ -2,8 +2,10 @@ package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.json.JsonPrimitive
 import org.sorapointa.dataloader.DataLoader
 import org.sorapointa.dataloader.common.FightProp
+import org.sorapointa.dataloader.common.acceptEnum
 
 private val reliquaryAffixLoader =
     DataLoader<List<ReliquaryAffixData>>("./ExcelBinOutput/ReliquaryAffixExcelConfigData.json")
@@ -19,11 +21,16 @@ data class ReliquaryAffixData(
     @JsonNames("groupId", "GroupId")
     val groupId: Int,
     @JsonNames("propType", "PropType")
-    val propType: FightProp,
+    private val _propType: JsonPrimitive,
     @JsonNames("propValue", "PropValue")
     val propValue: Double,
     @JsonNames("weight", "Weight")
-    val weight: Int,
+    val weight: Int? = null,
     @JsonNames("upgradeWeight", "UpgradeWeight")
-    val upgradeWeight: Int
-)
+    val upgradeWeight: Int? = null
+) {
+
+    val propType by lazy {
+        acceptEnum(_propType, FightProp.FIGHT_PROP_NONE)
+    }
+}

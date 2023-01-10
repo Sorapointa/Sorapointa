@@ -68,8 +68,8 @@ object ResourceHolder {
      * Load all registered data
      * @see [DataLoader.loadFromStream]
      */
-    suspend fun loadAll() {
-        val scope = ModuleScope("ResourceLoader", coroutineContext)
+    suspend fun loadAll(context: CoroutineContext? = null) {
+        val scope = ModuleScope("ResourceLoader", context ?: coroutineContext)
         dataMap.map { (k, v) ->
             scope.launch {
                 val loaded = v.load()

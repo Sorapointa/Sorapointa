@@ -2,8 +2,10 @@ package org.sorapointa.dataloader.def
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.json.JsonPrimitive
 import org.sorapointa.dataloader.DataLoader
 import org.sorapointa.dataloader.common.ElementType
+import org.sorapointa.dataloader.common.acceptEnum
 
 private val avatarSkillDataLoader =
     DataLoader<List<AvatarSkillData>>("./ExcelBinOutput/AvatarSkillExcelConfigData.json")
@@ -17,11 +19,11 @@ data class AvatarSkillData(
     @JsonNames("nameTextMapHash", "NameTextMapHash")
     val nameTextMapHash: Long,
     @JsonNames("abilityName", "AbilityName")
-    val abilityName: String,
+    val abilityName: String? = null,
     @JsonNames("descTextMapHash", "DescTextMapHash")
     val descTextMapHash: Long,
     @JsonNames("skillIcon", "SkillIcon")
-    val skillIcon: String,
+    val skillIcon: String? = null,
     @JsonNames("costStamina", "CostStamina")
     val costStamina: Double? = null,
     @JsonNames("maxChargeNum", "MaxChargeNum")
@@ -33,27 +35,32 @@ data class AvatarSkillData(
     @JsonNames("isAttackCameraLock", "IsAttackCameraLock")
     val isAttackCameraLock: Boolean = false,
     @JsonNames("buffIcon", "BuffIcon")
-    val buffIcon: String,
+    val buffIcon: String? = null,
     @JsonNames("globalValueKey", "GlobalValueKey")
-    val globalValueKey: String,
+    val globalValueKey: String? = null,
     @JsonNames("cdTime", "CdTime")
-    val cdTime: Double = 0.0,
+    val cdTime: Double? = null,
     @JsonNames("triggerID", "TriggerID")
     val triggerID: Int? = null,
     @JsonNames("proudSkillGroupId", "ProudSkillGroupId")
     val proudSkillGroupId: Int? = null,
     @JsonNames("costElemType", "CostElemType")
-    val costElemType: ElementType = ElementType.None,
+    private val _costElemType: JsonPrimitive? = null,
     @JsonNames("costElemVal", "CostElemVal")
-    val costElemVal: Double = 0.0,
+    val costElemVal: Double? = null,
     @JsonNames("ignoreCDMinusRatio", "IgnoreCDMinusRatio")
-    val ignoreCDMinusRatio: Boolean = false,
+    val ignoreCDMinusRatio: Boolean? = null,
     @JsonNames("needStore", "NeedStore")
-    val needStore: Boolean = false,
+    val needStore: Boolean? = null,
     @JsonNames("defaultLocked", "DefaultLocked")
-    val defaultLocked: Boolean = false,
+    val defaultLocked: Boolean? = null,
     @JsonNames("cdSlot", "CdSlot")
     val cdSlot: Int? = null,
     @JsonNames("energyMin", "EnergyMin")
     val energyMin: Double? = null
-)
+) {
+
+    val costElemType by lazy {
+        _costElemType?.let { acceptEnum(it, ElementType.None) }
+    }
+}

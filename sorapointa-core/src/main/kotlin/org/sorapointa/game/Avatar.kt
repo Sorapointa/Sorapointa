@@ -181,16 +181,16 @@ internal class AvatarProtoImpl(
 
     private val protoExcelInfo by lazy {
         AvatarExcelInfo(
-            prefab_path_hash = entity.avatarExcelData.prefabPathHash,
-            prefab_path_remote_hash = entity.avatarExcelData.prefabPathRemoteHash,
-            controller_path_hash = entity.avatarExcelData.controllerPathHash,
-            controller_path_remote_hash = entity.avatarExcelData.controllerPathRemoteHash,
-            combat_config_hash = entity.avatarExcelData.combatConfigHash,
+            prefab_path_hash = entity.avatarExcelData.prefabPathHash.toLong(),
+            prefab_path_remote_hash = entity.avatarExcelData.prefabPathRemoteHash.toLong(),
+            controller_path_hash = entity.avatarExcelData.controllerPathHash.toLong(),
+            controller_path_remote_hash = entity.avatarExcelData.controllerPathRemoteHash.toLong(),
+            combat_config_hash = entity.avatarExcelData.combatConfigHash.toLong(),
         )
     }
 
     override val protoPropMap
-        get() = mapOf<Int, PropValue>(
+        get() = mapOf(
             PlayerProp.PROP_LEVEL map entity.data.level,
             PlayerProp.PROP_EXP map entity.data.exp,
             PlayerProp.PROP_BREAK_LEVEL map entity.data.promoteLevel,
@@ -325,7 +325,7 @@ internal class AvatarProtoImpl(
         // TODO: isFocus is whether one of teammate of selected team
         avatar_type = entity.avatarType.value,
         // TODO: Team resonance
-        wearing_flycloak_id = entity.data.wearingFlyCloakId.id,
+        wearing_flycloak_id = entity.data.wearingFlyCloakId.value,
         // Still don't know what is `equip_affix_list` in this packet
         // It seems related to weapon passive skill and cd time
         // 比如西风和祭礼系列武器的被动冷却时间 - 持久化数据库存储，就像 protoSkillMap
@@ -356,7 +356,7 @@ internal class AvatarProtoImpl(
             // TODO: Proud skill extra level map
             // TODO: Server Buff List
             // TODO: Team resonance
-            wearing_flycloak_id = entity.data.wearingFlyCloakId.id,
+            wearing_flycloak_id = entity.data.wearingFlyCloakId.value,
             born_time = entity.data.bornTime.epochSeconds.toInt(),
             // TODO: `pending_promote_reward_list`
             costume_id = entity.data.costumeId ?: 0,
