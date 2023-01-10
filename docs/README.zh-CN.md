@@ -61,14 +61,12 @@ Sorapointa 可以写成对应的汉字「空想家」，但无论如何，请你
 |------------------------|-------------------------|------------------------|
 | `database.default`     | 为新配置填充的默认数据库    | `SQLITE`, `POSTGRESQL` |
 | `database.driver.list` | 构建将提供的数据库驱动列表  | `SQLITE`, `POSTGRESQL` |
-| `proto.fullCompile`    | 为 proto 开启全量编译     | `true`                 |
 
 示例：
 
 ```properties
 database.default=SQLITE
 database.driver.list=SQLITE,POSTGRESQL
-proto.fullCompile=true
 ```
 
 ## Contributing

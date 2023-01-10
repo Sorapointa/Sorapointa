@@ -64,14 +64,12 @@ Create `local.properties` in project root and edit it. Config uses Java `.proper
 |------------------------|---------------------------------|------------------------|
 | `database.default`     | default database for new config | `SQLITE`, `POSTGRESQL` |
 | `database.driver.list` | database drivers to build       | `SQLITE`, `POSTGRESQL` |
-| `proto.fullCompile`    | do full compile for proto       | `true`                 |
 
 Example:
 
 ```properties
 database.default=SQLITE
 database.driver.list=SQLITE,POSTGRESQL
-proto.fullCompile=true
 ```
 
 ## Thanks
