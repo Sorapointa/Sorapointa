@@ -6,6 +6,7 @@ import okio.ByteString.Companion.toByteString
 import org.sorapointa.CoreBundle
 import org.sorapointa.Sorapointa
 import org.sorapointa.SorapointaConfig
+import org.sorapointa.crypto.CryptoConfig
 import org.sorapointa.dataloader.common.EnterReason
 import org.sorapointa.dataloader.common.OpenState
 import org.sorapointa.dataloader.common.WorldType
@@ -42,8 +43,9 @@ internal abstract class GetPlayerTokenRspPacket : AbstractOutgoingPacket<GetPlay
 
     internal class Successful(
         private val tokenReq: GetPlayerTokenReq,
-        private val keySeed: ULong,
-        private val ip: String
+        private val ip: String,
+        private val encryptedServerSeed: String,
+        private val sign: String,
     ) : GetPlayerTokenRspPacket() {
         override fun buildProto(): GetPlayerTokenRsp =
             GetPlayerTokenRsp(
@@ -52,13 +54,15 @@ internal abstract class GetPlayerTokenRspPacket : AbstractOutgoingPacket<GetPlay
                 account_type = tokenReq.account_type,
                 account_uid = tokenReq.account_uid,
                 is_proficient_player = true,
-                secret_key_seed = keySeed.toLong(),
+                key_id = CryptoConfig.data.useKeyId,
+                server_rand_key = encryptedServerSeed,
+                sign = sign,
                 security_cmd_buffer = randomByteArray(32).toByteString(),
                 platform_type = tokenReq.platform_type,
                 channel_id = tokenReq.channel_id,
                 sub_channel_id = tokenReq.sub_channel_id,
                 country_code = "US",
-                client_version_random_key = "aeb-bc90f1631c05",
+                client_version_random_key = "a38-cc982d8bddd0",
                 reg_platform = 1,
                 client_ip_str = ip,
             )
@@ -92,7 +96,7 @@ internal abstract class PlayerLoginRspPacket : AbstractOutgoingPacket<PlayerLogi
 
             return PlayerLoginRsp(
                 is_use_ability_hash = true,
-                ability_hash_code = -2044997239, // TODO: Unknown
+                ability_hash_code = -1793064043, // TODO: Unknown
                 game_biz = "hk4e_global", // TODO: Hardcode
                 client_silence_data_version = regionInfo?.client_silence_data_version ?: 0,
                 client_data_version = regionInfo?.client_data_version ?: 0,
@@ -339,6 +343,20 @@ internal class GetPlayerSocialDetailRspPacket(
 
     override val adapter: ProtoAdapter<GetPlayerSocialDetailRsp>
         get() = GetPlayerSocialDetailRsp.ADAPTER
+}
+
+internal class SceneTeamUpdateNotifyPacket(
+    override val player: Player
+) : PlayerOutgoingPacket<SceneTeamUpdateNotify>(
+    PacketId.SCENE_TEAM_UPDATE_NOTIFY
+) {
+
+    override fun Player.buildProto(): SceneTeamUpdateNotify {
+        return SceneTeamUpdateNotify()
+    }
+
+    override val adapter: ProtoAdapter<SceneTeamUpdateNotify>
+        get() = SceneTeamUpdateNotify.ADAPTER
 }
 
 internal class EnterScenePeerNotifyPacket(

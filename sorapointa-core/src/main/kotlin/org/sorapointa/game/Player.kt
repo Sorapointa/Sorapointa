@@ -2,10 +2,8 @@ package org.sorapointa.game
 
 import com.squareup.wire.Message
 import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.update
 import kotlinx.coroutines.Job
 import mu.KotlinLogging
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.sorapointa.Sorapointa
 import org.sorapointa.command.CommandSender
 import org.sorapointa.dataloader.common.EntityIdType
@@ -180,7 +178,7 @@ class PlayerImpl internal constructor(
 
     override fun getNextEnterSceneToken(set: Boolean): Int =
         (1000..99999).random().also {
-            if (set) _enterSceneToken.update { it }
+            if (set) _enterSceneToken.value = it
         }
 
     override fun getNextEntityId(idType: EntityIdType): Int =
@@ -242,28 +240,26 @@ class PlayerImpl internal constructor(
         override val state: PlayerStateInterface.State = PlayerStateInterface.State.LOGIN
 
         internal suspend fun onLogin() {
-            newSuspendedTransaction {
-                // TODO: divide those into separate modules to implement `onLogin`
-                val loginPackets = listOf(
-                    PlayerDataNotifyPacket(player),
-                    StoreWeightLimitNotifyPacket(),
-                    PlayerStoreNotifyPacket(player),
-                    AvatarDataNotifyPacket(player),
-                    OpenStateUpdateNotifyPacket(player),
-                    PlayerEnterSceneNotifyPacket.Login(player),
-                )
-                // TODO: Resin, Quest, Achievement, Activity,
-                //  DailyTask, PlayerLevelReward,
-                //  AvatarExpedition, AvatarSatiation,
-                //  Cook, Combine (Craft), Forge,
-                //  Investigation, Tower, Codex, Widget,
-                //  Home, Announcement(Activity), Shop, Mail
-                loginPackets.forEach {
-                    networkHandler.sendPacket(it)
-                }
-
-                sceneState.setState(PlayerSceneStateInterface.State.LOADING)
+            // TODO: divide those into separate modules to implement `onLogin`
+            val loginPackets = listOf(
+                PlayerDataNotifyPacket(player),
+                StoreWeightLimitNotifyPacket(),
+                PlayerStoreNotifyPacket(player),
+                AvatarDataNotifyPacket(player),
+                OpenStateUpdateNotifyPacket(player),
+                PlayerEnterSceneNotifyPacket.Login(player),
+            )
+            // TODO: Resin, Quest, Achievement, Activity,
+            //  DailyTask, PlayerLevelReward,
+            //  AvatarExpedition, AvatarSatiation,
+            //  Cook, Combine (Craft), Forge,
+            //  Investigation, Tower, Codex, Widget,
+            //  Home, Announcement(Activity), Shop, Mail
+            loginPackets.forEach {
+                networkHandler.sendPacket(it)
             }
+
+            sceneState.setState(PlayerSceneStateInterface.State.LOADING)
         }
     }
 

@@ -1,10 +1,13 @@
 package org.sorapointa.server.network
 
 import com.squareup.wire.ProtoAdapter
+import io.ktor.util.*
 import kotlinx.coroutines.withTimeout
 import mu.KotlinLogging
 import org.sorapointa.Sorapointa
 import org.sorapointa.SorapointaConfig
+import org.sorapointa.crypto.clientRsaPrivateKey
+import org.sorapointa.crypto.signKey
 import org.sorapointa.dispatch.data.Account
 import org.sorapointa.dispatch.plugins.currentRegionRsp
 import org.sorapointa.game.Player
@@ -12,6 +15,10 @@ import org.sorapointa.game.data.PlayerDataImpl
 import org.sorapointa.game.impl
 import org.sorapointa.proto.*
 import org.sorapointa.utils.randomULong
+import org.sorapointa.utils.toByteArray
+import org.sorapointa.utils.toULong
+import org.sorapointa.utils.xor
+import java.nio.ByteOrder
 
 private val logger = KotlinLogging.logger {}
 
@@ -57,6 +64,7 @@ internal object GetPlayerTokenReqHandler : IncomingPreLoginPacketHandler
         val account = Account.findById(uid) ?: return GetPlayerTokenRspPacket.Error(
             Retcode.RET_ACCOUNT_NOT_EXIST, "user.notfound"
         )
+
         if (packet.account_token != account.getComboTokenWithCheck()) return GetPlayerTokenRspPacket.Error(
             Retcode.RET_TOKEN_ERROR, "auth.error.token"
         )
@@ -66,12 +74,25 @@ internal object GetPlayerTokenReqHandler : IncomingPreLoginPacketHandler
             it.impl().close()
         }
 
-        val seed = randomULong()
+        // Key exchange flow, see: https://sdl.moe/post/magic-sniffer/
 
-        updateKeyAndBindPlayer(account, seed)
+        val clientSeed = signKey?.decrypt(packet.client_rand_key.decodeBase64Bytes())
+            ?: error("Sign private key is null or not valid")
+
+        val serverSeed = randomULong()
+        val serverSeedByte = serverSeed.toByteArray(false)
+
+        val encryptedServerSeed = clientRsaPrivateKey?.encrypt(serverSeedByte)
+            ?: error("Client public key is null or not valid")
+        val sign = signKey?.sign(serverSeedByte)
+            ?: error("Sign private key is null or not valid")
+
+        val newSessionSeed = (clientSeed xor serverSeedByte).toULong(ByteOrder.BIG_ENDIAN)
+
+        updateKeyAndBindPlayer(account, newSessionSeed)
 
         return GetPlayerTokenRspPacket.Successful(
-            packet, seed, networkHandler.host
+            packet, networkHandler.host, encryptedServerSeed.encodeBase64(), sign.encodeBase64()
         )
     }
 }

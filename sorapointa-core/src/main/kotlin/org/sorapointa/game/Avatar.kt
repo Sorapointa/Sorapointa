@@ -169,6 +169,8 @@ internal interface AvatarProto : SceneEntityProto<Avatar> {
     val protoPropMap: Map<Int, PropValue>
 
     fun toAvatarInfoProto(): AvatarInfo
+
+    fun getSceneAvatarInfo(): SceneAvatarInfo
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -340,7 +342,14 @@ internal class AvatarProtoImpl(
             entity.equipWeapon!!.toSceneWeaponInfoProto(entity.equipWeaponEntityId!!)
         } else avatar?.weapon
 
-        val avatar = SceneAvatarInfo(
+        val avatar =
+            return copy(avatar = avatar)
+    }
+
+    override fun getSceneAvatarInfo(): SceneAvatarInfo {
+        val weapon = entity.equipWeapon?.toSceneWeaponInfoProto(entity.equipWeaponEntityId ?: 0)
+
+        return SceneAvatarInfo(
             uid = entity.ownerPlayer.uid,
             avatar_id = entity.data.avatarId,
             guid = entity.data.guid,
@@ -364,7 +373,6 @@ internal class AvatarProtoImpl(
             excel_info = protoExcelInfo,
             // animHash
         )
-        return copy(avatar = avatar)
     }
 }
 

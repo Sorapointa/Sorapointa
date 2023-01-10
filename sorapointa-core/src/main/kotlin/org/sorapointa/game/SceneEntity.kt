@@ -190,7 +190,6 @@ abstract class SceneGadgetEntityBaseProto<TEntity : SceneGadgetEntityBase> : Abs
 
     abstract override val entity: TEntity
 
-    @Suppress("DuplicatedCode")
     override fun SceneEntityInfo.toProto(): SceneEntityInfo {
         val gadget = SceneGadgetInfo(
             gadget_id = entity.gadgetId,

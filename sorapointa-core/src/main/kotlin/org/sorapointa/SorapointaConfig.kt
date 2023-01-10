@@ -27,6 +27,8 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
         val offsetHours: Int = 4,
         @SerialName("timeZone")
         private val _timeZone: String = TimeZone.currentSystemDefault().toString(),
+        @YamlComment("Use camel case for packet name in debug mode, if it is false then use big sneak case.")
+        val debugCamelCasePacketName: Boolean = true,
     ) {
 
         val timeZone by lazy {

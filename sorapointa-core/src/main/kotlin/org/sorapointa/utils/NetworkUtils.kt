@@ -3,13 +3,27 @@ package org.sorapointa.utils
 import io.ktor.utils.io.core.*
 import io.netty.buffer.ByteBuf
 import mu.KotlinLogging
-import org.sorapointa.proto.PacketHead
-import org.sorapointa.proto.START_MAGIC
-import org.sorapointa.proto.SoraPacket
-import org.sorapointa.proto.readToSoraPacket
+import org.sorapointa.SorapointaConfig
+import org.sorapointa.proto.*
 import org.sorapointa.utils.encoding.hex
 
 private val logger = KotlinLogging.logger {}
+
+/**
+ * Find a common name for a packet id
+ *
+ * This method is **inefficient** due to reflection,
+ * please call it in **performance insensitive situation**
+ * or lazy load it.
+ *
+ * @param cmdId packet id
+ */
+fun findCommonNameFromCmdId(cmdId: UShort): String {
+    val name = PacketId::class.java.declaredFields.first { it.get(PacketId).safeCast<Short>() == cmdId.toShort() }.name
+    return if (SorapointaConfig.data.debugCamelCasePacketName) {
+        name.toCamelCase()
+    } else name
+}
 
 internal fun ByteBuf.toByteArray(): ByteArray {
     val bytes = ByteArray(this.readableBytes())
