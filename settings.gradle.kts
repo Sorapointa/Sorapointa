@@ -6,6 +6,8 @@ include("sorapointa-dataprovider")
 include("sorapointa-dispatch")
 include("sorapointa-event")
 include("sorapointa-i18n")
+include("sorapointa-native")
+include("sorapointa-native-wrapper")
 include("sorapointa-proto")
 include("sorapointa-task")
 

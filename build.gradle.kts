@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.abi.validator)
     alias(libs.plugins.wire) apply false
+    alias(libs.plugins.rust.wrapper) apply false
 }
 
 subprojects {

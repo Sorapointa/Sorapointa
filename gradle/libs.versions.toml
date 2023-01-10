@@ -8,6 +8,7 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "10.3.0" }
 abi-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.11.1" }
 wire = { id = "com.squareup.wire", version = "4.4.3" }
+rust-wrapper = { id = "fr.stardustenterprises.rust.wrapper", version = "3.2.5" }
 
 [libraries]
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -69,6 +70,9 @@ build-kotlinpoet = "com.squareup:kotlinpoet:1.12.0"
 build-buildconfig = "com.github.gmazzo:gradle-buildconfig-plugin:3.1.0"
 build-shadow = "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
 build-atomicfu = "org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.18.5"
+
+yanl = "fr.stardustenterprises:yanl:0.8.1"
+plat4k = "fr.stardustenterprises:plat4k:1.6.3"
 
 [bundles]
 log = ["microutils-logging", "logback"]
