@@ -24,17 +24,17 @@ data class AvatarSkillDepotData(
     @JsonNames("skills", "Skills")
     private val _skills: List<Int>,
     @JsonNames("subSkills", "SubSkills")
-    val subSkills: List<Int>,
+    val subSkills: List<Int>? = null,
     @JsonNames("extraAbilities", "ExtraAbilities")
     val extraAbilities: List<String>,
     @JsonNames("talents", "Talents")
     val talents: List<Int>,
     @JsonNames("talentStarName", "TalentStarName")
-    val talentStarName: String,
+    val talentStarName: String? = null,
     @JsonNames("inherentProudSkillOpens", "InherentProudSkillOpens")
     private val _inherentProudSkillOpens: List<InherentProudSkillOpen>,
     @JsonNames("skillDepotAbilityGroup", "SkillDepotAbilityGroup")
-    val skillDepotAbilityGroup: String,
+    val skillDepotAbilityGroup: String? = null,
     @JsonNames("leaderTalent", "LeaderTalent")
     val leaderTalent: Int? = null,
     @JsonNames("attackModeSkill", "AttackModeSkill")

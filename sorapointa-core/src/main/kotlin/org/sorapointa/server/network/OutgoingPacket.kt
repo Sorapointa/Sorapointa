@@ -262,7 +262,7 @@ internal class AvatarDataNotifyPacket(
             avatar_team_map = data.compoundAvatarTeam.protoTeamMap,
             cur_avatar_team_id = data.selectedTeamId,
             choose_avatar_guid = data.selectedAvatarGuid,
-            owned_flycloak_list = data.flyCloakSet.map { it.id },
+            owned_flycloak_list = data.flyCloakSet.map { it.value },
             owned_costume_list = data.costumeSet.toList(),
         )
 

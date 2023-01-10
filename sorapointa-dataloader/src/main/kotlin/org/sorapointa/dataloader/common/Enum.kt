@@ -2,7 +2,30 @@
 
 package org.sorapointa.dataloader.common
 
-enum class SceneType(val value: Int) {
+import kotlinx.serialization.json.JsonPrimitive
+
+interface PropEnum {
+    val value: Int
+}
+
+inline fun <reified T> acceptEnum(jsonPrimitive: JsonPrimitive, defaultEnum: T): T
+where T : PropEnum, T : Enum<T> {
+    val content = jsonPrimitive.content
+
+    val tryName = getPropEnumByName<T>(content)
+    if (tryName != null) return tryName
+
+    val id = content.toIntOrNull() ?: return defaultEnum
+    return getPropEnumByValue(id) ?: defaultEnum
+}
+
+inline fun <reified T> getPropEnumByValue(value: Int): T?
+where T : PropEnum, T : Enum<T> = enumValues<T>().firstOrNull { it.value == value }
+
+inline fun <reified T> getPropEnumByName(name: String): T?
+where T : PropEnum, T : Enum<T> = enumValues<T>().firstOrNull { it.name == name }
+
+enum class SceneType(override val value: Int) : PropEnum {
     SCENE_NONE(0),
     SCENE_WORLD(1),
     SCENE_DUNGEON(2),
@@ -12,7 +35,7 @@ enum class SceneType(val value: Int) {
     SCENE_ACTIVITY(6)
 }
 
-enum class EquipType(val value: Int) {
+enum class EquipType(override val value: Int) : PropEnum {
     EQUIP_NONE(0),
     EQUIP_BRACER(1), // Flower of Life 生之花
     EQUIP_NECKLACE(2), // Plume of Death 死之羽
@@ -22,7 +45,7 @@ enum class EquipType(val value: Int) {
     EQUIP_WEAPON(6)
 }
 
-enum class FlyCloakId(_id: Int) {
+enum class FlyCloakId(lowId: Int) : PropEnum {
     GLIDER(1),
     STARLIT(2),
     PSALMUS(3),
@@ -34,10 +57,10 @@ enum class FlyCloakId(_id: Int) {
     SKALD(9),
     ;
 
-    val id = _id + 140000
+    override val value = lowId + 140000
 }
 
-enum class EntityIdType(val value: Int) {
+enum class EntityIdType(override val value: Int) : PropEnum {
     AVATAR(1),
     MONSTER(2),
     NPC(3),
@@ -47,7 +70,7 @@ enum class EntityIdType(val value: Int) {
     MPLEVEL(11);
 }
 
-enum class ClimateType(val value: Int) {
+enum class ClimateType(override val value: Int) : PropEnum {
     CLIMATE_NONE(0),
     CLIMATE_SUNNY(1),
     CLIMATE_CLOUDY(2),
@@ -57,7 +80,7 @@ enum class ClimateType(val value: Int) {
     CLIMATE_MIST(6)
 }
 
-enum class EntityAppearVisionType(val value: Int) {
+enum class EntityAppearVisionType(override val value: Int) : PropEnum {
     VISION_NONE(0),
     VISION_MEET(1),
     VISION_REBORN(2),
@@ -71,14 +94,14 @@ enum class EntityAppearVisionType(val value: Int) {
     VISION_REPLACE_DIE(10)
 }
 
-enum class LifeState(val value: Int) {
+enum class LifeState(override val value: Int) : PropEnum {
     LIFE_NONE(0),
     LIFE_ALIVE(1),
     LIFE_DEAD(2),
     LIFE_REVIVE(3)
 }
 
-enum class AvatarType(val value: Int) {
+enum class AvatarType(override val value: Int) : PropEnum {
     NONE(0),
     FORMAL(1),
     TRIAL(2),
@@ -86,10 +109,10 @@ enum class AvatarType(val value: Int) {
 }
 
 enum class ElementType(
-    val value: Int,
+    override val value: Int,
     val curEnergyProp: FightProp,
     val maxEnergyProp: FightProp
-) {
+) : PropEnum {
     None(0, FightProp.FIGHT_PROP_NONE, FightProp.FIGHT_PROP_NONE,),
     Fire(1, FightProp.FIGHT_PROP_CUR_FIRE_ENERGY, FightProp.FIGHT_PROP_MAX_FIRE_ENERGY),
     Water(2, FightProp.FIGHT_PROP_CUR_WATER_ENERGY, FightProp.FIGHT_PROP_MAX_WATER_ENERGY),
@@ -105,7 +128,7 @@ enum class ElementType(
     // VehicleMuteIce, COUNT, wtf is that?
 }
 
-enum class OpenState(val value: Int) {
+enum class OpenState(override val value: Int) : PropEnum {
     OPEN_STATE_NONE(0),
     OPEN_STATE_PAIMON(1),
     OPEN_STATE_PAIMON_NAVIGATION(2),
@@ -275,10 +298,6 @@ enum class OpenState(val value: Int) {
     OPEN_STATE_GUIDE_ROBOTGACHA(2704),
     OPEN_STATE_GUIDE_FRAGILE_RESIN(2800),
     OPEN_ADVENTURE_MANUAL_EDUCATION(2801),
-}
-
-interface PropEnum {
-    val value: Int
 }
 
 /**
@@ -451,7 +470,7 @@ enum class PlayerProp(override val value: Int) : PropEnum {
     PROP_IS_AUTO_UNLOCK_SPECIFIC_EQUIP(10044),
 }
 
-enum class EnterReason(val value: Int) {
+enum class EnterReason(override val value: Int) : PropEnum {
     NONE(0),
     LOGIN(1),
     DUNGEON_REPLAY(11),
@@ -486,7 +505,7 @@ enum class EnterReason(val value: Int) {
     HIDE_AND_SEEK(69),
 }
 
-enum class ItemType(val value: Int) {
+enum class ItemType(override val value: Int) : PropEnum {
     ITEM_NONE(0),
     ITEM_VIRTUAL(1),
     ITEM_MATERIAL(2),
@@ -503,7 +522,7 @@ enum class AnimatorParamType(override val value: Int) : PropEnum {
     FLOAT(3)
 }
 
-enum class RefreshType(val value: Int) {
+enum class RefreshType(override val value: Int) : PropEnum {
     SHOP_PRECONDITION_NONE(0),
     SHOP_PRECONDITION_SPECIFY(1),
     SHOP_PRECONDITION_REST(2),
@@ -516,18 +535,18 @@ enum class RefreshType(val value: Int) {
     SHOP_PRECONDITION_QUEST_FINISH_ANY(9)
 }
 
-enum class WorldType(val value: Int) {
+enum class WorldType(override val value: Int) : PropEnum {
     WORLD_NONE(0),
     WORLD_PLAYER(1),
     WORLD_HOME(2)
 }
 
-enum class AnimalCodexType(val value: Int) {
+enum class AnimalCodexType(override val value: Int) : PropEnum {
     CODEX_ANIMAL(0),
     CODEX_MONSTER(1)
 }
 
-enum class AnimalCodexSubType(val value: Int) {
+enum class AnimalCodexSubType(override val value: Int) : PropEnum {
     CODEX_SUBTYPE_ELEMENTAL(0),
     CODEX_SUBTYPE_HILICHURL(1),
     CODEX_SUBTYPE_ABYSS(2),
@@ -542,26 +561,26 @@ enum class AnimalCodexSubType(val value: Int) {
     CODEX_SUBTYPE_CRITTER(11)
 }
 
-enum class FoodQualityType(val value: Int) {
+enum class FoodQualityType(override val value: Int) : PropEnum {
     FOOD_QUALITY_NONE(0),
     FOOD_QUALITY_STRANGE(1),
     FOOD_QUALITY_ORDINARY(2),
     FOOD_QUALITY_DELICIOUS(3)
 }
 
-enum class MaterialDestroyType(val value: Int) {
+enum class MaterialDestroyType(override val value: Int) : PropEnum {
     DESTROY_NONE(0),
     DESTROY_RETURN_MATERIAL(1)
 }
 
-enum class AvatarUseType(val value: Int) {
+enum class AvatarUseType(override val value: Int) : PropEnum {
     AVATAR_TEST(0),
     AVATAR_SYNC_TEST(1),
     AVATAR_FORMAL(2),
     AVATAR_ABANDON(3)
 }
 
-enum class MaterialType(val value: Int) {
+enum class MaterialType(override val value: Int) : PropEnum {
     MATERIAL_NONE(0),
     MATERIAL_FOOD(1),
     MATERIAL_QUEST(2),
@@ -597,7 +616,7 @@ enum class MaterialType(val value: Int) {
     MATERIAL_SUMO_BUFF(34)
 }
 
-enum class ItemUseTarget(val value: Int) {
+enum class ItemUseTarget(override val value: Int) : PropEnum {
     ITEM_USE_TARGET_NONE(0),
     ITEM_USE_TARGET_CUR_AVATAR(1),
     ITEM_USE_TARGET_CUR_TEAM(2),
@@ -606,20 +625,20 @@ enum class ItemUseTarget(val value: Int) {
     ITEM_USE_TARGET_SPECIFY_DEAD_AVATAR(5)
 }
 
-enum class RecipeType(val value: Int) {
+enum class RecipeType(override val value: Int) : PropEnum {
     RECIPE_TYPE_NONE(0),
     RECIPE_TYPE_COMBINE(1),
     RECIPE_TYPE_CONVERT(2),
     RECIPE_TYPE_COMBINE_HOMEWORLD(3)
 }
 
-enum class DungeonStateType(val value: Int) {
+enum class DungeonStateType(override val value: Int) : PropEnum {
     DUNGEON_STATE_NONE(0),
     DUNGEON_STATE_RELEASE(1),
     DUNGEON_STATE_TEST(2)
 }
 
-enum class GrowCurveType(val value: Int) {
+enum class GrowCurveType(override val value: Int) : PropEnum {
     GROW_CURVE_NONE(0),
     GROW_CURVE_HP(1),
     GROW_CURVE_ATTACK(2),
@@ -683,7 +702,7 @@ enum class GrowCurveType(val value: Int) {
 }
 
 // DON'T CHANGE THE NAMING STYLE
-enum class EntityType(val value: Int) {
+enum class EntityType(override val value: Int) : PropEnum {
     None(0),
     Avatar(1),
     Monster(2),
@@ -752,7 +771,7 @@ enum class EntityType(val value: Int) {
     PlaceHolder(99)
 }
 
-enum class FetterCondType(val value: Int) {
+enum class FetterCondType(override val value: Int) : PropEnum {
     FETTER_COND_NONE(0),
     FETTER_COND_FETTER_LEVEL(1),
     FETTER_COND_AVATAR_LEVEL(2),
@@ -766,4 +785,22 @@ enum class FetterCondType(val value: Int) {
     FETTER_COND_NOT_OPEN(10),
     FETTER_COND_FINISH_PARENT_QUEST(11),
     FETTER_COND_UNLOCK_ARENA_BY_CITY_ID(12)
+}
+
+enum class WeaponType(override val value: Int) : PropEnum {
+    WEAPON_NONE(0),
+    WEAPON_SWORD_ONE_HAND(1),
+    WEAPON_CROSSBOW(2),
+    WEAPON_STAFF(3),
+    WEAPON_DOUBLE_DAGGER(4),
+    WEAPON_KATANA(5),
+    WEAPON_SHURIKEN(6),
+    WEAPON_STICK(7),
+    WEAPON_SPEAR(8),
+    WEAPON_SHIELD_SMALL(9),
+    WEAPON_CATALYST(10),
+    WEAPON_CLAYMORE(11),
+    WEAPON_BOW(12),
+    WEAPON_POLE(13)	// Properties
+    // Methods
 }

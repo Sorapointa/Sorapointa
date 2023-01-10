@@ -14,7 +14,7 @@ data class ReliquarySetData(
     @JsonNames("setId", "SetId")
     val setId: Int,
     @JsonNames("setIcon", "SetIcon")
-    val setIcon: String,
+    val setIcon: String? = null,
     @JsonNames("setNeedNum", "SetNeedNum")
     val setNeedNum: List<Int>,
     @JsonNames("equipAffixId", "EquipAffixId")

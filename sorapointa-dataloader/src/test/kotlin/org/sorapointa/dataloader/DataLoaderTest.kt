@@ -1,7 +1,7 @@
 package org.sorapointa.dataloader
 
 import org.junit.jupiter.api.Test
-import org.sorapointa.dataloader.def.avatarCostumeDataList
+import org.sorapointa.dataloader.def.avatarDataList
 import org.sorapointa.utils.TestOption
 import org.sorapointa.utils.runTest
 import kotlin.time.ExperimentalTime
@@ -19,6 +19,6 @@ class DataLoaderTest {
                 loadAll()
             }.also { println("Costed: $it") }
         }
-        println(avatarCostumeDataList)
+        println(avatarDataList)
     }
 }
