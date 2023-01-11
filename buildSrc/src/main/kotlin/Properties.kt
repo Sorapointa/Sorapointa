@@ -12,10 +12,10 @@ fun Project.getRootProjectLocalProps(): Map<String, String> {
         }.toMap().map {
             it.key.toString() to it.value.toString()
         }.toMap()
-    } else emptyMap()
+    } else {
+        emptyMap()
+    }
 }
-
-
 
 fun Project.getExtraString(name: String) = runCatching { this.extra[name]?.toString() }.getOrNull()
 

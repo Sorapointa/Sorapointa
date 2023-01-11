@@ -260,7 +260,7 @@ class PlayerDataImpl(id: EntityID<Int>) : Entity<Int>(id), PlayerData {
                     it[this.nickName] = nickName
                     it[profilePicture] = ProfilePictureData(pickInitAvatarId)
                     it[lastActiveTime] = now()
-                }
+                },
             )?.apply {
                 openStateSet.add(OpenState.OPEN_STATE_NONE)
                 flyCloakSet.add(FlyCloakId.GLIDER)
@@ -273,7 +273,7 @@ class PlayerDataImpl(id: EntityID<Int>) : Entity<Int>(id), PlayerData {
     override var guidCounter by PlayerDataTable.guidCounter
     override var locale: Locale? by PlayerDataTable.locale.transform(
         toColumn = { it?.toLanguageTag() },
-        toReal = { it?.let { Locale.forLanguageTag(it) } }
+        toReal = { it?.let { Locale.forLanguageTag(it) } },
     )
     override var nickName by PlayerDataTable.nickName
     override var signature by PlayerDataTable.signature
@@ -341,8 +341,8 @@ class PlayerDataImpl(id: EntityID<Int>) : Entity<Int>(id), PlayerData {
             player.impl().sendPacketAsync(
                 PlayerPropNotifyPacket(
                     player = player,
-                    propMap = mapOf(prop map converted)
-                )
+                    propMap = mapOf(prop map converted),
+                ),
             )
         }
 }
@@ -352,9 +352,9 @@ inline fun CompoundAvatarTeamData(initAvatarGuid: Long = 0) = CompoundAvatarTeam
     teamMap = hashMapOf(
         1 to CompoundAvatarTeamData.AvatarTeamData(
             teamName = "Default",
-            avatarGuidList = listOf(initAvatarGuid)
-        )
-    )
+            avatarGuidList = listOf(initAvatarGuid),
+        ),
+    ),
 )
 
 @Serializable
@@ -369,7 +369,7 @@ data class CompoundAvatarTeamData(
     @Serializable
     data class AvatarTeamData(
         val teamName: String,
-        val avatarGuidList: List<Long>
+        val avatarGuidList: List<Long>,
     ) {
 
         fun toProto(): AvatarTeam = AvatarTeam(
@@ -382,7 +382,7 @@ data class CompoundAvatarTeamData(
 @Serializable
 data class ProfilePictureData(
     val avatarId: Int,
-    val costumeId: Int? = null
+    val costumeId: Int? = null,
 ) {
 
     fun toProto() =
@@ -395,7 +395,7 @@ data class ProfilePictureData(
 @Serializable
 data class PlayerBirthday(
     val month: Int,
-    val day: Int
+    val day: Int,
 ) {
     fun toProto() = Birthday(month = month, day = day)
 }

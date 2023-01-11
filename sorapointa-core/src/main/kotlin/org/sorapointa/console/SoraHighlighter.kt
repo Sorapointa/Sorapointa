@@ -22,8 +22,11 @@ object SoraHighlighter : Highlighter {
             if (it.isNotBlank()) hasFirstNonBlank = true
 
             val style: AttributedStyle = when {
-                isFirstNonBlank -> if (CommandManager.hasCommand(it))
-                    DEFAULT.foreground(YELLOW) else BOLD.foreground(RED)
+                isFirstNonBlank -> if (CommandManager.hasCommand(it)) {
+                    DEFAULT.foreground(YELLOW)
+                } else {
+                    BOLD.foreground(RED)
+                }
                 it.startsWith("\"") -> DEFAULT.foreground(YELLOW)
                 it.startsWith("-") -> DEFAULT.foreground(CYAN)
                 else -> DEFAULT

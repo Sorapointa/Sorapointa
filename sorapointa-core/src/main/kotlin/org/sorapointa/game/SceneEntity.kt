@@ -62,7 +62,7 @@ abstract class AbstractSceneEntityProto<TEntity : SceneEntity> : SceneEntityProt
 
     open val propPairList: List<PropPair>
         get() = listOf(
-            PlayerProp.PROP_LEVEL pair entity.level
+            PlayerProp.PROP_LEVEL pair entity.level,
         )
 
     open val fightPropPairList: List<FightPropPair>
@@ -71,7 +71,7 @@ abstract class AbstractSceneEntityProto<TEntity : SceneEntity> : SceneEntityProt
             FightProp.FIGHT_PROP_CUR_HP pair entity.curHp,
             FightProp.FIGHT_PROP_CUR_ATTACK pair entity.curAttack,
             FightProp.FIGHT_PROP_CUR_DEFENSE pair entity.curDefense,
-            FightProp.FIGHT_PROP_CUR_SPEED pair entity.curSpeed
+            FightProp.FIGHT_PROP_CUR_SPEED pair entity.curSpeed,
         )
 
     // TODO: Unknown
@@ -222,7 +222,7 @@ class SceneGadgetItemEntity(
     override val scene: Scene,
     override val position: Position,
     val itemData: ItemData,
-    override val authorityPeerId: Int = DEFAULT_PEER_ID
+    override val authorityPeerId: Int = DEFAULT_PEER_ID,
 ) : SceneGadgetEntityBase() {
 
     private val itemExcelData = findItemExcelData(itemData.itemId)
@@ -242,7 +242,7 @@ class SceneGadgetItemEntity(
 }
 
 class SceneGadgetItemEntityProto(
-    override val entity: SceneGadgetItemEntity
+    override val entity: SceneGadgetItemEntity,
 ) : SceneGadgetEntityBaseProto<SceneGadgetItemEntity>() {
 
     override fun SceneGadgetInfo.toProto(): SceneGadgetInfo =

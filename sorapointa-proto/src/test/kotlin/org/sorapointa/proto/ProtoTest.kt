@@ -14,8 +14,8 @@ class ProtoTest {
             override_map = listOf(
                 AbilityScalarValueEntry(
                     float_value = 1.3f,
-                    key = AbilityString(str = "1919810")
-                )
+                    key = AbilityString(str = "1919810"),
+                ),
             ),
             instanced_ability_id = 100,
         )

@@ -53,7 +53,7 @@ private fun getDecryptVector(
 
 class Ec2bData(
     val seed: ByteArray,
-    val key: ByteArray
+    val key: ByteArray,
 )
 
 suspend fun Ec2bSeed.dumpToData() =
@@ -93,7 +93,9 @@ class Ec2bSeed(
         if (file.exists()) {
             if (!overwrite) {
                 return false
-            } else file.delete()
+            } else {
+                file.delete()
+            }
         }
         val decrypted = decrypt()
         withContext(Dispatchers.IO) {

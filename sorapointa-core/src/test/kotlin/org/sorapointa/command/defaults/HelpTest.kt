@@ -23,14 +23,14 @@ class HelpTest {
                 repeat(50) {
                     add(CommandNode(generateEntry()) { TestCommand(TestSender, generateEntry()) })
                 }
-            }
+            },
         )
     }
 
     @Suppress("InvalidBundleOrProperty")
     private fun generateEntry() = Command.Entry(
         "abcdefghijklmnopqrstuvwxyz".toList().shuffled().subList(0, (4..10).random()).joinToString(""),
-        helpKey = "abcdefghijklmnopqrstuvwxyz".toList().shuffled().subList(0, (0..5).random()).joinToString("")
+        helpKey = "abcdefghijklmnopqrstuvwxyz".toList().shuffled().subList(0, (0..5).random()).joinToString(""),
     )
 
     class TestCommand(sender: CommandSender, private val entry: Entry) : Command(sender, entry) {

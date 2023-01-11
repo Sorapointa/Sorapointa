@@ -38,7 +38,7 @@ class JsonColumnType<out T : Any>(
 
 inline fun <reified T : Any> Table.jsonb(
     name: String,
-    json: Json = networkJson
+    json: Json = networkJson,
 ): Column<T> = registerColumn(name, JsonColumnType(JsonParser<T>(serializer(), json)))
 
 class JsonParser<T : Any>(private val serializer: KSerializer<T>, private val json: Json = networkJson) {

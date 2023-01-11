@@ -42,7 +42,8 @@ object CommandLocalization : Localization {
             0 -> ""
             1 -> CoreBundle.message("clikt.no.such.subcommand.one", possibilities.first())
             else -> possibilities.joinToString(
-                prefix = CoreBundle.message("clikt.no.such.subcommand.else.prefix"), postfix = ")"
+                prefix = CoreBundle.message("clikt.no.such.subcommand.else.prefix"),
+                postfix = ")",
             )
         }
     }
@@ -53,7 +54,8 @@ object CommandLocalization : Localization {
             0 -> ""
             1 -> CoreBundle.message("clikt.no.such.option.one", possibilities.first())
             else -> possibilities.joinToString(
-                prefix = CoreBundle.message("clikt.no.such.option.else.prefix"), postfix = ")"
+                prefix = CoreBundle.message("clikt.no.such.option.else.prefix"),
+                postfix = ")",
             )
         }
     }
@@ -94,8 +96,8 @@ object CommandLocalization : Localization {
             "clikt.mutex.group.exception",
             name,
             others.joinToString(
-                CoreBundle.message("clikt.mutex.group.exception.separator")
-            )
+                CoreBundle.message("clikt.mutex.group.exception.separator"),
+            ),
         )
     }
 

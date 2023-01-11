@@ -21,7 +21,7 @@ interface World {
 
 class WorldImpl(
     override val owner: Player,
-    initScene: Scene
+    initScene: Scene,
 ) : World {
 
     override val sceneList: ConcurrentLinkedQueue<Scene> = ConcurrentLinkedQueue(listOf(initScene))

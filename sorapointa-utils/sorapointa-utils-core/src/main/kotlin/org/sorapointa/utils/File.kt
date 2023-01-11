@@ -117,9 +117,13 @@ suspend fun copyResourcesToDir(
         val input = getResourceAsStream(it) ?: error("Failed to get resource as stream")
 
         val target: File =
-            if (preserve) File(directory, it).apply {
-                parentFile.mkdirs()
-            } else File(directory, File(it).name)
+            if (preserve) {
+                File(directory, it).apply {
+                    parentFile.mkdirs()
+                }
+            } else {
+                File(directory, File(it).name)
+            }
 
         writeToFile(input, target)
     }

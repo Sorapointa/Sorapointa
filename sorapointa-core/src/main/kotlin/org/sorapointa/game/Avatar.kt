@@ -176,7 +176,7 @@ inline fun Map<Int, PropValue>.toFlattenPropMap(): Map<Int, Long> =
     map { it.key to it.value.val_ }.toMap()
 
 internal class AvatarProtoImpl(
-    override val entity: Avatar
+    override val entity: Avatar,
 ) : AbstractSceneEntityProto<Avatar>(), AvatarProto {
 
     private val protoExcelInfo by lazy {
@@ -338,7 +338,9 @@ internal class AvatarProtoImpl(
     override fun SceneEntityInfo.toProto(): SceneEntityInfo {
         val weapon = if (entity.equipWeapon != null && entity.equipWeaponEntityId != null) {
             entity.equipWeapon!!.toSceneWeaponInfoProto(entity.equipWeaponEntityId!!)
-        } else avatar?.weapon
+        } else {
+            avatar?.weapon
+        }
 
         val avatar = SceneAvatarInfo(
             uid = entity.ownerPlayer.uid,

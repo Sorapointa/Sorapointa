@@ -8,7 +8,7 @@ internal class SQLPropDelegate<TValue, TProp, TEntity : Entity<ID>, ID : Compara
     private val entityData: TEntity,
     private val column: Column<TValue>,
     private val prop: TProp?,
-    private val afterSetValue: (TProp, TValue) -> Unit
+    private val afterSetValue: (TProp, TValue) -> Unit,
 ) {
 
     operator fun getValue(thisRef: TEntity, property: KProperty<*>): TValue =
@@ -26,7 +26,7 @@ internal class SQLPropDelegate<TValue, TProp, TEntity : Entity<ID>, ID : Compara
 internal class SetPropDelegate<TEntity, TValue, TProp>(
     private val prop: TProp?,
     private var propValue: TValue,
-    private val afterSetValue: (TProp, TValue) -> Unit
+    private val afterSetValue: (TProp, TValue) -> Unit,
 ) {
 
     operator fun getValue(thisRef: TEntity, property: KProperty<*>): TValue =

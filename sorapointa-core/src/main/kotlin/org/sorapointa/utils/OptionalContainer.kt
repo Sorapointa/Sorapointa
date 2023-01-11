@@ -1,7 +1,7 @@
 package org.sorapointa.utils
 
 class OptionalContainer<T>(
-    private val defaultValue: T
+    private val defaultValue: T,
 ) {
     var value: T = defaultValue
         private set

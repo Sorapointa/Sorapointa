@@ -27,9 +27,9 @@ suspend fun <T> Mutex.withReentrantLock(block: suspend () -> T): T {
 }
 
 class ReentrantMutexContextElement(
-    override val key: ReentrantMutexContextKey
+    override val key: ReentrantMutexContextKey,
 ) : CoroutineContext.Element
 
 data class ReentrantMutexContextKey(
-    val mutex: Mutex
+    val mutex: Mutex,
 ) : CoroutineContext.Key<ReentrantMutexContextElement>

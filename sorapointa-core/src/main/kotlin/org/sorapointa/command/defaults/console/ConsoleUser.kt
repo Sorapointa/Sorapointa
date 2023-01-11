@@ -13,22 +13,22 @@ import org.sorapointa.console.ConsoleUsers
 class ConsoleUser(val sender: ConsoleCommandSender) : ConsoleCommand(
     sender,
     ConsoleUser,
-    Option(printHelpOnEmptyArgs = true)
+    Option(printHelpOnEmptyArgs = true),
 ) {
     companion object : Entry(
         name = "consoleuser",
         helpKey = "sora.cmd.console.user.desc",
-        alias = listOf("cslusr")
+        alias = listOf("cslusr"),
     )
 
     private val username by option(
         names = arrayOf("--username", "-u"),
-        help = CoreBundle.message("sora.cmd.console.user.opt.user", locale = sender.locale)
+        help = CoreBundle.message("sora.cmd.console.user.opt.user", locale = sender.locale),
     )
 
     private val password by option(
         names = arrayOf("--password", "--pwd", "-p"),
-        help = CoreBundle.message("sora.cmd.console.user.opt.pwd", locale = sender.locale)
+        help = CoreBundle.message("sora.cmd.console.user.opt.pwd", locale = sender.locale),
     )
 
     enum class Operation {
@@ -36,7 +36,7 @@ class ConsoleUser(val sender: ConsoleCommandSender) : ConsoleCommand(
     }
 
     private val operation by option(
-        help = CoreBundle.message("sora.cmd.console.user.opt.operation", locale = sender.locale)
+        help = CoreBundle.message("sora.cmd.console.user.opt.operation", locale = sender.locale),
     ).switchSet(
         setOf("--add", "-a") to Operation.ADD,
         setOf("--update", "--upd", "-U") to Operation.UPDATE,
@@ -52,7 +52,7 @@ class ConsoleUser(val sender: ConsoleCommandSender) : ConsoleCommand(
             password ?: run {
                 sender.sendMessage(CoreBundle.message("sora.cmd.console.user.msg.empty.pwd", locale = sender.locale))
                 ""
-            }
+            },
         )
     }
 
@@ -61,20 +61,20 @@ class ConsoleUser(val sender: ConsoleCommandSender) : ConsoleCommand(
             Operation.UPDATE -> {
                 addOrUpdate(username)
                 sender.sendMessage(
-                    CoreBundle.message("sora.cmd.console.user.msg.success.update", username, locale = sender.locale)
+                    CoreBundle.message("sora.cmd.console.user.msg.success.update", username, locale = sender.locale),
                 )
                 ConsoleUsers.save()
             }
             Operation.ADD -> {
                 if (ConsoleUsers.data.users.contains(username)) {
                     sender.sendMessage(
-                        CoreBundle.message("sora.cmd.console.user.msg.duplicate", username, locale = sender.locale)
+                        CoreBundle.message("sora.cmd.console.user.msg.duplicate", username, locale = sender.locale),
                     )
                     return
                 }
                 addOrUpdate(username)
                 sender.sendMessage(
-                    CoreBundle.message("sora.cmd.console.user.msg.success.add", username, locale = sender.locale)
+                    CoreBundle.message("sora.cmd.console.user.msg.success.add", username, locale = sender.locale),
                 )
                 ConsoleUsers.save()
             }
@@ -82,11 +82,13 @@ class ConsoleUser(val sender: ConsoleCommandSender) : ConsoleCommand(
                 val removed = ConsoleUsers.data.users.remove(username) != null
                 if (removed) {
                     sender.sendMessage(
-                        CoreBundle.message("sora.cmd.console.user.msg.success.remove", username, locale = sender.locale)
+                        CoreBundle.message("sora.cmd.console.user.msg.success.remove", username, locale = sender.locale),
                     )
-                } else sender.sendMessage(
-                    CoreBundle.message("sora.cmd.console.user.msg.nosuch", username, locale = sender.locale)
-                )
+                } else {
+                    sender.sendMessage(
+                        CoreBundle.message("sora.cmd.console.user.msg.nosuch", username, locale = sender.locale),
+                    )
+                }
             }
             Operation.LIST -> {
                 val usrs = ConsoleUsers.data.users.keys
@@ -96,7 +98,7 @@ class ConsoleUser(val sender: ConsoleCommandSender) : ConsoleCommand(
                         usrs.size,
                         usrs.joinToString(),
                         locale = sender.locale,
-                    )
+                    ),
                 )
             }
         }

@@ -20,7 +20,7 @@ class StateControllerTest {
         enum class State {
             START,
             DOING,
-            END
+            END,
         }
     }
 
@@ -31,7 +31,7 @@ class StateControllerTest {
         enum class State {
             HAPPY,
             BAD,
-            CRY
+            CRY,
         }
     }
 
@@ -42,13 +42,17 @@ class StateControllerTest {
         val stateController = InitStateController(
             scope = ModuleScope("TestScopeWithState"),
             parentStateClass = this,
-            Start(), Doing(), End(),
+            Start(),
+            Doing(),
+            End(),
         )
 
         val stateController2 = InitStateController(
             scope = ModuleScope("TestScopeWithState2"),
             parentStateClass = this,
-            Happy(), Bad(), Cry()
+            Happy(),
+            Bad(),
+            Cry(),
         )
 
         fun foobar(): String {
@@ -134,7 +138,6 @@ class StateControllerTest {
 
     @Test
     fun `state controller test`() = runBlocking {
-
         val sc = SomeClassWithStateImpl()
 
         sc.stateController.init()
@@ -170,7 +173,6 @@ class StateControllerTest {
 
     @Test
     fun `high volume test`() = runBlocking {
-
         val testCount = 1000
 
         val sc = SomeClassWithStateImpl()

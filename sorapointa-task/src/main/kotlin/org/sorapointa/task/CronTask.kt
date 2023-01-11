@@ -34,7 +34,7 @@ class CronTask(id: EntityID<String>) : Entity<String>(id) {
         },
         toReal = {
             parseCron(it)
-        }
+        },
     )
 
     var lastExecution by CronTasks.lastExecution

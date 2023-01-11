@@ -63,16 +63,18 @@ fun Project.jniHeaderTask(tasks: TaskContainer) = tasks.create("generateJniHeade
                     nativeMethods.forEach { method ->
                         val newMethod = if (method.contains("()")) {
                             method
-                        } else buildString {
-                            append(method)
-                            var count = 0
-                            var i = 0
-                            while (i < length) {
-                                if (this[i] == ',' || this[i] == ')') {
-                                    count++
-                                    insert(i, " arg$count".also { i += it.length + 1 })
-                                } else {
-                                    i++
+                        } else {
+                            buildString {
+                                append(method)
+                                var count = 0
+                                var i = 0
+                                while (i < length) {
+                                    if (this[i] == ',' || this[i] == ')') {
+                                        count++
+                                        insert(i, " arg$count".also { i += it.length + 1 })
+                                    } else {
+                                        i++
+                                    }
                                 }
                             }
                         }

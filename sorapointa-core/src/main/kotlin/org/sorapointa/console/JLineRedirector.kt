@@ -65,7 +65,9 @@ internal object JLineRedirector : PrintStream(nullOutputStream()) {
     override fun writeBytes(buf: ByteArray?) = println0(
         if (buf != null) {
             println0(String(buf, Charsets.UTF_8))
-        } else "null"
+        } else {
+            "null"
+        },
     )
 
     override fun write(buf: ByteArray) {

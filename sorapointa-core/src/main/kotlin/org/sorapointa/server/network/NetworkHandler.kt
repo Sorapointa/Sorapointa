@@ -43,13 +43,13 @@ internal interface NetworkHandlerStateInterface : WithState<NetworkHandlerStateI
         WAIT_TOKEN, // Client hasn't got the in-game key
         LOGIN,
         OK, // Client got the in-game key
-        CLOSED
+        CLOSED,
     }
 }
 
 internal open class NetworkHandler(
     private val connection: Ukcp,
-    parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
+    parentCoroutineContext: CoroutineContext = EmptyCoroutineContext,
 ) {
 
     val host: String = connection.user().remoteAddress.address.hostAddress
@@ -60,7 +60,7 @@ internal open class NetworkHandler(
         StateController<_, NetworkHandlerStateInterface, _>(
             scope = scope,
             parentStateClass = this,
-            WaitToken(this)
+            WaitToken(this),
         )
     }
 
@@ -104,14 +104,14 @@ internal open class NetworkHandler(
 
     open fun <T : Message<*, *>> sendPacketAsync(
         packet: OutgoingPacket<T>,
-        metadata: PacketHead? = null
+        metadata: PacketHead? = null,
     ): Job = scope.launch {
         sendPacket(packet, metadata)
     }
 
     open suspend fun <T : Message<*, *>> sendPacket(
         packet: OutgoingPacket<T>,
-        metadata: PacketHead? = null
+        metadata: PacketHead? = null,
     ) {
         if (networkStateController.getCurrentState() == NetworkHandlerStateInterface.State.CLOSED) return
         SendOutgoingPacketEvent(this@NetworkHandler, packet).broadcastEvent {
@@ -154,7 +154,7 @@ internal open class NetworkHandler(
     }
 
     inner class WaitToken(
-        override val networkHandler: NetworkHandler
+        override val networkHandler: NetworkHandler,
     ) : NetworkHandlerStateInterface {
 
         override val state: NetworkHandlerStateInterface.State =
@@ -169,7 +169,6 @@ internal open class NetworkHandler(
         }
 
         suspend fun updateKeyAndBindPlayer(account: Account, seed: ULong) {
-
             val playerData = newSuspendedTransaction {
                 PlayerDataImpl.findById(account.id.value)
             }
@@ -191,7 +190,7 @@ internal open class NetworkHandler(
         val account: Account,
         val playerData: PlayerData?,
         override val gameKey: ByteArray,
-        override val networkHandler: NetworkHandler
+        override val networkHandler: NetworkHandler,
     ) : SessionHandlePacketState() {
 
         override val state: NetworkHandlerStateInterface.State =
@@ -202,7 +201,7 @@ internal open class NetworkHandler(
                 account = account,
                 data = playerData,
                 networkHandler = networkHandler,
-                parentCoroutineContext = networkHandler.scope.coroutineContext
+                parentCoroutineContext = networkHandler.scope.coroutineContext,
             ).apply {
                 Sorapointa.addPlayer(this)
             }
@@ -220,7 +219,7 @@ internal open class NetworkHandler(
     inner class OK(
         override val gameKey: ByteArray,
         override val bindPlayer: Player,
-        override val networkHandler: NetworkHandler
+        override val networkHandler: NetworkHandler,
     ) : PlayerHandlePacketState() {
 
         override val state: NetworkHandlerStateInterface.State =
@@ -228,7 +227,7 @@ internal open class NetworkHandler(
     }
 
     inner class Closed(
-        override val networkHandler: NetworkHandler
+        override val networkHandler: NetworkHandler,
     ) : NetworkHandlerStateInterface {
 
         override val state: NetworkHandlerStateInterface.State =
@@ -245,7 +244,7 @@ private val connectionMap = ConcurrentHashMap<Ukcp, NetworkHandler>()
 
 // NO RUNTIME STATE of this class
 internal class ConnectionListener(
-    private val scope: ModuleScope
+    private val scope: ModuleScope,
 ) : KcpListener {
 
     override fun onConnected(ukcp: Ukcp) {

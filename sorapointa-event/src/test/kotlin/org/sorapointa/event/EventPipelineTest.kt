@@ -44,7 +44,6 @@ class EventPipelineTest {
 
     @Test
     fun `event cancel test`() = runBlocking {
-
         EventManager.registerBlockEventListener {
             if (it is CancelableEvent) {
                 it.cancel()
@@ -61,7 +60,6 @@ class EventPipelineTest {
 
     @Test
     fun `high volume test`(): Unit = runBlocking {
-
         EventManager.registerEventListener(EventPriority.LOW) {
             error("unreachable code")
         }
@@ -96,7 +94,6 @@ class EventPipelineTest {
 
     @Test
     fun `exception test`(): Unit = runBlocking {
-
         val parentJob = Job()
         val parentScope = CoroutineScope(CoroutineName("TestParentScope")) +
             CoroutineExceptionHandler { _, e ->
@@ -143,7 +140,6 @@ class EventPipelineTest {
 
     @Test
     fun `next event test`(): Unit = runBlocking {
-
         val e1 = async { nextEvent<TestEvent2> { it.isCancelled } }
         val e2 = async { nextEvent<TestEvent3> { it.isCancelled } }
 

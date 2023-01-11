@@ -51,7 +51,7 @@ sealed class ItemData {
         override val itemId: Int,
         override val guid: Long,
         override val count: Int = 1,
-        val deleteInfo: MaterialDeleteInfo? = null
+        val deleteInfo: MaterialDeleteInfo? = null,
     ) : CountableItem() {
 
         val materialExcelData by lazy {
@@ -72,7 +72,7 @@ sealed class ItemData {
     data class Furniture(
         override val itemId: Int,
         override val guid: Long,
-        override val count: Int = 1
+        override val count: Int = 1,
     ) : CountableItem() {
 
         val furnitureExcelData by lazy {
@@ -101,7 +101,7 @@ sealed class ItemData {
             val exp: Int = 0,
             val promoteLevel: Int = 0,
             // Refinement level starts from [0, 4], null for 1-2 star weapons
-            val refinement: Int? = null
+            val refinement: Int? = null,
         ) : Equip() {
 
             val weaponExcelData by lazy {
@@ -120,8 +120,10 @@ sealed class ItemData {
                         promote_level = promoteLevel,
                         affix_map = if (refinement != null) {
                             mapOf(refinementAffixId to refinement)
-                        } else emptyMap(),
-                    )
+                        } else {
+                            emptyMap()
+                        },
+                    ),
                 )
 
             fun toSceneWeaponInfoProto(entityId: Int) =
@@ -134,7 +136,9 @@ sealed class ItemData {
                     promote_level = promoteLevel,
                     affix_map = if (refinement != null) {
                         mapOf(refinementAffixId to refinement)
-                    } else emptyMap(),
+                    } else {
+                        emptyMap()
+                    },
                     // TODO: Unknown
                     ability_info = AbilitySyncStateInfo(is_inited = true),
                     // rendererChangedInfo
@@ -150,7 +154,7 @@ sealed class ItemData {
             val exp: Int = 0,
             val promoteLevel: Int = 0,
             val mainPropId: Int,
-            val appendPropIdList: List<Int> = listOf()
+            val appendPropIdList: List<Int> = listOf(),
         ) : Equip() {
 
             val reliquaryExcelData by lazy {
@@ -165,7 +169,7 @@ sealed class ItemData {
                             repeat(count) {
                                 add(reliquaryExcelData.getRandomAppendProps().id)
                             }
-                        }
+                        },
                 )
 
             override fun ProtoEquip.toProto(): ProtoEquip =
@@ -176,7 +180,7 @@ sealed class ItemData {
                         promote_level = promoteLevel,
                         main_prop_id = mainPropId,
                         append_prop_id_list = appendPropIdList,
-                    )
+                    ),
                 )
 
             fun toSceneReliquaryInfoProto() = SceneReliquaryInfo(
@@ -205,27 +209,27 @@ sealed class MaterialDeleteInfo {
     data class CountDownDelete(
         override val hasDeleteConfig: Boolean,
         val deleteTimeNumMap: Map<Int, Int>,
-        val configCountDownTime: Int
+        val configCountDownTime: Int,
     ) : MaterialDeleteInfo() {
 
         override fun ProtoMaterialDeleteInfo.toProto(): ProtoMaterialDeleteInfo = copy(
             count_down_delete = ProtoCountDownDelete(
                 delete_time_num_map = deleteTimeNumMap,
                 config_count_down_time = configCountDownTime,
-            )
+            ),
         )
     }
 
     @Serializable
     data class DateTimeDelete(
         override val hasDeleteConfig: Boolean,
-        val deleteTime: Int
+        val deleteTime: Int,
     ) : MaterialDeleteInfo() {
 
         override fun ProtoMaterialDeleteInfo.toProto(): ProtoMaterialDeleteInfo = copy(
             date_delete = ProtoDateTimeDelete(
-                delete_time = deleteTime
-            )
+                delete_time = deleteTime,
+            ),
         )
     }
 
@@ -234,7 +238,7 @@ sealed class MaterialDeleteInfo {
         override val hasDeleteConfig: Boolean,
         val deleteTimeNumMap: Map<Int, Int>,
         val configCountDownTime: Int,
-        val configDelayWeek: Int
+        val configDelayWeek: Int,
     ) : MaterialDeleteInfo() {
 
         override fun ProtoMaterialDeleteInfo.toProto(): ProtoMaterialDeleteInfo = copy(
@@ -242,7 +246,7 @@ sealed class MaterialDeleteInfo {
                 delete_time_num_map = deleteTimeNumMap,
                 config_count_down_time = configCountDownTime,
                 config_delay_week = configDelayWeek,
-            )
+            ),
         )
     }
 }

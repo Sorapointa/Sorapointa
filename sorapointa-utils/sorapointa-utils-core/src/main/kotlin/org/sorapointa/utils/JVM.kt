@@ -16,6 +16,6 @@ fun addShutdownHook(block: suspend () -> Unit) {
     Runtime.getRuntime().addShutdownHook(
         Thread {
             runBlocking { block() }
-        }
+        },
     )
 }

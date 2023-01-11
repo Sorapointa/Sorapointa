@@ -23,7 +23,7 @@ open class AutoLoadFilePersist<T : Any>(
     serializer: KSerializer<T>,
     format: StringFormat = prettyJson,
     private val scanInterval: Duration = 60.toDuration(DurationUnit.SECONDS),
-    scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    scope: CoroutineScope = CoroutineScope(Dispatchers.IO),
 ) : DataFilePersist<T>(file, default, serializer, format, scope) {
 
     override suspend fun init() {

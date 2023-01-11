@@ -19,7 +19,7 @@ internal fun ByteBuf.toByteArray(): ByteArray {
 
 internal fun ByteBuf.readToSoraPacket(
     key: ByteArray,
-    block: (SoraPacket) -> Unit
+    block: (SoraPacket) -> Unit,
 ) {
     if (this.readableBytes() > 12) { // 2+2+2+4+2 at least to be > 12 bytes
         val before = this.toByteArray()

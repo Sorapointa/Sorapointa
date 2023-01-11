@@ -60,7 +60,9 @@ internal object CommandEndResp : WebConsolePacket()
 internal class MessageNotify(val message: String) : WebConsolePacket()
 
 internal object ConsoleUsers : DataFilePersist<ConsoleUsers.Data>(
-    File(configDirectory, "consoleUsers.json"), Data(), Data.serializer(),
+    File(configDirectory, "consoleUsers.json"),
+    Data(),
+    Data.serializer(),
 ) {
     @Serializable
     data class Data(
@@ -127,7 +129,9 @@ internal fun Application.setupWebConsoleServer() {
                     }.onFailure {
                         if (it is CancellationException) {
                             throw it
-                        } else logger.info(it) { "Unexpected exception:" }
+                        } else {
+                            logger.info(it) { "Unexpected exception:" }
+                        }
                     }.getOrNull() ?: return@consumeEach
                     when (pkt) {
                         is VerifyReq -> {
@@ -189,8 +193,8 @@ internal suspend fun setupConsoleClient(username: String, password: String, url:
         sendSerialized<WebConsolePacket>(
             VerifyReq(
                 username,
-                password
-            )
+                password,
+            ),
         )
 
         val closedNotifyJob = scope.launch {

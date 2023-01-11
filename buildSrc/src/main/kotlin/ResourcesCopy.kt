@@ -31,7 +31,7 @@ fun Project.configureLogbackCopy() {
             group = "resources"
             from(
                 rootProject.subprojects.first { it.name == "sorapointa-core" }
-                    .layout.projectDirectory.dir(source)
+                    .layout.projectDirectory.dir(source),
             )
             into(project.layout.projectDirectory.dir(dest))
         }
@@ -40,12 +40,12 @@ fun Project.configureLogbackCopy() {
     registerCopyPath(
         name = "copyLogbackXml",
         source = "./src/main/resources/logback.xml",
-        dest = "./src/main/resources/"
+        dest = "./src/main/resources/",
     )
     registerCopyPath(
         name = "copyLogbackTestXml",
         source = "./src/test/resources/logback-test.xml",
-        dest = "./src/test/resources/"
+        dest = "./src/test/resources/",
     )
 
     afterEvaluate {

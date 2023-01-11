@@ -43,7 +43,7 @@ internal abstract class GetPlayerTokenRspPacket : AbstractOutgoingPacket<GetPlay
     internal class Successful(
         private val tokenReq: GetPlayerTokenReq,
         private val keySeed: ULong,
-        private val ip: String
+        private val ip: String,
     ) : GetPlayerTokenRspPacket() {
         override fun buildProto(): GetPlayerTokenRsp =
             GetPlayerTokenRsp(
@@ -68,26 +68,25 @@ internal abstract class GetPlayerTokenRspPacket : AbstractOutgoingPacket<GetPlay
 private val REGISTRY_CPS = "bWlob3lv".decodeBase64String()
 
 internal abstract class PlayerLoginRspPacket : AbstractOutgoingPacket<PlayerLoginRsp>(
-    PacketId.PLAYER_LOGIN_RSP
+    PacketId.PLAYER_LOGIN_RSP,
 ) {
     override val adapter: ProtoAdapter<PlayerLoginRsp>
         get() = PlayerLoginRsp.ADAPTER
 
     class Fail(
-        private val retcode: Retcode
+        private val retcode: Retcode,
     ) : PlayerLoginRspPacket() {
 
         override fun buildProto(): PlayerLoginRsp =
             PlayerLoginRsp(
-                retcode = this@Fail.retcode.value
+                retcode = this@Fail.retcode.value,
             )
     }
 
     class Succ(
-        private val queryCurrentRegionHttpRsp: QueryCurrRegionHttpRsp
+        private val queryCurrentRegionHttpRsp: QueryCurrRegionHttpRsp,
     ) : PlayerLoginRspPacket() {
         override fun buildProto(): PlayerLoginRsp {
-
             val regionInfo = queryCurrentRegionHttpRsp.region_info
 
             return PlayerLoginRsp(
@@ -111,16 +110,16 @@ internal abstract class PlayerLoginRspPacket : AbstractOutgoingPacket<PlayerLogi
 }
 
 internal class PingRspPacket(
-    private val pingReq: PingReq
+    private val pingReq: PingReq,
 ) : AbstractOutgoingPacket<PingRsp>(
-    PacketId.PING_RSP
+    PacketId.PING_RSP,
 ) {
     override fun buildProto(): PingRsp = PingRsp(client_time = pingReq.client_time)
     override val adapter: ProtoAdapter<PingRsp> get() = PingRsp.ADAPTER
 }
 
 internal class PlayerSetPauseRspPacket : AbstractOutgoingPacket<PlayerSetPauseRsp>(
-    PacketId.PLAYER_SET_PAUSE_RSP
+    PacketId.PLAYER_SET_PAUSE_RSP,
 ) {
     override fun buildProto(): PlayerSetPauseRsp = PlayerSetPauseRsp()
     override val adapter: ProtoAdapter<PlayerSetPauseRsp>
@@ -128,7 +127,7 @@ internal class PlayerSetPauseRspPacket : AbstractOutgoingPacket<PlayerSetPauseRs
 }
 
 internal class DoSetPlayerBornDataNotifyPacket : AbstractOutgoingPacket<DoSetPlayerBornDataNotify>(
-    PacketId.DO_SET_PLAYER_BORN_DATA_NOTIFY
+    PacketId.DO_SET_PLAYER_BORN_DATA_NOTIFY,
 ) {
 
     override fun buildProto(): DoSetPlayerBornDataNotify =
@@ -139,7 +138,7 @@ internal class DoSetPlayerBornDataNotifyPacket : AbstractOutgoingPacket<DoSetPla
 }
 
 internal class SetPlayerBornDataRspPacket : AbstractOutgoingPacket<SetPlayerBornDataRsp>(
-    PacketId.SET_PLAYER_BORN_DATA_RSP
+    PacketId.SET_PLAYER_BORN_DATA_RSP,
 ) {
     override fun buildProto(): SetPlayerBornDataRsp =
         SetPlayerBornDataRsp()
@@ -149,7 +148,7 @@ internal class SetPlayerBornDataRspPacket : AbstractOutgoingPacket<SetPlayerBorn
 }
 
 internal class ServerTimeNotifyPacket : AbstractOutgoingPacket<ServerTimeNotify>(
-    PacketId.SERVER_TIME_NOTIFY
+    PacketId.SERVER_TIME_NOTIFY,
 ) {
     override fun buildProto(): ServerTimeNotify =
         ServerTimeNotify(server_time = nowMilliseconds())
@@ -159,7 +158,7 @@ internal class ServerTimeNotifyPacket : AbstractOutgoingPacket<ServerTimeNotify>
 }
 
 internal class ServerDisconnectClientNotifyPacket : AbstractOutgoingPacket<ServerDisconnectClientNotify>(
-    PacketId.SERVER_DISCONNECT_CLIENT_NOTIFY
+    PacketId.SERVER_DISCONNECT_CLIENT_NOTIFY,
 ) {
     override fun buildProto(): ServerDisconnectClientNotify = ServerDisconnectClientNotify()
     override val adapter: ProtoAdapter<ServerDisconnectClientNotify>
@@ -169,9 +168,9 @@ internal class ServerDisconnectClientNotifyPacket : AbstractOutgoingPacket<Serve
 // --- Player ---
 
 internal class PlayerDataNotifyPacket(
-    override val player: Player
+    override val player: Player,
 ) : PlayerOutgoingPacket<PlayerDataNotify>(
-    PacketId.PLAYER_DATA_NOTIFY
+    PacketId.PLAYER_DATA_NOTIFY,
 ) {
 
     override fun Player.buildProto(): PlayerDataNotify =
@@ -189,9 +188,9 @@ internal class PlayerDataNotifyPacket(
 
 internal class PlayerPropNotifyPacket(
     override val player: Player,
-    val propMap: Map<Int, PropValue> = player.impl().playerProto.protoPropMap
+    val propMap: Map<Int, PropValue> = player.impl().playerProto.protoPropMap,
 ) : PlayerOutgoingPacket<PlayerPropNotify>(
-    PacketId.PLAYER_PROP_NOTIFY
+    PacketId.PLAYER_PROP_NOTIFY,
 ) {
     override fun Player.buildProto(): PlayerPropNotify =
         PlayerPropNotify(prop_map = propMap)
@@ -201,9 +200,9 @@ internal class PlayerPropNotifyPacket(
 }
 
 internal class OpenStateUpdateNotifyPacket(
-    override val player: Player
+    override val player: Player,
 ) : PlayerOutgoingPacket<OpenStateUpdateNotify>(
-    PacketId.OPEN_STATE_UPDATE_NOTIFY
+    PacketId.OPEN_STATE_UPDATE_NOTIFY,
 ) {
     override fun Player.buildProto(): OpenStateUpdateNotify =
         OpenStateUpdateNotify(
@@ -211,7 +210,7 @@ internal class OpenStateUpdateNotifyPacket(
             open_state_map = OpenState.values().associate {
                 // it.value to data.openState.contains(it)
                 it.value to 1 // For test
-            }
+            },
         )
 
     override val adapter: ProtoAdapter<OpenStateUpdateNotify>
@@ -219,7 +218,7 @@ internal class OpenStateUpdateNotifyPacket(
 }
 
 internal class StoreWeightLimitNotifyPacket : AbstractOutgoingPacket<StoreWeightLimitNotify>(
-    PacketId.STORE_WEIGHT_LIMIT_NOTIFY
+    PacketId.STORE_WEIGHT_LIMIT_NOTIFY,
 ) {
 
     override fun buildProto(): StoreWeightLimitNotify =
@@ -236,9 +235,9 @@ internal class StoreWeightLimitNotifyPacket : AbstractOutgoingPacket<StoreWeight
 }
 
 internal class PlayerStoreNotifyPacket(
-    override val player: Player
+    override val player: Player,
 ) : PlayerOutgoingPacket<PlayerStoreNotify>(
-    PacketId.PLAYER_STORE_NOTIFY
+    PacketId.PLAYER_STORE_NOTIFY,
 ) {
     override fun Player.buildProto(): PlayerStoreNotify =
         PlayerStoreNotify(
@@ -254,7 +253,7 @@ internal class PlayerStoreNotifyPacket(
 internal class AvatarDataNotifyPacket(
     override val player: Player,
 ) : PlayerOutgoingPacket<AvatarDataNotify>(
-    PacketId.AVATAR_DATA_NOTIFY
+    PacketId.AVATAR_DATA_NOTIFY,
 ) {
     override fun Player.buildProto(): AvatarDataNotify =
         AvatarDataNotify(
@@ -271,7 +270,7 @@ internal class AvatarDataNotifyPacket(
 }
 
 internal abstract class PlayerEnterSceneNotifyPacket : PlayerOutgoingPacket<PlayerEnterSceneNotify>(
-    PacketId.PLAYER_ENTER_SCENE_NOTIFY
+    PacketId.PLAYER_ENTER_SCENE_NOTIFY,
 ) {
     override val adapter: ProtoAdapter<PlayerEnterSceneNotify>
         get() = PlayerEnterSceneNotify.ADAPTER
@@ -293,15 +292,15 @@ internal abstract class PlayerEnterSceneNotifyPacket : PlayerOutgoingPacket<Play
     open fun PlayerEnterSceneNotify.buildProto(): PlayerEnterSceneNotify = this
 
     class Login(
-        override val player: Player
+        override val player: Player,
     ) : PlayerEnterSceneNotifyPacket()
 }
 
 internal class GetPlayerSocialDetailRspPacket(
     override val player: Player,
-    private val targetUid: Int
+    private val targetUid: Int,
 ) : PlayerOutgoingPacket<GetPlayerSocialDetailRsp>(
-    PacketId.GET_PLAYER_SOCIAL_DETAIL_RSP
+    PacketId.GET_PLAYER_SOCIAL_DETAIL_RSP,
 ) {
     override fun Player.buildProto(): GetPlayerSocialDetailRsp {
         val data = PlayerDataImpl.findById(targetUid)
@@ -342,9 +341,9 @@ internal class GetPlayerSocialDetailRspPacket(
 }
 
 internal class EnterScenePeerNotifyPacket(
-    override val player: Player
+    override val player: Player,
 ) : PlayerOutgoingPacket<EnterScenePeerNotify>(
-    PacketId.ENTER_SCENE_PEER_NOTIFY
+    PacketId.ENTER_SCENE_PEER_NOTIFY,
 ) {
     override fun Player.buildProto(): EnterScenePeerNotify =
         EnterScenePeerNotify(
@@ -359,13 +358,13 @@ internal class EnterScenePeerNotifyPacket(
 }
 
 internal abstract class EnterSceneReadyRspPacket : PlayerOutgoingPacket<EnterSceneReadyRsp>(
-    PacketId.ENTER_SCENE_READY_RSP
+    PacketId.ENTER_SCENE_READY_RSP,
 ) {
     override val adapter: ProtoAdapter<EnterSceneReadyRsp>
         get() = EnterSceneReadyRsp.ADAPTER
 
     class Succ(
-        override val player: Player
+        override val player: Player,
     ) : EnterSceneReadyRspPacket() {
         override fun Player.buildProto(): EnterSceneReadyRsp =
             EnterSceneReadyRsp(enter_scene_token = player.enterSceneToken)
@@ -373,7 +372,7 @@ internal abstract class EnterSceneReadyRspPacket : PlayerOutgoingPacket<EnterSce
 
     class Fail(
         override val player: Player,
-        private val retcode: Retcode
+        private val retcode: Retcode,
     ) : EnterSceneReadyRspPacket() {
 
         override fun Player.buildProto(): EnterSceneReadyRsp =
@@ -382,13 +381,13 @@ internal abstract class EnterSceneReadyRspPacket : PlayerOutgoingPacket<EnterSce
 }
 
 internal abstract class SceneInitFinishRspPacket : PlayerOutgoingPacket<SceneInitFinishRsp>(
-    PacketId.SCENE_INIT_FINISH_RSP
+    PacketId.SCENE_INIT_FINISH_RSP,
 ) {
     override val adapter: ProtoAdapter<SceneInitFinishRsp>
         get() = SceneInitFinishRsp.ADAPTER
 
     class Succ(
-        override val player: Player
+        override val player: Player,
     ) : SceneInitFinishRspPacket() {
         override fun Player.buildProto(): SceneInitFinishRsp =
             SceneInitFinishRsp(enter_scene_token = player.enterSceneToken)
@@ -396,7 +395,7 @@ internal abstract class SceneInitFinishRspPacket : PlayerOutgoingPacket<SceneIni
 
     class Fail(
         override val player: Player,
-        private val retcode: Retcode
+        private val retcode: Retcode,
     ) : SceneInitFinishRspPacket() {
         override fun Player.buildProto(): SceneInitFinishRsp =
             SceneInitFinishRsp(retcode = this@Fail.retcode.value)
@@ -407,9 +406,9 @@ internal abstract class SceneInitFinishRspPacket : PlayerOutgoingPacket<SceneIni
 
 internal class AvatarFightPropUpdateNotifyPacket(
     override val avatar: Avatar,
-    val propMap: Map<Int, Float>
+    val propMap: Map<Int, Float>,
 ) : AvatarOutgoingPacket<AvatarFightPropUpdateNotify>(
-    PacketId.AVATAR_FIGHT_PROP_UPDATE_NOTIFY
+    PacketId.AVATAR_FIGHT_PROP_UPDATE_NOTIFY,
 ) {
     override fun Avatar.buildProto(): AvatarFightPropUpdateNotify =
         AvatarFightPropUpdateNotify(
@@ -423,9 +422,9 @@ internal class AvatarFightPropUpdateNotifyPacket(
 
 internal class AvatarPropNotifyPacket(
     override val avatar: Avatar,
-    val propMap: Map<Int, Long> = avatar.impl().avatarProto.protoPropMap.toFlattenPropMap()
+    val propMap: Map<Int, Long> = avatar.impl().avatarProto.protoPropMap.toFlattenPropMap(),
 ) : AvatarOutgoingPacket<AvatarPropNotify>(
-    PacketId.AVATAR_PROP_NOTIFY
+    PacketId.AVATAR_PROP_NOTIFY,
 ) {
     override fun Avatar.buildProto(): AvatarPropNotify =
         AvatarPropNotify(avatar_guid = guid, prop_map = propMap)

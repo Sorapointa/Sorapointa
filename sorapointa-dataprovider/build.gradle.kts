@@ -51,6 +51,6 @@ buildConfig {
     useKotlinOutput()
     dbType(
         name = "DEFAULT_DATABASE_TYPE",
-        value = (defaultDatabaseType ?: databaseCompileList?.firstOrNull() ?: "SQLITE").toString()
+        value = (defaultDatabaseType ?: databaseCompileList?.firstOrNull() ?: "SQLITE").toString(),
     )
 }

@@ -33,7 +33,7 @@ abstract class Command(
         val name: String,
         @PropertyKey(resourceBundle = BUNDLE) val helpKey: String,
         val alias: List<String> = emptyList(),
-        val permissionRequired: Int = 0
+        val permissionRequired: Int = 0,
     )
 
     init {

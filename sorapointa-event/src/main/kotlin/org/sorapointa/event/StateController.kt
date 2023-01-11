@@ -146,7 +146,7 @@ interface WithState<out T : Enum<*>> {
 open class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState> (
     protected var scope: ModuleScope,
     protected var parentStateClass: TClassWithState,
-    firstState: TInterfaceWithState
+    firstState: TInterfaceWithState,
 ) {
 
     protected val currentState = atomic(firstState)
@@ -202,7 +202,7 @@ open class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TSt
         beforeState: TState,
         afterState: TState,
         listenerState: ListenerState,
-        listenerCaller: TClassWithState
+        listenerCaller: TClassWithState,
     ): Boolean {
         var isIntercepted by atomic(false)
         observers
@@ -238,7 +238,7 @@ open class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TSt
      */
     fun observeStateChange(
         listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-        observer: suspend TClassWithState.(TState, TState) -> Unit
+        observer: suspend TClassWithState.(TState, TState) -> Unit,
     ) {
         observers[observer] = listenerState
     }
@@ -256,7 +256,7 @@ open class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TSt
      */
     fun interceptStateChange(
         listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-        interceptor: suspend TClassWithState.(TState, TState) -> Boolean
+        interceptor: suspend TClassWithState.(TState, TState) -> Boolean,
     ) {
         interceptors[interceptor] = listenerState
     }
@@ -280,7 +280,7 @@ open class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TSt
      */
     enum class ListenerState {
         BEFORE_UPDATE,
-        AFTER_UPDATE
+        AFTER_UPDATE,
     }
 }
 
@@ -290,7 +290,7 @@ open class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TSt
 class InitStateController<TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState> (
     scope: ModuleScope,
     parentStateClass: TClassWithState,
-    vararg stateInstances: TInterfaceWithState
+    vararg stateInstances: TInterfaceWithState,
 ) : StateController<TState, TInterfaceWithState, TClassWithState>(scope, parentStateClass, stateInstances.first()) {
 
     private val states = listOf(*stateInstances)
@@ -324,7 +324,7 @@ class InitStateController<TState : Enum<*>, TInterfaceWithState : WithState<TSta
 inline fun <TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState>
 StateController<TState, TInterfaceWithState, TClassWithState>.observe(
     listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-    noinline observer: suspend TClassWithState.() -> Unit
+    noinline observer: suspend TClassWithState.() -> Unit,
 ) = observeStateChange(listenerState) { _, _ -> this.observer() }
 
 /**
@@ -340,7 +340,7 @@ StateController<TState, TInterfaceWithState, TClassWithState>.observe(
 inline fun <TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState>
 StateController<TState, TInterfaceWithState, TClassWithState>.intercept(
     listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-    noinline interceptor: suspend TClassWithState.() -> Boolean
+    noinline interceptor: suspend TClassWithState.() -> Boolean,
 ) = interceptStateChange(listenerState) { _, _ -> this.interceptor() }
 
 /**
@@ -358,5 +358,5 @@ StateController<TState, TInterfaceWithState, TClassWithState>.intercept(
 inline fun <TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState>
 StateController<TState, TInterfaceWithState, TClassWithState>.block(
     listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-    noinline block: suspend TClassWithState.() -> Unit
+    noinline block: suspend TClassWithState.() -> Unit,
 ) = interceptStateChange(listenerState) { _, _ -> this.block(); false }

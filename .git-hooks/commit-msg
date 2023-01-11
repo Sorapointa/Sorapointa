@@ -1,24 +1,20 @@
 #!/usr/bin/env bash
 
-echo "======== MESSAGE ========"
-
 INPUT_FILE=$1
 
 START_LINE=$(head -n1 "$INPUT_FILE")
 
-PATTERN="^(#[0-9]+ )?(feat(ure)?|fix|docs|style|refactor|ci|chore|perf|build|test|revert)(\(.+\))?: .+$"
+PATTERN='^(feat(ure)?|fix|docs|style|refactor|ci|chore|perf|build|test|revert)(\(.+\))?(!)?: .+$'
 
 if [ "${#START_LINE}" -gt "72" ]; then
-  echo "Message too long! Assert length <= 72."
-  echo "Consider multi-line messages instead."
+  echo -e "Message too long! Assert length <= 72."
   exit
 fi
 
 if ! [[ "$START_LINE" =~ $PATTERN ]]; then
-  echo "$START_LINE"
+  echo -e "$START_LINE"
   echo
-  echo "↑ Bad commit message, commit message must be matched by $PATTERN"
-  echo "Template: type(scope): messages"
-  echo "For example: feat(i18n): LocalAble interface"
+  echo -e "↑ Bad commit message, it does not meet the Conventional Commit standard."
+  echo -e "See more: https://www.conventionalcommits.org/en/v1.0.0/"
   exit 1
 fi

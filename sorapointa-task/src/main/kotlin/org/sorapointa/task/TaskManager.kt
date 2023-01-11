@@ -163,7 +163,7 @@ object TaskManager : ITaskManager {
                         transaction {
                             taskData.lastExecution = now()
                         }
-                    }
+                    },
                 ).joinAll()
             }
         }.also {

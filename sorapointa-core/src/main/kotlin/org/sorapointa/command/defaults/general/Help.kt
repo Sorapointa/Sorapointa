@@ -16,17 +16,18 @@ class Help(private val sender: CommandSender) : Command(sender, Help) {
     companion object : Entry(
         name = "help",
         helpKey = "sora.cmd.help.desc",
-        alias = listOf("?")
+        alias = listOf("?"),
     )
 
     private val pageNum by argument(
         name = CoreBundle.message("sora.cmd.help.arg.page.num.name", locale = sender.locale),
-        help = CoreBundle.message("sora.cmd.help.arg.page.num.desc", locale = sender.locale)
+        help = CoreBundle.message("sora.cmd.help.arg.page.num.desc", locale = sender.locale),
     ).int().default(1)
 
     private val pageSize by option(
-        "--page-size", "-s",
-        help = CoreBundle.message("sora.cmd.help.opt.page.size.desc", locale = sender.locale)
+        "--page-size",
+        "-s",
+        help = CoreBundle.message("sora.cmd.help.opt.page.size.desc", locale = sender.locale),
     ).int().convert {
         it.coerceIn(1..50)
     }.default(10)
@@ -51,11 +52,13 @@ class Help(private val sender: CommandSender) : Command(sender, Help) {
                     append(" >> ")
                     if (it.helpKey.isNotBlank()) {
                         append(CoreBundle.message(it.helpKey))
-                    } else append(CoreBundle.message("sora.cmd.help.msg.empty.desc", locale = sender.locale))
+                    } else {
+                        append(CoreBundle.message("sora.cmd.help.msg.empty.desc", locale = sender.locale))
+                    }
                     appendLine()
                 }
                 append(CoreBundle.message("sora.cmd.help.msg.more"))
-            }
+            },
         )
     }
 }

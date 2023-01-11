@@ -32,7 +32,6 @@ class AccountTest {
 
     @Test
     fun `create account test`() = runTest(TestOption.SKIP_CI) {
-
         newSuspendedTransaction {
             AccountTable.deleteWhere { AccountTable.userName eq "foobar" }
             Account.create("foobar", "password")
@@ -42,7 +41,6 @@ class AccountTest {
 
     @Test
     fun `password test`() = runTest(TestOption.SKIP_CI) {
-
         newSuspendedTransaction {
             AccountTable.deleteWhere { AccountTable.userName eq "foobar" }
 
@@ -62,12 +60,11 @@ class AccountTest {
 
     @Test
     fun `high volume test`() = runTest(TestOption.SKIP_CI) {
-
         val totalTestCount = 1000
 
         data class TestAccountInfo(
             val name: String,
-            val pwd: String
+            val pwd: String,
         )
 
         val testAccountMap = (1..totalTestCount).map {

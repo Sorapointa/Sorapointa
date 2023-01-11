@@ -20,7 +20,7 @@ data class ReliquaryLevelData(
     @JsonNames("rank", "Rank")
     val rank: Int = 0,
     @JsonNames("exp", "Exp")
-    val exp: Int = 0
+    val exp: Int = 0,
 ) {
 
     val addProp by lazy {

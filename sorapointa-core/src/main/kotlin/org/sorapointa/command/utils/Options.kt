@@ -23,7 +23,7 @@ fun <T : Any> RawOption.switchSet(vararg choices: Pair<Collection<String>, T>): 
     switch(
         choices.flatMap { (keys, value) ->
             keys.map { it to value }
-        }.toMap()
+        }.toMap(),
     )
 
 /**
@@ -42,5 +42,5 @@ fun <T : OptionGroup> RawOption.groupSwitchSet(vararg choices: Pair<Collection<S
     groupSwitch(
         choices.flatMap { (keys, value) ->
             keys.map { it to value }
-        }.toMap()
+        }.toMap(),
     )

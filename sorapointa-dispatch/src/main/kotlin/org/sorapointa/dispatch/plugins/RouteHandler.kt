@@ -64,7 +64,7 @@ private suspend fun getQueryRegionListHttpRsp(host: String): QueryRegionListHttp
         client_secret_key = dispatchSeed.toByteString(),
         enable_login_pc = true,
         client_custom_config_encrypted = networkJson.encodeToString(
-            DispatchConfig.data.regionListClientCustomConfig
+            DispatchConfig.data.regionListClientCustomConfig,
         ).toByteArray().xor(dispatchKey).toByteString(),
     )
 }
@@ -150,7 +150,6 @@ suspend fun getCurrentRegionHttpRsp(call: ApplicationCall? = null): QueryCurrReg
 
 @OptIn(ExperimentalCoroutinesApi::class)
 private suspend fun ApplicationCall.forwardQueryCurrentRegionHttpRsp(): QueryCurrRegionHttpRsp {
-
     val requestSetting = DispatchConfig.data.requestSetting
 
     val queryCurrentRegionHttpRsp = if (currentRegionRsp.isCompleted) {
@@ -170,7 +169,7 @@ private suspend fun ApplicationCall.forwardQueryCurrentRegionHttpRsp(): QueryCur
 
     val regionCustomConfig = if (requestSetting.currentRegionContainsCustomClientConfig) {
         networkJson.encodeToString(
-            DispatchConfig.data.clientCustomConfig
+            DispatchConfig.data.clientCustomConfig,
         ).toByteArray().xor(dispatchKey).toByteString()
     } else {
         queryCurrentRegionHttpRsp.region_custom_config_encrypted
@@ -183,7 +182,7 @@ private suspend fun ApplicationCall.forwardQueryCurrentRegionHttpRsp(): QueryCur
             secret_key = dispatchSeed.toByteString(),
         ),
         region_custom_config_encrypted = regionCustomConfig,
-        client_secret_key = dispatchSeed.toByteString()
+        client_secret_key = dispatchSeed.toByteString(),
     )
 }
 
@@ -227,7 +226,8 @@ internal suspend fun ApplicationCall.handleLogin() {
     val loginAccountRequestData = receive<LoginAccountRequestData>()
 
     suspend fun returnErrorMsg(@PropertyKey(resourceBundle = BUNDLE) msgKey: String) = LoginAccountResponseEvent(
-        this, LoginResultData(-201, DispatchBundle.message(msgKey))
+        this,
+        LoginResultData(-201, DispatchBundle.message(msgKey)),
     ).respond()
 
     LoginAccountRequestEvent(this, loginAccountRequestData).broadcastEvent {
@@ -259,15 +259,16 @@ internal suspend fun ApplicationCall.handleLogin() {
             LoginAccountResponseEvent(
                 this@handleLogin,
                 LoginResultData(
-                    returnCode = 0, message = "OK",
+                    returnCode = 0,
+                    message = "OK",
                     LoginResultData.VerifyData(
                         LoginResultData.VerifyAccountData(
                             uid = account.id.value,
                             token = token,
-                            email = account.email ?: name
-                        )
-                    )
-                )
+                            email = account.email ?: name,
+                        ),
+                    ),
+                ),
             ).respond()
         }
     }
@@ -277,7 +278,8 @@ internal suspend fun ApplicationCall.handleComboLogin() {
     val comboTokenRequestData = receive<ComboTokenRequestData>()
 
     suspend fun returnErrorMsg(@PropertyKey(resourceBundle = BUNDLE) msgKey: String) = ComboTokenResponseEvent(
-        this@handleComboLogin, ComboTokenResponseData(-201, DispatchBundle.message(msgKey))
+        this@handleComboLogin,
+        ComboTokenResponseData(-201, DispatchBundle.message(msgKey)),
     ).respond()
 
     // TODO: hardcode warning
@@ -301,7 +303,8 @@ internal suspend fun ApplicationCall.handleComboLogin() {
         ComboTokenResponseEvent(
             this@handleComboLogin,
             ComboTokenResponseData(
-                returnCode = 0, message = "OK",
+                returnCode = 0,
+                message = "OK",
                 ComboTokenResponseData.LoginData(
                     accountType = 1,
                     comboId = comboId,
@@ -309,8 +312,8 @@ internal suspend fun ApplicationCall.handleComboLogin() {
                     data = ComboTokenResponseData.LoginData.LoginGuestData(guest = false),
                     heartbeat = false,
                     openId = comboTokenRequestData.data.uid,
-                )
-            )
+                ),
+            ),
         ).respond()
     }
 }
@@ -319,7 +322,8 @@ internal suspend fun ApplicationCall.handleVerify() {
     val verifyData = receive<VerifyTokenRequestData>()
 
     suspend fun returnErrorMsg(@PropertyKey(resourceBundle = BUNDLE) msgKey: String) = LoginAccountResponseEvent(
-        this@handleVerify, LoginResultData(-201, DispatchBundle.message(msgKey))
+        this@handleVerify,
+        LoginResultData(-201, DispatchBundle.message(msgKey)),
     ).respond()
 
     newSuspendedTransaction {
@@ -336,15 +340,16 @@ internal suspend fun ApplicationCall.handleVerify() {
         LoginAccountResponseEvent(
             this@handleVerify,
             LoginResultData(
-                returnCode = 0, message = "OK",
+                returnCode = 0,
+                message = "OK",
                 LoginResultData.VerifyData(
                     LoginResultData.VerifyAccountData(
                         uid = account.id.value,
                         token = token,
-                        email = account.email
-                    )
-                )
-            )
+                        email = account.email,
+                    ),
+                ),
+            ),
         ).respond()
     }
 }
@@ -353,7 +358,8 @@ internal suspend fun ApplicationCall.handleLoadConfig() {
     forwardCallWithAll(
         DOMAIN_HK4E_OS_VERSION,
         MdkShieldLoadConfigData(
-            returnCode = 0, message = "OK",
+            returnCode = 0,
+            message = "OK",
             data = MdkShieldLoadConfigData.Data(
                 id = 6,
                 gameKey = "sora",
@@ -370,9 +376,9 @@ internal suspend fun ApplicationCall.handleLoadConfig() {
                 serverGuest = false,
                 thirdPartyIgnore = mapOf(),
                 thirdPartyLoginConfigs = mapOf(),
-                enablePsBindAccount = false
-            )
-        )
+                enablePsBindAccount = false,
+            ),
+        ),
     ) { GetMdkShieldLoadConfigDataEvent(this, it) }
 }
 
@@ -380,7 +386,8 @@ internal suspend fun ApplicationCall.handleGetConfig() {
     forwardCallWithAll(
         DOMAIN_SDK_STATIC,
         ComboConfigData(
-            returnCode = 0, message = "OK",
+            returnCode = 0,
+            message = "OK",
             data = ComboConfigData.Data(
                 protocol = false,
                 qrEnabled = false,
@@ -388,9 +395,9 @@ internal suspend fun ApplicationCall.handleGetConfig() {
                 announceUrl = ANNOUNCE_URL.decodeBase64String(),
                 pushAliasType = 1,
                 enableAnnouncePicPopup = true,
-                disableYsdkGuard = true
-            )
-        )
+                disableYsdkGuard = true,
+            ),
+        ),
     ) { GetComboConfigDataEvent(this, it) }
 }
 
@@ -398,7 +405,8 @@ internal suspend fun ApplicationCall.handleGetCompareProtocolVersion() {
     forwardCallWithAll(
         DOMAIN_HK4E_OS_VERSION,
         CompareProtocolVersionData(
-            returnCode = 0, message = "OK",
+            returnCode = 0,
+            message = "OK",
             data = CompareProtocolVersionData.Data(
                 modified = true,
                 protocol = CompareProtocolVersionData.Data.Protocol(
@@ -411,10 +419,10 @@ internal suspend fun ApplicationCall.handleGetCompareProtocolVersion() {
                     minimum = 2,
                     createTime = 0,
                     teenagerProto = "",
-                    thirdProto = ""
-                )
-            )
-        )
+                    thirdProto = "",
+                ),
+            ),
+        ),
     ) { GetCompareProtocolVersionDataEvent(this, it) }
 }
 
@@ -422,11 +430,12 @@ internal suspend fun ApplicationCall.handleGetAgreementInfos() {
     forwardCallWithAll(
         DOMAIN_HK4E_OS_VERSION,
         AgreementData(
-            returnCode = 0, message = "OK",
+            returnCode = 0,
+            message = "OK",
             data = AgreementData.Data(
-                marketingAgreements = arrayListOf()
-            )
-        )
+                marketingAgreements = arrayListOf(),
+            ),
+        ),
     ) // TODO: not sure so far
     { GetAgreementDataEvent(this, it) }
 }
@@ -435,11 +444,12 @@ internal suspend fun ApplicationCall.handleGetComboData() {
     forwardCallWithAll(
         DOMAIN_SDK_STATIC,
         ComboData(
-            returnCode = 0, message = "OK",
+            returnCode = 0,
+            message = "OK",
             data = ComboData.Data(
-                values = mapOf("modify_real_name_other_verify" to "true")
-            )
-        )
+                values = mapOf("modify_real_name_other_verify" to "true"),
+            ),
+        ),
     ) { GetComboDataEvent(this, it) }
 }
 
@@ -462,7 +472,7 @@ internal suspend inline fun <reified T : Any> DispatchDataEvent<T>.respond() {
 internal suspend inline fun <reified T : Any> ApplicationCall.forwardCallWithAll(
     domain: String,
     defaultData: T,
-    eventBuilder: (T) -> DispatchDataEvent<T>
+    eventBuilder: (T) -> DispatchDataEvent<T>,
 ) {
     val data = if (DispatchConfig.data.requestSetting.forwardCommonRequest) {
         this.forwardCall(domain)
@@ -475,7 +485,7 @@ internal suspend inline fun <reified T : Any> ApplicationCall.forwardCallWithAll
 }
 
 internal suspend inline fun <reified T> ApplicationCall.forwardCall(
-    domain: String
+    domain: String,
 ): T {
     val url = "https://${request.headers["original"] ?: domain}${request.uri}"
     logger.debug { "Forwarding request from ${request.uri} to $url" }

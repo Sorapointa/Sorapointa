@@ -8,7 +8,7 @@ import kotlin.math.sqrt
 inline fun Position(
     x: Int = 0,
     y: Int = 0,
-    z: Int = 0
+    z: Int = 0,
 ) = Position(x.toFloat(), y.toFloat(), z.toFloat())
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
@@ -16,7 +16,7 @@ inline fun Position(
 data class Position(
     val x: Float = 0f,
     val y: Float = 0f,
-    val z: Float = 0f
+    val z: Float = 0f,
 ) {
 
     fun set(x: Float = this.x, y: Float = this.y, z: Float = this.z) =
@@ -83,7 +83,7 @@ data class Position(
         rectangleA: Position,
         rectangleB: Position,
         circleCenter: Position,
-        r: Float
+        r: Float,
     ): Boolean {
         val ext = (rectangleA - rectangleB) / 2f
         val rectangleCenter: Position = rectangleA - ext
