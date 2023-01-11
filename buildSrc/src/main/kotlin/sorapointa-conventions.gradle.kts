@@ -75,3 +75,40 @@ tasks.withType<Jar>() {
     exclude("logback-test.xml")
     exclude("*.proto")
 }
+
+tasks.shadowJar {
+    exclude("checkstyle.xml")
+    exclude("**/*.html")
+    exclude("CronUtilsI18N*.properties")
+    exclude("DebugProbesKt.bin")
+    exclude("custom.config.*")
+
+    // SQLite
+    exclude("org/sqlite/native/FreeBSD/**/*")
+    exclude("org/sqlite/native/Linux-Android/**/*")
+    exclude("org/sqlite/native/Linux-Musl/**/*")
+    arrayOf("arm", "armv6", "armv7", "ppc64", "x86").forEach {
+        exclude("org/sqlite/native/Linux/$it/**/*")
+        exclude("org/sqlite/native/Windows/$it/**/*")
+    }
+    arrayOf("freebsd32", "freebsd64", "linux32", "windows32").forEach {
+        exclude("META-INF/native/$it/**/*")
+    }
+
+    // JNA
+    arrayOf("aix", "freebsd", "openbsd", "sunos").forEach {
+        exclude("com/sun/jna/$it*/**/*")
+    }
+    arrayOf("arm", "armel", "loongarch64", "mips64el", "ppc", "ppc64le", "riscv64", "s390x", "x86").forEach {
+        exclude("com/sun/jna/linux-$it/**/*")
+        exclude("com/sun/jna/win32-$it/**/*")
+    }
+
+    // Jansi Native Lib
+    exclude("org/fusesource/jansi/internal/native/FreeBSD")
+    arrayOf("arm", "armv6", "armv7", "ppc64", "x86").forEach {
+        exclude("org/fusesource/jansi/internal/native/Linux/$it/**/*")
+        exclude("org/fusesource/jansi/internal/native/Mac/$it/**/*")
+        exclude("org/fusesource/jansi/internal/native/Windows/$it/**/*")
+    }
+}

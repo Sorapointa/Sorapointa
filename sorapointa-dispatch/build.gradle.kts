@@ -23,7 +23,6 @@ dependencies {
     api(libs.ktor.server.compression)
     api(libs.ktor.server.netty)
     api(libs.ktor.server.status.page)
-    api(libs.ktor.server.html)
 
     api(libs.ktor.client.core)
     api(libs.ktor.client.cio)
