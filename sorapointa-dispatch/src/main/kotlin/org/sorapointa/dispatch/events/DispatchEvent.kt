@@ -20,58 +20,58 @@ abstract class DispatchDataEvent<T> : DispatchEvent() {
 }
 
 class CreateAccountEvent(
-    val username: String
+    val username: String,
 ) : AbstractEvent()
 
 class ComboTokenResponseEvent(
     override val call: ApplicationCall,
-    override val data: ComboTokenResponseData
+    override val data: ComboTokenResponseData,
 ) : DispatchDataEvent<ComboTokenResponseData>(), CancelableEvent
 class LoginAccountResponseEvent(
     override val call: ApplicationCall,
-    override val data: LoginResultData
+    override val data: LoginResultData,
 ) : DispatchDataEvent<LoginResultData>(), CancelableEvent
 class LoginAccountRequestEvent(
     override val call: ApplicationCall,
-    override val data: LoginAccountRequestData
+    override val data: LoginAccountRequestData,
 ) : DispatchDataEvent<LoginAccountRequestData>(), CancelableEvent
 
 class GetAgreementDataEvent(
     override val call: ApplicationCall,
-    override val data: AgreementData
+    override val data: AgreementData,
 ) : DispatchDataEvent<AgreementData>(), CancelableEvent
 
 class GetComboConfigDataEvent(
     override val call: ApplicationCall,
-    override val data: ComboConfigData
+    override val data: ComboConfigData,
 ) : DispatchDataEvent<ComboConfigData>(), CancelableEvent
 
 class GetMdkShieldLoadConfigDataEvent(
     override val call: ApplicationCall,
-    override val data: MdkShieldLoadConfigData
+    override val data: MdkShieldLoadConfigData,
 ) : DispatchDataEvent<MdkShieldLoadConfigData>(), CancelableEvent
 
 class GetPlatMVersionDataEvent(
     override val call: ApplicationCall,
-    override val data: PlatMVersionData
+    override val data: PlatMVersionData,
 ) : DispatchDataEvent<PlatMVersionData>(), CancelableEvent
 
 class GetCompareProtocolVersionDataEvent(
     override val call: ApplicationCall,
-    override val data: CompareProtocolVersionData
+    override val data: CompareProtocolVersionData,
 ) : DispatchDataEvent<CompareProtocolVersionData>(), CancelableEvent
 
 class GetComboDataEvent(
     override val call: ApplicationCall,
-    override val data: ComboData
+    override val data: ComboData,
 ) : DispatchDataEvent<ComboData>(), CancelableEvent
 
 class QueryRegionListEvent(
     override val call: ApplicationCall,
-    override val data: QueryRegionListHttpRsp
+    override val data: QueryRegionListHttpRsp,
 ) : DispatchDataEvent<QueryRegionListHttpRsp>(), CancelableEvent
 
 class QueryCurrentRegionEvent(
     override val call: ApplicationCall,
-    override val data: QueryCurrRegionHttpRsp
+    override val data: QueryCurrRegionHttpRsp,
 ) : DispatchDataEvent<QueryCurrRegionHttpRsp>(), CancelableEvent

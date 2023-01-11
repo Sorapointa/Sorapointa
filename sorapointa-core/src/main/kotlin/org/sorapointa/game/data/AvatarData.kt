@@ -229,8 +229,8 @@ class AvatarDataImpl(id: EntityID<Long>) : Entity<Long>(id), AvatarData {
                         it[this.ownerId] = owner.uid
                         it[this.avatarId] = avatarId
                         it[bornTime] = now()
-                    }
-                ) ?: error("Could not create avatar data into database")
+                    },
+                ) ?: error("Could not create avatar data into database"),
             ).also {
                 it.initNewAvatar()
             }
@@ -238,7 +238,7 @@ class AvatarDataImpl(id: EntityID<Long>) : Entity<Long>(id), AvatarData {
         private fun createAvatarInstance(
             owner: Player,
             data: AvatarDataImpl,
-            avatarType: AvatarType = AvatarType.FORMAL
+            avatarType: AvatarType = AvatarType.FORMAL,
         ) = AvatarImpl(owner, data, avatarType).also {
             data.avatar = it
         }
@@ -328,8 +328,8 @@ class AvatarDataImpl(id: EntityID<Long>) : Entity<Long>(id), AvatarData {
             avatar.ownerPlayer.impl().sendPacketAsync(
                 AvatarPropNotifyPacket(
                     avatar = avatar,
-                    propMap = mapOf(prop.value to value.toLong())
-                )
+                    propMap = mapOf(prop.value to value.toLong()),
+                ),
             )
         }
 
@@ -339,8 +339,8 @@ class AvatarDataImpl(id: EntityID<Long>) : Entity<Long>(id), AvatarData {
             avatar.ownerPlayer.impl().sendPacketAsync(
                 AvatarFightPropUpdateNotifyPacket(
                     avatar = avatar,
-                    propMap = mapOf(prop.value to value.toFloat())
-                )
+                    propMap = mapOf(prop.value to value.toFloat()),
+                ),
             )
         }
 }

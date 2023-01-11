@@ -5,6 +5,10 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### Cargo ###
+target/
+Cargo.lock
+
 ### IntelliJ IDEA ###
 /.idea/**/*
 !/.idea/encodings.xml

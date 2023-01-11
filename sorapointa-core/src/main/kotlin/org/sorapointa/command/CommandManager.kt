@@ -24,17 +24,17 @@ abstract class AbstractCommandNode<TSender : CommandSender>(
 
 class CommandNode(
     entry: Command.Entry,
-    creator: (CommandSender) -> Command
+    creator: (CommandSender) -> Command,
 ) : AbstractCommandNode<CommandSender>(entry, creator)
 
 class ConsoleCommandNode(
     entry: Command.Entry,
-    creator: (ConsoleCommandSender) -> Command
+    creator: (ConsoleCommandSender) -> Command,
 ) : AbstractCommandNode<ConsoleCommandSender>(entry, creator)
 
 class PlayerCommandNode(
     entry: Command.Entry,
-    creator: (Player) -> Command
+    creator: (Player) -> Command,
 ) : AbstractCommandNode<Player>(entry, creator)
 
 object CommandManager {
@@ -84,7 +84,7 @@ object CommandManager {
     ): Job = commandScope.launch {
         if (rawMsg.isBlank()) {
             sender.sendMessage(
-                CoreBundle.message("sora.cmd.manager.invoke.empty", locale = sender.locale)
+                CoreBundle.message("sora.cmd.manager.invoke.empty", locale = sender.locale),
             )
             return@launch
         }
@@ -96,14 +96,16 @@ object CommandManager {
             val mainTypo = suggestTypo(mainCommand, cmdMap.keys.toList())
             if (mainTypo == null) {
                 sender.sendMessage(
-                    CoreBundle.message("sora.cmd.manager.invoke.error", mainCommand, locale = sender.locale)
+                    CoreBundle.message("sora.cmd.manager.invoke.error", mainCommand, locale = sender.locale),
                 )
             } else {
                 sender.sendMessage(
                     CoreBundle.message(
                         "sora.cmd.manager.invoke.typo.suggest",
-                        mainCommand, mainTypo, locale = sender.locale
-                    )
+                        mainCommand,
+                        mainTypo,
+                        locale = sender.locale,
+                    ),
                 )
             }
             return@launch
@@ -112,7 +114,8 @@ object CommandManager {
         val result: CommandResult = run {
             if (sender is Player && sender.account.permissionLevel < cmd.entry.permissionRequired) {
                 return@run Error(
-                    null, userMessage = CoreBundle.message("sora.cmd.no.permission", locale = sender.locale)
+                    null,
+                    userMessage = CoreBundle.message("sora.cmd.no.permission", locale = sender.locale),
                 )
             }
             when (cmd) {
@@ -147,8 +150,10 @@ object CommandManager {
                     if (result.cause is PrintHelpMessage && cmd.entry.alias.isNotEmpty()) {
                         append(
                             CoreBundle.message(
-                                "sora.cmd.manager.alias", cmd.entry.alias.joinToString(), locale = sender.locale
-                            )
+                                "sora.cmd.manager.alias",
+                                cmd.entry.alias.joinToString(),
+                                locale = sender.locale,
+                            ),
                         )
                     }
                 }

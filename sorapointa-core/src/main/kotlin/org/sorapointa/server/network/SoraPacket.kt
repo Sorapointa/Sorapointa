@@ -33,7 +33,7 @@ internal fun <T : Message<*, *>> OutgoingPacket<T>.toFinalBytePacket(): ByteArra
 }
 
 internal abstract class PlayerOutgoingPacket<T : Message<*, *>>(
-    cmdId: UShort
+    cmdId: UShort,
 ) : AbstractOutgoingPacket<T>(cmdId) {
 
     protected abstract val player: Player
@@ -47,7 +47,7 @@ internal abstract class PlayerOutgoingPacket<T : Message<*, *>>(
 }
 
 internal abstract class AvatarOutgoingPacket<T : Message<*, *>>(
-    cmdId: UShort
+    cmdId: UShort,
 ) : AbstractOutgoingPacket<T>(cmdId) {
 
     abstract val avatar: Avatar

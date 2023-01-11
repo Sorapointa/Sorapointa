@@ -20,9 +20,8 @@ interface IncomingPacketHandler<TPacketReq : Message<*, *>> {
  * Server passively receives a packet (request),
  * client will require a response, copy metadata in this case
  */
-internal abstract class AbstractIncomingPacketHandler
-<TPacketReq : Message<*, *>>(
-    override val cmdId: UShort
+internal abstract class AbstractIncomingPacketHandler<TPacketReq : Message<*, *>>(
+    override val cmdId: UShort,
 ) : IncomingPacketHandler<TPacketReq> {
 
     protected abstract val adapter: ProtoAdapter<TPacketReq>
@@ -30,27 +29,24 @@ internal abstract class AbstractIncomingPacketHandler
     override fun parsing(data: ByteArray): TPacketReq = adapter.decode(data)
 }
 
-internal abstract class IncomingSessionPacketHandler
-<TPacketReq : Message<*, *>, TState : NetworkHandlerStateInterface>(
-    cmdId: UShort
+internal abstract class IncomingSessionPacketHandler<TPacketReq : Message<*, *>, TState : NetworkHandlerStateInterface>(
+    cmdId: UShort,
 ) : AbstractIncomingPacketHandler<TPacketReq>(cmdId) {
     abstract suspend fun TState.handle(soraPacket: SoraPacket): OutgoingPacket<*>?
 }
 
-internal abstract class IncomingPlayerPacketHandler
-<TPacketReq : Message<*, *>>(
-    cmdId: UShort
+internal abstract class IncomingPlayerPacketHandler<TPacketReq : Message<*, *>>(
+    cmdId: UShort,
 ) : IncomingSessionPacketHandler<TPacketReq, NetworkHandler.PlayerHandlePacketState>(cmdId) {
 
     override suspend fun NetworkHandler.PlayerHandlePacketState.handle(
-        soraPacket: SoraPacket
+        soraPacket: SoraPacket,
     ): OutgoingPacket<*>? = this.bindPlayer.handle(soraPacket)
 
     abstract suspend fun Player.handle(soraPacket: SoraPacket): OutgoingPacket<*>?
 }
 
-internal abstract class IncomingPacketHandlerWithoutResponse
-<TPacketReq : Message<*, *>>(
+internal abstract class IncomingPacketHandlerWithoutResponse<TPacketReq : Message<*, *>>(
     cmdId: UShort,
 ) : IncomingPlayerPacketHandler<TPacketReq>(cmdId) {
 
@@ -65,9 +61,8 @@ internal abstract class IncomingPacketHandlerWithoutResponse
     }
 }
 
-internal abstract class IncomingPacketHandlerWithResponse
-<TPacketReq : Message<*, *>, TPacketRsp : OutgoingPacket<*>>(
-    cmdId: UShort
+internal abstract class IncomingPacketHandlerWithResponse<TPacketReq : Message<*, *>, TPacketRsp : OutgoingPacket<*>>(
+    cmdId: UShort,
 ) : IncomingPlayerPacketHandler<TPacketReq>(cmdId) {
 
     protected abstract suspend fun Player.handlePacket(packet: TPacketReq): TPacketRsp
@@ -82,9 +77,8 @@ internal abstract class IncomingPacketHandlerWithResponse
     }
 }
 
-internal abstract class IncomingPreLoginPacketHandler
-<TPacketReq : Message<*, *>, TPacketRsp : OutgoingPacket<*>, TState : NetworkHandlerStateInterface>(
-    cmdId: UShort
+internal abstract class IncomingPreLoginPacketHandler<TPacketReq : Message<*, *>, TPacketRsp : OutgoingPacket<*>, TState : NetworkHandlerStateInterface>(
+    cmdId: UShort,
 ) : IncomingSessionPacketHandler<TPacketReq, TState>(cmdId) {
 
     protected abstract suspend fun TState.handlePacket(packet: TPacketReq): TPacketRsp
@@ -111,11 +105,11 @@ internal object IncomingPacketFactory {
         GetPlayerSocialDetailReqHandler,
         EnterSceneReadyReqHandler,
         SceneInitFinishReqHandler,
-        UnionCmdNotifyHandler
+        UnionCmdNotifyHandler,
     )
 
     suspend inline fun <reified TState : NetworkHandlerStateInterface, T : Message<*, *>> TState.tryHandle(
-        packet: SoraPacket
+        packet: SoraPacket,
     ): OutgoingPacket<*>? {
         val handler = incomingPacketHandlers
             .firstOrNull { it.cmdId == packet.cmdId }

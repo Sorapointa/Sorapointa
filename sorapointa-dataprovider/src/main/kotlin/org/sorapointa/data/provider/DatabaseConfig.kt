@@ -26,7 +26,8 @@ enum class DatabaseType {
         override val defaultMaxPoolSize: Int = Runtime.getRuntime().availableProcessors()
         override val driverPath: String = "org.postgresql.Driver"
         override val defaultIsolationLevel: String = "REPEATABLE_READ"
-    };
+    },
+    ;
 
     abstract val defaultConnectionString: String
     abstract val defaultMaxPoolSize: Int
@@ -35,7 +36,10 @@ enum class DatabaseType {
 }
 
 object DatabaseConfig : DataFilePersist<DatabaseConfig.Data>(
-    File(configDirectory, "databaseConfig.yaml"), Data(), Data.serializer(), lenientYaml,
+    File(configDirectory, "databaseConfig.yaml"),
+    Data(),
+    Data.serializer(),
+    lenientYaml,
 ) {
     @Serializable
     data class Data(
@@ -84,7 +88,7 @@ object DatabaseConfig : DataFilePersist<DatabaseConfig.Data>(
                 "SERIALIZABLE" -> TRANSACTION_SERIALIZABLE
                 else -> error(
                     "No such field '$_isolationLevel', " +
-                        "'${type.defaultIsolationLevel}' is default value for $type"
+                        "'${type.defaultIsolationLevel}' is default value for $type",
                 )
             }
     }

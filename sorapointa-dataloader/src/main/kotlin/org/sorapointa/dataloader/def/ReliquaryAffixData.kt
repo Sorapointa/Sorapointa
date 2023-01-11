@@ -27,7 +27,7 @@ data class ReliquaryAffixData(
     @JsonNames("weight", "Weight")
     val weight: Int? = null,
     @JsonNames("upgradeWeight", "UpgradeWeight")
-    val upgradeWeight: Int? = null
+    val upgradeWeight: Int? = null,
 ) {
 
     val propType by lazy {

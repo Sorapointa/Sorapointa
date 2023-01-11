@@ -117,10 +117,12 @@ class DataLoader<T : Any> @PublishedApi internal constructor(
     private val file = resolveResourceDirectory(path)
 
     fun init() {
-        if (!file.exists()) throw NoSuchFileException(
-            file = file,
-            reason = "Failed to load data for class ${clazz.qualifiedOrSimple}"
-        )
+        if (!file.exists()) {
+            throw NoSuchFileException(
+                file = file,
+                reason = "Failed to load data for class ${clazz.qualifiedOrSimple}",
+            )
+        }
         ResourceHolder.registerData(this.uncheckedCast())
     }
 

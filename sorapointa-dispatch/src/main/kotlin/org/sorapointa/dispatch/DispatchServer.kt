@@ -61,7 +61,7 @@ object DispatchServer {
                     keyStore = cert,
                     keyAlias = dispatchConfig.certification.keyAlias,
                     keyStorePassword = { dispatchConfig.certification.keyStorePassword.toCharArray() },
-                    privateKeyPassword = { dispatchConfig.certification.privateKeyPassword.toCharArray() }
+                    privateKeyPassword = { dispatchConfig.certification.privateKeyPassword.toCharArray() },
                 ) {
                     host = dispatchConfig.host
                     port = dispatchConfig.port
@@ -113,7 +113,10 @@ object DispatchServer {
 
 @SorapointaInternal
 object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
-    File(configDirectory, "dispatchConfig.yaml"), Data(), Data.serializer(), lenientYaml,
+    File(configDirectory, "dispatchConfig.yaml"),
+    Data(),
+    Data.serializer(),
+    lenientYaml,
 ) {
 
     @Serializable
@@ -155,7 +158,7 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
             regionConfig = "",
             regionDispatchType = 0,
             videoKey = 5578228838233776,
-            downloadMode = 0
+            downloadMode = 0,
         ),
         @YamlComment(
             "Client config that will be included in `query_cur_region`",
@@ -169,9 +172,9 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
             gachaSharePlatform = 13,
             homeItemFilter = 20,
             reportNetDelayConfig = ClientCustomConfig.ReportNetDelayConfigData(
-                openGateServer = true
-            )
-        )
+                openGateServer = true,
+            ),
+        ),
     )
 
     @Serializable
@@ -234,7 +237,7 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
             "",
             "More info: https://github.com/Password4j/password4j/wiki/Argon2",
         )
-        val password: Argon2PasswordSetting = Argon2PasswordSetting()
+        val password: Argon2PasswordSetting = Argon2PasswordSetting(),
     ) {
         val comboTokenExpiredTime: Duration
             get() = Duration.parse(_comboTokenExpiredTime)
@@ -257,19 +260,19 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
         val byteLength: Int = 32,
         val parallelism: Int = 2,
         val argon2Type: Argon2 = Argon2.ID,
-        val argon2Version: Int = 19
+        val argon2Version: Int = 19,
     )
 
     @Serializable
     data class Certification(
         val keyStoreFilePath: String = File(
             configDirectory,
-            KeyProvider.DEFAULT_CERT_NAME + KeyProvider.defaultKeyStoreFileExtension
+            KeyProvider.DEFAULT_CERT_NAME + KeyProvider.defaultKeyStoreFileExtension,
         ).absPath,
         val keyStore: String = "JKS",
         val keyAlias: String = KeyProvider.DEFAULT_ALIAS,
         val keyStorePassword: String = KeyProvider.DEFAULT_KEY_STORE_PASSWORD,
-        val privateKeyPassword: String = KeyProvider.DEFAULT_CERT_PASSWORD
+        val privateKeyPassword: String = KeyProvider.DEFAULT_CERT_PASSWORD,
     )
 
     @Serializable
@@ -290,6 +293,6 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
             "so unless you want to setup multiple game or dispatch servers,",
             "just keep it as public address of dispatch server.",
         )
-        val dispatchDomain: String = "localhost"
+        val dispatchDomain: String = "localhost",
     )
 }

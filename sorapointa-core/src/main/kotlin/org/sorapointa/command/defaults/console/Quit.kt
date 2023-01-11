@@ -8,7 +8,7 @@ class Quit(sender: ConsoleCommandSender) : ConsoleCommand(sender, Quit) {
     companion object : Entry(
         name = "quit",
         helpKey = "sora.cmd.quit.desc",
-        alias = listOf("exit")
+        alias = listOf("exit"),
     )
 
     override suspend fun run() {

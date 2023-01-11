@@ -70,7 +70,7 @@ internal object Console {
         setVariable(
             LineReader.HISTORY_FILE,
             resolveHome(HISTORY_FILE)
-                ?: resolveWorkDirectory(HISTORY_FILE)
+                ?: resolveWorkDirectory(HISTORY_FILE),
         )
         DefaultHistory(this).apply {
             addShutdownHook {

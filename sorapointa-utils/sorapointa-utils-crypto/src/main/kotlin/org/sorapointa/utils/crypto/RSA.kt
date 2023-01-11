@@ -101,7 +101,7 @@ fun parseRSAKey(dom: Document): RSAKey? {
     return RSAKey(
         modulus.decodeBase64Bytes().toBigInteger(),
         exponent.decodeBase64Bytes().toBigInteger(),
-        d?.decodeBase64Bytes()?.toBigInteger()
+        d?.decodeBase64Bytes()?.toBigInteger(),
     )
 }
 

@@ -10,5 +10,5 @@ data class PointData(
     @JsonNames("\$type", "\$Type") val type: String,
     @JsonNames("transPos", "TransPos") val transPos: Triple<Int, Int, Int>, // Position
     @JsonNames("dungeonIds", "DungeonIds") val dungeonIds: List<Int>, // Array
-    @JsonNames("dungeonRandomList", "DungeonRandomList") val dungeonRandomList: List<Int> // Array
+    @JsonNames("dungeonRandomList", "DungeonRandomList") val dungeonRandomList: List<Int>, // Array
 )

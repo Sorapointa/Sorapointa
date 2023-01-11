@@ -2,7 +2,7 @@ package org.sorapointa.utils
 
 @RequiresOptIn(
     level = RequiresOptIn.Level.ERROR,
-    message = "This is an experimental Sorapointa api, may be change in future without notice"
+    message = "This is an experimental Sorapointa api, may be change in future without notice",
 )
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
@@ -17,13 +17,13 @@ package org.sorapointa.utils
     AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY_GETTER,
     AnnotationTarget.PROPERTY_SETTER,
-    AnnotationTarget.TYPEALIAS
+    AnnotationTarget.TYPEALIAS,
 )
 annotation class SorapointaExperimental
 
 @RequiresOptIn(
     level = RequiresOptIn.Level.ERROR,
-    message = "This is an internal Sorapointa api, may be change in future without notice"
+    message = "This is an internal Sorapointa api, may be change in future without notice",
 )
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
@@ -38,6 +38,6 @@ annotation class SorapointaExperimental
     AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY_GETTER,
     AnnotationTarget.PROPERTY_SETTER,
-    AnnotationTarget.TYPEALIAS
+    AnnotationTarget.TYPEALIAS,
 )
 annotation class SorapointaInternal

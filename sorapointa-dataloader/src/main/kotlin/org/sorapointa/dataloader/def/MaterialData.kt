@@ -90,7 +90,7 @@ data class MaterialData(
     @JsonNames("cdGroup", "CdGroup")
     val cdGroup: Int? = null,
     @JsonNames("isSplitDrop", "IsSplitDrop")
-    val isSplitDrop: Boolean = false
+    val isSplitDrop: Boolean = false,
 ) : ItemExcelData {
 
     override val itemType by lazy {

@@ -7,14 +7,14 @@ import org.sorapointa.console.WebConsolePacket
 import java.util.*
 
 open class ConsoleCommandSender(
-    override val locale: Locale? = null
+    override val locale: Locale? = null,
 ) : CommandSender {
     override suspend fun sendMessage(msg: String): Unit = println(msg)
 }
 
 class RemoteCommandSender(
     private val session: DefaultWebSocketServerSession,
-    override val locale: Locale?
+    override val locale: Locale?,
 ) : ConsoleCommandSender() {
     val isActive
         get() = session.isActive

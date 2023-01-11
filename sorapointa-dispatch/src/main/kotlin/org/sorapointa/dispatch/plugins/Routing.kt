@@ -6,7 +6,6 @@ import io.ktor.server.routing.*
 import org.sorapointa.dispatch.utils.getAndPost
 
 internal fun Application.configureRouting() {
-
     routing {
         get("/") {
             call.respondText("Hello Sorapointa! The Dispatch Server has been successfully launched!")

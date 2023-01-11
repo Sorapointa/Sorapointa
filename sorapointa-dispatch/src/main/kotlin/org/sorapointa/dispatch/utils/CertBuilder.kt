@@ -51,7 +51,7 @@ internal class CertificateBuilder {
         country = "US",
         organization = "Sorapointa",
         organizationUnit = "GI",
-        commonName = "Sorapointa"
+        commonName = "Sorapointa",
     )
 
     var hosts: List<String> = listOf("localhost")
@@ -80,7 +80,7 @@ internal class CertificateBuilder {
                 to = to,
                 domains = hosts,
                 ipAddresses = ipAddress,
-                keyType = keyType
+                keyType = keyType,
             )
         }.readBytes()
 

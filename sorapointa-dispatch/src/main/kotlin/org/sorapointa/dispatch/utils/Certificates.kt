@@ -49,7 +49,7 @@ internal data class Counterparty(
     val country: String = "",
     val organization: String = "",
     val organizationUnit: String = "",
-    val commonName: String = ""
+    val commonName: String = "",
 )
 
 internal fun BytePacketBuilder.writeX509Info(
@@ -61,7 +61,7 @@ internal fun BytePacketBuilder.writeX509Info(
     to: Date,
     domains: List<String>,
     ipAddresses: List<InetAddress>,
-    keyType: KeyType = KeyType.Server
+    keyType: KeyType = KeyType.Server,
 ) {
     val version = BigInteger(64, SecureRandom())
 
@@ -126,7 +126,7 @@ private fun BytePacketBuilder.serverAuth() {
 
 private fun BytePacketBuilder.subjectAlternativeNames(
     domains: List<String>,
-    ipAddresses: List<InetAddress>
+    ipAddresses: List<InetAddress>,
 ) {
     writeDerSequence {
         writeDerObjectIdentifier(OID.SubjectAltName)
@@ -214,7 +214,7 @@ internal fun BytePacketBuilder.writeCertificate(
     domains: List<String>,
     ipAddresses: List<InetAddress>,
     signerKeyPair: KeyPair = keyPair,
-    keyType: KeyType = KeyType.Server
+    keyType: KeyType = KeyType.Server,
 ) {
     require(to.after(from))
 
@@ -278,16 +278,16 @@ private fun BytePacketBuilder.writeDerUTCTime(date: Date) {
         SimpleDateFormat("yyMMddHHmmss'Z'").apply {
             timeZone = TimeZone.getTimeZone("UTC")
         }.format(date),
-        0x17
+        0x17,
     )
 }
 
 private fun BytePacketBuilder.writeDerGeneralizedTime(date: Date) {
     writeDerUTF8String(
         SimpleDateFormat("yyyyMMddHHmmss'Z'").apply { timeZone = TimeZone.getTimeZone("UTC") }.format(
-            date
+            date,
         ),
-        0x18
+        0x18,
     )
 }
 

@@ -11,7 +11,7 @@ import org.sorapointa.utils.sha256sign
 @Serializable
 data class QueryCurrentRegionData(
     val content: String,
-    val sign: String
+    val sign: String,
 )
 
 @Serializable
@@ -22,7 +22,7 @@ data class RegionListClientCustomConfig(
     val regionConfig: String,
     val regionDispatchType: Int,
     val videoKey: Long,
-    val downloadMode: Int
+    val downloadMode: Int,
 )
 
 /**
@@ -43,16 +43,16 @@ data class ClientCustomConfig(
     val gachaSharePlatform: Int? = null,
     val homeDotPattern: Boolean? = null,
     val homeItemFilter: Int? = null,
-    val reportNetDelayConfig: ReportNetDelayConfigData? = null
+    val reportNetDelayConfig: ReportNetDelayConfigData? = null,
 ) {
     @Serializable
     data class ReportNetDelayConfigData(
-        @SerialName("openGateserver") val openGateServer: Boolean? = null
+        @SerialName("openGateserver") val openGateServer: Boolean? = null,
     )
 
     @Serializable
     data class MtrConfigData(
-        val isOpen: Boolean? = null
+        val isOpen: Boolean? = null,
     )
 }
 
@@ -60,7 +60,7 @@ data class ClientCustomConfig(
 class AgreementData(
     @SerialName("retcode") val returnCode: Short,
     val message: String,
-    val data: Data? = null
+    val data: Data? = null,
 ) {
     @Serializable
     data class Data(
@@ -72,7 +72,7 @@ class AgreementData(
 class ComboConfigData(
     @SerialName("retcode") val returnCode: Short,
     val message: String,
-    val data: Data? = null
+    val data: Data? = null,
 ) {
     @Serializable
     data class Data(
@@ -90,7 +90,7 @@ class ComboConfigData(
 data class MdkShieldLoadConfigData(
     @SerialName("retcode") val returnCode: Short,
     val message: String,
-    val data: Data? = null
+    val data: Data? = null,
 ) {
     @Serializable
     data class Data(
@@ -109,27 +109,27 @@ data class MdkShieldLoadConfigData(
         @SerialName("server_guest") val serverGuest: Boolean,
         @SerialName("thirdparty") val thirdParty: List<String>,
         @SerialName("thirdparty_ignore") val thirdPartyIgnore: Map<String, String>,
-        @SerialName("thirdparty_login_configs") val thirdPartyLoginConfigs: Map<String, ThirdPartyLoginConfigsData>
+        @SerialName("thirdparty_login_configs") val thirdPartyLoginConfigs: Map<String, ThirdPartyLoginConfigsData>,
     ) {
 
         @Serializable
         data class ThirdPartyLoginConfigsData(
             @SerialName("token_type") val tokenType: String,
-            @SerialName("game_token_expires_in") val gameTokenExpiresIn: Int
+            @SerialName("game_token_expires_in") val gameTokenExpiresIn: Int,
         )
     }
 }
 
 @Serializable
 data class PlatMVersionData(
-    val version: Int
+    val version: Int,
 )
 
 @Serializable
 data class ComboData(
     @SerialName("retcode") val returnCode: Short,
     val message: String,
-    val data: Data? = null
+    val data: Data? = null,
 ) {
     @Serializable
     data class Data(
@@ -141,12 +141,12 @@ data class ComboData(
 data class CompareProtocolVersionData(
     @SerialName("retcode") val returnCode: Short,
     val message: String,
-    val data: Data? = null
+    val data: Data? = null,
 ) {
     @Serializable
     data class Data(
         val modified: Boolean,
-        val protocol: Protocol? = null
+        val protocol: Protocol? = null,
     ) {
 
         @Serializable
@@ -160,7 +160,7 @@ data class CompareProtocolVersionData(
             @SerialName("user_proto") val userProto: String,
             @SerialName("priv_proto") val privProto: String,
             @SerialName("teenager_proto") val teenagerProto: String,
-            @SerialName("third_proto") val thirdProto: String
+            @SerialName("third_proto") val thirdProto: String,
         )
     }
 }
@@ -171,7 +171,7 @@ data class ComboTokenRequestData(
     @SerialName("channel_id") val channelId: Int,
     @SerialName("data") private val _data: String,
     val device: String,
-    val sign: String
+    val sign: String,
 ) {
 
     val data: LoginTokenData by lazy {
@@ -188,7 +188,7 @@ data class ComboTokenRequestData(
     fun signCheck(isChina: Boolean): Boolean {
         val calSign = "app_id=$appId&channel_id=$channelId&data=$_data&device=$device"
         val final = calSign.sha256sign(
-            if (isChina) "d0d3a7342df2026a70f650b907800111" else "6a4c78fe0356ba4673b8071127b28123"
+            if (isChina) "d0d3a7342df2026a70f650b907800111" else "6a4c78fe0356ba4673b8071127b28123",
         )
         return final == sign
     }
@@ -198,7 +198,7 @@ data class ComboTokenRequestData(
 data class ComboTokenResponseData(
     @SerialName("retcode") val returnCode: Short,
     val message: String,
-    val data: LoginData? = null
+    val data: LoginData? = null,
 ) {
 
     @Serializable
@@ -228,14 +228,14 @@ data class ComboTokenResponseData(
 data class LoginAccountRequestData(
     val account: String,
     val password: String,
-    @SerialName("is_crypto") val isCrypto: Boolean
+    @SerialName("is_crypto") val isCrypto: Boolean,
 )
 
 @Serializable
 data class LoginResultData(
     @SerialName("retcode") val returnCode: Short,
     val message: String,
-    val data: VerifyData? = null
+    val data: VerifyData? = null,
 ) {
 
     @Serializable
@@ -244,7 +244,7 @@ data class LoginResultData(
         @SerialName("device_grant_required") val deviceGrantRequired: Boolean = false,
         @SerialName("realname_operation") val realNameOperation: String = "None",
         @SerialName("realperson_required") val realPersonRequired: Boolean = false,
-        @SerialName("safe_mobile_required") val safeMobileRequired: Boolean = false
+        @SerialName("safe_mobile_required") val safeMobileRequired: Boolean = false,
     )
 
     @Serializable
@@ -275,5 +275,5 @@ data class LoginResultData(
 @Serializable
 data class VerifyTokenRequestData(
     val uid: Int,
-    val token: String
+    val token: String,
 )

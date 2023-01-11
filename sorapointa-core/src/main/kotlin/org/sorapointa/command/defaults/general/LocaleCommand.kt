@@ -20,7 +20,7 @@ class LocaleCommand(private val sender: CommandSender) : Command(sender, LocaleC
     companion object : Entry(
         name = "locale",
         helpKey = "sora.cmd.locale.desc",
-        alias = listOf("lang")
+        alias = listOf("lang"),
     )
 
     enum class Operation {
@@ -32,7 +32,9 @@ class LocaleCommand(private val sender: CommandSender) : Command(sender, LocaleC
         CoreBundle.message("sora.cmd.locale.arg.operation.name", locale = sender.locale),
         help = CoreBundle.message(
             "sora.cmd.locale.arg.operation.desc",
-            Operation.values().joinToString { it.name }, defaultOp.name, locale = sender.locale
+            Operation.values().joinToString { it.name },
+            defaultOp.name,
+            locale = sender.locale,
         ),
     ).enum<Operation>(ignoreCase = true).default(defaultOp)
 
@@ -42,8 +44,9 @@ class LocaleCommand(private val sender: CommandSender) : Command(sender, LocaleC
     ).optional()
 
     private val force by option(
-        "--force", "-F",
-        help = CoreBundle.message("sora.cmd.locale.opt.force.desc", locale = sender.locale)
+        "--force",
+        "-F",
+        help = CoreBundle.message("sora.cmd.locale.opt.force.desc", locale = sender.locale),
     ).flag(default = false)
 
     private suspend fun sendLocaleInfo(locale: JavaLocale?) {
@@ -59,7 +62,7 @@ class LocaleCommand(private val sender: CommandSender) : Command(sender, LocaleC
         }
         if (newValue.length > LOCALE_LENGTH_LIMIT) {
             sender.sendMessage(
-                CoreBundle.message("sora.cmd.locale.msg.new.value.toolong", LOCALE_LENGTH_LIMIT, locale = sender.locale)
+                CoreBundle.message("sora.cmd.locale.msg.new.value.toolong", LOCALE_LENGTH_LIMIT, locale = sender.locale),
             )
             return
         }
@@ -71,7 +74,7 @@ class LocaleCommand(private val sender: CommandSender) : Command(sender, LocaleC
         }
         modifyValue(locale)
         sender.sendMessage(
-            CoreBundle.message("sora.cmd.locale.msg.success", locale.toLanguageTag(), locale = sender.locale)
+            CoreBundle.message("sora.cmd.locale.msg.success", locale.toLanguageTag(), locale = sender.locale),
         )
     }
 

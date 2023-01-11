@@ -11,7 +11,10 @@ import java.io.File
 import kotlin.time.Duration
 
 object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
-    File(configDirectory, "sorapointaConfig.yaml"), Data(), Data.serializer(), lenientYaml
+    File(configDirectory, "sorapointaConfig.yaml"),
+    Data(),
+    Data.serializer(),
+    lenientYaml,
 ) {
 
     @Serializable
@@ -40,7 +43,7 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
         val reliquary: Int = 2000,
         val material: Int = 2000,
         val furniture: Int = 2000,
-        val allWeight: Int = 30000
+        val allWeight: Int = 30000,
     )
 
     @Serializable
@@ -54,7 +57,7 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
             "Game server kcp setting, don't change those settings if you don't know about KCP",
             "See more: https://github.com/skywind3000/kcp",
         )
-        val uKcpSetting: UKcpSetting = UKcpSetting()
+        val uKcpSetting: UKcpSetting = UKcpSetting(),
     ) {
         val pingTimeout: Duration
             get() = Duration.parse(_pingTimeout)
@@ -70,6 +73,6 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
         val sendWindow: Int = 256,
         val receiveWindow: Int = 256,
         val timeoutMillis: Long = 30 * 1000, // KCP Timeout > Protocol Ping Timeout
-        val ackNoDelay: Boolean = false
+        val ackNoDelay: Boolean = false,
     )
 }

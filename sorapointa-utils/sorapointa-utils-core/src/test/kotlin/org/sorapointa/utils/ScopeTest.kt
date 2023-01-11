@@ -13,7 +13,6 @@ class ScopeTest {
 
     @Test
     fun `scope test`(): Unit = runBlocking {
-
         val parentScope = ModuleScope("TestParent")
 
         val moduleScope = ModuleScope("TestModule", parentScope.coroutineContext)

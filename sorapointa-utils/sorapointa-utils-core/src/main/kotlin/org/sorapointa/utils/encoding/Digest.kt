@@ -50,7 +50,7 @@ fun getPrefixSuffixHash(str: String): SegmentHash {
 
 data class SegmentHash(
     val prefixHash: UShort,
-    val suffixHash: UInt
+    val suffixHash: UInt,
 ) {
 
     val combinedHash by lazy {

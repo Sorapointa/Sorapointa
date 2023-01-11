@@ -89,7 +89,7 @@ data class AvatarExcelData(
     @JsonNames("useType", "UseType")
     private val _useType: JsonPrimitive? = null,
     @JsonNames("isRangeAttack", "IsRangeAttack")
-    val isRangeAttack: Boolean = false
+    val isRangeAttack: Boolean = false,
 ) {
     val weaponType by lazy {
         acceptEnum(_weaponType, WeaponType.WEAPON_NONE)

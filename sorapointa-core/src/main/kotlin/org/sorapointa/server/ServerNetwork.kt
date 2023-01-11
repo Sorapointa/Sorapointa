@@ -32,7 +32,7 @@ object ServerNetwork {
                         ukcpSetting.noDelay,
                         ukcpSetting.interval,
                         ukcpSetting.fastResend,
-                        ukcpSetting.noCongestionWindow
+                        ukcpSetting.noCongestionWindow,
                     )
                     mtu = ukcpSetting.MTU
                     sndwnd = ukcpSetting.sendWindow
@@ -41,7 +41,7 @@ object ServerNetwork {
                     isUseConvChannel = true
                     isAckNoDelay = ukcpSetting.ackNoDelay
                 },
-                InetSocketAddress(port)
+                InetSocketAddress(port),
             )
         }
 

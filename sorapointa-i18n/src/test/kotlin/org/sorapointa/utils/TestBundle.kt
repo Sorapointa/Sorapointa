@@ -12,6 +12,6 @@ object TestBundle : MessageBundle(BUNDLE) {
     fun message(
         @PropertyKey(resourceBundle = BUNDLE) key: String,
         vararg params: Any?,
-        locale: Locale? = null
+        locale: Locale? = null,
     ): String = getString(key, *params, locale = locale)
 }

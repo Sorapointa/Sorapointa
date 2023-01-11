@@ -9,7 +9,7 @@ data class AddProp(
     @JsonNames("propType", "PropType")
     private val _propType: JsonPrimitive,
     @JsonNames("value", "Value")
-    val value: Double = 0.0
+    val value: Double = 0.0,
 ) {
 
     val propType by lazy {

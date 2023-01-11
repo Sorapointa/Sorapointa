@@ -79,16 +79,16 @@ abstract class AbstractPlayer : Player {
 
     internal abstract fun <T : Message<*, *>> sendPacketAsync(
         packet: OutgoingPacket<T>,
-        metadata: PacketHead? = null
+        metadata: PacketHead? = null,
     ): Job
 
     internal abstract suspend fun <T : Message<*, *>> sendPacket(
         packet: OutgoingPacket<T>,
-        metadata: PacketHead? = null
+        metadata: PacketHead? = null,
     )
 
     internal abstract fun forwardHandlePacket(
-        packet: SoraPacket
+        packet: SoraPacket,
     ): Job
 
     internal abstract suspend fun close()
@@ -100,7 +100,7 @@ interface PlayerStateInterface : WithState<PlayerStateInterface.State> {
     enum class State {
         LOGIN,
         OK,
-        CLOSED
+        CLOSED,
     }
 }
 
@@ -109,7 +109,7 @@ interface PlayerSceneStateInterface : WithState<PlayerSceneStateInterface.State>
     enum class State {
         LOADING,
         INIT,
-        LOADED
+        LOADED,
     }
 }
 
@@ -117,7 +117,7 @@ class PlayerImpl internal constructor(
     override val account: Account,
     override val data: PlayerData,
     private val networkHandler: NetworkHandler,
-    parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
+    parentCoroutineContext: CoroutineContext = EmptyCoroutineContext,
 ) : AbstractPlayer() {
 
     override val uid = account.id.value
@@ -130,7 +130,7 @@ class PlayerImpl internal constructor(
         StateController<PlayerStateInterface.State, PlayerStateInterface, Player>(
             scope = scope,
             parentStateClass = this,
-            Login(this)
+            Login(this),
         )
     }
 
@@ -138,7 +138,9 @@ class PlayerImpl internal constructor(
         InitStateController<PlayerSceneStateInterface.State, PlayerSceneStateInterface, Player>(
             scope = scope,
             parentStateClass = this,
-            SceneLoading(), SceneInit(), SceneLoaded()
+            SceneLoading(),
+            SceneInit(),
+            SceneLoaded(),
         )
     }
 
@@ -229,7 +231,7 @@ class PlayerImpl internal constructor(
     ) = networkHandler.sendPacket(packet)
 
     override fun forwardHandlePacket(
-        packet: SoraPacket
+        packet: SoraPacket,
     ) = networkHandler.handlePacket(packet)
 
     private fun onConnectionClosed() {
@@ -307,7 +309,7 @@ internal interface PlayerProto {
 }
 
 class PlayerProtoImpl(
-    private val player: Player
+    private val player: Player,
 ) : PlayerProto {
 
     override val protoPropMap

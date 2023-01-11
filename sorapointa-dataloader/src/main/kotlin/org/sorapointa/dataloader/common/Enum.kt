@@ -32,7 +32,7 @@ enum class SceneType(override val value: Int) : PropEnum {
     SCENE_ROOM(3),
     SCENE_HOME_WORLD(4),
     SCENE_HOME_ROOM(5),
-    SCENE_ACTIVITY(6)
+    SCENE_ACTIVITY(6),
 }
 
 enum class EquipType(override val value: Int) : PropEnum {
@@ -42,7 +42,7 @@ enum class EquipType(override val value: Int) : PropEnum {
     EQUIP_SHOES(3), // Sands of Eon 时之沙
     EQUIP_RING(4), // Goblet of Eonothem 空之杯
     EQUIP_DRESS(5), // Circlet of Logos 理之冠
-    EQUIP_WEAPON(6)
+    EQUIP_WEAPON(6),
 }
 
 enum class FlyCloakId(lowId: Int) : PropEnum {
@@ -67,7 +67,8 @@ enum class EntityIdType(override val value: Int) : PropEnum {
     GADGET(4),
     WEAPON(6),
     TEAM(9),
-    MPLEVEL(11);
+    MPLEVEL(11),
+    ;
 }
 
 enum class ClimateType(override val value: Int) : PropEnum {
@@ -77,7 +78,7 @@ enum class ClimateType(override val value: Int) : PropEnum {
     CLIMATE_RAIN(3),
     CLIMATE_THUNDERSTORM(4),
     CLIMATE_SNOW(5),
-    CLIMATE_MIST(6)
+    CLIMATE_MIST(6),
 }
 
 enum class EntityAppearVisionType(override val value: Int) : PropEnum {
@@ -91,38 +92,40 @@ enum class EntityAppearVisionType(override val value: Int) : PropEnum {
     VISION_GATHER_ESCAPE(7),
     VISION_REFRESH(8),
     VISION_TRANSPORT(9),
-    VISION_REPLACE_DIE(10)
+    VISION_REPLACE_DIE(10),
 }
 
 enum class LifeState(override val value: Int) : PropEnum {
     LIFE_NONE(0),
     LIFE_ALIVE(1),
     LIFE_DEAD(2),
-    LIFE_REVIVE(3)
+    LIFE_REVIVE(3),
 }
 
 enum class AvatarType(override val value: Int) : PropEnum {
     NONE(0),
     FORMAL(1),
     TRIAL(2),
-    MIRROR(3)
+    MIRROR(3),
 }
 
 enum class ElementType(
     override val value: Int,
     val curEnergyProp: FightProp,
-    val maxEnergyProp: FightProp
+    val maxEnergyProp: FightProp,
 ) : PropEnum {
-    None(0, FightProp.FIGHT_PROP_NONE, FightProp.FIGHT_PROP_NONE,),
+    None(0, FightProp.FIGHT_PROP_NONE, FightProp.FIGHT_PROP_NONE),
     Fire(1, FightProp.FIGHT_PROP_CUR_FIRE_ENERGY, FightProp.FIGHT_PROP_MAX_FIRE_ENERGY),
     Water(2, FightProp.FIGHT_PROP_CUR_WATER_ENERGY, FightProp.FIGHT_PROP_MAX_WATER_ENERGY),
     Grass(3, FightProp.FIGHT_PROP_CUR_GRASS_ENERGY, FightProp.FIGHT_PROP_MAX_GRASS_ENERGY),
     Electric(4, FightProp.FIGHT_PROP_CUR_ELEC_ENERGY, FightProp.FIGHT_PROP_MAX_ELEC_ENERGY),
     Ice(5, FightProp.FIGHT_PROP_CUR_ICE_ENERGY, FightProp.FIGHT_PROP_MAX_ICE_ENERGY),
+
     // Frozen Element 冻元素, Water + Ice = Frozen, (Water or Ice) + Frozen = Nothing
     Frozen(6, FightProp.FIGHT_PROP_CUR_ICE_ENERGY, FightProp.FIGHT_PROP_MAX_ICE_ENERGY),
     Wind(7, FightProp.FIGHT_PROP_CUR_WIND_ENERGY, FightProp.FIGHT_PROP_MAX_WIND_ENERGY),
     Rock(8, FightProp.FIGHT_PROP_CUR_ROCK_ENERGY, FightProp.FIGHT_PROP_MAX_ROCK_ENERGY),
+
     // Questionable ?: Combustion Element 燃元素, Fire + Grass = Combustion
     AntiFire(9, FightProp.FIGHT_PROP_CUR_FIRE_ENERGY, FightProp.FIGHT_PROP_MAX_FIRE_ENERGY),
     // VehicleMuteIce, COUNT, wtf is that?
@@ -512,14 +515,14 @@ enum class ItemType(override val value: Int) : PropEnum {
     ITEM_RELIQUARY(3),
     ITEM_WEAPON(4),
     ITEM_DISPLAY(5),
-    ITEM_FURNITURE(6)
+    ITEM_FURNITURE(6),
 }
 
 enum class AnimatorParamType(override val value: Int) : PropEnum {
     TRIGGER(0),
     BOOL(1),
     INT(2),
-    FLOAT(3)
+    FLOAT(3),
 }
 
 enum class RefreshType(override val value: Int) : PropEnum {
@@ -532,18 +535,18 @@ enum class RefreshType(override val value: Int) : PropEnum {
     SHOP_PRECONDITION_QUEST_FINISH(6),
     SHOP_PRECONDITION_SHEET_FLEUR_FAIR_WATCHER_FINISH(7),
     SHOP_PRECONDITION_QUEST_FINISH_ALL(8),
-    SHOP_PRECONDITION_QUEST_FINISH_ANY(9)
+    SHOP_PRECONDITION_QUEST_FINISH_ANY(9),
 }
 
 enum class WorldType(override val value: Int) : PropEnum {
     WORLD_NONE(0),
     WORLD_PLAYER(1),
-    WORLD_HOME(2)
+    WORLD_HOME(2),
 }
 
 enum class AnimalCodexType(override val value: Int) : PropEnum {
     CODEX_ANIMAL(0),
-    CODEX_MONSTER(1)
+    CODEX_MONSTER(1),
 }
 
 enum class AnimalCodexSubType(override val value: Int) : PropEnum {
@@ -558,26 +561,26 @@ enum class AnimalCodexSubType(override val value: Int) : PropEnum {
     CODEX_SUBTYPE_AVIARY(8),
     CODEX_SUBTYPE_ANIMAL(9),
     CODEX_SUBTYPE_FISH(10),
-    CODEX_SUBTYPE_CRITTER(11)
+    CODEX_SUBTYPE_CRITTER(11),
 }
 
 enum class FoodQualityType(override val value: Int) : PropEnum {
     FOOD_QUALITY_NONE(0),
     FOOD_QUALITY_STRANGE(1),
     FOOD_QUALITY_ORDINARY(2),
-    FOOD_QUALITY_DELICIOUS(3)
+    FOOD_QUALITY_DELICIOUS(3),
 }
 
 enum class MaterialDestroyType(override val value: Int) : PropEnum {
     DESTROY_NONE(0),
-    DESTROY_RETURN_MATERIAL(1)
+    DESTROY_RETURN_MATERIAL(1),
 }
 
 enum class AvatarUseType(override val value: Int) : PropEnum {
     AVATAR_TEST(0),
     AVATAR_SYNC_TEST(1),
     AVATAR_FORMAL(2),
-    AVATAR_ABANDON(3)
+    AVATAR_ABANDON(3),
 }
 
 enum class MaterialType(override val value: Int) : PropEnum {
@@ -613,7 +616,7 @@ enum class MaterialType(override val value: Int) : PropEnum {
     MATERIAL_HOME_SEED(31),
     MATERIAL_FISH_BAIT(32),
     MATERIAL_FISH_ROD(33),
-    MATERIAL_SUMO_BUFF(34)
+    MATERIAL_SUMO_BUFF(34),
 }
 
 enum class ItemUseTarget(override val value: Int) : PropEnum {
@@ -622,20 +625,20 @@ enum class ItemUseTarget(override val value: Int) : PropEnum {
     ITEM_USE_TARGET_CUR_TEAM(2),
     ITEM_USE_TARGET_SPECIFY_AVATAR(3),
     ITEM_USE_TARGET_SPECIFY_ALIVE_AVATAR(4),
-    ITEM_USE_TARGET_SPECIFY_DEAD_AVATAR(5)
+    ITEM_USE_TARGET_SPECIFY_DEAD_AVATAR(5),
 }
 
 enum class RecipeType(override val value: Int) : PropEnum {
     RECIPE_TYPE_NONE(0),
     RECIPE_TYPE_COMBINE(1),
     RECIPE_TYPE_CONVERT(2),
-    RECIPE_TYPE_COMBINE_HOMEWORLD(3)
+    RECIPE_TYPE_COMBINE_HOMEWORLD(3),
 }
 
 enum class DungeonStateType(override val value: Int) : PropEnum {
     DUNGEON_STATE_NONE(0),
     DUNGEON_STATE_RELEASE(1),
-    DUNGEON_STATE_TEST(2)
+    DUNGEON_STATE_TEST(2),
 }
 
 enum class GrowCurveType(override val value: Int) : PropEnum {
@@ -698,7 +701,7 @@ enum class GrowCurveType(override val value: Int) : PropEnum {
     GROW_CURVE_CRITICAL_302(2302),
     GROW_CURVE_CRITICAL_303(2303),
     GROW_CURVE_CRITICAL_304(2304),
-    GROW_CURVE_CRITICAL_305(2305)
+    GROW_CURVE_CRITICAL_305(2305),
 }
 
 // DON'T CHANGE THE NAMING STYLE
@@ -768,7 +771,7 @@ enum class EntityType(override val value: Int) : PropEnum {
     FishRod(62),
     CustomGadget(63),
     RoguelikeOperatorGadget(64),
-    PlaceHolder(99)
+    PlaceHolder(99),
 }
 
 enum class FetterCondType(override val value: Int) : PropEnum {
@@ -784,7 +787,7 @@ enum class FetterCondType(override val value: Int) : PropEnum {
     FETTER_COND_AVATAR_BIRTHDAY(9),
     FETTER_COND_NOT_OPEN(10),
     FETTER_COND_FINISH_PARENT_QUEST(11),
-    FETTER_COND_UNLOCK_ARENA_BY_CITY_ID(12)
+    FETTER_COND_UNLOCK_ARENA_BY_CITY_ID(12),
 }
 
 enum class WeaponType(override val value: Int) : PropEnum {
@@ -801,6 +804,6 @@ enum class WeaponType(override val value: Int) : PropEnum {
     WEAPON_CATALYST(10),
     WEAPON_CLAYMORE(11),
     WEAPON_BOW(12),
-    WEAPON_POLE(13)	// Properties
+    WEAPON_POLE(13),	// Properties
     // Methods
 }

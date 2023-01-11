@@ -66,7 +66,7 @@ data class WeaponData(
     @JsonNames("initialLockState", "InitialLockState")
     val initialLockState: Int? = null,
     @JsonNames("unRotate", "UnRotate")
-    val unRotate: Boolean? = null
+    val unRotate: Boolean? = null,
 ) : ItemExcelData {
 
     val weaponType by lazy {

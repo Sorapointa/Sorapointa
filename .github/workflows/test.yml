@@ -7,6 +7,7 @@ on:
     paths:
       - '**.kt'
       - '**.kts'
+      - '**.rs'
       - '**.proto'
       - '.github/workflows/*.yml'
   pull_request:
@@ -15,12 +16,41 @@ on:
     paths:
       - '**.kt'
       - '**.kts'
+      - '**.rs'
       - '**.proto'
       - '.github/workflows/*.yml'
 
 jobs:
+  clippy_rustfmt:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v2
+        - name: Set up Rust Toolchains
+          uses: actions-rs/toolchain@v1
+          with:
+            profile: minimal
+            toolchain: stable
+            components: rustfmt, clippy
 
-  build:
+        - name: Rust Cache
+          uses: Swatinem/rust-cache@v2
+          with:
+            prefix-key: "v0-rust"
+            workspaces: "sorapointa-native -> target"
+
+        - name: Clippy
+          uses: giraffate/clippy-action@v1
+          with:
+            workdir: ./sorapointa-native
+            reporter: 'github-pr-review'
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            clippy_flags: -- -Dwarnings
+
+        - name: rustfmt
+          working-directory: ./sorapointa-native
+          run: cargo fmt --all -- --check
+
+  spotlessCheck:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -31,9 +61,51 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
+      - name: Set up Rust Toolchains
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "v0-rust"
+          workspaces: "sorapointa-native -> target"
+
       - uses: burrunan/gradle-cache-action@v1
         name: Checker
         with:
           job-id: checker
-          arguments: ktlintCheck test
+          arguments: spotlessCheck
+          gradle-version: wrapper
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      - name: Set up Rust Toolchains
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "v0-rust"
+          workspaces: "sorapointa-native -> target"
+
+      - uses: burrunan/gradle-cache-action@v1
+        name: Checker
+        with:
+          job-id: checker
+          arguments: test
           gradle-version: wrapper

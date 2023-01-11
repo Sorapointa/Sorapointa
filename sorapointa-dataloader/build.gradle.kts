@@ -17,7 +17,7 @@ dependencies {
 tasks.withType<KotlinCompile> {
     kotlinOptions.apply {
         val newOptIn = listOf(
-            "kotlinx.serialization.ExperimentalSerializationApi"
+            "kotlinx.serialization.ExperimentalSerializationApi",
         )
         (OptInAnnotations.list + newOptIn).forEach {
             freeCompilerArgs = freeCompilerArgs + "-opt-in=$it"

@@ -15,12 +15,12 @@ interface Inventory {
     fun createMaterialItem(
         itemId: Int,
         count: Int = 1,
-        deleteInfo: MaterialDeleteInfo? = null
+        deleteInfo: MaterialDeleteInfo? = null,
     ): ItemData.Material
 
     fun createFurnitureItem(
         itemId: Int,
-        count: Int = 1
+        count: Int = 1,
     ): ItemData.Furniture
 
     fun createWeaponItem(
@@ -29,7 +29,7 @@ interface Inventory {
         level: Int = 1,
         exp: Int = 0,
         promoteLevel: Int = 0,
-        refinementLevel: Int? = null
+        refinementLevel: Int? = null,
     ): ItemData.Equip.Weapon
 
     fun createReliquaryItem(
@@ -37,7 +37,7 @@ interface Inventory {
         isLocked: Boolean = false,
         level: Int = 1,
         exp: Int = 0,
-        appendPropIdList: List<Int> = listOf()
+        appendPropIdList: List<Int> = listOf(),
     ): ItemData.Equip.Reliquary
 
     fun removeItem(itemGuid: Long): ItemData?
@@ -45,13 +45,13 @@ interface Inventory {
     fun removeItem(
         itemGuid: Long,
         count: Int = 1,
-        forceRemove: Boolean = false
+        forceRemove: Boolean = false,
     ): Boolean
 
     fun removeItemById(
         itemId: Int,
         count: Int = 1,
-        forceRemove: Boolean = false
+        forceRemove: Boolean = false,
     ): Boolean
 }
 
@@ -73,21 +73,21 @@ class InventoryImpl(
     override fun createMaterialItem(
         itemId: Int,
         count: Int,
-        deleteInfo: MaterialDeleteInfo?
+        deleteInfo: MaterialDeleteInfo?,
     ) = ItemData.Material(
         itemId = itemId,
         guid = guidEntity.getNextGuid(),
         count = count,
-        deleteInfo = deleteInfo
+        deleteInfo = deleteInfo,
     )
 
     override fun createFurnitureItem(
         itemId: Int,
-        count: Int
+        count: Int,
     ) = ItemData.Furniture(
         itemId = itemId,
         guid = guidEntity.getNextGuid(),
-        count = count
+        count = count,
     )
 
     override fun createWeaponItem(
@@ -96,7 +96,7 @@ class InventoryImpl(
         level: Int,
         exp: Int,
         promoteLevel: Int,
-        refinementLevel: Int?
+        refinementLevel: Int?,
     ) = ItemData.Equip.Weapon(
         itemId = itemId,
         guid = guidEntity.getNextGuid(),
@@ -104,7 +104,7 @@ class InventoryImpl(
         level = level,
         exp = exp,
         promoteLevel = promoteLevel,
-        refinement = refinementLevel
+        refinement = refinementLevel,
     )
 
     override fun createReliquaryItem(
@@ -112,7 +112,7 @@ class InventoryImpl(
         isLocked: Boolean,
         level: Int,
         exp: Int,
-        appendPropIdList: List<Int>
+        appendPropIdList: List<Int>,
     ) = ItemData.Equip.Reliquary(
         itemId = itemId,
         guid = guidEntity.getNextGuid(),
@@ -120,7 +120,7 @@ class InventoryImpl(
         level = level,
         exp = exp,
         mainPropId = findReliquaryExcelData(itemId).mainProp.id,
-        appendPropIdList = appendPropIdList
+        appendPropIdList = appendPropIdList,
     )
 
     override fun removeItem(itemGuid: Long) =
@@ -129,7 +129,7 @@ class InventoryImpl(
     override fun removeItem(
         itemGuid: Long,
         count: Int,
-        forceRemove: Boolean
+        forceRemove: Boolean,
     ): Boolean {
         val item = data[itemGuid] ?: return false
         return when (item) {
@@ -162,7 +162,7 @@ class InventoryImpl(
     override fun removeItemById(
         itemId: Int,
         count: Int,
-        forceRemove: Boolean
+        forceRemove: Boolean,
     ): Boolean {
         val item = findItemById(itemId) ?: return false
         return removeItem(item.guid, count, forceRemove)

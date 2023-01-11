@@ -22,5 +22,5 @@ data class ReliquarySetData(
     @JsonNames("containsList", "ContainsList")
     val containsList: List<Int>,
     @JsonNames("disableFilter", "DisableFilter")
-    val disableFilter: Int? = null
+    val disableFilter: Int? = null,
 )

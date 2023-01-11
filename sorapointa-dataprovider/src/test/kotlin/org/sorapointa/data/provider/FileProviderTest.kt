@@ -18,7 +18,7 @@ class FileProviderTest {
     fun readOnlyTest() = runBlocking {
         @kotlinx.serialization.Serializable
         data class TestConfig(
-            private val test: String = "114514"
+            private val test: String = "114514",
         )
 
         val file = File("./tmp/read-only-provider-test.json")
@@ -39,7 +39,9 @@ class FileProviderTest {
         val file = File("./tmp/auto-save-provider-test.json")
         file.apply { if (exists()) delete() }
         val config = AutoSaveFilePersist(
-            file, TestConfig(), serializer(),
+            file,
+            TestConfig(),
+            serializer(),
             saveInterval = 30.toDuration(DurationUnit.MILLISECONDS),
         )
         config.init()
@@ -66,7 +68,7 @@ class FileProviderTest {
             file,
             AutoLoadData(),
             serializer(),
-            scanInterval = 30.toDuration(DurationUnit.MILLISECONDS)
+            scanInterval = 30.toDuration(DurationUnit.MILLISECONDS),
         )
         config.init()
         println(config.data)

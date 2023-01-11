@@ -22,7 +22,10 @@ interface LocaleAble {
 
 @SorapointaInternal
 object I18nConfig : DataFilePersist<I18nConfig.Config>(
-    File(configDirectory, "i18n.yaml"), Config(), Config.serializer(), lenientYaml,
+    File(configDirectory, "i18n.yaml"),
+    Config(),
+    Config.serializer(),
+    lenientYaml,
 ) {
     @Serializable
     data class Config(

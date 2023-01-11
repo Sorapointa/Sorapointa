@@ -48,7 +48,7 @@ val argon2Function: Argon2Function by lazy {
         setting.parallelism,
         setting.byteLength,
         setting.argon2Type,
-        setting.argon2Version
+        setting.argon2Version,
     )
 }
 

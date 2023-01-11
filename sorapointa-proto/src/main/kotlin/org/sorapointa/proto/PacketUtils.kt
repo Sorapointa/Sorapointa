@@ -20,7 +20,7 @@ import org.sorapointa.utils.SorapointaInternal
 class SoraPacket(
     val cmdId: UShort,
     val metadata: PacketHead,
-    val data: ByteArray
+    val data: ByteArray,
 )
 
 @SorapointaInternal
@@ -40,7 +40,7 @@ fun <T : Message<*, *>, E : ProtoAdapter<T>> BytePacketBuilder.writeSoraPacket(
     cmdId: UShort,
     adapter: E,
     data: T? = null,
-    metadata: PacketHead? = null
+    metadata: PacketHead? = null,
 ) {
     val metadataBytes = metadata?.let { PacketHead.ADAPTER.encode(it) } ?: byteArrayOf()
     val dataBytes = data?.let { adapter.encode(it) } ?: byteArrayOf()

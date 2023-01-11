@@ -11,7 +11,7 @@ class ListPlayer(private val sender: CommandSender) : Command(sender, ListPlayer
         name = "listplayer",
         helpKey = "sora.cmd.list.player.desc",
         alias = listOf("list"),
-        permissionRequired = 1
+        permissionRequired = 1,
     )
 
     override suspend fun run() {
@@ -20,8 +20,8 @@ class ListPlayer(private val sender: CommandSender) : Command(sender, ListPlayer
                 "sora.cmd.list.player.msg",
                 Sorapointa.playerList.size,
                 Sorapointa.playerList.joinToString { "${it.account.userName} (${it.uid})" },
-                locale = sender.locale
-            )
+                locale = sender.locale,
+            ),
         )
     }
 }

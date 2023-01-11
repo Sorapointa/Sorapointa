@@ -57,7 +57,7 @@ data class AvatarSkillData(
     @JsonNames("cdSlot", "CdSlot")
     val cdSlot: Int? = null,
     @JsonNames("energyMin", "EnergyMin")
-    val energyMin: Double? = null
+    val energyMin: Double? = null,
 ) {
 
     val costElemType by lazy {
