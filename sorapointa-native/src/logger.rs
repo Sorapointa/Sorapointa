@@ -99,10 +99,11 @@ pub extern "system" fn Java_org_sorapointa_rust_logging_RustLogger_setup(
             return;
         }
     };
-    if let Err(_) = INSTANCE.set(Logger {
+    let result = INSTANCE.set(Logger {
         jvm,
         level: level_filter.to_level().unwrap_or(Level::Info),
-    }) {
+    });
+    if result.is_err() {
         env.throw_new_or_eprint(ILLEGAL_STATE_EXCEPTION, "Logger has already inited");
         return;
     };
