@@ -19,7 +19,6 @@ dependencies {
     implementation(project(":sorapointa-utils:sorapointa-utils-serialization"))
 
     implementation(libs.bundles.log)
-    implementation(libs.kotlin.reflect)
     implementation(libs.atomicfu)
 
     // Database
