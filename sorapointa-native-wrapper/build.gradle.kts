@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     implementation(libs.bundles.log)
+    implementation(project(":sorapointa-utils:sorapointa-utils-core"))
     implementation(libs.yanl)
     implementation(libs.plat4k)
     rust(project(":sorapointa-native"))
