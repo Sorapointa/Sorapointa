@@ -9,6 +9,8 @@ on:
       - '**.kts'
       - '**.rs'
       - '**.proto'
+      - 'Cargo.toml'
+      - 'gradle/libs.versions.toml'
       - '.github/workflows/*.yml'
   pull_request:
     branches:
@@ -18,6 +20,8 @@ on:
       - '**.kts'
       - '**.rs'
       - '**.proto'
+      - 'Cargo.toml'
+      - 'gradle/libs.versions.toml'
       - '.github/workflows/*.yml'
 
 jobs:
