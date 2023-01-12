@@ -12,13 +12,18 @@ message PacketHead {
   uint32 user_id = 11;
   uint32 user_ip = 12;
   uint32 user_session_id = 13;
+  uint32 home_user_id = 14;
   uint64 recv_time_ms = 21;
   uint32 rpc_begin_time_ms = 22;
   map<uint32, uint32> ext_map = 23;
   uint32 sender_app_id = 24;
+  uint32 sender_load = 25;
+  bytes span_context_str = 26;
   uint32 source_service = 31;
   uint32 target_service = 32;
   map<uint32, uint32> service_app_id_map = 33;
   bool is_set_game_thread = 34;
   uint32 game_thread_index = 35;
+  bool is_set_multi_thread = 36;
+  uint32 multi_thread_index = 37;
 }
