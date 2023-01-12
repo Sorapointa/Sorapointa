@@ -6,7 +6,7 @@ exposed = "0.39.2"
 [plugins]
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "10.3.0" }
-abi-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.11.1" }
+abi-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.12.1" }
 wire = { id = "com.squareup.wire", version = "4.4.3" }
 rust-wrapper = { id = "fr.stardustenterprises.rust.wrapper", version = "3.2.5" }
 spotless = { id = "com.diffplug.spotless", version = "6.12.1" }
