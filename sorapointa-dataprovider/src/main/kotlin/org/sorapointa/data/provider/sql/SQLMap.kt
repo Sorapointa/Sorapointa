@@ -3,6 +3,7 @@ package org.sorapointa.data.provider.sql
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 abstract class MapTable<TID : Comparable<TID>, K, V>(
     tableName: String

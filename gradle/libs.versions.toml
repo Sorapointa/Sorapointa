@@ -1,7 +1,7 @@
 [versions]
 kotlin = "1.7.20"
 ktor = "2.1.2"
-exposed = "0.39.2"
+exposed = "0.41.1"
 
 [plugins]
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
@@ -64,6 +64,7 @@ ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
 
 cron-utils = "com.cronutils:cron-utils:9.2.0"
 wire-runtime = "com.squareup.wire:wire-runtime:4.4.3"
+okio = "com.squareup.okio:okio:3.3.0"
 
 build-kotlinpoet = "com.squareup:kotlinpoet:1.12.0"
 build-buildconfig = "com.github.gmazzo:gradle-buildconfig-plugin:3.1.0"
