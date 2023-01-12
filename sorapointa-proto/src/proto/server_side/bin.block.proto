@@ -1,0 +1,151 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "org.sorapointa.proto.bin";
+
+import "server_side/bin_common.server.proto";
+
+message BlossomChestBin {
+  uint32 blossom_chest_id = 1;
+  uint32 drop_id = 2;
+  fixed32 dead_time = 3;
+  repeated uint32 qualify_uid_list = 4;
+  repeated uint32 remain_uid_list = 5;
+  uint32 item_limit_type = 6;
+  uint32 refresh_id = 7;
+}
+
+message GadgetPlatformBin {
+  uint32 route_id = 1;
+  int32 point_index = 2;
+  bool is_started = 3;
+  uint32 point_id = 4;
+  uint32 moving_platform_type = 5;
+}
+
+message BossChestBin {
+  repeated uint32 remain_uid_list = 1;
+  fixed32 dead_time = 2;
+  uint32 dead_level = 3;
+  repeated uint32 qualify_uid_list = 4;
+}
+
+message ChallengeRecordBin {
+  uint32 challenge_index = 1;
+  uint32 challenge_id = 2;
+  uint32 challenge_record_type = 3;
+  uint32 best_value = 4;
+}
+
+message BossDieInfoBin {
+  repeated uint32 surround_uid_list = 1;
+  fixed32 dead_time = 2;
+  uint32 dead_level = 3;
+}
+
+message GroupTriggerBin {
+  uint32 trigger_count = 1;
+  uint32 config_id = 2;
+}
+
+message GeneralRewardBin {
+  uint32 drop_id = 1;
+  uint32 reward_id = 2;
+  uint32 drop_num = 3;
+  map<uint32, uint32> drop_map = 4;
+}
+
+message GadgetGeneralRewardBin {
+  uint32 resin = 2;
+  uint32 dead_time = 3;
+  repeated uint32 remain_uid_list = 5;
+  map<uint32, GeneralRewardBin> qualify_info_map = 7;
+  uint32 destroy_cd = 8;
+  uint32 item_limit_type = 9;
+  ItemParamBin item_param = 10;
+  repeated uint32 open_state_list = 11;
+}
+
+message FishStockBin {
+  uint32 stock_type = 1;
+  uint32 gen_fish_num = 2;
+  uint32 max_num = 3;
+}
+
+message GadgetFishPoolBin {
+  repeated FishStockBin fish_stock_list = 1;
+  uint32 today_fish_num = 2;
+  uint32 last_refresh_today_fish_time = 3;
+  map<uint32, uint32> cached_fish_map = 4;
+}
+
+message CustomGadgetNodeInfoBin {
+  int32 parent_index = 1;
+  uint32 config_id = 2;
+  string slot_identifier = 3;
+}
+
+message CustomGadgetTreeInfoBin {
+  repeated CustomGadgetNodeInfoBin node_list = 1;
+}
+
+message GadgetWorktopBin {
+  repeated uint32 option_list = 1;
+}
+
+message GroupGadgetBin {
+  uint32 gadget_state = 1;
+  bool is_enable_interact = 2;
+  uint32 gadget_talk_state = 3;
+  oneof component {
+    GadgetPlatformBin platform = 101;
+    BossChestBin boss_chest = 102;
+    BlossomChestBin blossom_chest = 103;
+    GadgetGeneralRewardBin general_reward = 104;
+    GadgetFishPoolBin fish_pool = 105;
+    CustomGadgetTreeInfoBin custom_gadget_tree_info = 106;
+    GadgetWorktopBin worktop = 107;
+  }
+}
+
+message GroupMonsterBin {
+  uint32 dropped_hp_percent = 1;
+}
+
+message GroupGatherBin {
+  uint32 config_id = 1;
+  fixed32 last_refresh_time = 2;
+}
+
+message GroupRefreshTimeBin {
+  uint32 save_type = 1;
+  fixed32 last_refresh_time = 2;
+}
+
+message GroupBin {
+  map<uint32, GroupMonsterBin> monster_map = 1;
+  repeated uint32 del_monster_list = 2;
+  map<uint32, GroupGadgetBin> gadget_map = 3;
+  repeated uint32 del_gadget_list = 4;
+  map<string, GroupTriggerBin> trigger_map = 5;
+  map<string, GroupVariableBin> variable_map = 6;
+  uint32 suite_index = 7;
+  repeated uint32 show_cutscene_chest_list = 8;
+  repeated ChallengeRecordBin challenge_record_list = 9;
+  uint32 revise_level = 10;
+  fixed32 last_refresh_time = 11;
+  uint32 target_suite_index = 12;
+  map<uint32, BossDieInfoBin> boss_die_info_map = 13;
+  repeated GroupGatherBin gather_refresh_time_list = 14;
+  bool is_replaceable = 15;
+  uint32 replaceable_version = 16;
+  repeated GroupTriggerBin trigger_list = 17;
+  repeated GroupRefreshTimeBin group_refresh_list = 18;
+  repeated GroupVariableConfigIdBin variable_config_id_bin_list = 19;
+}
+
+message BlockBin {
+  map<uint32, bytes> group_map = 1;
+  map<uint32, GroupProductBin> group_product_map = 2;
+}

@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "org.sorapointa.proto.bin";
+
+import "server_side/define.proto";
+import "server_side/config.server.proto";
+
+message StopServerConfigNotify {
+}
+
+message NodeserverConnectedAndRegisteredNotify {
+  uint32 nodeserver_id = 1;
+}
+
+message MultiPlayerMsg {
+  repeated uint32 uid_list = 1;
+  bytes proto_bin = 2;
+}
+
+message AddGateserverNotify {
+  uint32 listen_port = 1;
+  uint32 outer_ip = 2;
+  bool use_domain_name = 3;
+  string domain_name = 4;
+}
+
+message RegisterServiceNotify {
+  repeated ServiceType service_type_list = 1;
+}
+
+message PlayerTransferNotify {
+  uint32 transfer_uid = 1;
+  uint32 target_uid = 2;
+  uint32 target_home_owner_uid = 3;
+  uint32 target_home_gameserver_id = 4;
+  uint32 target_home_param = 5;
+}
+
+message PacketCountInfo {
+  uint32 cmd_id = 1;
+  uint32 count = 2;
+}
+
+message PacketFreqencyExceedNotify {
+  uint32 packet_count = 1;
+  uint32 interval = 2;
+  repeated PacketCountInfo packet_count_list = 3;
+}
+
+message SceneAsyncLoadGroupBatchNotify {
+}
+
+message CrcVersionConfig {
+  repeated string client_version_list = 1;
+}
+
+message ClientVersionSyncNotify {
+  DataVersionConfig data_version_config = 1;
+  map<uint32, ResVersionConfig> res_version_config_map = 2;
+  map<uint32, CrcVersionConfig> crc_version_config_map = 3;
+  map<uint32, ResVersionConfig> next_res_version_config_map = 4;
+}
+
+message RegisterServiceSuccessNotify {
+}
+
+message ReloadConfigNotify {
+}
+
+message MultiserverServiceTypeNotify {
+  repeated ServiceType service_type_list = 1;
+}
+
+message MatchServiceStopNotify {
+  uint32 server_id = 1;
+}
+
+message MatchServiceStopImplementNotify {
+  MatchServiceStopNotify msg = 1;
+}
+
+message ServerBlockPlayerMpNotify {
+  bool is_unlock = 1;
+  uint32 end_time = 2;
+}
+
+message ServerBlockPlayerChatNotify {
+  bool is_unlock = 1;
+  uint32 end_time = 2;
+}
+
+message ServerCheckSegmentCrcNotify {
+}

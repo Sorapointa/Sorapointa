@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "org.sorapointa.proto.bin";
+
+message Timestamp {
+  int64 seconds = 1;
+  int32 nanos = 2;
+}
+
+message StopServerConfig {
+  Timestamp begin_time = 1;
+  Timestamp end_time = 2;
+  string url = 3;
+  uint32 text_id = 4;
+  uint32 content_text_id = 5;
+}
+
+message StopRegisterConfig {
+  Timestamp begin_time = 1;
+  Timestamp end_time = 2;
+  uint32 max_player_num = 3;
+}
+
+message ForceUpdateConfig {
+  string url = 1;
+  uint32 text_id = 2;
+}
+
+message DateTimeIntervalConfig {
+  Timestamp begin_time = 1;
+  Timestamp end_time = 2;
+  uint32 text_id = 3;
+}
+
+message DataVersionConfig {
+  enum DataVersionType {
+    SERVER = 0;
+    CLIENT = 1;
+    CLIENT_SILENCE = 2;
+  }
+
+  uint32 server = 1;
+  uint32 client = 2;
+  uint32 client_silence = 3;
+  map<string, string> client_md5 = 4;
+  map<uint32, string> client_platform_md5 = 5;
+  map<string, string> client_silence_md5 = 6;
+  map<uint32, string> client_silence_platform_md5 = 7;
+  string client_version_suffix = 8;
+  string client_silence_version_suffix = 9;
+  bool relogin = 10;
+  bool mp_relogin = 11;
+  bool gcg_forbid_relogin = 12;
+}
+
+message SdkAccountReqConfig {
+  uint32 app_id = 1;
+  uint32 channel_id = 2;
+  string open_id = 3;
+  string combo_token = 4;
+  string sign = 5;
+  string region = 6;
+}
+
+message GachaUpConfig {
+  uint32 item_parent_type = 1;
+  uint32 prob = 2;
+  repeated uint32 item_list = 3;
+}
+
+message DbGachaUpConfig {
+  repeated GachaUpConfig gacha_up_list = 1;
+}
+
+message DbGachaRuleConfig {
+  repeated uint32 gacha_rule_list = 1;
+}
+
+message AntiCheatConfig {
+  bool is_segment_crc_valid = 1;
+}
+
+message GameplayRecommendationSkillConfig {
+  repeated uint32 skill_id_list = 1;
+}
+
+message GameplayRecommendationReliquaryMainPropConfig {
+  uint32 main_prop_id = 1;
+  uint32 permillage = 2;
+}
+
+message GameplayRecommendationReliquaryConfig {
+  repeated GameplayRecommendationReliquaryMainPropConfig main_prop_config_list = 1;
+}
+
+message GameplayRecommendationReliquaryMapConfig {
+  map<uint32, GameplayRecommendationReliquaryConfig> reliquary_config_map = 1;
+}
+
+message GameplayRecommendationAvatarConfig {
+  map<uint32, GameplayRecommendationSkillConfig> skill_config_map = 1;
+  map<uint32, GameplayRecommendationReliquaryConfig> reliquary_config_map = 2;
+  map<uint32, GameplayRecommendationReliquaryMapConfig> element_reliquary_config_map = 3;
+}
+
+message GameplayRecommendationConfig {
+  map<uint32, GameplayRecommendationAvatarConfig> avatar_config_map = 1;
+}

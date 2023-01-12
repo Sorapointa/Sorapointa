@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "org.sorapointa.proto.bin";
+
+import "server_side/define.proto";
+import "server_side/enum.server.proto";
+
+message MatchPlayer {
+  uint32 uid = 1;
+  string nickname = 2;
+  uint32 player_level = 3;
+  uint32 world_level = 4;
+  uint32 platform_type = 5;
+  bool is_only_match_with_ps_player = 6;
+  repeated uint32 blacklist_uid_list = 7;
+  OnlinePlayerInfo player_info = 8;
+  uint32 hide_and_seek_hider_count = 9;
+  repeated uint32 hide_and_seek_chosen_map_list = 10;
+}
+
+message MatchUnit {
+  repeated MatchPlayer match_player_list = 1;
+  uint32 unit_id = 2;
+}
+
+message AddMatchUnitReq {
+  MatchType match_type = 1;
+  MatchUnit match_unit = 2;
+  MatchIdentity expect_identity = 3;
+  uint32 dungeon_id = 11;
+  uint32 mp_play_id = 12;
+  uint32 mechanicus_tag = 13;
+  uint32 match_id = 14;
+  repeated uint32 match_param_list = 15;
+  oneof detail {
+    GCGDuelExtra gcg_duel_extra = 21;
+  }
+}
+
+message AddMatchUnitRsp {
+  int32 retcode = 1;
+  MatchType match_type = 2;
+  MatchUnit match_unit = 3;
+  uint32 dungeon_id = 11;
+  uint32 mp_play_id = 12;
+  uint32 mechanicus_tag = 13;
+}
+
+message MatchStartNotify {
+  MatchType match_type = 1;
+  uint32 match_begin_time = 2;
+  uint32 estimate_match_cost_time = 3;
+  bool is_rematch = 4;
+  uint32 dungeon_id = 11;
+  uint32 mp_play_id = 12;
+  uint32 mechanicus_tag = 13;
+  uint32 match_id = 14;
+  repeated uint32 match_param_list = 15;
+}
+
+message RemoveMatchUnitReq {
+  MatchType match_type = 1;
+  uint32 unit_id = 2;
+  MatchUnitRemoveOpType op_type = 3;
+}
+
+message RemoveMatchUnitRsp {
+  int32 retcode = 1;
+  MatchType match_type = 2;
+  uint32 unit_id = 3;
+  MatchUnitRemoveOpType op_type = 4;
+}
+
+message MatchUnitRemovedNotify {
+  MatchType match_type = 1;
+  MatchReason reason = 2;
+}
+
+message GuestUnitMatchSuccNotify {
+  uint32 host_unit_id = 1;
+  uint32 confirm_end_time = 2;
+  uint32 match_type = 3;
+  uint32 dungeon_id = 11;
+  uint32 mp_play_id = 12;
+  uint32 mechanicus_tag = 13;
+}
+
+message ConfirmGuestUnitReq {
+  MatchType match_type = 1;
+  uint32 unit_id = 2;
+  bool is_agreed = 3;
+  uint32 match_id = 4;
+}
+
+message ConfirmGuestUnitRsp {
+  int32 retcode = 1;
+  MatchType match_type = 2;
+  uint32 unit_id = 3;
+  bool is_agreed = 4;
+  uint32 match_id = 5;
+}
+
+message MatchPlayerJoinNotify {
+  MatchType match_type = 1;
+  uint32 unit_id = 2;
+  MatchPlayer match_player = 3;
+}
+
+message MatchPlayerQuitNotify {
+  MatchType match_type = 1;
+  uint32 unit_id = 2;
+  uint32 player_uid = 3;
+}
+
+message GuestUnitAgreedResultNotify {
+  enum Reason {
+    SUCC = 0;
+    HOST_UNIT_QUIT = 1;
+  }
+
+  MatchType match_type = 1;
+  uint32 host_unit_id = 2;
+  Reason reason = 3;
+}
+
+message HostUnitMatchSuccNotify {
+  uint32 match_type = 1;
+  uint32 dungeon_id = 11;
+  uint32 mp_play_id = 12;
+  uint32 mechanicus_difficult_level = 13;
+}
+
+message SyncMatchUnitReq {
+  MatchType match_type = 1;
+  MatchUnit match_unit = 2;
+}
+
+message SyncMatchUnitRsp {
+  int32 retcode = 1;
+}
+
+message MatchserverWorkloadInfoNotify {
+  uint32 match_unit_num = 1;
+  map<uint32, uint32> match_unit_map = 2;
+}
+
+message MatchPlayerUpdateNotify {
+  MatchType match_type = 1;
+  uint32 unit_id = 2;
+  MatchPlayer match_player = 3;
+}
+
+message MatchIdentityNotify {
+  MatchType match_type = 1;
+  MatchIdentity match_identity = 2;
+}
+
+message GeneralMatchFinishNotify {
+  MatchType match_type = 1;
+  uint32 match_id = 2;
+  uint32 match_param = 3;
+  repeated MatchPlayer match_player_list = 4;
+}
