@@ -28,7 +28,7 @@ jobs:
   clippy_rustfmt:
     runs-on: ubuntu-latest
     steps:
-        - uses: actions/checkout@v2
+        - uses: actions/checkout@v3
         - name: Set up Rust Toolchains
           uses: actions-rs/toolchain@v1
           with:
@@ -57,7 +57,7 @@ jobs:
   spotlessCheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up JDK
         uses: actions/setup-java@v2
@@ -87,7 +87,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up JDK
         uses: actions/setup-java@v2
