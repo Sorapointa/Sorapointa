@@ -32,6 +32,8 @@ dependencies {
     implementation(libs.jline)
     implementation(libs.password4j)
 
+    implementation(libs.okio)
+
     testImplementation(project(":sorapointa-dispatch", "test"))
     testImplementation(project(":sorapointa-dataprovider", "test"))
 }

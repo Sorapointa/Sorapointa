@@ -9,16 +9,17 @@ import org.sorapointa.command.CommandSender
 import org.sorapointa.dataloader.common.EntityIdType
 import org.sorapointa.dataloader.common.PlayerProp
 import org.sorapointa.dispatch.data.Account
-import org.sorapointa.event.InitStateController
-import org.sorapointa.event.StateController
-import org.sorapointa.event.WithState
-import org.sorapointa.game.data.AvatarDataImpl
-import org.sorapointa.game.data.CompoundAvatarTeamData
+import org.sorapointa.event.*
+import org.sorapointa.events.PlayerDisconnectEvent
+import org.sorapointa.events.PlayerEvent
+import org.sorapointa.events.PlayerInitEvent
+import org.sorapointa.events.PlayerLoginEvent
 import org.sorapointa.game.data.PlayerData
-import org.sorapointa.game.data.PlayerDataImpl
+import org.sorapointa.proto.MpSettingType
 import org.sorapointa.proto.PacketHead
 import org.sorapointa.proto.PropValue
 import org.sorapointa.proto.SoraPacket
+import org.sorapointa.proto.bin.PlayerDataBin
 import org.sorapointa.server.network.*
 import org.sorapointa.utils.*
 import java.util.*
@@ -36,7 +37,7 @@ interface Player : CommandSender {
 
     val account: Account
 
-    val data: PlayerData
+//    val data: PlayerData
 
     val uid: Int
 
@@ -44,9 +45,16 @@ interface Player : CommandSender {
 
     val world: World
 
-    val allAvatar: List<Avatar>
+    val basicComp: PlayerBasicComp
+    val avatarComp: PlayerAvatarComp
+    val itemComp: PlayerItemComp
+    val sceneComp: PlayerSceneComp
+    val socialComp: PlayerSocialComp
 
-    val inventory: Inventory
+//
+//    val allAvatar: List<Avatar>
+//
+//    val inventory: Inventory
 
     val guidEntityMap: MutableMap<Long, Int> // Guid -> EntityId
 
@@ -80,6 +88,7 @@ abstract class AbstractPlayer : Player {
         metadata: PacketHead? = null
     ): Job
 
+    // TODO: 长包 / 合并包 流优化
     internal abstract suspend fun <T : Message<*, *>> sendPacket(
         packet: OutgoingPacket<T>,
         metadata: PacketHead? = null
@@ -92,6 +101,8 @@ abstract class AbstractPlayer : Player {
     internal abstract suspend fun close()
 
     internal abstract suspend fun init()
+
+    internal abstract suspend fun saveData()
 }
 
 interface PlayerStateInterface : WithState<PlayerStateInterface.State> {
@@ -113,7 +124,7 @@ interface PlayerSceneStateInterface : WithState<PlayerSceneStateInterface.State>
 
 class PlayerImpl internal constructor(
     override val account: Account,
-    override val data: PlayerData,
+    private val data: PlayerData,
     private val networkHandler: NetworkHandler,
     parentCoroutineContext: CoroutineContext = EmptyCoroutineContext
 ) : AbstractPlayer() {
@@ -140,19 +151,42 @@ class PlayerImpl internal constructor(
         )
     }
 
-    private val _scene = atomic(SceneImpl(this, data.sceneId))
+    private lateinit var dataBin: PlayerDataBin
+
+    override val basicComp by lazy {
+        PlayerBasicComp(this, dataBin.basic_bin ?: error("PlayerBasicComp is null"))
+    }
+
+    override val avatarComp by lazy {
+        PlayerAvatarComp(this, dataBin.avatar_bin ?: error("PlayerAvatarComp is null"))
+    }
+
+    override val itemComp by lazy {
+        PlayerItemComp(this, dataBin.item_bin ?: error("PlayerItemComp is null"))
+    }
+
+    override val sceneComp by lazy {
+        PlayerSceneComp(this, dataBin.scene_bin ?: error("PlayerSceneComp is null"))
+    }
+
+    override val socialComp by lazy {
+        PlayerSocialComp(this, dataBin.social_bin ?: error("PlayerSocialComp is null"))
+    }
 
     override val scene: Scene
         get() = _scene.value
 
-    override val world = WorldImpl(this, scene)
+    private val _scene by lazy {
+        atomic(SceneImpl(this, sceneComp.myCurSceneId))
+    }
 
-    override val allAvatar
-        get() = AvatarDataImpl.findAll(this)
+    override val world by lazy {
+        WorldImpl(this, scene)
+    }
 
-    override val playerProto = PlayerProtoImpl(this)
-
-    override val inventory = InventoryImpl(data, data.inventory)
+    override val playerProto by lazy {
+        PlayerProtoImpl(this)
+    }
 
     override val guidEntityMap: MutableMap<Long, Int> = ConcurrentHashMap()
 
@@ -191,26 +225,27 @@ class PlayerImpl internal constructor(
 
     override suspend fun close() {
         networkHandler.close()
-        state.setState(Closed())
+        state.setState(Closed(this))
         scope.dispose()
     }
 
     override suspend fun init() {
         logger.info { toString() + " has joined to the server" }
-        if (data is PlayerDataImpl) data.player = this
+        dataBin = data.getPlayerDataBin()
         state.init()
         networkHandler.networkStateController.observeStateChange { _, state ->
             if (state == NetworkHandlerStateInterface.State.CLOSED) {
-                onConnectionClosed()
+                close()
             }
         }
-    }
-
-    internal fun initNewPlayerAvatar(pickInitAvatarId: Int) {
-        val avatarGuid = data.getNextGuid()
-        AvatarDataImpl.create(avatarGuid, this, pickInitAvatarId)
-        data.compoundAvatarTeam = CompoundAvatarTeamData(avatarGuid)
-        data.selectedAvatarGuid = avatarGuid
+        basicComp.init()
+        avatarComp.init()
+        itemComp.init()
+        sceneComp.init()
+        socialComp.init()
+        scene.impl().init()
+        data.player = this
+        PlayerInitEvent(this).broadcast()
     }
 
     override suspend fun sendMessage(msg: String) {
@@ -230,9 +265,8 @@ class PlayerImpl internal constructor(
         packet: SoraPacket
     ) = networkHandler.handlePacket(packet)
 
-    private fun onConnectionClosed() {
-        logger.info { toString() + " has disconnected to the server" }
-        Sorapointa.playerList.remove(this)
+    override suspend fun saveData() {
+        data.save()
     }
 
     inner class Login(private val player: PlayerImpl) : PlayerStateInterface {
@@ -240,25 +274,8 @@ class PlayerImpl internal constructor(
         override val state: PlayerStateInterface.State = PlayerStateInterface.State.LOGIN
 
         internal suspend fun onLogin() {
-            // TODO: divide those into separate modules to implement `onLogin`
-            val loginPackets = listOf(
-                PlayerDataNotifyPacket(player),
-                StoreWeightLimitNotifyPacket(),
-                PlayerStoreNotifyPacket(player),
-                AvatarDataNotifyPacket(player),
-                OpenStateUpdateNotifyPacket(player),
-                PlayerEnterSceneNotifyPacket.Login(player),
-            )
-            // TODO: Resin, Quest, Achievement, Activity,
-            //  DailyTask, PlayerLevelReward,
-            //  AvatarExpedition, AvatarSatiation,
-            //  Cook, Combine (Craft), Forge,
-            //  Investigation, Tower, Codex, Widget,
-            //  Home, Announcement(Activity), Shop, Mail
-            loginPackets.forEach {
-                networkHandler.sendPacket(it)
-            }
-
+            PlayerLoginEvent(player).broadcast()
+            basicComp.updateLastLoginTime()
             sceneState.setState(PlayerSceneStateInterface.State.LOADING)
         }
     }
@@ -268,13 +285,17 @@ class PlayerImpl internal constructor(
         override val state: PlayerStateInterface.State = PlayerStateInterface.State.OK
     }
 
-    inner class Closed : PlayerStateInterface {
+    inner class Closed(private val player: PlayerImpl) : PlayerStateInterface {
 
         override val state: PlayerStateInterface.State = PlayerStateInterface.State.CLOSED
 
         override suspend fun startState() {
             // onClosed
-            data.lastActiveTime = now()
+            player.data.save()
+            logger.info { toString() + " has disconnected to the server" }
+            PlayerDisconnectEvent(player).broadcast()
+            Sorapointa.playerList.remove(player)
+            basicComp.updateLastLoginTime()
         }
     }
 
@@ -308,30 +329,31 @@ class PlayerProtoImpl(
 
     override val protoPropMap
         get() = mapOf(
-            PlayerProp.PROP_MAX_SPRING_VOLUME map player.data.maxSpringVolume,
-            PlayerProp.PROP_CUR_SPRING_VOLUME map player.data.curSpringVolume,
-            PlayerProp.PROP_IS_SPRING_AUTO_USE map player.data.isSpringAutoUse.toInt(),
-            PlayerProp.PROP_SPRING_AUTO_USE_PERCENT map player.data.springAutoUsePercent,
-            PlayerProp.PROP_IS_FLYABLE map player.data.isFlyable.toInt(),
-            PlayerProp.PROP_IS_TRANSFERABLE map player.data.isTransferable.toInt(),
-            PlayerProp.PROP_MAX_STAMINA map player.data.maxStamina,
-            PlayerProp.PROP_CUR_PERSIST_STAMINA map player.data.curPersistStamina,
-            PlayerProp.PROP_CUR_TEMPORARY_STAMINA map player.data.curTemporaryStamina,
-            PlayerProp.PROP_PLAYER_LEVEL map player.data.playerLevel,
-            PlayerProp.PROP_EXP map player.data.exp,
-            PlayerProp.PROP_PLAYER_HCOIN map player.data.primoGem,
-            PlayerProp.PROP_PLAYER_SCOIN map player.data.mora,
-            PlayerProp.PROP_PLAYER_MP_SETTING_TYPE map player.data.mpSettingType.value,
-            PlayerProp.PROP_IS_MP_MODE_AVAILABLE map player.data.isMpModeAvailable.toInt(),
-            PlayerProp.PROP_PLAYER_WORLD_LEVEL map player.data.worldLevel,
-            PlayerProp.PROP_PLAYER_RESIN map player.data.playerResin,
-            PlayerProp.PROP_PLAYER_MCOIN map player.data.genesisCrystal,
-            PlayerProp.PROP_PLAYER_LEGENDARY_KEY map player.data.legendaryStoryKey,
-            PlayerProp.PROP_IS_HAS_FIRST_SHARE map player.data.isHasFirstShare.toInt(),
-            PlayerProp.PROP_PLAYER_FORGE_POINT map player.data.playerForgePoint,
-            PlayerProp.PROP_PLAYER_WORLD_LEVEL_ADJUST_CD map player.data.worldLevelAdjustCD,
-            PlayerProp.PROP_PLAYER_LEGENDARY_DAILY_TASK_NUM map player.data.legendaryDailyTaskSum,
-            PlayerProp.PROP_PLAYER_HOME_COIN map player.data.homeCoin,
+            PlayerProp.PROP_MAX_SPRING_VOLUME map 100, // TODO: hardcode
+            PlayerProp.PROP_CUR_SPRING_VOLUME map player.avatarComp.curSpringVolume,
+            PlayerProp.PROP_IS_SPRING_AUTO_USE map player.avatarComp.isSpringAutoUse.toInt(),
+            PlayerProp.PROP_SPRING_AUTO_USE_PERCENT map player.avatarComp.springAutoUsePercent,
+            PlayerProp.PROP_IS_FLYABLE map player.avatarComp.isFlyable.toInt(),
+            PlayerProp.PROP_IS_TRANSFERABLE map player.avatarComp.isTransferable.toInt(),
+            PlayerProp.PROP_MAX_STAMINA mapFloat player.basicComp.persistStaminaLimit,
+            PlayerProp.PROP_CUR_PERSIST_STAMINA mapFloat player.basicComp.curPersistStamina,
+            PlayerProp.PROP_CUR_TEMPORARY_STAMINA mapFloat player.basicComp.curTemporaryStamina,
+            PlayerProp.PROP_PLAYER_LEVEL map player.basicComp.level,
+            PlayerProp.PROP_EXP map player.basicComp.exp,
+            PlayerProp.PROP_PLAYER_HCOIN map player.itemComp.primoGem,
+            PlayerProp.PROP_PLAYER_SCOIN map player.itemComp.mora,
+            PlayerProp.PROP_PLAYER_MP_SETTING_TYPE map
+                MpSettingType.MP_SETTING_TYPE_ENTER_AFTER_APPLY.value, // TODO: hardcode
+            PlayerProp.PROP_IS_MP_MODE_AVAILABLE map 1, // TODO: hardcode
+            PlayerProp.PROP_PLAYER_WORLD_LEVEL map player.sceneComp.world.level,
+            PlayerProp.PROP_PLAYER_RESIN map 160, // TODO: hardcode
+            PlayerProp.PROP_PLAYER_MCOIN map player.itemComp.genesisCrystal,
+            PlayerProp.PROP_PLAYER_LEGENDARY_KEY map player.itemComp.legendaryKey,
+            PlayerProp.PROP_IS_HAS_FIRST_SHARE map player.socialComp.isHaveFirstShare.toInt(),
+            PlayerProp.PROP_PLAYER_FORGE_POINT map 0, // TODO: hardcode
+            PlayerProp.PROP_PLAYER_WORLD_LEVEL_ADJUST_CD map 0, // TODO: hardcode
+            PlayerProp.PROP_PLAYER_LEGENDARY_DAILY_TASK_NUM map 0, // TODO: hardcode
+            PlayerProp.PROP_PLAYER_HOME_COIN map player.itemComp.homeCoin,
         )
 }
 
@@ -342,4 +364,46 @@ internal inline fun Player.impl(): AbstractPlayer {
         "A Player instance is not instance of AbstractPlayer. Your instance: ${this::class.qualifiedOrSimple}"
     }
     return this
+}
+
+inline fun <reified T : PlayerEvent> Player.registerEventListener(
+    noinline listener: suspend T.() -> Unit
+) {
+    registerListener<T> {
+        if (it.player == this) {
+            listener(it)
+        }
+    }
+}
+
+inline fun <reified T : PlayerEvent> Player.registerEventListener(
+    priority: EventPriority,
+    noinline listener: suspend T.() -> Unit
+) {
+    registerListener<T>(priority) {
+        if (it.player == this) {
+            listener(it)
+        }
+    }
+}
+
+inline fun <reified T : PlayerEvent> Player.registerEventBlockListener(
+    noinline listener: suspend T.() -> Unit
+) {
+    registerBlockListener<T> {
+        if (it.player == this) {
+            listener(it)
+        }
+    }
+}
+
+inline fun <reified T : PlayerEvent> Player.registerEventBlockListener(
+    priority: EventPriority,
+    noinline listener: suspend T.() -> Unit
+) {
+    registerBlockListener<T>(priority) {
+        if (it.player == this) {
+            listener(it)
+        }
+    }
 }

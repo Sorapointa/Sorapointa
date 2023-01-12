@@ -3,6 +3,7 @@ package org.sorapointa.dispatch
 import io.ktor.util.*
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -34,7 +35,7 @@ class AccountTest {
     fun `create account test`() = runTest(TestOption.SKIP_CI) {
 
         newSuspendedTransaction {
-            AccountTable.deleteWhere { AccountTable.userName eq "foobar" }
+            AccountTable.deleteWhere { userName eq "foobar" }
             Account.create("foobar", "password")
             assertEquals(1, Account.findByName("foobar").count())
         }
@@ -44,7 +45,7 @@ class AccountTest {
     fun `password test`() = runTest(TestOption.SKIP_CI) {
 
         newSuspendedTransaction {
-            AccountTable.deleteWhere { AccountTable.userName eq "foobar" }
+            AccountTable.deleteWhere { userName eq "foobar" }
 
             Account.create("foobar", "password123")
 

@@ -10,8 +10,10 @@ import org.sorapointa.crypto.clientRsaPrivateKey
 import org.sorapointa.crypto.signKey
 import org.sorapointa.dispatch.data.Account
 import org.sorapointa.dispatch.plugins.currentRegionRsp
+import org.sorapointa.event.broadcast
+import org.sorapointa.events.PlayerFirstCreateEvent
 import org.sorapointa.game.Player
-import org.sorapointa.game.data.PlayerDataImpl
+import org.sorapointa.game.data.PlayerData
 import org.sorapointa.game.impl
 import org.sorapointa.proto.*
 import org.sorapointa.utils.randomULong
@@ -61,14 +63,14 @@ internal object GetPlayerTokenReqHandler : IncomingPreLoginPacketHandler
         packet: GetPlayerTokenReq
     ): GetPlayerTokenRspPacket {
         val uid = packet.account_uid.toInt()
-        val account = Account.findById(uid) ?: return GetPlayerTokenRspPacket.Error(
+        val account = Account.findById(uid) ?: return GetPlayerTokenRspPacket.Err(
             Retcode.RET_ACCOUNT_NOT_EXIST, "user.notfound"
         )
 
-        if (packet.account_token != account.getComboTokenWithCheck()) return GetPlayerTokenRspPacket.Error(
+        if (packet.account_token != account.getComboTokenWithCheck()) return GetPlayerTokenRspPacket.Err(
             Retcode.RET_TOKEN_ERROR, "auth.error.token"
         )
-        Sorapointa.findPlayerById(uid)?.let {
+        Sorapointa.findOrNullPlayerById(uid)?.let {
             // TODO: replace it with graceful disconnect
             logger.info { "$it has been kicked out due to duplicated login" }
             it.impl().close()
@@ -91,7 +93,7 @@ internal object GetPlayerTokenReqHandler : IncomingPreLoginPacketHandler
 
         updateKeyAndBindPlayer(account, newSessionSeed)
 
-        return GetPlayerTokenRspPacket.Successful(
+        return GetPlayerTokenRspPacket.Succ(
             packet, networkHandler.host, encryptedServerSeed.encodeBase64(), sign.encodeBase64()
         )
     }
@@ -121,7 +123,7 @@ internal object PlayerLoginReqHandler : IncomingPreLoginPacketHandler
             }
         }.getOrNull()?.let {
             PlayerLoginRspPacket.Succ(it)
-        } ?: PlayerLoginRspPacket.Fail(Retcode.RET_SVR_ERROR)
+        } ?: PlayerLoginRspPacket.Err(Retcode.RET_SVR_ERROR)
     }
 }
 
@@ -136,10 +138,11 @@ internal object SetPlayerBornDataReqHandler : IncomingPreLoginPacketHandler
         packet: SetPlayerBornDataReq
     ): SetPlayerBornDataRspPacket {
 
-        val playerData = PlayerDataImpl.create(account.id.value, packet.nick_name, packet.avatar_id)
-        val player = createPlayer(playerData).apply {
-            initNewPlayerAvatar(packet.avatar_id)
-        }
+        val pickAvatarId = packet.avatar_id
+        val playerData = PlayerData.create(account.id.value, packet.nick_name, pickAvatarId)
+        val player = createPlayer(playerData)
+        PlayerFirstCreateEvent(player, pickAvatarId).broadcast()
+        player.impl().saveData()
 
         setToOK(player)
 
@@ -158,7 +161,19 @@ internal object GetPlayerSocialDetailReqHandler : IncomingPacketHandlerWithRespo
         packet: GetPlayerSocialDetailReq
     ): GetPlayerSocialDetailRspPacket {
 
-        return GetPlayerSocialDetailRspPacket(this@handlePacket, packet.uid)
+        val targetUid = packet.uid
+        val targetPlayer = Sorapointa.findOrNullPlayerById(targetUid)
+
+        return if (targetPlayer != null) {
+            GetPlayerSocialDetailRspPacket.SuccOnline(this, targetPlayer)
+        } else {
+            val targetPlayerData = PlayerData.findById(targetUid)?.getPlayerDataBin()
+            if (targetPlayerData != null) {
+                GetPlayerSocialDetailRspPacket.SuccOffline(this, targetUid, targetPlayerData)
+            } else {
+                GetPlayerSocialDetailRspPacket.Err(this, Retcode.RET_PLAYER_NOT_EXIST)
+            }
+        }
     }
 }
 
@@ -173,15 +188,32 @@ internal object EnterSceneReadyReqHandler : IncomingPacketHandlerWithResponse
         packet: EnterSceneReadyReq
     ): EnterSceneReadyRspPacket {
         return if (packet.enter_scene_token == enterSceneToken) {
-            impl().sendPacketAsync(EnterScenePeerNotifyPacket(this)) // doesn't have packetHeader (metadata)
+            impl().sendPacket(EnterScenePeerNotifyPacket(this)) // doesn't have packetHeader (metadata)
             EnterSceneReadyRspPacket.Succ(this) // has packetHeader
         } else EnterSceneReadyRspPacket.Fail(this, Retcode.RET_ENTER_SCENE_TOKEN_INVALID)
     }
 }
 
+internal object EnterSceneDoneReqHandler : IncomingPacketHandlerWithResponse
+<EnterSceneDoneReq, EnterSceneDoneRspPacket>(
+    PacketId.ENTER_SCENE_DONE_REQ
+) {
+
+    override val adapter: ProtoAdapter<EnterSceneDoneReq> = EnterSceneDoneReq.ADAPTER
+
+    override suspend fun Player.handlePacket(
+        packet: EnterSceneDoneReq
+    ): EnterSceneDoneRspPacket {
+        return if (packet.enter_scene_token == enterSceneToken) {
+            impl().sendPacket(SceneEntityAppearNotifyPacket(this))
+            EnterSceneDoneRspPacket.Succ(this) // has packetHeader
+        } else EnterSceneDoneRspPacket.Fail(this, Retcode.RET_ENTER_SCENE_TOKEN_INVALID)
+    }
+}
+
 internal object SceneInitFinishReqHandler : IncomingPacketHandlerWithResponse
 <SceneInitFinishReq, SceneInitFinishRspPacket>(
-    PacketId.ENTER_SCENE_READY_REQ
+    PacketId.SCENE_INIT_FINISH_REQ
 ) {
 
     override val adapter: ProtoAdapter<SceneInitFinishReq> = SceneInitFinishReq.ADAPTER
@@ -191,9 +223,26 @@ internal object SceneInitFinishReqHandler : IncomingPacketHandlerWithResponse
     ): SceneInitFinishRspPacket {
         return if (packet.enter_scene_token == enterSceneToken) {
             // TODO: divide those into separate modules
-
+            impl().sendPacket(SceneTeamUpdateNotifyPacket(this))
+            impl().sendPacket(PlayerEnterSceneInfoNotifyPacket(this))
             SceneInitFinishRspPacket.Succ(this)
         } else SceneInitFinishRspPacket.Fail(this, Retcode.RET_ENTER_SCENE_TOKEN_INVALID)
+    }
+}
+
+internal object PostEnterSceneReqHandler : IncomingPacketHandlerWithResponse
+<PostEnterSceneReq, PostEnterSceneRspPacket>(
+    PacketId.POST_ENTER_SCENE_REQ
+) {
+
+    override val adapter: ProtoAdapter<PostEnterSceneReq> = PostEnterSceneReq.ADAPTER
+
+    override suspend fun Player.handlePacket(
+        packet: PostEnterSceneReq
+    ): PostEnterSceneRspPacket {
+        return if (packet.enter_scene_token == enterSceneToken) {
+            PostEnterSceneRspPacket.Succ(this) // has packetHeader
+        } else PostEnterSceneRspPacket.Fail(this, Retcode.RET_ENTER_SCENE_TOKEN_INVALID)
     }
 }
 

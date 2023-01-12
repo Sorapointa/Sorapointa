@@ -1,4 +1,4 @@
-package org.sorapointa.game.dao
+package org.sorapointa.game.data
 
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable

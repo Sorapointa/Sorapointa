@@ -11,7 +11,6 @@ import org.sorapointa.command.Command
 import org.sorapointa.command.CommandSender
 import org.sorapointa.command.ConsoleCommandSender
 import org.sorapointa.game.Player
-import org.sorapointa.game.data.PlayerDataTable.LOCALE_LENGTH_LIMIT
 import org.sorapointa.utils.I18nConfig
 import java.util.Locale as JavaLocale
 
@@ -57,9 +56,9 @@ class LocaleCommand(private val sender: CommandSender) : Command(sender, LocaleC
             sender.sendMessage(CoreBundle.message("sora.cmd.locale.msg.new.value.missing", locale = sender.locale))
             return
         }
-        if (newValue.length > LOCALE_LENGTH_LIMIT) {
+        if (newValue.length > 20) {
             sender.sendMessage(
-                CoreBundle.message("sora.cmd.locale.msg.new.value.toolong", LOCALE_LENGTH_LIMIT, locale = sender.locale)
+                CoreBundle.message("sora.cmd.locale.msg.new.value.toolong", 20, locale = sender.locale)
             )
             return
         }

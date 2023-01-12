@@ -22,6 +22,9 @@ inline infix fun PlayerProp.map(value: Int) =
 inline infix fun PlayerProp.map(value: Long) =
     this.value to value(value)
 
+inline infix fun PlayerProp.mapFloat(value: Float) =
+    this.value to valueFloat(value)
+
 inline infix fun PlayerProp.value(value: Int) =
     this@value.value(value.toLong())
 
@@ -30,6 +33,12 @@ inline infix fun PlayerProp.value(value: Long) =
         type = this@value.value,
         ival = value,
         val_ = value,
+    )
+
+inline infix fun PlayerProp.valueFloat(value: Float) =
+    PropValue(
+        type = this@valueFloat.value,
+        fval = value,
     )
 
 inline infix fun PlayerProp.pair(value: Int) =

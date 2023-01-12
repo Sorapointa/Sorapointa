@@ -2,6 +2,7 @@ package org.sorapointa.game.data
 
 import kotlinx.serialization.Serializable
 import org.sorapointa.proto.Vector
+import org.sorapointa.proto.bin.VectorBin
 import kotlin.math.sqrt
 
 @Suppress("NOTHING_TO_INLINE")
@@ -10,6 +11,15 @@ inline fun Position(
     y: Int = 0,
     z: Int = 0
 ) = Position(x.toFloat(), y.toFloat(), z.toFloat())
+@Suppress("NOTHING_TO_INLINE")
+inline fun Position(
+    vectorBin: VectorBin?
+) = Position(vectorBin?.x ?: 0f, vectorBin?.y ?: 0f, vectorBin?.z ?: 0f)
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun Position(
+    vectorProto: Vector?
+) = Position(vectorProto?.x ?: 0f, vectorProto?.y ?: 0f, vectorProto?.z ?: 0f)
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 @Serializable
@@ -95,6 +105,8 @@ data class Position(
     }
 
     fun toProto() = Vector(x = x, y = y, z = z)
+
+    fun toBin() = VectorBin(x = x, y = y, z = z)
 
     override fun toString(): String =
         "Position[$x, $y, $z]"

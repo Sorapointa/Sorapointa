@@ -20,7 +20,6 @@ import org.sorapointa.events.SendOutgoingPacketEvent
 import org.sorapointa.game.Player
 import org.sorapointa.game.PlayerImpl
 import org.sorapointa.game.data.PlayerData
-import org.sorapointa.game.data.PlayerDataImpl
 import org.sorapointa.game.impl
 import org.sorapointa.proto.PacketHead
 import org.sorapointa.proto.SoraPacket
@@ -126,6 +125,9 @@ internal open class NetworkHandler(
             logger.debug {
                 "SEQ: ${packet.metadata?.client_sequence_id ?: 0} Send: ${findCommonNameFromCmdId(packet.cmdId)}"
             }
+            logger.debug {
+                "Body: ${packet.buildProto()}"
+            }
             val bytes = getKey()?.let { key ->
                 packet.toFinalBytePacket().xor(key)
             }
@@ -179,7 +181,7 @@ internal open class NetworkHandler(
 
         suspend fun updateKeyAndBindPlayer(account: Account, seed: ULong) {
 
-            val playerData = PlayerDataImpl.findById(account.id.value)
+            val playerData = PlayerData.findById(account.id.value)
             val gameKey = MT19937.generateKey(seed)
 
             updateSessionState = Login(account, playerData, gameKey, networkHandler)
@@ -204,15 +206,16 @@ internal open class NetworkHandler(
         override val state: NetworkHandlerStateInterface.State =
             NetworkHandlerStateInterface.State.LOGIN
 
-        suspend fun createPlayer(playerData: PlayerData) =
-            PlayerImpl(
+        suspend fun createPlayer(playerData: PlayerData): Player {
+            val player = PlayerImpl(
                 account = account,
                 data = playerData,
                 networkHandler = networkHandler,
                 parentCoroutineContext = networkHandler.scope.coroutineContext
-            ).apply {
-                Sorapointa.addPlayer(this)
-            }
+            )
+            Sorapointa.addPlayer(player)
+            return player
+        }
 
         suspend fun setToOK(player: Player) {
             networkStateController.setState(OK(gameKey, player, networkHandler))

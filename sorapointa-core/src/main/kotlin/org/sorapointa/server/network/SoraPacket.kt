@@ -3,7 +3,7 @@ package org.sorapointa.server.network
 import com.squareup.wire.Message
 import com.squareup.wire.ProtoAdapter
 import io.ktor.utils.io.core.*
-import org.sorapointa.game.Avatar
+import org.sorapointa.game.AvatarEntity
 import org.sorapointa.game.Player
 import org.sorapointa.proto.PacketHead
 import org.sorapointa.proto.writeSoraPacket
@@ -50,12 +50,12 @@ internal abstract class AvatarOutgoingPacket<T : Message<*, *>>(
     cmdId: UShort
 ) : AbstractOutgoingPacket<T>(cmdId) {
 
-    abstract val avatar: Avatar
+    abstract val avatarEntity: AvatarEntity
 
     override fun buildProto(): T =
-        with(avatar) {
+        with(avatarEntity) {
             buildProto()
         }
 
-    abstract fun Avatar.buildProto(): T
+    abstract fun AvatarEntity.buildProto(): T
 }

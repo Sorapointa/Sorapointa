@@ -3,6 +3,7 @@ package org.sorapointa.data.provider.sql
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
@@ -74,7 +75,8 @@ class SQLDatabaseSet<TID : Comparable<TID>, V>(
         needToUpdate()
         val previous = elements.intersect(values.toSet()).isNotEmpty()
         elements.forEach {
-            setTable.deleteWhere { setTable.value eq it }
+            val e = setTable.value eq it
+            setTable.deleteWhere { e }
         }
         return previous
     }

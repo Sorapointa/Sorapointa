@@ -5,10 +5,7 @@ package org.sorapointa.game.data
 
 // TODO: extra to config
 
-const val NICK_NAME_LENGTH_LIMIT = 20
-
 const val MAX_STAMINA = 24000
-const val MAX_RESIN = 160
 
 const val DEFAULT_NAME_CARD = 210001
 const val BIG_WORLD_SCENE_ID = 3
