@@ -5,11 +5,11 @@ use jni::{JNIEnv, JavaVM};
 use log::{Level, LevelFilter, Metadata, Record};
 use once_cell::sync::OnceCell;
 
+use crate::cls::ILLEGAL_STATE_EXCEPTION;
 use crate::jnienv::JNIEnvExt;
 
 const LOG_CLASS: &str = "org/sorapointa/rust/logging/RustLogger";
 const LOG_SIG: &str = "(Ljava/lang/String;)V";
-const ILLEGAL_STATE_EXCEPTION: &str = "java/lang/IllegalStateException";
 
 static INSTANCE: OnceCell<Logger> = OnceCell::new();
 
