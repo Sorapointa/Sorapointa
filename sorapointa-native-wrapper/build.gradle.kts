@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":sorapointa-utils:sorapointa-utils-core"))
     implementation(libs.yanl)
     implementation(libs.plat4k)
+    testImplementation(libs.kotlinx.coroutines.core)
     rust(project(":sorapointa-native"))
 }
 
