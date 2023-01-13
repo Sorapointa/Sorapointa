@@ -36,3 +36,17 @@ fun String.replaceWithOrder(vararg args: Any?): String {
     }
     return builder.toString()
 }
+
+fun String.beginWithUpperCase(): String {
+    return when (this.length) {
+        0 -> ""
+        1 -> this.uppercase()
+        else -> this[0].uppercase() + this.substring(1)
+    }
+}
+
+fun String.toCamelCase(): String {
+    return this.lowercase().split('_').joinToString("") {
+        it.beginWithUpperCase()
+    }
+}

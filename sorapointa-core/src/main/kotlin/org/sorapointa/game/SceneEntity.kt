@@ -6,7 +6,6 @@ import org.sorapointa.dataloader.common.LifeState
 import org.sorapointa.dataloader.common.PlayerProp
 import org.sorapointa.dataloader.def.findItemExcelData
 import org.sorapointa.game.data.DEFAULT_PEER_ID
-import org.sorapointa.game.data.ItemData
 import org.sorapointa.game.data.Position
 import org.sorapointa.proto.*
 import org.sorapointa.utils.OptionalContainer
@@ -190,7 +189,6 @@ abstract class SceneGadgetEntityBaseProto<TEntity : SceneGadgetEntityBase> : Abs
 
     abstract override val entity: TEntity
 
-    @Suppress("DuplicatedCode")
     override fun SceneEntityInfo.toProto(): SceneEntityInfo {
         val gadget = SceneGadgetInfo(
             gadget_id = entity.gadgetId,
@@ -221,7 +219,7 @@ abstract class SceneGadgetEntityBaseProto<TEntity : SceneGadgetEntityBase> : Abs
 class SceneGadgetItemEntity(
     override val scene: Scene,
     override val position: Position,
-    val itemData: ItemData,
+    val itemData: AbstractItem,
     override val authorityPeerId: Int = DEFAULT_PEER_ID,
 ) : SceneGadgetEntityBase() {
 

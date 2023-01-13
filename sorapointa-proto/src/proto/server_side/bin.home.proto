@@ -1,0 +1,322 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "org.sorapointa.proto.bin";
+
+import "server_side/bin_common.server.proto";
+import "server_side/define.proto";
+
+message HomeBasicCompBin {
+  uint64 trans_no_count = 1;
+  uint64 exp = 4;
+  uint32 level = 5;
+  string owner_nick_name = 6;
+  uint32 total_home_time = 7;
+  uint64 home_time_ms = 8;
+}
+
+message HomeFurnitureBin {
+  uint32 furniture_id = 1;
+  VectorBin spawn_pos = 3;
+  VectorBin spawn_rot = 4;
+  int32 parent_furniture_index = 7;
+  uint32 guid = 8;
+  uint32 version = 9;
+}
+
+message HomeFurnitureSuiteBin {
+  uint32 suite_id = 1;
+  VectorBin spawn_pos = 2;
+  repeated int32 included_furniture_index_list = 3;
+  uint32 guid = 4;
+  bool is_allow_summon = 5;
+}
+
+message HomeNpcBin {
+  uint32 avatar_id = 1;
+  VectorBin spawn_pos = 2;
+  VectorBin spawn_rot = 3;
+  uint32 costume_id = 4;
+}
+
+message HomeAnimalBin {
+  uint32 furniture_id = 1;
+  VectorBin spawn_pos = 2;
+  VectorBin spawn_rot = 3;
+}
+
+message HomeBlockSubFieldBin {
+  VectorBin spawn_pos = 1;
+  VectorBin spawn_rot = 2;
+}
+
+message HomeBlockFieldBin {
+  uint32 guid = 1;
+  uint32 furniture_id = 2;
+  VectorBin spawn_pos = 3;
+  VectorBin spawn_rot = 4;
+  repeated HomeBlockSubFieldBin sub_field_list = 5;
+}
+
+message HomeFurnitureGroupBin {
+  uint32 group_furniture_index = 1;
+  repeated HomeFurnitureBin virtual_furniure_list = 2;
+}
+
+message HomeFurnitureCustomSuiteBin {
+  VectorBin spawn_pos = 1;
+  repeated int32 included_furniture_index_list = 2;
+  uint32 guid = 3;
+}
+
+message HomeBlockBin {
+  uint32 block_id = 1;
+  repeated HomeFurnitureBin persistent_furniture_list = 2;
+  repeated HomeFurnitureBin deploy_furniure_list = 3;
+  repeated HomeNpcBin deploy_npc_list = 4;
+  repeated HomeFurnitureSuiteBin furniture_suite_list = 5;
+  repeated HomeAnimalBin deploy_animal_list = 6;
+  bool is_unlocked = 7;
+  repeated HomeBlockFieldBin deploy_field_list = 8;
+  repeated HomeFurnitureGroupBin deploy_furniture_group_list = 9;
+  repeated HomeFurnitureCustomSuiteBin furniture_custom_suite_list = 10;
+}
+
+message HomeSceneBin {
+  uint32 scene_id = 1;
+  SceneBin scene_bin = 2;
+  repeated HomeBlockBin block_bin_list = 3;
+  bool is_set_born_pos = 4;
+  VectorBin born_pos = 5;
+  VectorBin born_rot = 6;
+  repeated HomeFurnitureBin door_list = 7;
+  repeated HomeFurnitureBin stair_list = 8;
+  HomeFurnitureBin main_house = 9;
+  VectorBin djinn_pos = 10;
+  uint32 tmp_version = 12;
+  fixed32 save_time = 13;
+  uint32 bgm_id = 14;
+}
+
+message HomeModuleBin {
+  uint32 module_id = 1;
+  uint32 cur_room_scene_id = 2;
+  repeated HomeSceneBin scene_bin_list = 3;
+}
+
+message HomeSceneCompBin {
+  uint32 cur_module_id = 1;
+  repeated HomeModuleBin module_bin_list = 2;
+}
+
+message HomeOfflineMsgExeBin {
+  HomeOfflineMsgBin msg = 1;
+  uint32 exe_times = 2;
+}
+
+message HomeOfflineMsgCompBin {
+  uint32 index = 1;
+  repeated HomeOfflineMsgExeBin next_offline_msg_list = 2;
+}
+
+message HomeFurnitureMakeBin {
+  repeated FurnitureMakeSlotsBin furniture_make_slots_bin_list = 1;
+}
+
+message HomeLimitedShopPoolRecordBin {
+  uint32 pool_id = 1;
+  repeated uint32 goods_id_list = 2;
+}
+
+message HomeLimitedShopGoodsInfoBin {
+  uint32 goods_id = 1;
+  uint32 buy_num = 2;
+}
+
+message HomeLimitedShopNPCPosBin {
+  uint32 module_id = 1;
+  uint32 scene_id = 4;
+  uint32 block_id = 5;
+  uint32 index = 6;
+}
+
+message HomeLimitedShopBin {
+  uint32 last_refresh_time = 1;
+  repeated HomeLimitedShopPoolRecordBin pool_record_bin_list = 3;
+  repeated HomeLimitedShopGoodsInfoBin goods_info_bin_list = 4;
+  repeated HomeLimitedShopNPCPosBin npc_pos_bin_list = 5;
+}
+
+message HomePlantSubFieldBin {
+  uint32 index = 1;
+  uint32 seed_id = 2;
+  uint32 grow_time = 3;
+  uint32 last_update_time = 4;
+  repeated uint32 gather_index_list = 5;
+  uint32 home_gather_id = 6;
+}
+
+message HomePlantFieldBin {
+  uint32 module_id = 1;
+  uint32 scene_id = 2;
+  uint32 guid = 3;
+  uint32 furniture_id = 4;
+  repeated HomePlantSubFieldBin sub_field_bin_list = 5;
+}
+
+message HomePlantBin {
+  repeated HomePlantFieldBin field_bin_list = 1;
+}
+
+message HomeFishpondFarmingBin {
+  uint32 scene_id = 1;
+  uint32 fishpond_guid = 2;
+  uint32 furniture_id = 3;
+  repeated uint32 fish_id_list = 4;
+}
+
+message HomeScenePointFishFarmingBin {
+  uint32 scene_id = 1;
+  uint32 local_entity_id = 2;
+  repeated uint32 fish_id_list = 4;
+}
+
+message HomeModuleFishFarmingBin {
+  uint32 module_id = 1;
+  repeated HomeFishpondFarmingBin fishpond_farming_bin_list = 2;
+  repeated HomeScenePointFishFarmingBin scene_point_fish_farming_bin_list = 3;
+}
+
+message HomeFishFarmingBin {
+  repeated HomeModuleFishFarmingBin module_fish_farming_bin_list = 1;
+}
+
+message HomeCustomFurnitureNodeInfoBin {
+  int32 parent_index = 1;
+  uint32 furniture_id = 2;
+  string slot_identifier = 3;
+}
+
+message HomeOneCustomFurnitureBin {
+  uint32 scene_id = 1;
+  uint32 guid = 2;
+  uint32 furniture_id = 3;
+  repeated HomeCustomFurnitureNodeInfoBin sub_furniture_list = 4;
+}
+
+message HomeModuleCustomFurnitureBin {
+  uint32 module_id = 1;
+  repeated HomeOneCustomFurnitureBin custom_furniture_bin_list = 2;
+}
+
+message HomeCustomFurnitureBin {
+  repeated HomeModuleCustomFurnitureBin module_custom_furniture_bin_list = 1;
+}
+
+message HomeOnePictureFrameBin {
+  uint32 scene_id = 1;
+  uint32 guid = 2;
+  uint32 furniture_id = 3;
+  uint32 picture_id = 4;
+}
+
+message HomeModulePictureFrameBin {
+  uint32 module_id = 1;
+  repeated HomeOnePictureFrameBin picture_frame_bin_list = 2;
+}
+
+message HomePictureFrameBin {
+  repeated HomeModulePictureFrameBin module_picture_frame_bin_list = 1;
+}
+
+message HomeGroupPlayerInfoBin {
+  uint32 uid = 1;
+  string nickname = 2;
+  uint32 player_level = 3;
+  ProfilePictureBin profile_picture = 4;
+  string online_id = 5;
+  string psn_id = 6;
+}
+
+message HomeRacingGalleryRecordBin {
+  uint32 use_time = 1;
+  HomeGroupPlayerInfoBin player_info = 2;
+  uint32 timestamp = 3;
+}
+
+message HomeRacingRecordBin {
+  repeated HomeRacingGalleryRecordBin record_list = 1;
+}
+
+message HomeBalloonGalleryRecordBin {
+  uint32 score = 1;
+  uint32 hit_count = 2;
+  HomeGroupPlayerInfoBin player_info = 3;
+  uint32 timestamp = 4;
+}
+
+message HomeBalloonRecordBin {
+  repeated HomeBalloonGalleryRecordBin record_list = 1;
+}
+
+message HomeStakePlayRecordBin {
+  uint32 timestamp = 1;
+  repeated HomeGroupPlayerInfoBin engaged_player_info_list = 2;
+}
+
+message HomeStakeRecordBin {
+  repeated HomeStakePlayRecordBin record_list = 1;
+}
+
+message HomeSeekFurniturePlayerScoreBin {
+  HomeGroupPlayerInfoBin player_info = 1;
+  uint32 score = 2;
+}
+
+message HomeSeekFurnitureOneRecordBin {
+  uint32 timestamp = 1;
+  repeated HomeSeekFurniturePlayerScoreBin engaged_player_score_list = 2;
+}
+
+message HomeSeekFurnitureAllRecordBin {
+  repeated HomeSeekFurnitureOneRecordBin record_list = 1;
+}
+
+message HomeGroupRecordBin {
+  oneof detail {
+    HomeRacingRecordBin racing_gallery_info_bin = 11;
+    HomeBalloonRecordBin balloon_gallery_info_bin = 12;
+    HomeStakeRecordBin stake_play_info_bin = 13;
+    HomeSeekFurnitureAllRecordBin seek_furniture_play_info_bin = 14;
+  }
+}
+
+message HomeGroupRecordCompBin {
+  map<uint32, HomeGroupRecordBin> group_record_map_bin = 1;
+}
+
+message HomeBlueprintCompBin {
+  bool is_allow_friend_copy = 1;
+}
+
+message HomeDataBin {
+  HomeBasicCompBin basic_bin = 1;
+  HomeSceneCompBin scene_bin = 2;
+  HomeOfflineMsgCompBin offline_msg_bin = 3;
+  HomeFurnitureMakeBin furniture_make_bin = 4;
+  HomeLimitedShopBin limited_shop_bin = 5;
+  HomePlantBin plant_bin = 6;
+  HomeFishFarmingBin fish_farming_bin = 7;
+  HomeCustomFurnitureBin custom_furniture_bin = 8;
+  HomePictureFrameBin picture_frame_bin = 9;
+  HomeGroupRecordCompBin group_record_bin = 10;
+  HomeBlueprintCompBin blueprint_bin = 11;
+}
+
+message HomeData {
+  uint32 uid = 1;
+  uint32 data_version = 2;
+  bytes bin_data = 3;
+  int32 block_end_time = 4;
+}

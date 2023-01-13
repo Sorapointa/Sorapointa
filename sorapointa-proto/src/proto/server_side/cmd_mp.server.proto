@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "org.sorapointa.proto.bin";
+
+import "server_side/define.proto";
+
+message UpdateMpStatusNotify {
+  uint32 uid = 1;
+  bool is_only_mp_with_ps_player = 2;
+  PlatformType platform_type = 3;
+  OnlinePlayerInfo online_player_info = 4;
+}
+
+message DelMpStatusNotify {
+  uint32 uid = 1;
+}
+
+message GetPlayerMpStatusListReq {
+}
+
+message GetPlayerMpStatusListRsp {
+  int32 retcode = 1;
+  repeated OnlinePlayerInfo player_list = 2;
+}
+
+message GetPlayerMpStatusInfoReq {
+  bool is_online_id = 1;
+  oneof player_id {
+    uint32 target_uid = 2;
+    string online_id = 3;
+    string psn_id = 4;
+  }
+}
+
+message GetPlayerMpStatusInfoRsp {
+  int32 retcode = 1;
+  uint32 target_uid = 2;
+  OnlinePlayerInfo target_player_info = 3;
+}

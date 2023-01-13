@@ -1,6 +1,7 @@
 rootProject.name = "Sorapointa"
 
 include("sorapointa-core")
+include("sorapointa-crypto")
 include("sorapointa-dataloader")
 include("sorapointa-dataprovider")
 include("sorapointa-dispatch")

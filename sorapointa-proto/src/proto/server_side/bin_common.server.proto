@@ -1,0 +1,912 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "org.sorapointa.proto.bin";
+
+import "server_side/define.proto";
+
+enum GroupBinOperation {
+  GROUP_OP_NONE = 0;
+  GROUP_OP_GADGET_MAP_DEL = 1;
+  GROUP_OP_DEL_GADGET_LIST = 2;
+  GROUP_OP_MONSTER_MAP_DEL = 3;
+  GROUP_OP_DEL_MONSTER_LIST = 4;
+  GORUP_OP_DEL_TRIGGER = 5;
+  GROUP_OP_SET_TRIGGER_COUNT = 6;
+  GROUP_OP_SET_VARIABLE_VAL = 7;
+  GROUP_OP_SET_TARGET_SUITE = 8;
+  GROUP_OP_SET_GADGET_STATE = 9;
+  GROUP_OP_SET_DEAD = 10;
+  GROUP_OP_SET_UNREGISTER = 11;
+}
+
+enum GroupLinkOpType {
+  GROUP_LINK_OP_NONE = 0;
+  GROUP_LINK_OP_BUNDLE_REGISTER = 1;
+  GROUP_LINK_OP_BUNDLE_FINISH = 2;
+  GROUP_LINK_OP_BUNDLE_UNREGISTER = 3;
+}
+
+enum SceneTagOpType {
+  SCENE_TAG_OP_NONE = 0;
+  SCENE_TAG_OP_ADD = 1;
+  SCENE_TAG_OP_DEL = 2;
+}
+
+enum OfflineOpType {
+  OFFLINE_OP_NONE = 0;
+  OFFLINE_OP_TEST = 1;
+  OFFLINE_OP_FURNITURE_MAKE_HELP = 2;
+  OFFLINE_OP_PLANT_FLOWER_ACTIVITY_GIVE_FLOWER = 3;
+  OFFLINE_OP_WINTER_CAMP_GIVE_ITEM = 4;
+  OFFLINE_OP_ACTIVITY_GIVE_GIFT = 5;
+  OFFLINE_OP_VINTAGE_ACTIVITY_DIVIDEND = 6;
+  OFFLINE_OP_GCG_SETTLE = 7;
+}
+
+message VectorBin {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message Uint32PairBin {
+  uint32 key = 1;
+  uint32 value = 2;
+}
+
+message Uint32ToInt32PairBin {
+  uint32 key = 1;
+  int32 value = 2;
+}
+
+message FloatPairBin {
+  float first = 1;
+  float second = 2;
+}
+
+message Uint32List {
+  repeated uint32 uint32_list = 1;
+}
+
+message Int32List {
+  repeated int32 int32_list = 1;
+}
+
+message ReliquaryBin {
+  uint32 level = 1;
+  uint32 exp = 2;
+  uint32 main_prop_id = 4;
+  uint32 promote_level = 5; // sp add
+  repeated uint32 append_prop_id_list = 6;
+}
+
+message WeaponBin {
+  uint32 level = 1;
+  uint32 exp = 2;
+  uint32 promote_level = 3;
+  map<uint32, uint32> affix_map = 4;
+}
+
+message ItemParamBin {
+  uint32 item_id = 1;
+  uint32 count = 2;
+  uint32 level = 3;
+  uint32 promote_level = 4;
+}
+
+message MailBin {
+  string title = 1;
+  string content = 2;
+  string sender = 3;
+  repeated ItemParamBin item_param_list = 4;
+  fixed32 send_time = 5;
+  fixed32 expire_time = 6;
+  uint32 importance = 7;
+  uint32 config_id = 8;
+  repeated string argument_list = 9;
+  uint32 item_limit_type = 10;
+  uint32 source_type = 11;
+  string tag = 12;
+  uint32 reason_type = 13;
+  uint32 collect_state = 14;
+}
+
+message DelItemOp {
+  uint32 item_id = 1;
+  uint32 item_num = 2;
+}
+
+message DelItemNegativeOp {
+  uint32 item_id = 1;
+  uint32 item_num = 2;
+  uint32 remain_num = 3;
+}
+
+message DelEquipOp {
+  uint64 guid = 1;
+}
+
+message PlayerGotoOp {
+  uint32 scene_id = 1;
+  VectorBin pos = 2;
+}
+
+message ResetParentQuestOp {
+  uint32 parent_quest_id = 3;
+}
+
+message RefreshGroupOp {
+  uint32 group_id = 1;
+  uint32 suite_id = 2;
+  uint32 scene_id = 3;
+}
+
+message SetScenePointLockStatusOp {
+  uint32 scene_id = 1;
+  uint32 point_id = 2;
+  bool is_locked = 3;
+}
+
+message SetPlayerNickNameOp {
+  string nick_name = 1;
+}
+
+message RefreshShopOp {
+}
+
+message UnlockTalentOp {
+  uint32 avatar_id = 1;
+  uint32 skill_depot_id = 2;
+  uint32 talent_id = 3;
+}
+
+message TakeOffEquipOp {
+  uint32 avatar_id = 1;
+  uint32 equip_type = 2;
+}
+
+message DelMailOp {
+  repeated uint32 mail_id_list = 1;
+}
+
+message UnlockAreaOp {
+  uint32 area_id = 1;
+}
+
+message FinishDailyTaskOp {
+  uint32 daily_task_id = 1;
+  uint32 daily_time = 2;
+}
+
+message AddItemOp {
+  uint32 item_id = 1;
+  uint32 item_count = 2;
+  oneof detail {
+    ReliquaryBin reliquary = 101;
+    WeaponBin weapon = 102;
+  }
+}
+
+message ModifyBornPosOp {
+  uint32 scene_id = 1;
+  VectorBin pos = 2;
+}
+
+message SubCoinNegativeOp {
+  uint32 scoin = 1;
+  uint32 hcoin = 2;
+  uint32 mcoin = 3;
+  uint32 home_coin = 4;
+  PlatformType platform_type = 5;
+}
+
+message SetQuestContentProgressOp {
+  uint32 quest_id = 1;
+  map<uint32, uint32> finish_progress_map = 2;
+  map<uint32, uint32> fail_progress_map = 3;
+}
+
+message FinishOrderOp {
+  uint32 order_id = 1;
+}
+
+message AddOrModifyWatcherOp {
+  uint32 watcher_id = 1;
+  uint32 progress = 2;
+}
+
+message DelWatcherOp {
+  uint32 watcher_id = 1;
+}
+
+message SetSignatureOp {
+  string signature = 1;
+}
+
+message AddOrSubResinOp {
+  uint32 delta_count = 1;
+  bool is_sub = 2;
+}
+
+message SetQuestGlobalVarValueOp {
+  uint32 id = 1;
+  int32 value = 2;
+}
+
+message AddMcoinVipPointOp {
+  uint32 mcoin = 1;
+  uint32 vip_point = 2;
+  PlatformType platform_type = 3;
+}
+
+message ExchangeMcoinOp {
+  uint32 num = 1;
+  ExchangeMcoinType exchange_type = 2;
+}
+
+message GroupBinOp {
+  GroupBinOperation op_type = 1;
+  uint32 group_id = 2;
+  uint32 config_id = 3;
+  bool is_add = 4;
+  uint32 state = 5;
+  bool is_create = 6;
+  string trigger_name = 7;
+  uint32 trigger_count = 8;
+  string variable_name = 9;
+  int32 variable_value = 10;
+  uint32 target_suite = 11;
+  uint32 scene_id = 12;
+}
+
+message DelOneOffOp {
+  uint32 group_id = 1;
+  uint32 config_id = 2;
+  bool is_monster = 3;
+  uint32 scene_id = 4;
+}
+
+message FinishRoutineOp {
+  uint32 routine_id = 1;
+}
+
+message FinishDailyTaskUnloadGroupOp {
+  uint32 daily_task_id = 1;
+  uint32 daily_time = 2;
+}
+
+message RefreshBlossomCircleCampOp {
+  uint32 refresh_id = 1;
+  uint32 circle_camp_id = 2;
+}
+
+message BlessingActivityGivePicOp {
+  uint32 source_uid = 1;
+  uint32 target_uid = 2;
+  uint32 pic_id = 3;
+}
+
+message ExpeditionActivityAssistOp {
+  uint32 avatar_id = 1;
+  uint32 assist_time = 2;
+  uint32 target_uid = 3;
+  string target_nick_name = 4;
+  string online_id = 5;
+  uint32 assist_uid = 6;
+}
+
+message RecoverWorldLevelOp {
+}
+
+message AddRegionSearchProgressOp {
+  uint32 region_id = 1;
+  uint32 add_recycle = 2;
+  uint32 add_progress = 3;
+}
+
+message SetMatchPunishTimesOp {
+  uint32 match_id = 1;
+  uint32 punish_times = 2;
+}
+
+message ResetChannellerSlabCampGroupOp {
+  uint32 stage_id = 1;
+  uint32 round_id = 2;
+}
+
+message ForceAcceptQuestOp {
+  uint32 quest_id = 1;
+}
+
+message SetMainCoopConfidenceOp {
+  uint32 confidence = 1;
+}
+
+message AddCoopPointSavePointListOp {
+  uint32 coop_point_id = 1;
+  repeated uint32 save_point_list = 2;
+}
+
+message SetClimateAreaTypeOp {
+  uint32 scene_id = 1;
+  uint32 climate_area_id = 2;
+  uint32 climate_type = 3;
+}
+
+message ProcSceneTagOp {
+  uint32 scene_id = 1;
+  uint32 scene_tag_id = 2;
+  SceneTagOpType op_type = 3;
+}
+
+message SetFinishedParentQuestChildStateOp {
+  uint32 quest_id = 1;
+  uint32 state = 2;
+}
+
+message ChangeMapAreaInfoOp {
+  uint32 map_area_id = 1;
+  bool is_open = 2;
+}
+
+message SetLevel1AreaExplorePointOp {
+  uint32 scene_id = 1;
+  uint32 level1_area_id = 2;
+  uint32 explore_point = 3;
+}
+
+message SetCodexOpenOrCloseOp {
+  uint32 codex_type = 1;
+  uint32 codex_id = 2;
+  bool is_open = 3;
+}
+
+message GroupLinkOp {
+  GroupLinkOpType op_type = 1;
+  uint32 group_bundle_id = 2;
+  uint32 activity_id = 3;
+}
+
+message SetWatcherCompRecordValueOp {
+  oneof optional_max_critical_damage {
+    float max_critical_damage = 1;
+  }
+  oneof optional_max_fly_map_distance {
+    float max_fly_map_distance = 2;
+  }
+  oneof optional_max_fly_time {
+    float max_fly_time = 3;
+  }
+  oneof optional_max_dash_time {
+    float max_dash_time = 4;
+  }
+}
+
+message AddFriendOp {
+  uint32 target_uid = 1;
+}
+
+message DelFriendOp {
+  uint32 target_uid = 1;
+}
+
+message AddFriendAskOp {
+  uint32 target_uid = 1;
+}
+
+message DelFriendAskOp {
+  uint32 target_uid = 1;
+}
+
+message BanCustomDungeonOp {
+  uint32 ban_expire_time = 1;
+}
+
+message RemoveInvalidMapMarksOp {
+  uint32 scene_id = 1;
+  FloatPairBin x_range = 2;
+  FloatPairBin z_range = 3;
+}
+
+message RecalculateAreaExplorePointOp {
+  uint32 area_id = 1;
+  uint32 old_exp = 2;
+  uint32 recalc_exp = 3;
+  uint32 new_exp = 4;
+}
+
+message NicknameAuditResultOp {
+  string nickname = 1;
+  bool is_ok = 2;
+}
+
+message SignatureAuditResultOp {
+  string signature = 1;
+  bool is_ok = 2;
+}
+
+message PassHomeSceneArrangementAuditOp {
+  uint32 module_id = 1;
+  uint32 scene_id = 2;
+  uint32 version = 3;
+}
+
+message FailHomeSceneArrangementAuditOp {
+  uint32 module_id = 1;
+  uint32 scene_id = 2;
+  uint32 version = 3;
+}
+
+message FailHomeModulesArrangementAuditOp {
+  bool is_all_module = 1;
+  repeated uint32 module_id_list = 2;
+  uint32 version = 3;
+}
+
+message BanUgcPublishOp {
+  uint32 ban_publish_expire_time = 1;
+}
+
+message ResetPlayerPersistentDungeonOp {
+  uint32 scene_id = 1;
+}
+
+message ResetPlayerPosInPersistentDungeonOp {
+  uint32 scene_id = 1;
+}
+
+message LevelTagChangeOp {
+  uint32 level_tag_id = 1;
+}
+
+message ResetPlayerWayPointInPersistentDungeonOp {
+  uint32 scene_id = 1;
+  uint32 way_point_id = 2;
+}
+
+message ExhibitionSetOp {
+  uint32 exhibition_id = 1;
+  oneof optional_accumulable_val {
+    uint32 accumulable_val = 2;
+  }
+  oneof optional_replaceable_val {
+    uint32 replaceable_val = 3;
+  }
+}
+
+message SetAvatarExtraPropOp {
+  uint32 avatar_id = 1;
+  uint32 extra_prop_id = 2;
+  uint32 extra_prop_count = 3;
+}
+
+message AddItemWithLimitOp {
+  AddItemOp add_item_op = 1;
+  uint32 max_item_count = 2;
+}
+
+message SetGadgetChainLevelOp {
+  uint32 gadgetchain_id = 1;
+  uint32 gadgetchain_level = 2;
+}
+
+message SetDailyTaskVarOp {
+  uint32 task_id = 1;
+  uint32 index = 2;
+  int32 value = 3;
+}
+
+message AvatarRenameAuditResultOp {
+  uint32 rename_id = 1;
+  string target_name = 2;
+  bool is_succ = 3;
+  uint32 source_type = 4;
+}
+
+message ResetAvatarRenameOp {
+  uint32 avatar_id = 1;
+  uint32 reason = 2;
+}
+
+message AddFinishedTalkOp {
+  uint32 talk_id = 1;
+}
+
+message DelFinishedTalkOp {
+  uint32 talk_id = 1;
+}
+
+message SetPlayerGCGMatchScoreOp {
+  uint32 match_id = 1;
+  uint32 score = 2;
+}
+
+message SetPushTipsStateOp {
+  uint32 push_tips_id = 1;
+  uint32 push_tips_state = 2;
+}
+
+message DeletePlayerGCGCardOp {
+  uint32 card_id = 1;
+  uint32 del_num = 2;
+}
+
+message DeletePlayerGCGCardFaceOp {
+  uint32 card_face_id = 1;
+}
+
+message DeletePlayerGCGCardBackOp {
+  uint32 card_back_id = 1;
+}
+
+message DeletePlayerGCGDeckFieldOp {
+  uint32 deck_field_id = 1;
+}
+
+message BanPlayerGCGMatchOp {
+  uint32 expire_time = 1;
+}
+
+message BanPlayerGCGPVPOp {
+  uint32 expire_time = 1;
+}
+
+message OfflineMsgBin {
+  fixed32 enque_time = 1;
+  string ticket = 2;
+  uint32 index = 3;
+  oneof detail {
+    DelItemOp del_item_op = 4;
+    PlayerGotoOp goto_op = 5;
+    ResetParentQuestOp reset_parent_quest_op = 6;
+    RefreshGroupOp refresh_group_op = 7;
+    SetScenePointLockStatusOp set_scene_point_lock_status_op = 8;
+    SetPlayerNickNameOp set_nick_name_op = 9;
+    RefreshShopOp refresh_shop_op = 10;
+    UnlockTalentOp unlock_talent_op = 11;
+    TakeOffEquipOp take_off_equip_op = 12;
+    DelMailOp del_mail_op = 13;
+    FinishDailyTaskOp finish_daily_task_op = 14;
+    UnlockAreaOp unlock_area_op = 15;
+    DelItemNegativeOp del_item_negative_op = 16;
+    DelEquipOp del_equip_op = 17;
+    AddItemOp add_item_op = 18;
+    ModifyBornPosOp modify_born_pos_op = 19;
+    SubCoinNegativeOp sub_coin_negative_op = 20;
+    SetQuestContentProgressOp set_quest_content_progress_op = 21;
+    FinishOrderOp finish_order_op = 22;
+    AddOrModifyWatcherOp add_or_modify_watcher_op = 23;
+    DelWatcherOp del_watcher_op = 24;
+    SetSignatureOp set_signature_op = 25;
+    AddOrSubResinOp add_or_sub_resin_op = 26;
+    SetQuestGlobalVarValueOp set_quest_global_var_value_op = 27;
+    AddMcoinVipPointOp add_mcoin_op = 28;
+    GroupBinOp group_bin_op = 29;
+    DelOneOffOp del_one_off_op = 30;
+    FinishRoutineOp finish_routine_op = 31;
+    FinishDailyTaskUnloadGroupOp finish_daily_task_group_op = 32;
+    RefreshBlossomCircleCampOp refresh_blossom_circle_camp_op = 33;
+    BlessingActivityGivePicOp blessing_give_pic_op = 34;
+    ExpeditionActivityAssistOp expedition_assist_op = 35;
+    RecoverWorldLevelOp recover_world_level_op = 36;
+    ForceAcceptQuestOp force_accept_quest_op = 37;
+    SetMainCoopConfidenceOp set_main_coop_confidence_op = 38;
+    AddCoopPointSavePointListOp add_coop_point_save_point_list_op = 39;
+    AddRegionSearchProgressOp add_region_search_progress_op = 40;
+    SetMatchPunishTimesOp set_match_punish_times_op = 41;
+    ResetChannellerSlabCampGroupOp reset_channeller_slab_camp_group_op = 42;
+    ProcSceneTagOp proc_scene_tag_op = 43;
+    SetClimateAreaTypeOp set_climate_area_type_op = 44;
+    ExchangeMcoinOp exchange_mcoin_op = 45;
+    SetFinishedParentQuestChildStateOp set_finished_parent_quest_child_state_op = 46;
+    SetLevel1AreaExplorePointOp set_level1_area_explore_point_op = 47;
+    SetCodexOpenOrCloseOp set_codex_open_or_close_op = 48;
+    ChangeMapAreaInfoOp change_map_area_info_op = 49;
+    GroupLinkOp group_link_op = 50;
+    SetWatcherCompRecordValueOp set_watcher_comp_record_value_op = 51;
+    AddFriendOp add_friend_op = 52;
+    DelFriendOp del_friend_op = 53;
+    AddFriendAskOp add_friend_ask_op = 54;
+    DelFriendAskOp del_friend_ask_op = 55;
+    BanCustomDungeonOp ban_custom_dungeon_op = 56;
+    RemoveInvalidMapMarksOp remove_invalid_map_marks_op = 57;
+    RecalculateAreaExplorePointOp recalculate_area_explore_point_op = 58;
+    NicknameAuditResultOp nickname_audit_result_op = 59;
+    SignatureAuditResultOp signature_audit_result_op = 60;
+    PassHomeSceneArrangementAuditOp pass_home_scene_arrangement_audit_op = 61;
+    FailHomeSceneArrangementAuditOp fail_home_scene_arrangement_audit_op = 62;
+    FailHomeModulesArrangementAuditOp fail_home_modules_arrangement_audit_op = 63;
+    BanUgcPublishOp ban_ugc_publish_op = 64;
+    ResetPlayerPersistentDungeonOp reset_player_persistent_dungeon_op = 28001;
+    ResetPlayerPosInPersistentDungeonOp reset_player_pos_in_persistent_dungeon_op = 28002;
+    LevelTagChangeOp level_tag_change_op = 28003;
+    ResetPlayerWayPointInPersistentDungeonOp reset_player_way_point_in_persistent_dungeon_op = 28004;
+    ExhibitionSetOp exhibition_set_op = 30000;
+    SetAvatarExtraPropOp set_avatar_extra_prop_op = 30001;
+    AddItemWithLimitOp add_item_with_limit_op = 30002;
+    SetGadgetChainLevelOp set_gadget_chain_level_op = 31001;
+    SetDailyTaskVarOp set_daily_task_var_op = 32001;
+    AvatarRenameAuditResultOp avatar_rename_audit_result_op = 33001;
+    ResetAvatarRenameOp reset_avatar_rename_op = 33002;
+    AddFinishedTalkOp add_finished_talk_op = 33003;
+    DelFinishedTalkOp del_finished_talk_op = 33004;
+    SetPlayerGCGMatchScoreOp set_player_gcg_match_score_op = 33005;
+    SetPushTipsStateOp set_push_tips_state_op = 33006;
+    DeletePlayerGCGCardOp delete_player_gcg_card_op = 33007;
+    DeletePlayerGCGCardFaceOp delete_player_gcg_card_face_op = 33008;
+    DeletePlayerGCGCardBackOp delete_player_gcg_card_back_op = 33009;
+    DeletePlayerGCGDeckFieldOp delete_player_gcg_deck_field_op = 33010;
+    BanPlayerGCGMatchOp ban_player_gcg_match_op = 33011;
+    BanPlayerGCGPVPOp ban_player_gcg_pvp_op = 33012;
+  }
+}
+
+message HomeTestOp {
+  uint32 val = 1;
+}
+
+message HomeRestoreDefaultsArrangementOp {
+  bool is_all_module = 1;
+  repeated uint32 module_id_list = 2;
+  uint32 version = 3;
+}
+
+message HomeRestoreDefaultsSceneArrangementOp {
+  uint32 module_id = 1;
+  uint32 scene_id = 2;
+  uint32 version = 3;
+}
+
+message HomeOfflineMsgBin {
+  fixed32 enque_time = 1;
+  string ticket = 2;
+  uint32 index = 3;
+  oneof detail {
+    HomeTestOp test_op = 101;
+    HomeRestoreDefaultsArrangementOp restore_defaults_arrangement_op = 102;
+    HomeRestoreDefaultsSceneArrangementOp restore_defaults_scene_arrangement_op = 103;
+  }
+}
+
+message GroupVariableBin {
+  int32 value = 2;
+}
+
+message GroupVariableConfigIdBin {
+  uint32 config_id = 1;
+  int32 value = 2;
+}
+
+message GroupProductBin {
+  map<uint32, uint32> gadget_one_off_map = 1;
+  map<uint32, uint32> monster_one_off_map = 2;
+}
+
+message InteractGadget {
+  uint32 group_id = 1;
+  uint32 config_id = 2;
+}
+
+message AreaBin {
+  uint32 explore_num = 1;
+  uint32 explore_point = 2;
+  repeated uint32 unlock_point_list = 3;
+  repeated InteractGadget interact_gadget_list = 4;
+}
+
+message CityBin {
+  uint32 level = 1;
+  uint32 crystal_num = 2;
+}
+
+message ScenePlayerLocationBin {
+  VectorBin cur_pos = 1;
+  VectorBin cur_rot = 2;
+  VectorBin last_valid_pos = 3;
+  VectorBin last_valid_rot = 4;
+}
+
+message EnvZoneInfoBin {
+  fixed32 last_refresh_time = 1;
+  uint32 animal_num = 2;
+}
+
+message SceneEnvAnimalCompBin {
+  map<uint32, EnvZoneInfoBin> zone_info_map = 1;
+}
+
+message SceneWeatherInfoBin {
+  uint32 height_area_id = 1;
+  uint32 climate_type = 2;
+  uint64 next_climate_time = 3;
+  repeated uint32 forcast_climate_list = 4;
+}
+
+message SceneClimateAreaInfoBin {
+  uint32 climate_area_id = 1;
+  uint32 json_climate_type = 2;
+}
+
+message SceneAllWeatherInfoBin {
+  repeated SceneWeatherInfoBin weather_info_list = 1;
+  repeated uint32 closed_weather_area_list = 2;
+  repeated SceneClimateAreaInfoBin climate_area_info_list = 3;
+  repeated uint32 closed_climate_area_list = 4;
+}
+
+message BackupGroupBin {
+  repeated uint32 del_monster_list = 1;
+  map<string, GroupVariableBin> variable_map = 2;
+  uint32 revise_level = 3;
+  fixed32 last_refresh_time = 4;
+}
+
+message SceneBlockGroupCompBin {
+  repeated uint32 dead_group_list = 1;
+  map<uint32, BackupGroupBin> backup_group_map = 2;
+  bool is_scene_group_all_dead = 3;
+}
+
+message SceneAreaCompBin {
+  repeated uint32 unlocked_area_list = 1;
+  map<uint32, AreaBin> area_map = 2;
+  map<uint32, CityBin> city_map = 3;
+}
+
+message SceneEncounterCompBin {
+  repeated uint32 parent_quest_id_list = 1;
+}
+
+message ActivitySceneBin {
+  bool is_open = 1;
+}
+
+message SceneVehicleBin {
+  uint32 config_id = 1;
+  VectorBin cur_pos = 2;
+  VectorBin cur_rot = 3;
+}
+
+message SceneTagOp {
+  uint32 id = 1;
+  SceneTagOpType op_type = 2;
+}
+
+message WayPoint {
+  uint32 point_id = 1;
+  uint32 activate_time = 2;
+}
+
+message DungeonSceneBin {
+  repeated WayPoint activated_way_point_list = 1;
+  repeated WayPoint activated_slip_revive_list = 2;
+}
+
+message SceneBin {
+  repeated uint32 unlocked_point_list = 1;
+  repeated uint32 unlocked_force_list = 2;
+  repeated uint32 locked_point_list = 3;
+  SceneAllWeatherInfoBin all_weather_info = 4;
+  ScenePlayerLocationBin owner_player_location = 5;
+  SceneBlockGroupCompBin block_group_bin = 6;
+  SceneEnvAnimalCompBin env_animal_bin = 7;
+  SceneAreaCompBin area_comp_bin = 8;
+  SceneEncounterCompBin encounter_comp_bin = 9;
+  uint64 last_spring_recover_time_ms = 10;
+  repeated uint32 group_unlimit_point_list = 11;
+  repeated uint32 interacted_to_be_explored_point_list = 12;
+  float cur_spring_volume = 13;
+  bool is_locked = 14;
+  repeated SceneVehicleBin vehicle_list = 15;
+  repeated SceneTagOp scene_tag_op_list = 16;
+  repeated uint32 hide_point_list = 17;
+  repeated uint32 unhide_point_list = 18;
+  oneof detail {
+    ActivitySceneBin activity_scene_bin = 101;
+    DungeonSceneBin dungeon_scene_bin = 102;
+  }
+}
+
+message GCGSettleData {
+  uint32 app_id = 1;
+  uint32 thread_index = 2;
+  uint32 game_id = 3;
+  uint32 game_uid = 4;
+  uint32 verify_code = 5;
+  uint32 reason = 6;
+  uint32 business_type = 7;
+  map<uint32, uint32> uid_map = 8;
+  uint32 winner_controller = 9;
+  map<uint32, uint32> challenge_progress_map = 10;
+  repeated uint32 card_id_list = 11;
+  uint32 card_group_id = 12;
+  map<uint32, uint32> score_map = 13;
+  uint32 match_id = 14;
+  repeated uint32 custom_param_list = 15;
+  repeated uint32 forbid_finish_challenge_list = 16;
+}
+
+message OfflineOpTestOp {
+  string msg = 1;
+}
+
+message OfflineOpFurnitureMakeHelp {
+  string player_name = 1;
+  fixed32 time = 2;
+  uint32 uid = 3;
+  uint32 icon = 4;
+  ProfilePictureBin profile_picture_bin = 5;
+}
+
+message OfflineOpPlantFlowerActivityGiveFlower {
+  uint32 uid = 1;
+  map<uint32, uint32> flower_num_map = 2;
+  uint32 schedule_id = 3;
+}
+
+message OfflineOpWinterCampActivityGiveItem {
+  uint32 uid = 1;
+  repeated ItemParamBin item_bin_list = 2;
+  uint32 schedule_id = 3;
+}
+
+message OfflineOpGCGSettle {
+  GCGSettleData settle_data = 1;
+}
+
+message OfflineOpActivityGiveGift {
+  uint32 uid = 1;
+  map<uint32, uint32> gift_num_map = 2;
+  uint32 schedule_id = 3;
+}
+
+message OfflineOpVintageActivityDividend {
+  uint32 uid = 1;
+  uint32 schedule_id = 2;
+}
+
+message OfflineOpBin {
+  oneof detail {
+    OfflineOpTestOp test_op = 1;
+    OfflineOpFurnitureMakeHelp furniture_make_help_op = 2;
+    OfflineOpPlantFlowerActivityGiveFlower plant_flower_give_flower_op = 3;
+    OfflineOpWinterCampActivityGiveItem winter_camp_give_item_op = 4;
+    OfflineOpActivityGiveGift activity_give_gift_op = 5;
+    OfflineOpVintageActivityDividend vintage_dividend_op = 6;
+    OfflineOpGCGSettle gcg_settle_op = 7;
+  }
+}
+
+message FurnitureMakeSlotsBin {
+  uint32 make_id = 1;
+  fixed32 begin_time = 2;
+  uint32 dur_time = 3;
+  fixed32 accelerate_time = 4;
+  uint32 accelerate_count = 6;
+  uint32 avatar_id = 7;
+}
+
+message ProfilePictureBin {
+  uint32 avatar_id = 1;
+  uint32 costume_id = 2;
+}
+
+message CustomDungeonSettingBin {
+  bool is_arrive_finish = 1;
+  uint32 coin_limit = 2;
+  uint32 time_limit = 3;
+  bool is_forbid_skill = 4;
+  repeated uint32 open_room_list = 5;
+  uint32 start_room_id = 6;
+  uint32 life_num = 7;
+}
+
+message CustomDungeonAbstractBin {
+  uint32 finish_room_id = 1;
+  uint32 total_coin_num = 2;
+  uint32 first_publish_time = 3;
+  uint32 last_publish_time = 4;
+  map<uint32, uint32> brick_statistics_map = 5;
+}

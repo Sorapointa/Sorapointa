@@ -15,6 +15,7 @@ dependencies {
     api(project(":sorapointa-i18n"))
     api(project(":sorapointa-proto"))
     api(project(":sorapointa-task"))
+    api(project(":sorapointa-crypto"))
     api(project(":sorapointa-utils:sorapointa-utils-all"))
 
     // KotlinX
@@ -30,6 +31,8 @@ dependencies {
     // Console
     implementation(libs.jline)
     implementation(libs.password4j)
+
+    implementation(libs.okio)
 
     testImplementation(project(":sorapointa-dispatch", "test"))
     testImplementation(project(":sorapointa-dataprovider", "test"))

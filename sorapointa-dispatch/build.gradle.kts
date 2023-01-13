@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":sorapointa-i18n"))
     implementation(project(":sorapointa-event"))
     implementation(project(":sorapointa-proto"))
+    implementation(project(":sorapointa-crypto"))
     implementation(project(":sorapointa-utils:sorapointa-utils-all"))
 
     api(libs.bundles.log)

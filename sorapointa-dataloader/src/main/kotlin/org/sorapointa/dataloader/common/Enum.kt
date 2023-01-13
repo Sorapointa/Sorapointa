@@ -12,17 +12,23 @@ inline fun <reified T> acceptEnum(jsonPrimitive: JsonPrimitive, defaultEnum: T):
 where T : PropEnum, T : Enum<T> {
     val content = jsonPrimitive.content
 
-    val tryName = getPropEnumByName<T>(content)
+    val tryName = getPropEnumByNameOrNull<T>(content)
     if (tryName != null) return tryName
 
     val id = content.toIntOrNull() ?: return defaultEnum
-    return getPropEnumByValue(id) ?: defaultEnum
+    return getPropEnumByValueOrNull(id) ?: defaultEnum
 }
 
-inline fun <reified T> getPropEnumByValue(value: Int): T?
+inline fun <reified T> getPropEnumByValue(value: Int): T
+    where T : PropEnum, T : Enum<T> = enumValues<T>().first { it.value == value }
+
+inline fun <reified T> getPropEnumByValueOrNull(value: Int): T?
 where T : PropEnum, T : Enum<T> = enumValues<T>().firstOrNull { it.value == value }
 
-inline fun <reified T> getPropEnumByName(name: String): T?
+inline fun <reified T> getPropEnumByName(name: String): T
+    where T : PropEnum, T : Enum<T> = enumValues<T>().first { it.name == name }
+
+inline fun <reified T> getPropEnumByNameOrNull(name: String): T?
 where T : PropEnum, T : Enum<T> = enumValues<T>().firstOrNull { it.name == name }
 
 enum class SceneType(override val value: Int) : PropEnum {

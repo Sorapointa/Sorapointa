@@ -55,7 +55,7 @@ object DispatchServer {
         val cert = KeyProvider.getCertsFromConfigOrGenerate()
         return applicationEngineEnvironment {
             val dispatchConfig = DispatchConfig.data
-            log = LoggerFactory.getLogger("ktor.application")
+            log = LoggerFactory.getLogger("DispatchServer")
             if (dispatchConfig.useSSL) {
                 sslConnector(
                     keyStore = cert,
@@ -209,18 +209,6 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
         val enableSignVerify: Boolean = true,
         @YamlComment("Sign the changed `query_cur_region` response by following RSA private key")
         val enableSignature: Boolean = true,
-        @YamlComment(
-            "If dispatch server try to forward 2.8 or higher version,",
-            "dispatch server will use this RSA key to decrypt the forwarding result",
-            "KeyId 4 is used for Chinese client, 5 is used for oversea client",
-        )
-        val useKeyId: Int = 4,
-        val enableCustomKey: Boolean = false,
-        val customRSAPublicKey: String = "",
-        val customRSAPrivateKey: String = "",
-        val enableCustomSignKey: Boolean = false,
-        val customSignPublicKey: String = "",
-        val customSignPrivateKey: String = "",
     )
 
     @Serializable

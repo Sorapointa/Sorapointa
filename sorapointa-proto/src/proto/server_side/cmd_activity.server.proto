@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "org.sorapointa.proto.bin";
+
+message SeaLampPlayerContributionNotify {
+  uint32 total_contribution = 1;
+  uint32 add_progress = 2;
+}
+
+message SeaLampProgressNotify {
+  uint32 schedule_id = 1;
+  uint32 progress = 2;
+  bool is_finished = 3;
+  bool is_changed_by_muip = 4;
+}
+
+message SeaLampBroadcastNotify {
+  uint32 schedule_id = 1;
+  uint32 last_phase = 2;
+  uint32 phase = 3;
+  uint32 progress = 4;
+  bool is_changed_by_muip = 5;
+}
+
+message SeaLampSetProgressByMuipReq {
+  uint32 progress = 1;
+}
+
+message SeaLampSetProgressByMuipRsp {
+  int32 retcode = 1;
+  uint32 old_progress = 2;
+  uint32 new_progress = 3;
+  uint32 factor = 4;
+}
+
+message SeaLampProgressImplementNotify {
+  SeaLampProgressNotify msg = 1;
+}
+
+message SeaLampClearProgressByGmNotify {
+}
+
+message SeaLampAddProgressByMuipReq {
+  uint32 add_progress = 1;
+}
+
+message SeaLampAddProgressByMuipRsp {
+  int32 retcode = 1;
+  uint32 old_progress = 2;
+  uint32 new_progress = 3;
+  uint32 factor = 4;
+}
+
+message SeaLampActivityDataMuip {
+  uint32 progress = 1;
+  uint32 phase_id = 2;
+  uint32 factor = 3;
+}
+
+message GetActivityDataByMuipReq {
+  uint32 activity_id = 1;
+}
+
+message GetActivityDataByMuipRsp {
+  int32 retcode = 1;
+  uint32 activity_id = 2;
+  uint32 schedule_id = 3;
+  bool is_started = 4;
+  bool is_finished = 5;
+  oneof detail {
+    SeaLampActivityDataMuip sea_lamp_data = 10;
+  }
+}

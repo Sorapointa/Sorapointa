@@ -105,10 +105,12 @@ internal object IncomingPacketFactory {
         GetPlayerSocialDetailReqHandler,
         EnterSceneReadyReqHandler,
         SceneInitFinishReqHandler,
+        EnterSceneDoneReqHandler,
+        PostEnterSceneReqHandler,
         UnionCmdNotifyHandler,
     )
 
-    suspend inline fun <reified TState : NetworkHandlerStateInterface, T : Message<*, *>> TState.tryHandle(
+    suspend inline fun <reified TState : NetworkHandlerStateInterface> TState.tryHandle(
         packet: SoraPacket,
     ): OutgoingPacket<*>? {
         val handler = incomingPacketHandlers

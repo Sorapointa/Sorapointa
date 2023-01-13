@@ -1,0 +1,223 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "org.sorapointa.proto.bin";
+
+import "server_side/define.proto";
+
+enum PlayerMemDataType {
+  MEM_DATA_BASIC = 0;
+  MEM_DATA_H5_ACTIVITY = 1;
+}
+
+message OnlinePlayerNumReq {
+}
+
+message OnlinePlayerNumRsp {
+  int32 retcode = 1;
+  uint32 online_player_num = 2;
+  map<uint32, uint32> gameserver_player_num_map = 3;
+  uint32 online_player_num_except_sub_account = 4;
+}
+
+message KickoutPlayerNotify {
+  uint32 reason = 1;
+}
+
+message CheckOnlinePlayerReq {
+  uint32 gameserver_id = 1;
+  uint32 ns_gameserver_id = 2;
+}
+
+message CheckOnlinePlayerRsp {
+  message NodeStatus {
+    uint32 gameserver_id = 1;
+    uint32 nodeserver_id = 2;
+  }
+
+  message GameStatus {
+    uint32 gameserver_id = 1;
+    uint32 login_time = 2;
+    uint64 login_rand = 3;
+    bool is_wait_save = 4;
+  }
+
+  int32 retcode = 1;
+  NodeStatus node_status = 2;
+  GameStatus game_status = 3;
+}
+
+message PlayerCombatForceReq {
+}
+
+message PlayerCombatForceRsp {
+  int32 retcode = 1;
+  float player_combat_force = 2;
+  map<uint32, float> player_combat_force_map = 3;
+}
+
+message CheckGameVersionReq {
+  uint32 server_version = 1;
+  uint32 client_version = 2;
+  uint32 client_silence_version = 3;
+  map<uint32, uint32> res_version_map = 4;
+  map<uint32, uint32> next_res_version_map = 5;
+}
+
+message GameVersionResult {
+  uint32 version = 1;
+  uint32 wrong_num = 2;
+  repeated uint32 wrong_name_list = 3;
+}
+
+message CheckGameVersionRsp {
+  int32 retcode = 1;
+  uint32 total_game = 2;
+  GameVersionResult server_version_result = 3;
+  GameVersionResult client_version_result = 4;
+  GameVersionResult client_silence_version_result = 5;
+  map<uint32, GameVersionResult> res_version_result_map = 6;
+  map<uint32, GameVersionResult> next_res_version_result_map = 7;
+}
+
+message PlatformPlayerNumReq {
+}
+
+message PlatformPlayerNumRsp {
+  int32 retcode = 1;
+  uint32 online_player_num = 2;
+  map<uint32, uint32> platform_player_num_map = 3;
+}
+
+message PlayerMemBasicData {
+  string nickname = 1;
+  uint32 level = 2;
+  uint32 exp = 3;
+  uint32 scoin = 4;
+  uint32 hcoin = 5;
+  uint32 last_login = 6;
+  ProfilePicture profile_picture = 7;
+  fixed32 register_time = 8;
+  uint32 gender_type = 9;
+}
+
+message PlayerMemH5AcitivityWatcherData {
+  uint32 h5_activity_watcher_id = 1;
+  uint32 progress = 2;
+}
+
+message PlayerMemH5ActivityData {
+  uint32 h5_schedule_id = 1;
+  uint32 h5_activity_id = 2;
+  uint32 last_refresh_time = 3;
+  repeated uint32 finished_h5_activity_watcher_list = 4;
+  repeated uint32 unaccept_h5_activity_watcher_list = 5;
+  repeated PlayerMemH5AcitivityWatcherData h5_activity_watcher_list = 6;
+}
+
+message PlayerMemH5ActivityDataResult {
+  map<uint32, int32> retcode_map = 1;
+  repeated PlayerMemH5ActivityData h5_activity_data_list = 2;
+}
+
+message QueryPlayerMemDataByMuipReq {
+  uint32 data_type = 1;
+  repeated uint32 param_list = 2;
+}
+
+message QueryPlayerMemDataByMuipRsp {
+  int32 retcode = 1;
+  oneof detail {
+    PlayerMemBasicData basic_data = 2;
+    PlayerMemH5ActivityDataResult h5_activity_data_result = 3;
+  }
+}
+
+message BindGmUidNotify {
+  uint32 gm_uid = 1;
+  uint32 player_uid = 2;
+}
+
+message UnbindGmUidNotify {
+  uint32 gm_uid = 1;
+}
+
+message GetBindGmUidReq {
+}
+
+message GetBindGmUidRsp {
+  int32 retcode = 1;
+  map<uint32, uint32> gm_uid_map = 2;
+}
+
+message PlatformAntiAddictNotify {
+  int32 msg_type = 2;
+  string msg = 3;
+  string level = 4;
+}
+
+message PlayerLoginPerSecondReq {
+}
+
+message PlayerLoginPerSecondRsp {
+  int32 retcode = 1;
+  uint32 player_login_per_second = 2;
+}
+
+message FineGrainedPlayerNumReq {
+}
+
+message FineGrainedPlayerNumRsp {
+  int32 retcode = 1;
+  uint32 online_player_num = 2;
+  map<string, uint32> fine_grained_player_num_map = 3;
+}
+
+message CheckGameCrcVersionReq {
+  uint32 platform = 1;
+  string client_version_str = 2;
+}
+
+message CheckGameCrcVersionRsp {
+  int32 retcode = 1;
+  uint32 total_game = 2;
+  uint32 platform = 3;
+  string client_version_str = 4;
+  uint32 wrong_num = 5;
+  repeated uint32 wrong_name_list = 6;
+}
+
+message UpdateRedPointByMuipNotify {
+  repeated RedPointData red_point_list = 1;
+}
+
+message SendConcertProductReq {
+  string ticket = 1;
+  uint32 config_id = 2;
+}
+
+message SendConcertProductRsp {
+  int32 retcode = 1;
+  string ticket = 2;
+  uint32 config_id = 3;
+}
+
+message QueryConcertProductInfoReq {
+  uint32 config_id = 1;
+}
+
+message QueryConcertProductInfoRsp {
+  int32 retcode = 1;
+  uint32 config_id = 2;
+  uint32 obtain_count = 3;
+  uint32 obtain_limit = 4;
+}
+
+message PlayerMpModeReq {
+}
+
+message PlayerMpModeRsp {
+  int32 retcode = 1;
+  bool is_mp_mode = 2;
+}

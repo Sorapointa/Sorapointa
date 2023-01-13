@@ -12,6 +12,9 @@ private val avatarExcelDataLoader =
 val avatarDataList get() = avatarExcelDataLoader.data
 
 fun getAvatarExcelData(id: Int) =
+    avatarDataList.first { it.id == id }
+
+fun getAvatarExcelDataOrNull(id: Int) =
     avatarDataList.firstOrNull { it.id == id }
 
 @Serializable
@@ -61,15 +64,15 @@ data class AvatarExcelData(
     @JsonNames("infoDescTextMapHash", "InfoDescTextMapHash")
     val infoDescTextMapHash: ULong,
     @JsonNames("hpBase", "HpBase")
-    val hpBase: Double,
+    val hpBase: Float,
     @JsonNames("attackBase", "AttackBase")
-    val attackBase: Double,
+    val attackBase: Float,
     @JsonNames("defenseBase", "DefenseBase")
-    val defenseBase: Double,
+    val defenseBase: Float,
     @JsonNames("critical", "Critical")
-    val critical: Double,
+    val critical: Float,
     @JsonNames("criticalHurt", "CriticalHurt")
-    val criticalHurt: Double,
+    val criticalHurt: Float,
     @JsonNames("propGrowCurves", "PropGrowCurves")
     private val _propGrowCurves: List<PropGrowCurve>,
     @JsonNames("prefabPathRagdollHash", "PrefabPathRagdollHash")

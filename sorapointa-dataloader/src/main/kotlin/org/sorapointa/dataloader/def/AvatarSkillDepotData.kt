@@ -9,9 +9,6 @@ private val avatarSkillDepotDataLoader =
 
 val avatarSkillDepotData get() = avatarSkillDepotDataLoader.data
 
-val AvatarExcelData.skillDepotData
-    get() = avatarSkillDepotData.firstOrNull { it.id == skillDepotId }
-
 val AvatarExcelData.candSkillDepotData
     get() = avatarSkillDepotData.firstOrNull { it.id == skillDepotId }
 
@@ -45,6 +42,10 @@ data class AvatarSkillDepotData(
         _skills.filter { it != 0 }
     }
 
+    val energySkillId = _energySkill
+    val normalAttackSkillId = skills.getOrNull(0)
+    val elementSkillId = skills.getOrNull(1)
+
     val inherentProudSkillOpens by lazy {
         _inherentProudSkillOpens.filter { it.proudSkillGroupId != 0 }
     }
@@ -54,12 +55,11 @@ data class AvatarSkillDepotData(
     }
 
     val normalAttack by lazy {
-        avatarSkillData.firstOrNull { skills.getOrNull(0) == it.id }
-            ?: error("Could not find the avatarDepotId: $id, normal attack skill")
+        avatarSkillData.firstOrNull { normalAttackSkillId == it.id }
     }
 
     val elementSkill by lazy {
-        avatarSkillData.firstOrNull { skills.getOrNull(1) == it.id }
+        avatarSkillData.firstOrNull { elementSkillId == it.id }
     }
 
     @Serializable

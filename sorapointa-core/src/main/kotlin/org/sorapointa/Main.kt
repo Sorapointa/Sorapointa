@@ -24,6 +24,7 @@ import org.sorapointa.console.setupWebConsoleServer
 import org.sorapointa.data.provider.DatabaseManager
 import org.sorapointa.dataloader.ResourceHolder
 import org.sorapointa.event.EventManager
+import org.sorapointa.game.data.SorapointaStore
 import org.sorapointa.task.TaskManager
 import org.sorapointa.utils.ModuleScope
 import org.sorapointa.utils.absPath
@@ -177,6 +178,7 @@ class SorapointaMain : CliktCommand(name = "sorapointa") {
                 DatabaseManager.loadTables(registeredDatabaseTable)
             }
             logger.info { "Loaded ${registeredDatabaseTable.size} tables in $time ms" }
+            SorapointaStore.initDefaultEntry()
         }
 
     private fun setupDefaultsCommand() {

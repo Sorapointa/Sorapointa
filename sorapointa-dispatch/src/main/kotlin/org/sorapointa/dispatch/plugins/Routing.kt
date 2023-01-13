@@ -8,7 +8,7 @@ import org.sorapointa.dispatch.utils.getAndPost
 internal fun Application.configureRouting() {
     routing {
         get("/") {
-            call.respondText("Hello Sorapointa! The Dispatch Server has been successfully launched!")
+            call.respondText("Hello Sorapointa! The dispatch server has been successfully launched!")
         }
     }
 

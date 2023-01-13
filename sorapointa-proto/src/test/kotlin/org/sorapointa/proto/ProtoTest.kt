@@ -22,11 +22,6 @@ class ProtoTest {
     }
 
     @Test
-    fun findName() {
-        assertEquals("ABILITY_CHANGE_NOTIFY", findCommonNameFromCmdId(1155u))
-    }
-
-    @Test
     fun `sorapointa packet read write test`() {
         val cmdId = PacketId.GET_PLAYER_TOKEN_REQ
         val randomInt = Random.nextInt()

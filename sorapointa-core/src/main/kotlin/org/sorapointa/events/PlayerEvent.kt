@@ -20,6 +20,25 @@ class HandleIncomingPacketEvent<T : Message<*, *>>(
     val adapter: ProtoAdapter<T>,
 ) : PlayerEvent(), CancelableEvent
 
+// Login order: Init -> (FirstCreate) -> Login -> Disconnect
+
+class PlayerInitEvent(
+    override val player: Player,
+) : PlayerEvent()
+
+class PlayerFirstCreateEvent(
+    override val player: Player,
+    val pickAvatarId: Int,
+) : PlayerEvent()
+
+class PlayerLoginEvent(
+    override val player: Player,
+) : PlayerEvent()
+
+class PlayerDisconnectEvent(
+    override val player: Player,
+) : PlayerEvent()
+
 internal abstract class NetworkEvent : AbstractEvent() {
     abstract val networkHandler: NetworkHandler
 }

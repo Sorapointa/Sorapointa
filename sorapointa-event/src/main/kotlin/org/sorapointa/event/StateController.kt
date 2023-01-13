@@ -2,8 +2,6 @@
 
 package org.sorapointa.event
 
-import org.sorapointa.utils.ModuleScope
-
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.update
 import kotlinx.coroutines.flow.asFlow
@@ -11,6 +9,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.sorapointa.event.StateController.ListenerState
+import org.sorapointa.utils.ModuleScope
 import org.sorapointa.utils.SorapointaInternal
 import java.util.concurrent.ConcurrentHashMap
 

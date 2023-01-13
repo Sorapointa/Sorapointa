@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import kcp.highway.KcpListener
 import kcp.highway.Ukcp
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.*
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -19,11 +20,9 @@ import org.sorapointa.events.SendOutgoingPacketEvent
 import org.sorapointa.game.Player
 import org.sorapointa.game.PlayerImpl
 import org.sorapointa.game.data.PlayerData
-import org.sorapointa.game.data.PlayerDataImpl
 import org.sorapointa.game.impl
 import org.sorapointa.proto.PacketHead
 import org.sorapointa.proto.SoraPacket
-import org.sorapointa.proto.findCommonNameFromCmdId
 import org.sorapointa.server.network.IncomingPacketFactory.tryHandle
 import org.sorapointa.utils.*
 import org.sorapointa.utils.crypto.MT19937
@@ -54,8 +53,6 @@ internal open class NetworkHandler(
 
     val host: String = connection.user().remoteAddress.address.hostAddress
 
-    private val scope = ModuleScope("NetworkHandler[$host]", parentCoroutineContext)
-
     val networkStateController by lazy {
         StateController<_, NetworkHandlerStateInterface, _>(
             scope = scope,
@@ -64,8 +61,14 @@ internal open class NetworkHandler(
         )
     }
 
-    var clientTime: Int = 0
-        private set
+    val clientTime
+        get() = _clientTime.value
+
+    private val scope = ModuleScope("NetworkHandler[$host]", parentCoroutineContext)
+
+    private val _clientTime = atomic(0)
+
+    private val _packetSequence = atomic(0uL)
 
     private var lastPingTime = now()
 
@@ -75,6 +78,7 @@ internal open class NetworkHandler(
             while (isActive) {
                 delay(1000)
                 if (now() - lastPingTime > SorapointaConfig.data.networkSetting.pingTimeout) {
+                    logger.debug { "Session $host has been closed due to timeout" }
                     close()
                 }
             }
@@ -98,7 +102,7 @@ internal open class NetworkHandler(
         }
 
     fun updatePingTime(clientTime: Int) {
-        this.clientTime = clientTime
+        _clientTime.value = clientTime
         lastPingTime = now()
     }
 
@@ -118,7 +122,12 @@ internal open class NetworkHandler(
             if (metadata != null) {
                 packet.metadata = metadata
             }
-            logger.debug { "Send: ${findCommonNameFromCmdId(packet.cmdId)} Id: ${packet.cmdId}" }
+            logger.debug {
+                "SEQ: ${packet.metadata?.client_sequence_id ?: 0} Send: ${findCommonNameFromCmdId(packet.cmdId)}"
+            }
+            logger.debug {
+                "Body: ${packet.buildProto()}"
+            }
             val bytes = getKey()?.let { key ->
                 packet.toFinalBytePacket().xor(key)
             }
@@ -130,7 +139,9 @@ internal open class NetworkHandler(
 
     open fun handlePacket(packet: SoraPacket): Job =
         scope.launch {
-            logger.debug { "Recv: ${findCommonNameFromCmdId(packet.cmdId)} Id: ${packet.cmdId}" }
+            logger.debug {
+                "SEQ: ${packet.metadata.client_sequence_id} Recv: ${findCommonNameFromCmdId(packet.cmdId)}"
+            }
             networkStateController.getStateInstance().handlePacket(packet)
         }
 
@@ -169,17 +180,15 @@ internal open class NetworkHandler(
         }
 
         suspend fun updateKeyAndBindPlayer(account: Account, seed: ULong) {
-            val playerData = newSuspendedTransaction {
-                PlayerDataImpl.findById(account.id.value)
-            }
+            val playerData = PlayerData.findById(account.id.value)
             val gameKey = MT19937.generateKey(seed)
 
             updateSessionState = Login(account, playerData, gameKey, networkHandler)
         }
 
         override suspend fun handlePacket(packet: SoraPacket) {
-            val outgoingPacket = tryHandle(packet) ?: return
             newSuspendedTransaction {
+                val outgoingPacket = tryHandle(packet) ?: return@newSuspendedTransaction
                 sendPacket(outgoingPacket) // Wait for sending, cuz we need to update key
                 updateSessionState?.also { networkStateController.setState(it) }
             }
@@ -196,15 +205,16 @@ internal open class NetworkHandler(
         override val state: NetworkHandlerStateInterface.State =
             NetworkHandlerStateInterface.State.LOGIN
 
-        suspend fun createPlayer(playerData: PlayerData) =
-            PlayerImpl(
+        suspend fun createPlayer(playerData: PlayerData): Player {
+            val player = PlayerImpl(
                 account = account,
                 data = playerData,
                 networkHandler = networkHandler,
                 parentCoroutineContext = networkHandler.scope.coroutineContext,
-            ).apply {
-                Sorapointa.addPlayer(this)
-            }
+            )
+            Sorapointa.addPlayer(player)
+            return player
+        }
 
         suspend fun setToOK(player: Player) {
             networkStateController.setState(OK(gameKey, player, networkHandler))
