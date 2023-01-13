@@ -16,7 +16,7 @@ class DispatchServerTest {
         }
         client.get("/").apply {
             assertEquals(HttpStatusCode.OK, status)
-            assertEquals("Hello Sorapointa! The Dispatch Server has been successfully launched!", bodyAsText())
+            assertEquals("Hello Sorapointa! The dispatch server has been successfully launched!", bodyAsText())
         }
     }
 }
