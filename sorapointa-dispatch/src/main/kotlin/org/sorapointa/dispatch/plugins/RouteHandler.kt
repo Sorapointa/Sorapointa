@@ -9,8 +9,8 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.util.*
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonElement
@@ -28,9 +28,10 @@ import org.sorapointa.dispatch.data.*
 import org.sorapointa.dispatch.events.*
 import org.sorapointa.event.broadcastEvent
 import org.sorapointa.proto.*
-import org.sorapointa.utils.SorapointaInternal
 import org.sorapointa.utils.networkJson
+import org.sorapointa.utils.touch
 import org.sorapointa.utils.xor
+import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
 private val logger = mu.KotlinLogging.logger {}
@@ -69,8 +70,35 @@ private suspend fun getQueryRegionListHttpRsp(host: String): QueryRegionListHttp
     )
 }
 
-@SorapointaInternal
-var currentRegionRsp = CompletableDeferred<QueryCurrRegionHttpRsp>()
+private var queryCurrRegionCache: QueryCurrRegionHttpRsp? = null
+
+suspend fun QueryCurrRegionHttpRsp.saveCache() {
+    val file = File(DispatchConfig.data.requestSetting.queryCurrentRegionCacheFile)
+    if (file.exists()) {
+        file.delete()
+    }
+    withContext(Dispatchers.IO) {
+        file.touch()
+        file.writeBytes(adapter.encode(this@saveCache))
+    }
+}
+
+suspend fun readCurrRegionCacheOrRequest(): QueryCurrRegionHttpRsp {
+    return readCurrRegionCacheOrNull() ?: getCurrentRegionHttpRsp().also {
+        it.saveCache()
+    }
+}
+
+suspend fun readCurrRegionCacheOrNull(): QueryCurrRegionHttpRsp? {
+    queryCurrRegionCache?.let { return it }
+    val file = File(DispatchConfig.data.requestSetting.queryCurrentRegionCacheFile)
+    if (!file.exists()) return null
+    return withContext(Dispatchers.IO) {
+        QueryCurrRegionHttpRsp.ADAPTER.decode(file.readBytes())
+    }.also {
+        queryCurrRegionCache = it
+    }
+}
 
 suspend fun getCurrentRegionHttpRsp(call: ApplicationCall? = null): QueryCurrRegionHttpRsp {
     val requestSetting = DispatchConfig.data.requestSetting
@@ -112,17 +140,11 @@ suspend fun getCurrentRegionHttpRsp(call: ApplicationCall? = null): QueryCurrReg
     return QueryCurrRegionHttpRsp.ADAPTER.decode(decryptResult)
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 private suspend fun ApplicationCall.forwardQueryCurrentRegionHttpRsp(): QueryCurrRegionHttpRsp {
     val requestSetting = DispatchConfig.data.requestSetting
 
-    val queryCurrentRegionHttpRsp = if (currentRegionRsp.isCompleted) {
-        currentRegionRsp.getCompleted()
-    } else {
-        getCurrentRegionHttpRsp(this).also {
-            currentRegionRsp.complete(it)
-        }
-    }
+    val queryCurrentRegionHttpRsp = readCurrRegionCacheOrNull()
+        ?: getCurrentRegionHttpRsp(this).also { it.saveCache() }
 
     val ec2b = newSuspendedTransaction {
         DispatchKeyData.getOrGenerate(host)

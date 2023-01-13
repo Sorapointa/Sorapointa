@@ -25,10 +25,10 @@ abstract class AbstractOutgoingPacket<T : Message<*, *>>(
     abstract override fun buildProto(): T
 }
 
-internal fun <T : Message<*, *>> OutgoingPacket<T>.toFinalBytePacket(): ByteArray {
+internal fun <T : Message<*, *>> OutgoingPacket<T>.toFinalBytePacket(proto: T): ByteArray {
     val packet = this
     return buildPacket {
-        writeSoraPacket(packet.cmdId, packet.adapter, packet.buildProto(), packet.metadata)
+        writeSoraPacket(packet.cmdId, packet.adapter, proto, packet.metadata)
     }.readBytes()
 }
 

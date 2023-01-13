@@ -20,7 +20,7 @@ private val logger = KotlinLogging.logger {}
  */
 fun findCommonNameFromCmdId(cmdId: UShort): String {
     val name = PacketId::class.java.declaredFields.first { it.get(PacketId).safeCast<Short>() == cmdId.toShort() }.name
-    return if (SorapointaConfig.data.debugCamelCasePacketName) {
+    return if (SorapointaConfig.data.debugSetting.camelCasePacketName) {
         name.toCamelCase()
     } else {
         name

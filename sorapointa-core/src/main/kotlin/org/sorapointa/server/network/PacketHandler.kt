@@ -95,7 +95,6 @@ internal abstract class IncomingPreLoginPacketHandler<TPacketReq : Message<*, *>
 
 internal object IncomingPacketFactory {
 
-    // TODO: Check it type in real situation
     private val incomingPacketHandlers = listOf<IncomingSessionPacketHandler<*, *>>(
         GetPlayerTokenReqHandler,
         PingReqHandler,
@@ -119,6 +118,17 @@ internal object IncomingPacketFactory {
         val cast = handler.uncheckedCast<IncomingSessionPacketHandler<*, TState>>()
         return cast.run { handle(packet) }
     }
+
+    /**
+     * Only used for debug parsing
+     *
+     * @param packet packet to parse
+     * @return parsed proto
+     */
+    fun parseToProto(packet: SoraPacket): Message<*, *>? =
+        incomingPacketHandlers
+            .firstOrNull { it.cmdId == packet.cmdId }
+            ?.parsing(packet.data)
 }
 
 /*
@@ -163,12 +173,3 @@ S: EnterSceneDoneRsp
 C: PostEnterSceneReq
 S: PostEnterSceneRsp
 */
-
-/*
-
-NetworkHandler (ByteReadPacket) -> IncomingFactories (SoraPacket, find Factory by cmdId) [List Factory]
-  -> IncomingFactory (get Serializer of ProtobufData, then parse it)
-  -> SomeIncomingPacketFactory (get ProtoBuf only)
-  -> may return a (Reponse OutgoingPacket)
-  -> NetworkHandler would send it
- */

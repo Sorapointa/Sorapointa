@@ -19,10 +19,6 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
 
     @Serializable
     data class Data(
-        @YamlComment("Game server network setting")
-        val networkSetting: NetworkSetting = NetworkSetting(),
-        @YamlComment("Player inventory store limits")
-        val inventoryLimits: InventoryLimits = InventoryLimits(),
         @YamlComment("Run sorapointa with dispatch server, sorapointa allow you to run them separately")
         val startWithDispatch: Boolean = true,
         @YamlComment("Use current region info for login rsp")
@@ -30,8 +26,17 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
         val offsetHours: Int = 4,
         @SerialName("timeZone")
         private val _timeZone: String = TimeZone.currentSystemDefault().toString(),
-        @YamlComment("Use camel case for packet name in debug mode, if it is false then use big sneak case.")
-        val debugCamelCasePacketName: Boolean = true,
+        @YamlComment("Game server network setting")
+        val networkSetting: NetworkSetting = NetworkSetting(),
+        @YamlComment("Player inventory store limits")
+        val inventoryLimits: InventoryLimits = InventoryLimits(),
+        @YamlComment(
+            "" +
+                "Debug setting for developers",
+            "Notice: if you want to enable debug log, " +
+                "YOU SHOULD ENABLE IT BY `-Dlogback.configurationFile=path/to/logback.xml`",
+        )
+        val debugSetting: DebugSetting = DebugSetting(),
     ) {
 
         val timeZone by lazy {
@@ -76,5 +81,23 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
         val receiveWindow: Int = 256,
         val timeoutMillis: Long = 30 * 1000, // KCP Timeout > Protocol Ping Timeout
         val ackNoDelay: Boolean = false,
+    )
+
+    @Serializable
+    data class DebugSetting(
+        @YamlComment("Use CamelCase rather than SNAKE_CASE for packet name")
+        val camelCasePacketName: Boolean = true,
+        @YamlComment("Turn on means use blocklist to filter packet, off means use allowlist to filter packet")
+        val blockListPacketWatcher: Boolean = true,
+        @YamlComment("Blocklist of Packet Watcher")
+        val blocklist: List<String> = listOf(
+            "PingReq",
+            "PingRsp",
+            "UnionCmdNotify",
+            "PlayerSetPauseReq",
+            "PlayerSetPauseRsp",
+        ),
+        @YamlComment("Allowlist of Packet Watcher")
+        val allowlist: List<String> = listOf(),
     )
 }

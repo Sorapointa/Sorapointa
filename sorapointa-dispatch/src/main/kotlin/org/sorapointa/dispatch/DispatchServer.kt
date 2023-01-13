@@ -197,11 +197,11 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
             "In general, this option should be used for accessing beta or other client version.",
         )
         val usingCurrentRegionUrlHardcode: Boolean = false,
+        val queryCurrentRegionHardcode: String = "",
         @YamlComment(
             "In some special cases, containing custom client config will cause client stuck in loading scene,",
             "turn off this option may solve this issue.",
         )
-        val queryCurrentRegionHardcode: String = "",
         val currentRegionContainsCustomClientConfig: Boolean = true,
         @YamlComment("Response `query_cur_region` in the old 2.7 and lower version format")
         val oldCurrentRegionFormat: Boolean = false,
@@ -209,6 +209,7 @@ object DispatchConfig : DataFilePersist<DispatchConfig.Data>(
         val enableSignVerify: Boolean = true,
         @YamlComment("Sign the changed `query_cur_region` response by following RSA private key")
         val enableSignature: Boolean = true,
+        val queryCurrentRegionCacheFile: String = "cache/query_curr_region_http_rsp.bin",
     )
 
     @Serializable

@@ -9,7 +9,7 @@ import org.sorapointa.SorapointaConfig
 import org.sorapointa.crypto.clientRsaPrivateKey
 import org.sorapointa.crypto.signKey
 import org.sorapointa.dispatch.data.Account
-import org.sorapointa.dispatch.plugins.currentRegionRsp
+import org.sorapointa.dispatch.plugins.readCurrRegionCacheOrRequest
 import org.sorapointa.event.broadcast
 import org.sorapointa.events.PlayerFirstCreateEvent
 import org.sorapointa.game.Player
@@ -111,9 +111,9 @@ internal object PlayerLoginReqHandler : IncomingPreLoginPacketHandler<PlayerLogi
         packet: PlayerLoginReq,
     ): PlayerLoginRspPacket {
         return runCatching {
-            withTimeout(1000) {
+            withTimeout(5000) {
                 val curRegion = if (SorapointaConfig.data.useCurrentRegionForLoginRsp) {
-                    currentRegionRsp.await()
+                    readCurrRegionCacheOrRequest()
                 } else {
                     QueryCurrRegionHttpRsp()
                 }
@@ -257,7 +257,6 @@ internal object UnionCmdNotifyHandler : IncomingPacketHandlerWithoutResponse<Uni
     override val adapter: ProtoAdapter<UnionCmdNotify> = UnionCmdNotify.ADAPTER
 
     override suspend fun Player.handlePacket(packet: UnionCmdNotify) {
-        logger.debug { "Expanding UnionCmdNotify packets..." }
         packet.cmd_list.forEach {
             val soraPacket = SoraPacket(it.message_id.toUShort(), PacketHead(), it.body.toByteArray())
             impl().forwardHandlePacket(soraPacket)

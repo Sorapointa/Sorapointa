@@ -6,8 +6,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.sorapointa.command.CommandManager
 import org.sorapointa.dispatch.DispatchServer
-import org.sorapointa.dispatch.plugins.currentRegionRsp
 import org.sorapointa.dispatch.plugins.getCurrentRegionHttpRsp
+import org.sorapointa.dispatch.plugins.saveCache
 import org.sorapointa.game.Player
 import org.sorapointa.game.impl
 import org.sorapointa.server.ServerNetwork
@@ -37,7 +37,7 @@ object Sorapointa {
             // And since we don't have original request from player client, or sth,
             // so we can only use the hardcode URL in
             scope.launch {
-                currentRegionRsp.complete(getCurrentRegionHttpRsp())
+                getCurrentRegionHttpRsp().saveCache()
             }
         }
     }

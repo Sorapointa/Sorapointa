@@ -13,6 +13,8 @@ dependencies {
     implementation(project(":sorapointa-utils:sorapointa-utils-core"))
     api(libs.wire.runtime)
     api(libs.ktor.utils)
+    api(libs.moshi)
+    api(libs.wire.moshi.adapter)
 }
 
 wire {

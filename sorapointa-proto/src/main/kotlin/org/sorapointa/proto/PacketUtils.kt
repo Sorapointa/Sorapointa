@@ -1,7 +1,10 @@
 package org.sorapointa.proto
 
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
 import com.squareup.wire.Message
 import com.squareup.wire.ProtoAdapter
+import com.squareup.wire.WireJsonAdapterFactory
 import io.ktor.utils.io.core.*
 import org.sorapointa.utils.SorapointaInternal
 
@@ -22,6 +25,16 @@ class SoraPacket(
     val metadata: PacketHead,
     val data: ByteArray,
 )
+
+val moshi: Moshi = Moshi.Builder()
+    .add(WireJsonAdapterFactory())
+    .build()
+
+@SorapointaInternal
+fun <T : Message<*, *>> T.toJson(): String {
+    val adapter = moshi.adapter(adapter.type?.java) as JsonAdapter<T>
+    return adapter.toJson(this)
+}
 
 @SorapointaInternal
 fun ByteReadPacket.readToSoraPacket(): SoraPacket {

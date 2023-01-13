@@ -23,6 +23,7 @@ import org.sorapointa.game.data.PlayerData
 import org.sorapointa.game.impl
 import org.sorapointa.proto.PacketHead
 import org.sorapointa.proto.SoraPacket
+import org.sorapointa.proto.toJson
 import org.sorapointa.server.network.IncomingPacketFactory.tryHandle
 import org.sorapointa.utils.*
 import org.sorapointa.utils.crypto.MT19937
@@ -122,14 +123,10 @@ internal open class NetworkHandler(
             if (metadata != null) {
                 packet.metadata = metadata
             }
-            logger.debug {
-                "SEQ: ${packet.metadata?.client_sequence_id ?: 0} Send: ${findCommonNameFromCmdId(packet.cmdId)}"
-            }
-            logger.debug {
-                "Body: ${packet.buildProto()}"
-            }
+            val proto = packet.buildProto()
+            logPacket(isOutgoing = true, cmdId = packet.cmdId, metadata = metadata, proto = proto)
             val bytes = getKey()?.let { key ->
-                packet.toFinalBytePacket().xor(key)
+                packet.toFinalBytePacket(proto).xor(key)
             }
             val buf: ByteBuf = Unpooled.wrappedBuffer(bytes)
             connection.write(buf)
@@ -139,11 +136,40 @@ internal open class NetworkHandler(
 
     open fun handlePacket(packet: SoraPacket): Job =
         scope.launch {
-            logger.debug {
-                "SEQ: ${packet.metadata.client_sequence_id} Recv: ${findCommonNameFromCmdId(packet.cmdId)}"
+            if (logger.isDebugEnabled) {
+                logPacket(
+                    isOutgoing = false,
+                    cmdId = packet.cmdId,
+                    metadata = packet.metadata,
+                    proto = IncomingPacketFactory.parseToProto(packet),
+                )
             }
             networkStateController.getStateInstance().handlePacket(packet)
         }
+
+    private fun logPacket(
+        isOutgoing: Boolean,
+        cmdId: UShort,
+        metadata: PacketHead?,
+        proto: Message<*, *>?,
+    ) {
+        if (logger.isDebugEnabled) {
+            val setting = SorapointaConfig.data.debugSetting
+            val cmdName = findCommonNameFromCmdId(cmdId)
+            val switch = setting.blockListPacketWatcher
+            if (switch) {
+                if (setting.blocklist.contains(cmdName)) return
+            } else {
+                if (!setting.allowlist.contains(cmdName)) return
+            }
+            val direction = if (isOutgoing) "Send" else "Recv"
+            logger.debug(
+                "SEQ: ${metadata?.client_sequence_id ?: 0} " +
+                    "$direction: $cmdName " +
+                    (proto?.toJson()?.let { "Body: $it" } ?: ""),
+            )
+        }
+    }
 
     abstract inner class UpdatedKeyState : NetworkHandlerStateInterface {
         abstract val gameKey: ByteArray
