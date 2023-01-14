@@ -121,7 +121,16 @@ internal object PlayerLoginReqHandler : IncomingPreLoginPacketHandler<PlayerLogi
                     setToOK(createPlayer(playerData))
                 } else {
                     // Still to be `Login` state
-                    networkHandler.sendPacketAsync(DoSetPlayerBornDataNotifyPacket())
+                    if (SorapointaConfig.data.debugSetting.skipBornCutscene) {
+                        logger.debug { "Skipped born cutscene and auto choose nickname and avatar" }
+                        SetPlayerBornDataReqHandler.createNewPlayer(
+                            networkHandler = this@handlePacket,
+                            nickname = "SpTest",
+                            pickAvatarId = 10000007, // PlayerGirl
+                        )
+                    } else {
+                        networkHandler.sendPacketAsync(DoSetPlayerBornDataNotifyPacket())
+                    }
                 }
                 curRegion
             }
@@ -137,17 +146,23 @@ internal object SetPlayerBornDataReqHandler : IncomingPreLoginPacketHandler<SetP
 
     override val adapter: ProtoAdapter<SetPlayerBornDataReq> = SetPlayerBornDataReq.ADAPTER
 
-    override suspend fun NetworkHandler.Login.handlePacket(
-        packet: SetPlayerBornDataReq,
-    ): SetPlayerBornDataRspPacket {
-        val pickAvatarId = packet.avatar_id
-        val playerData = PlayerData.create(account.id.value, packet.nick_name, pickAvatarId)
-        val player = createPlayer(playerData)
+    suspend fun createNewPlayer(
+        networkHandler: NetworkHandler.Login,
+        nickname: String,
+        pickAvatarId: Int,
+    ) {
+        val playerData = PlayerData.create(networkHandler.account.id.value, nickname, pickAvatarId)
+        val player = networkHandler.createPlayer(playerData)
         PlayerFirstCreateEvent(player, pickAvatarId).broadcast()
         player.impl().saveData()
 
-        setToOK(player)
+        networkHandler.setToOK(player)
+    }
 
+    override suspend fun NetworkHandler.Login.handlePacket(
+        packet: SetPlayerBornDataReq,
+    ): SetPlayerBornDataRspPacket {
+        createNewPlayer(this, packet.nick_name, packet.avatar_id)
         return SetPlayerBornDataRspPacket()
     }
 }
