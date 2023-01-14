@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
-use jni::objects::{JClass, JValue};
-use jni::sys::jint;
+use jni::objects::{JClass, JStaticMethodID};
+use jni::signature::{Primitive, ReturnType};
+use jni::sys::{jint, jvalue};
 use jni::{JNIEnv, JavaVM};
 use log::{Level, LevelFilter, Metadata, Record};
 use once_cell::sync::OnceCell;
@@ -20,8 +21,8 @@ struct Logger {
 }
 
 macro_rules! log_impl {
-    ($func_name:ident, $method_name:expr) => {
-        fn $func_name(&self, message: &str) -> Result<()> {
+    ($fn_name:ident) => {
+        fn $fn_name(&self, message: &str) -> Result<()> {
             let env = self
                 .jvm
                 .attach_current_thread_permanently()
@@ -29,19 +30,31 @@ macro_rules! log_impl {
             let jmessage = env
                 .new_string(message)
                 .context("Failed to allocate String")?;
-            env.call_static_method(LOG_CLASS, $method_name, LOG_SIG, &[JValue::from(jmessage)])
-                .context("Failed to call logger from native")?;
+            static ID: OnceCell<JStaticMethodID> = OnceCell::new();
+            let id = ID.get_or_init(|| {
+                env.get_static_method_id(LOG_CLASS, stringify!($fn_name), LOG_SIG)
+                    .unwrap()
+            });
+            env.call_static_method_unchecked(
+                LOG_CLASS,
+                id.clone(),
+                ReturnType::Primitive(Primitive::Void),
+                &[jvalue {
+                    l: jmessage.into_raw(),
+                }],
+            )
+            .context("Failed to call logger from native")?;
             Ok(())
         }
     };
 }
 
 impl Logger {
-    log_impl!(error, "error");
-    log_impl!(warn, "warn");
-    log_impl!(info, "info");
-    log_impl!(debug, "debug");
-    log_impl!(trace, "trace");
+    log_impl!(error);
+    log_impl!(warn);
+    log_impl!(info);
+    log_impl!(debug);
+    log_impl!(trace);
 }
 
 impl log::Log for Logger {
