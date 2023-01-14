@@ -26,9 +26,11 @@ import org.sorapointa.utils.crypto.dumpToData
     companion object : EntityClass<String, DispatchKeyData>(DispatchKeyDataTable) {
         @SorapointaInternal
         suspend fun getOrGenerate(host: String): Ec2bData {
-            return DispatchKeyData.findById(host)?.let {
-                Ec2bData(it.dispatchSeed, it.dispatchKey)
-            } ?: Ec2bSeed.generate().dumpToData().also { ec2b ->
+            val row = DispatchKeyData.findById(host)
+            if (row != null) {
+                return Ec2bData(row.dispatchSeed, row.dispatchKey)
+            }
+            return Ec2bSeed.generate().dumpToData().also { ec2b ->
                 DispatchKeyDataTable.insert {
                     it[id] = host
                     it[dispatchSeed] = ec2b.seed

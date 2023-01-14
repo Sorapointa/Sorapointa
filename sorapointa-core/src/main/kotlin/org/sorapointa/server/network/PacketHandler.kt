@@ -32,7 +32,7 @@ internal abstract class AbstractIncomingPacketHandler<Req : Message<*, *>>(
 internal abstract class IncomingSessionPacketHandler<Req, S>(
     cmdId: UShort,
 ) : AbstractIncomingPacketHandler<Req>(cmdId)
-    where Req : Message<*, *>, S : NetworkHandlerStateInterface {
+    where Req : Message<*, *>, S : NetworkHandlerStateI {
     abstract suspend fun S.handle(soraPacket: SoraPacket): OutgoingPacket<*>?
 }
 
@@ -83,7 +83,7 @@ internal abstract class IncomingPreLoginPacketHandler<Req, Rsp, S>(cmdId: UShort
     IncomingSessionPacketHandler<Req, S>(cmdId)
     where Req : Message<*, *>,
           Rsp : OutgoingPacket<*>,
-          S : NetworkHandlerStateInterface {
+          S : NetworkHandlerStateI {
 
     protected abstract suspend fun S.handlePacket(packet: Req): Rsp
 
@@ -113,7 +113,7 @@ internal object IncomingPacketFactory {
         UnionCmdNotifyHandler,
     )
 
-    suspend inline fun <reified S : NetworkHandlerStateInterface> S.tryHandle(
+    suspend inline fun <reified S : NetworkHandlerStateI> S.tryHandle(
         packet: SoraPacket,
     ): OutgoingPacket<*>? {
         val handler = incomingPacketHandlers

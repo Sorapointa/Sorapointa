@@ -2,7 +2,7 @@ package org.sorapointa.server.network
 
 import com.squareup.wire.ProtoAdapter
 import io.ktor.util.*
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import mu.KotlinLogging
 import org.sorapointa.Sorapointa
 import org.sorapointa.SorapointaConfig
@@ -24,13 +24,13 @@ import java.nio.ByteOrder
 
 private val logger = KotlinLogging.logger {}
 
-internal object PingReqHandler : IncomingPreLoginPacketHandler<PingReq, PingRspPacket, NetworkHandlerStateInterface>(
+internal object PingReqHandler : IncomingPreLoginPacketHandler<PingReq, PingRspPacket, NetworkHandlerStateI>(
     PacketId.PING_REQ,
 ) {
 
     override val adapter: ProtoAdapter<PingReq> = PingReq.ADAPTER
 
-    override suspend fun NetworkHandlerStateInterface.handlePacket(
+    override suspend fun NetworkHandlerStateI.handlePacket(
         packet: PingReq,
     ): PingRspPacket {
         networkHandler.updatePingTime(packet.client_time)
@@ -38,12 +38,12 @@ internal object PingReqHandler : IncomingPreLoginPacketHandler<PingReq, PingRspP
     }
 }
 
-internal object PlayerSetPauseReqHandler : IncomingPreLoginPacketHandler<PlayerSetPauseReq, PlayerSetPauseRspPacket, NetworkHandlerStateInterface>(
+internal object PlayerSetPauseReqHandler : IncomingPreLoginPacketHandler<PlayerSetPauseReq, PlayerSetPauseRspPacket, NetworkHandlerStateI>(
     PacketId.PLAYER_SET_PAUSE_REQ,
 ) {
     override val adapter: ProtoAdapter<PlayerSetPauseReq> = PlayerSetPauseReq.ADAPTER
 
-    override suspend fun NetworkHandlerStateInterface.handlePacket(
+    override suspend fun NetworkHandlerStateI.handlePacket(
         packet: PlayerSetPauseReq,
     ): PlayerSetPauseRspPacket {
         return PlayerSetPauseRspPacket()
@@ -110,31 +110,28 @@ internal object PlayerLoginReqHandler : IncomingPreLoginPacketHandler<PlayerLogi
     override suspend fun NetworkHandler.Login.handlePacket(
         packet: PlayerLoginReq,
     ): PlayerLoginRspPacket {
-        return runCatching {
-            withTimeout(5000) {
-                val curRegion = if (SorapointaConfig.data.useCurrentRegionForLoginRsp) {
-                    readCurrRegionCacheOrRequest()
-                } else {
-                    QueryCurrRegionHttpRsp()
-                }
-                if (playerData != null) {
-                    setToOK(createPlayer(playerData))
-                } else {
-                    // Still to be `Login` state
-                    if (SorapointaConfig.data.debugSetting.skipBornCutscene) {
-                        logger.debug { "Skipped born cutscene and auto choose nickname and avatar" }
-                        SetPlayerBornDataReqHandler.createNewPlayer(
-                            networkHandler = this@handlePacket,
-                            nickname = "SpTest",
-                            pickAvatarId = 10000007, // PlayerGirl
-                        )
-                    } else {
-                        networkHandler.sendPacketAsync(DoSetPlayerBornDataNotifyPacket())
-                    }
-                }
-                curRegion
+        if (playerData == null) {
+            // Still to be `Login` state
+            if (SorapointaConfig.data.debugSetting.skipBornCutscene) {
+                logger.debug { "Skipped born cutscene and auto choose nickname and avatar" }
+                SetPlayerBornDataReqHandler.createNewPlayer(
+                    networkHandler = this@handlePacket,
+                    nickname = "SpTest",
+                    pickAvatarId = 10000007, // PlayerGirl
+                )
+            } else {
+                networkHandler.sendPacketAsync(DoSetPlayerBornDataNotifyPacket())
             }
-        }.getOrNull()?.let {
+        } else {
+            setToOK(createPlayer(playerData))
+        }
+        return withTimeoutOrNull(5000) {
+            if (SorapointaConfig.data.useCurrentRegionForLoginRsp) {
+                readCurrRegionCacheOrRequest()
+            } else {
+                QueryCurrRegionHttpRsp()
+            }
+        }?.let {
             PlayerLoginRspPacket.Succ(it)
         } ?: PlayerLoginRspPacket.Err(Retcode.RET_SVR_ERROR)
     }

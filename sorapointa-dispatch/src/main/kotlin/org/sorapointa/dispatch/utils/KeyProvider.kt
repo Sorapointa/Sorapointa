@@ -64,9 +64,8 @@ internal object KeyProvider {
     }
 
     private fun fromCertFile(certFile: File, password: String): KeyStore {
-        return KeyStore.getInstance(DispatchConfig.data.certification.keyStore)?.let {
-            it.load(certFile.inputStream(), password.toCharArray())
-            it
+        return KeyStore.getInstance(DispatchConfig.data.certification.keyStore)?.apply {
+            load(certFile.inputStream(), password.toCharArray())
         } ?: throw IllegalStateException("Failed to load key store")
     }
 

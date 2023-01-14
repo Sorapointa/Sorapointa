@@ -56,9 +56,3 @@ internal fun Int.getNextGuid(uid: Int): Long {
 internal fun Int.getNextEntityId(idType: EntityIdType): Int {
     return (idType.value shl 24) + this
 }
-
-internal fun buildMetadata(sequenceId: Int) =
-    PacketHead(
-        client_sequence_id = sequenceId,
-        sent_ms = nowMilliseconds(),
-    )
