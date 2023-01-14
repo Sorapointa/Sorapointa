@@ -3,6 +3,7 @@ package org.sorapointa.game
 import kotlinx.atomicfu.atomic
 import org.sorapointa.dataloader.common.EntityIdType
 import org.sorapointa.game.data.DEFAULT_PEER_ID
+import org.sorapointa.utils.getNextEntityId
 import java.util.concurrent.ConcurrentLinkedQueue
 
 interface World {
@@ -34,11 +35,10 @@ class WorldImpl(
 
     fun getNextPeerId() = ++peerId
 
-    private var nextEntityId by atomic(0)
+    private val nextEntityId = atomic(0)
 
     override fun getNextEntityId(idType: EntityIdType): Int {
-        val nextId = ++nextEntityId
-        return ((idType.value shl 24) + nextId)
+        return nextEntityId.getAndIncrement().getNextEntityId(idType)
     }
 
     override fun toString(): String =
