@@ -33,7 +33,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 private val logger = KotlinLogging.logger {}
 
-internal interface NetworkHandlerStateInterface : WithState<NetworkHandlerStateInterface.State> {
+internal interface NetworkHandlerStateI : WithState<NetworkHandlerStateI.State> {
 
     val networkHandler: NetworkHandler
 
@@ -55,7 +55,7 @@ internal open class NetworkHandler(
     val host: String = connection.user().remoteAddress.address.hostAddress
 
     val networkStateController by lazy {
-        StateController<_, NetworkHandlerStateInterface, _>(
+        StateController<_, NetworkHandlerStateI, _>(
             scope = scope,
             parentStateClass = this,
             WaitToken(this),
@@ -116,8 +116,8 @@ internal open class NetworkHandler(
         packet: OutgoingPacket<T>,
         metadata: PacketHead? = null,
     ) {
-        if (networkStateController.getCurrentState() == NetworkHandlerStateInterface.State.CLOSED) return
-        SendOutgoingPacketEvent(this@NetworkHandler, packet).broadcastEvent {
+        if (networkStateController.getCurrentState() == NetworkHandlerStateI.State.CLOSED) return
+        SendOutgoingPacketEvent(this, packet).broadcastEvent {
             if (metadata != null) {
                 packet.metadata = metadata
             }
@@ -169,7 +169,7 @@ internal open class NetworkHandler(
         }
     }
 
-    abstract inner class UpdatedKeyState : NetworkHandlerStateInterface {
+    abstract inner class UpdatedKeyState : NetworkHandlerStateI {
         abstract val gameKey: ByteArray
     }
 
@@ -197,12 +197,12 @@ internal open class NetworkHandler(
 
     inner class WaitToken(
         override val networkHandler: NetworkHandler,
-    ) : NetworkHandlerStateInterface {
+    ) : NetworkHandlerStateI {
 
-        override val state: NetworkHandlerStateInterface.State =
-            NetworkHandlerStateInterface.State.WAIT_TOKEN
+        override val state: NetworkHandlerStateI.State =
+            NetworkHandlerStateI.State.WAIT_TOKEN
 
-        private var updateSessionState: NetworkHandlerStateInterface? = null
+        private var updateSessionState: NetworkHandlerStateI? = null
 
         val dispatchKey: Deferred<ByteArray> = scope.async {
             newSuspendedTransaction {
@@ -221,7 +221,7 @@ internal open class NetworkHandler(
             newSuspendedTransaction {
                 val outgoingPacket = tryHandle(packet) ?: return@newSuspendedTransaction
                 sendPacket(outgoingPacket) // Wait for sending, cuz we need to update key
-                updateSessionState?.also { networkStateController.setState(it) }
+                updateSessionState?.let { networkStateController.setState(it) }
             }
         }
     }
@@ -233,8 +233,8 @@ internal open class NetworkHandler(
         override val networkHandler: NetworkHandler,
     ) : SessionHandlePacketState() {
 
-        override val state: NetworkHandlerStateInterface.State =
-            NetworkHandlerStateInterface.State.LOGIN
+        override val state: NetworkHandlerStateI.State =
+            NetworkHandlerStateI.State.LOGIN
 
         suspend fun createPlayer(playerData: PlayerData): Player {
             val player = PlayerImpl(
@@ -249,10 +249,9 @@ internal open class NetworkHandler(
 
         suspend fun setToOK(player: Player) {
             networkStateController.setState(OK(gameKey, player, networkHandler))
-            player.impl().state.getStateInstance().let {
-                if (it is PlayerImpl.Login) {
-                    it.onLogin()
-                }
+            val state = player.impl().state.getStateInstance()
+            if (state is PlayerImpl.Login) {
+                state.onLogin()
             }
         }
     }
@@ -263,16 +262,16 @@ internal open class NetworkHandler(
         override val networkHandler: NetworkHandler,
     ) : PlayerHandlePacketState() {
 
-        override val state: NetworkHandlerStateInterface.State =
-            NetworkHandlerStateInterface.State.OK
+        override val state: NetworkHandlerStateI.State =
+            NetworkHandlerStateI.State.OK
     }
 
     inner class Closed(
         override val networkHandler: NetworkHandler,
-    ) : NetworkHandlerStateInterface {
+    ) : NetworkHandlerStateI {
 
-        override val state: NetworkHandlerStateInterface.State =
-            NetworkHandlerStateInterface.State.CLOSED
+        override val state: NetworkHandlerStateI.State =
+            NetworkHandlerStateI.State.CLOSED
 
         override suspend fun handlePacket(packet: SoraPacket) {
             // ignore
@@ -299,12 +298,12 @@ internal class ConnectionListener(
 
     override fun handleReceive(byteBuf: ByteBuf, ukcp: Ukcp) {
         runBlocking {
-            connectionMap[ukcp]?.let { handler ->
-                handler.getKey()?.let { key ->
-                    byteBuf.readToSoraPacket(key) {
-                        handler.handlePacket(it)
-                    }
-                }
+            val handler = connectionMap[ukcp]
+            if (handler?.getKey() == null) {
+                return@runBlocking
+            }
+            byteBuf.readToSoraPacket(handler.getKey()!!) {
+                handler.handlePacket(it)
             }
         }
     }

@@ -236,7 +236,7 @@ class PlayerImpl internal constructor(
         dataBin = data.getPlayerDataBin()
         state.init()
         networkHandler.networkStateController.observeStateChange { _, state ->
-            if (state == NetworkHandlerStateInterface.State.CLOSED) {
+            if (state == NetworkHandlerStateI.State.CLOSED) {
                 close()
             }
         }

@@ -75,17 +75,18 @@ inline infix fun Int.fightProp(value: Float) =
     )
 
 val todayStartTime: Instant
-    get() = run {
+    get() {
         val offsetHour = SorapointaConfig.data.offsetHours
         val timeZone = SorapointaConfig.data.timeZone
-        val nowDate = now().toLocalDateTime(timeZone)
-        LocalDateTime(nowDate.year, nowDate.month, nowDate.dayOfMonth, offsetHour, 0)
+        val nowDate = now().toLocalDateTime(timeZone) // Get current time in local time zone
+        // Get today start time, plus offset hour, there are two situations
+        val startOfDay = LocalDateTime(nowDate.year, nowDate.month, nowDate.dayOfMonth, offsetHour, 0)
             .toInstant(timeZone)
-            .let {
-                if (nowDate.hour < offsetHour) {
-                    it - 1.toDuration(DurationUnit.DAYS)
-                } else {
-                    it
-                }
-            }
+        // If current time is before the offset hour
+        // e.g. 1:00 AM > 4:00 AM, so the start time is yesterday at the same time
+        return if (nowDate.hour < offsetHour) {
+            startOfDay - 1.toDuration(DurationUnit.DAYS)
+        } else { // Otherwise it's today, e.g. 10:00 AM > 4:00 AM, 4:00 AM is the start time of today
+            startOfDay
+        }
     }
