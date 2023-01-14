@@ -4,6 +4,7 @@ import io.ktor.utils.io.core.*
 import io.netty.buffer.ByteBuf
 import mu.KotlinLogging
 import org.sorapointa.SorapointaConfig
+import org.sorapointa.dataloader.common.EntityIdType
 import org.sorapointa.proto.*
 import org.sorapointa.utils.encoding.hex
 
@@ -46,6 +47,14 @@ internal fun ByteBuf.readToSoraPacket(
             logger.debug { "Detected insanity packet, hex: ${before.hex} decrypted: ${decrypt.readBytes().hex}" }
         }
     }
+}
+
+internal fun Int.getNextGuid(uid: Int): Long {
+    return (uid shl 24) + this.toLong()
+}
+
+internal fun Int.getNextEntityId(idType: EntityIdType): Int {
+    return (idType.value shl 24) + this
 }
 
 internal fun buildMetadata(sequenceId: Int) =

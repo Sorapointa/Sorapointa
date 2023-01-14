@@ -9,6 +9,7 @@ import org.sorapointa.game.data.MAX_STAMINA
 import org.sorapointa.proto.ProfilePicture
 import org.sorapointa.proto.bin.*
 import org.sorapointa.server.network.PlayerDataNotifyPacket
+import org.sorapointa.utils.getNextGuid
 import org.sorapointa.utils.now
 import org.sorapointa.utils.nowSeconds
 import org.sorapointa.utils.todayStartTime
@@ -101,8 +102,7 @@ class PlayerBasicComp(
     }
 
     internal fun getNextGuid(): Long {
-        val nextGuid = _guidSeqId.getAndIncrement().toLong()
-        return (player.uid shl 32) + nextGuid
+        return _guidSeqId.getAndIncrement().getNextGuid(player.uid)
     }
 
     fun toBin(): PlayerBasicCompBin {

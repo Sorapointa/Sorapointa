@@ -119,6 +119,7 @@ class PlayerData(id: EntityID<Int>) : Entity<Int>(id) {
                         social_bin = player.socialComp.toBin(),
                     )
                     binData = PlayerDataBin.ADAPTER.encode(_playerDataBin!!)
+                    lastSaveTime = now()
                 }
             }
         }

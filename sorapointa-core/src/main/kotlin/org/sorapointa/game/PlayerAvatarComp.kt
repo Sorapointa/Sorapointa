@@ -571,6 +571,19 @@ class PlayerAvatarSkillDepot(
 
     private val _coreProudSkillLevel = atomic(skillDepotBin.core_proud_skill_level)
 
+    init {
+        // init default skill level
+        if (normalAttackLevel == 0) {
+            skillLevelMap[normalAttack?.id] = 1
+        }
+        if (elementSkillLevel == 0) {
+            skillLevelMap[elementSkill?.id] = 1
+        }
+        if (energySkillLevel == 0) {
+            skillLevelMap[energySkill?.id] = 1
+        }
+    }
+
     // TODO: Cache Optimize
     val inherentProudSkillList
         get() = skillDepotData

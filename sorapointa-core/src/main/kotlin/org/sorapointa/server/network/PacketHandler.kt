@@ -29,9 +29,10 @@ internal abstract class AbstractIncomingPacketHandler<TPacketReq : Message<*, *>
     override fun parsing(data: ByteArray): TPacketReq = adapter.decode(data)
 }
 
-internal abstract class IncomingSessionPacketHandler<TPacketReq : Message<*, *>, TState : NetworkHandlerStateInterface>(
+internal abstract class IncomingSessionPacketHandler<TPacketReq, TState>(
     cmdId: UShort,
-) : AbstractIncomingPacketHandler<TPacketReq>(cmdId) {
+) : AbstractIncomingPacketHandler<TPacketReq>(cmdId)
+    where TPacketReq : Message<*, *>, TState : NetworkHandlerStateInterface {
     abstract suspend fun TState.handle(soraPacket: SoraPacket): OutgoingPacket<*>?
 }
 
@@ -115,7 +116,15 @@ internal object IncomingPacketFactory {
         val handler = incomingPacketHandlers
             .firstOrNull { it.cmdId == packet.cmdId }
             ?: return null
-        val cast = handler.uncheckedCast<IncomingSessionPacketHandler<*, TState>>()
+        val cast = runCatching {
+            handler.uncheckedCast<IncomingSessionPacketHandler<*, TState>>()
+        }.getOrElse {
+            throw IllegalStateException(
+                "Handler ${handler::class.simpleName} " +
+                    "is not compatible with state ${this::class.simpleName}",
+                it,
+            )
+        }
         return cast.run { handle(packet) }
     }
 
