@@ -50,7 +50,7 @@ internal fun ByteBuf.readToSoraPacket(
 }
 
 internal fun Int.getNextGuid(uid: Int): Long {
-    return (uid shl 24) + this.toLong()
+    return (uid.toLong() shl 32) + this.toLong()
 }
 
 internal fun Int.getNextEntityId(idType: EntityIdType): Int {
