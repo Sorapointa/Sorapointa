@@ -89,6 +89,8 @@ object SorapointaConfig : DataFilePersist<SorapointaConfig.Data>(
         val camelCasePacketName: Boolean = true,
         @YamlComment("Turn on means use blocklist to filter packet, off means use allowlist to filter packet")
         val blockListPacketWatcher: Boolean = true,
+        @YamlComment("Skip born cutscene and auto choose name and avatar")
+        val skipBornCutscene: Boolean = false,
         @YamlComment("Blocklist of Packet Watcher")
         val blocklist: List<String> = listOf(
             "PingReq",

@@ -69,8 +69,6 @@ internal open class NetworkHandler(
 
     private val _clientTime = atomic(0)
 
-    private val _packetSequence = atomic(0uL)
-
     private var lastPingTime = now()
 
     internal suspend fun init() {
@@ -179,8 +177,15 @@ internal open class NetworkHandler(
 
         override suspend fun handlePacket(packet: SoraPacket) {
             newSuspendedTransaction {
-                tryHandle(packet)?.also {
-                    sendPacket(it)
+                runCatching {
+                    tryHandle(packet)?.also {
+                        sendPacket(it)
+                    }
+                }.getOrElse {
+                    throw IllegalStateException(
+                        "Error while handling packet: ${findCommonNameFromCmdId(packet.cmdId)}",
+                        it,
+                    )
                 }
             }
         }
