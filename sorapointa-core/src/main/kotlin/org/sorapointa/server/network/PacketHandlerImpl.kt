@@ -13,7 +13,6 @@ import org.sorapointa.dispatch.plugins.readCurrRegionCacheOrRequest
 import org.sorapointa.event.broadcast
 import org.sorapointa.events.PlayerFirstCreateEvent
 import org.sorapointa.game.data.PlayerData
-import org.sorapointa.game.impl
 import org.sorapointa.proto.*
 import org.sorapointa.utils.randomULong
 import org.sorapointa.utils.toByteArray
@@ -74,10 +73,10 @@ internal object GetPlayerTokenReqHandler : PreLoginPacketHandler<GetPlayerTokenR
             return
         }
 
-        Sorapointa.findOrNullPlayerById(uid)?.let {
+        Sorapointa.findPlayerByIdOrNull(uid)?.let {
             // TODO: replace it with graceful disconnect
             logger.info { "$it has been kicked out due to duplicated login" }
-            it.impl().close()
+            it.close()
         }
 
         // Key exchange flow, see: https://sdl.moe/post/magic-sniffer/
@@ -95,7 +94,7 @@ internal object GetPlayerTokenReqHandler : PreLoginPacketHandler<GetPlayerTokenR
 
         val newSessionSeed = (clientSeed xor serverSeedByte).toULong(ByteOrder.BIG_ENDIAN)
 
-        state.updateKeyAndBindPlayer(uid, newSessionSeed)
+        state.updateKeyAndBindPlayer(account, newSessionSeed)
 
         sendPacketSync(
             GetPlayerTokenRspPacket.Succ(
@@ -121,7 +120,7 @@ internal object PlayerLoginReqHandler : PreLoginPacketHandler<PlayerLoginReq, Ne
             if (SorapointaConfig.data.debugSetting.skipBornCutscene) {
                 logger.debug { "Skipped born cutscene and auto choose nickname and avatar" }
                 SetPlayerBornDataReqHandler.createNewPlayer(
-                    state = state,
+                    ctx = this,
                     nickname = "SpTest",
                     pickAvatarId = 10000007, // PlayerGirl
                 )
@@ -129,7 +128,7 @@ internal object PlayerLoginReqHandler : PreLoginPacketHandler<PlayerLoginReq, Ne
                 sendPacket(DoSetPlayerBornDataNotifyPacket())
             }
         } else {
-            state.setToOK(state.createPlayer(state.playerData))
+            state.setToOK(state.createPlayer(state.playerData), metadata)
         }
         withTimeoutOrNull(5000) {
             if (SorapointaConfig.data.useCurrentRegionForLoginRsp) {
@@ -150,22 +149,22 @@ internal object SetPlayerBornDataReqHandler : PreLoginPacketHandler<SetPlayerBor
     override val adapter: ProtoAdapter<SetPlayerBornDataReq> = SetPlayerBornDataReq.ADAPTER
 
     suspend fun createNewPlayer(
-        state: NetworkHandler.Login,
+        ctx: PacketHandlerContext<NetworkHandler.Login>,
         nickname: String,
         pickAvatarId: Int,
     ) {
-        val playerData = PlayerData.create(state.uid, nickname, pickAvatarId)
-        val player = state.createPlayer(playerData)
-        PlayerFirstCreateEvent(player, pickAvatarId).broadcast()
-        player.impl().saveData()
+        val playerData = PlayerData.create(ctx.state.account.id.value, nickname, pickAvatarId)
+        val player = ctx.state.createPlayer(playerData)
+        PlayerFirstCreateEvent(player, ctx.metadata, pickAvatarId).broadcast()
+        player.saveData()
 
-        state.setToOK(player)
+        ctx.state.setToOK(player, ctx.metadata)
     }
 
     override suspend fun PacketHandlerContext<NetworkHandler.Login>.handlePacket(
         packet: SetPlayerBornDataReq,
     ) {
-        createNewPlayer(state, packet.nick_name, packet.avatar_id)
+        createNewPlayer(this, packet.nick_name, packet.avatar_id)
         sendPacket(SetPlayerBornDataRspPacket())
     }
 }
@@ -180,7 +179,7 @@ internal object GetPlayerSocialDetailReqHandler : PlayerPacketHandler<GetPlayerS
         packet: GetPlayerSocialDetailReq,
     ) {
         val targetUid = packet.uid
-        val targetPlayer = Sorapointa.findOrNullPlayerById(targetUid)
+        val targetPlayer = Sorapointa.findPlayerByIdOrNull(targetUid)
 
         if (targetPlayer == null) {
             val targetPlayerData = PlayerData.findById(targetUid)?.getPlayerDataBin()
@@ -206,8 +205,8 @@ internal object EnterSceneReadyReqHandler : PlayerPacketHandler<EnterSceneReadyR
         packet: EnterSceneReadyReq,
     ) {
         if (packet.enter_scene_token == player.enterSceneToken) {
-            sendPacket(EnterScenePeerNotifyPacket(player))
-            sendPacket(EnterSceneReadyRspPacket.Succ(player))
+            sendPacketSync(EnterScenePeerNotifyPacket(player))
+            sendPacketSync(EnterSceneReadyRspPacket.Succ(player))
         } else {
             sendPacket(EnterSceneReadyRspPacket.Fail(player, Retcode.RET_ENTER_SCENE_TOKEN_INVALID))
         }
@@ -224,8 +223,8 @@ internal object EnterSceneDoneReqHandler : PlayerPacketHandler<EnterSceneDoneReq
         packet: EnterSceneDoneReq,
     ) {
         if (packet.enter_scene_token == player.enterSceneToken) {
-            sendPacket(SceneEntityAppearNotifyPacket(player))
-            sendPacket(EnterSceneDoneRspPacket.Succ(player))
+            sendPacketSync(SceneEntityAppearNotifyPacket(player))
+            sendPacketSync(EnterSceneDoneRspPacket.Succ(player))
         } else {
             sendPacket(EnterSceneDoneRspPacket.Fail(player, Retcode.RET_ENTER_SCENE_TOKEN_INVALID))
         }
@@ -243,9 +242,9 @@ internal object SceneInitFinishReqHandler : PlayerPacketHandler<SceneInitFinishR
     ) {
         if (packet.enter_scene_token == player.enterSceneToken) {
             // TODO: divide those into separate modules
-            sendPacket(SceneTeamUpdateNotifyPacket(player))
-            sendPacket(PlayerEnterSceneInfoNotifyPacket(player))
-            sendPacket(SceneInitFinishRspPacket.Succ(player))
+            sendPacketSync(SceneTeamUpdateNotifyPacket(player))
+            sendPacketSync(PlayerEnterSceneInfoNotifyPacket(player))
+            sendPacketSync(SceneInitFinishRspPacket.Succ(player))
         } else {
             sendPacket(SceneInitFinishRspPacket.Fail(player, Retcode.RET_ENTER_SCENE_TOKEN_INVALID))
         }
@@ -269,16 +268,16 @@ internal object PostEnterSceneReqHandler : PlayerPacketHandler<PostEnterSceneReq
     }
 }
 
-internal object UnionCmdNotifyHandler : PlayerPacketHandler<UnionCmdNotify>(
+internal object UnionCmdNotifyHandler : PreLoginPacketHandler<UnionCmdNotify, NetworkHandlerStateI>(
     PacketId.UNION_CMD_NOTIFY,
 ) {
 
     override val adapter: ProtoAdapter<UnionCmdNotify> = UnionCmdNotify.ADAPTER
 
-    override suspend fun PlayerPacketHandlerContext.handlePacket(packet: UnionCmdNotify) {
+    override suspend fun PacketHandlerContext<NetworkHandlerStateI>.handlePacket(packet: UnionCmdNotify) {
         packet.cmd_list.forEach {
             val soraPacket = SoraPacket(it.message_id.toUShort(), metadata, it.body.toByteArray())
-            player.impl().forwardHandlePacket(soraPacket)
+            state.handlePacket(soraPacket)
         }
     }
 }
