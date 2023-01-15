@@ -7,7 +7,9 @@
 <p align="center">
 <a href="https://kotlinlang.org"><img 
 src="https://img.shields.io/badge/kotlin-%230095D5.svg?style=for-the-badge&logo=kotlin&logoColor=white" 
-alt="Kotlin"/></a><a 
+alt="Kotlin"/></a><a href="https://www.rust-lang.org/"><img 
+src="https://img.shields.io/badge/rust-%23704b34.svg?style=for-the-badge&logo=rust&logoColor=white" 
+alt="Rust"/></a><a 
 href="https://gradle.org/"><img 
 src="https://img.shields.io/badge/Gradle-02303A.svg?style=for-the-badge&logo=Gradle&logoColor=white" 
 alt="Gradle"/></a><a 
@@ -49,6 +51,7 @@ Sorapointa can be written as the Chinese equivalent of "空想家", but in any c
 Requirement:
 
 - JDK 17
+- Rust Toolchains, see：[sorapointa-native/README.md](../sorapointa-native/README.md)
 
 ```shell
 ./gradlew shadowJar
@@ -76,12 +79,13 @@ database.driver.list=SQLITE,POSTGRESQL
 
 ### Person
 
-- [HolographicHat](https://github.com/HolographicHat) - Supports a lot on algorithms and cryptographic.
+- [HolographicHat](https://github.com/HolographicHat) - Supports a lot on algorithms and computer security.
 
 ### Project
 
-- JVM - The best programming language VM
+- [JVM](https://openjdk.org/) - The best programming language VM
 - [Kotlin](https://github.com/JetBrains/kotlin) - A modern programming language that makes developers happier.
+- [Rust](https://github.com/rust-lang/rust) - A language empowering everyone to build reliable and efficient software.
 - [IDEA](https://www.jetbrains.com/idea/) - Capable and Ergonomic IDE for JVM
 - [Grasscutter](https://github.com/Grasscutters/Grasscutter)
 - [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) - Kotlin multiplatform / multi-format
@@ -98,6 +102,6 @@ database.driver.list=SQLITE,POSTGRESQL
 - [Password4j](https://github.com/Password4j/password4j) - Password4j is a user-friendly cryptographic library that
   supports Argon2 and so on
 - [JLine](https://github.com/jline/jline3) - JLine is a Java library for handling console input.
-- [kaml](https://github.com/charleskorn/kaml) - YAML support for kotlinx.serialization
+- [yamlkt](https://github.com/him188/yamlkt) - Multiplatform YAML parser & serializer for kotlinx.serialization
 - [Protobuf](https://developers.google.com/protocol-buffers) - Protocol buffers are a language-neutral, platform-neutral
   extensible mechanism for serializing structured data
