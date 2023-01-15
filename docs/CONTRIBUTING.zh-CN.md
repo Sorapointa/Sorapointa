@@ -4,11 +4,12 @@
 
 ## 代码风格
 
-- Kotlin 官方代码风格 - [中文站参考](https://www.kotlincn.net/docs/reference/coding-conventions.html)
+- Kotlin 官方代码风格 - [中文站参考](https://book.kotlincn.net/text/coding-conventions.html)
 - 缩进 4 空格，项目中的 `.editorconfig` 配置会帮助您的 IDE 自动设置
 - 可以使用 `*` 导入
 - 我们会要求**所有并入活跃分支**的 PR 通过 `ktlint` 检查
-- 我们建议您在提交前使用 `Ktlint` 格式化代码。可安装 [Ktlint](https://ktlint.github.io/) 后运行根目录 `format.sh`。
+- 可使用命令 `./gradlew spotlessCheck` 运行 Gradle 任务
+- 关于 Rust 代码风格，参见：[sorapointa-native/README.md](../sorapointa-native/README.zh-CN.md)
 
 ## Git 规范
 
@@ -36,14 +37,14 @@
 ### 关于不兼容性修改与同步上游更新
 
 - 一般而言，最好不要在 `fork` 后拉取任何上游的更新，但是若这些更新对您来说是必须地请按照以下流程进行更新：
-  - 从当前最新的上游分支中新建分支 `xxx_update` 到本地
-  - 将您已经在其他分支提交的更改 `rebase`（若无冲突） 或者 `cherrypick` 进入 `xxx_update` 分支
+  - 从当前最新的上游分支中新建分支 `xxx-update` 到本地
+  - 将您已经在其他分支提交的更改 `rebase`（若无冲突） 或者 `cherrypick` 进入 `xxx-update` 分支
   - 解决所有冲突，并修正所有的兼容性错误
-  - 将 `xxx_update` 提交 PR 并入活跃分支
-- 当您进行了任何的不兼容性修改，请同样按照上述流程，将修复了所有不兼容性问题的分支作为新分支，如 `xxx_premerge`
+  - 将 `xxx-update` 提交 PR 并入活跃分支
+- 当您进行了任何的不兼容性修改，请同样按照上述流程，将修复了所有不兼容性问题的分支作为新分支，如 `xxx-premerge`
   - 注意，若此时同时存在其他 PR 或者分支，并同样受到您的不兼容性更新影响，
-    请将其他 PR 的合并目标设置为 `xxx_premerge` 也就是相当于一个暂存分支
-  - 当所有受到影响 PR 或者分支，都合并进入了 `xxx_premerge` 并解决了所有兼容性问题后，提交 PR 申请并入活跃分支
+    请将其他 PR 的合并目标设置为 `xxx-premerge` 也就是相当于一个暂存分支
+  - 当所有受到影响 PR 或者分支，都合并进入了 `xxx-premerge` 并解决了所有兼容性问题后，提交 PR 申请并入活跃分支
 
 ### Commit 规范
 

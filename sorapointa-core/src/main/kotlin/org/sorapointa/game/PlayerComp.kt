@@ -9,6 +9,7 @@ import org.sorapointa.game.data.MAX_STAMINA
 import org.sorapointa.proto.ProfilePicture
 import org.sorapointa.proto.bin.*
 import org.sorapointa.server.network.PlayerDataNotifyPacket
+import org.sorapointa.utils.getNextGuid
 import org.sorapointa.utils.now
 import org.sorapointa.utils.nowSeconds
 import org.sorapointa.utils.todayStartTime
@@ -87,8 +88,8 @@ class PlayerBasicComp(
     private var _guidSeqId = atomic(initPlayerBasicCompBin.guid_seq_id)
 
     internal fun init() {
-        player.registerEventListener<PlayerLoginEvent> {
-            player.impl().sendPacket(PlayerDataNotifyPacket(player))
+        player.registerEventBlockListener<PlayerLoginEvent> {
+            sendPacketSync(PlayerDataNotifyPacket(player))
         }
     }
 
@@ -101,8 +102,7 @@ class PlayerBasicComp(
     }
 
     internal fun getNextGuid(): Long {
-        val nextGuid = _guidSeqId.getAndIncrement().toLong()
-        return (player.uid shl 32) + nextGuid
+        return _guidSeqId.getAndIncrement().getNextGuid(player.uid)
     }
 
     fun toBin(): PlayerBasicCompBin {
@@ -184,6 +184,9 @@ class PlayerWorldData(
         }
     }
 
+    internal fun init() {
+    }
+
     private val sceneMap = ConcurrentHashMap(initWorldBin.scene_map)
     val level = initWorldBin.level
     val lastAdjustTime = initWorldBin.last_adjust_time
@@ -217,8 +220,6 @@ class PlayerSocialComp(
     }
 
     internal fun init() {
-//        player.registerEventListener<PlayerLoginEvent> {
-//        }
     }
 
     private val unlockNameCardList = ConcurrentLinkedQueue(initPlayerSocialBin.unlock_name_card_list)

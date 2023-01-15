@@ -3,101 +3,94 @@ package org.sorapointa.server.network
 import com.squareup.wire.Message
 import com.squareup.wire.ProtoAdapter
 import org.sorapointa.event.broadcastEvent
-import org.sorapointa.events.HandleIncomingPacketEvent
-import org.sorapointa.events.HandlePreLoginIncomingPacketEvent
+import org.sorapointa.events.HandlePacketEvent
+import org.sorapointa.events.HandlePreLoginPacketEvent
 import org.sorapointa.game.Player
+import org.sorapointa.game.impl
+import org.sorapointa.proto.PacketHead
 import org.sorapointa.proto.SoraPacket
 import org.sorapointa.utils.uncheckedCast
 
-interface IncomingPacketHandler<TPacketReq : Message<*, *>> {
+internal interface IncomingPacketHandler<Req, S, C>
+    where Req : Message<*, *>, S : NetworkHandlerStateI, C : PacketHandlerContext<S> {
 
     val cmdId: UShort
 
-    fun parsing(data: ByteArray): TPacketReq
+    fun parsing(data: ByteArray): Req
+
+    suspend fun C.handle(soraPacket: SoraPacket)
 }
 
-/**
- * Server passively receives a packet (request),
- * client will require a response, copy metadata in this case
- */
-internal abstract class AbstractIncomingPacketHandler<TPacketReq : Message<*, *>>(
+internal open class PacketHandlerContext<S : NetworkHandlerStateI>(
+    val state: S,
+    val metadata: PacketHead,
+) {
+
+    fun sendPacket(packet: OutgoingPacket<*>) {
+        state.networkHandler.sendPacket(packet, metadata)
+    }
+
+    suspend fun sendPacketSync(packet: OutgoingPacket<*>) {
+        state.networkHandler.sendPacketSync(packet, metadata)
+    }
+}
+
+internal open class PlayerPacketHandlerContext(
+    val player: Player,
+    metadata: PacketHead,
+) : PacketHandlerContext<NetworkHandler.Logged>(
+    state = player.impl().networkHandler.state.getStateInstance().uncheckedCast(),
+    metadata = metadata,
+)
+
+internal abstract class AbstractPacketHandler<Req, S, C>(
     override val cmdId: UShort,
-) : IncomingPacketHandler<TPacketReq> {
+) : IncomingPacketHandler<Req, S, C>
+    where Req : Message<*, *>, S : NetworkHandlerStateI, C : PacketHandlerContext<S> {
 
-    protected abstract val adapter: ProtoAdapter<TPacketReq>
+    protected abstract val adapter: ProtoAdapter<Req>
 
-    override fun parsing(data: ByteArray): TPacketReq = adapter.decode(data)
+    override fun parsing(data: ByteArray): Req = adapter.decode(data)
+
+    override suspend fun C.handle(soraPacket: SoraPacket) {
+        handle(parsing(soraPacket.data))
+    }
+
+    abstract suspend fun C.handle(packet: Req)
 }
 
-internal abstract class IncomingSessionPacketHandler<TPacketReq : Message<*, *>, TState : NetworkHandlerStateInterface>(
+internal abstract class PlayerPacketHandler<Req : Message<*, *>>(
     cmdId: UShort,
-) : AbstractIncomingPacketHandler<TPacketReq>(cmdId) {
-    abstract suspend fun TState.handle(soraPacket: SoraPacket): OutgoingPacket<*>?
-}
+) : AbstractPacketHandler<Req, NetworkHandler.Logged, PlayerPacketHandlerContext>(cmdId) {
 
-internal abstract class IncomingPlayerPacketHandler<TPacketReq : Message<*, *>>(
-    cmdId: UShort,
-) : IncomingSessionPacketHandler<TPacketReq, NetworkHandler.PlayerHandlePacketState>(cmdId) {
-
-    override suspend fun NetworkHandler.PlayerHandlePacketState.handle(
-        soraPacket: SoraPacket,
-    ): OutgoingPacket<*>? = this.bindPlayer.handle(soraPacket)
-
-    abstract suspend fun Player.handle(soraPacket: SoraPacket): OutgoingPacket<*>?
-}
-
-internal abstract class IncomingPacketHandlerWithoutResponse<TPacketReq : Message<*, *>>(
-    cmdId: UShort,
-) : IncomingPlayerPacketHandler<TPacketReq>(cmdId) {
-
-    protected abstract suspend fun Player.handlePacket(packet: TPacketReq)
-
-    override suspend fun Player.handle(soraPacket: SoraPacket): OutgoingPacket<*>? {
-        val packet = parsing(soraPacket.data)
-        HandleIncomingPacketEvent(this, packet, adapter).broadcastEvent {
+    override suspend fun PlayerPacketHandlerContext.handle(
+        packet: Req,
+    ) {
+        HandlePacketEvent(player, packet, metadata, adapter).broadcastEvent {
             handlePacket(packet)
         }
-        return null // No response for this type of packet
     }
+
+    abstract suspend fun PlayerPacketHandlerContext.handlePacket(packet: Req)
 }
 
-internal abstract class IncomingPacketHandlerWithResponse<TPacketReq : Message<*, *>, TPacketRsp : OutgoingPacket<*>>(
-    cmdId: UShort,
-) : IncomingPlayerPacketHandler<TPacketReq>(cmdId) {
+internal abstract class PreLoginPacketHandler<Req, S>(cmdId: UShort) :
+    AbstractPacketHandler<Req, S, PacketHandlerContext<S>>(cmdId)
+    where Req : Message<*, *>,
+          S : NetworkHandlerStateI {
 
-    protected abstract suspend fun Player.handlePacket(packet: TPacketReq): TPacketRsp
+    protected abstract suspend fun PacketHandlerContext<S>.handlePacket(packet: Req)
 
-    override suspend fun Player.handle(soraPacket: SoraPacket): OutgoingPacket<*>? {
-        val packet = parsing(soraPacket.data)
-        return HandleIncomingPacketEvent(this, packet, adapter).broadcastEvent {
-            handlePacket(packet).also {
-                it.metadata = soraPacket.metadata
-            }
-        }
-    }
-}
-
-internal abstract class IncomingPreLoginPacketHandler<
-    TPacketReq : Message<*, *>, TPacketRsp : OutgoingPacket<*>, TState : NetworkHandlerStateInterface,
-    >(
-    cmdId: UShort,
-) : IncomingSessionPacketHandler<TPacketReq, TState>(cmdId) {
-
-    protected abstract suspend fun TState.handlePacket(packet: TPacketReq): TPacketRsp
-
-    override suspend fun TState.handle(soraPacket: SoraPacket): OutgoingPacket<*>? {
-        val packet = parsing(soraPacket.data)
-        return HandlePreLoginIncomingPacketEvent(networkHandler, packet, adapter).broadcastEvent {
-            handlePacket(packet).also {
-                it.metadata = soraPacket.metadata
-            }
+    override suspend fun PacketHandlerContext<S>.handle(packet: Req) {
+        HandlePreLoginPacketEvent(state.networkHandler, packet, metadata, adapter).broadcastEvent {
+            handlePacket(packet)
         }
     }
 }
 
 internal object IncomingPacketFactory {
 
-    private val incomingPacketHandlers = listOf<IncomingSessionPacketHandler<*, *>>(
+    private val incomingPacketHandlers = listOf<IncomingPacketHandler<*, *, *>>(
         GetPlayerTokenReqHandler,
         PingReqHandler,
         PlayerSetPauseReqHandler,
@@ -111,14 +104,20 @@ internal object IncomingPacketFactory {
         UnionCmdNotifyHandler,
     )
 
-    suspend inline fun <reified TState : NetworkHandlerStateInterface> TState.tryHandle(
-        packet: SoraPacket,
-    ): OutgoingPacket<*>? {
+    suspend inline fun <reified S, reified C> handle(context: C, packet: SoraPacket)
+        where S : NetworkHandlerStateI, C : PacketHandlerContext<S> {
         val handler = incomingPacketHandlers
             .firstOrNull { it.cmdId == packet.cmdId }
-            ?: return null
-        val cast = handler.uncheckedCast<IncomingSessionPacketHandler<*, TState>>()
-        return cast.run { handle(packet) }
+            ?: return
+        val cast = runCatching {
+            handler.uncheckedCast<IncomingPacketHandler<*, S, C>>()
+        }.getOrElse {
+            throw IllegalStateException(
+                "Handler ${handler::class.simpleName} can not be cast with " +
+                    "state: ${S::class.simpleName}, context: ${C::class.simpleName}",
+            )
+        }
+        cast.run { context.handle(packet) }
     }
 
     /**

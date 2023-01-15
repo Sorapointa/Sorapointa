@@ -8,6 +8,7 @@ import org.sorapointa.dataloader.def.*
 import org.sorapointa.game.data.Position
 import org.sorapointa.proto.*
 import org.sorapointa.utils.*
+import org.sorapointa.utils.encoding.bkdrHash
 import kotlin.contracts.contract
 
 interface AvatarEntity : SceneEntity {
@@ -219,6 +220,7 @@ internal class AvatarProto(
         // TODO: hardcode
         if (avatar.avatarId == 10000005) {
             val abilities = listOf(
+                "",
                 "Avatar_PlayerBoy_NormalAttack_DamageHandler",
                 "Avatar_Player_FlyingBomber",
                 "Avatar_Player_CamCtrl",
@@ -239,13 +241,14 @@ internal class AvatarProto(
                 ability_embryo_list = abilities.map {
                     AbilityEmbryo(
                         ability_id = abilities.indexOf(it),
-                        ability_name_hash = it.hashCode(),
+                        ability_name_hash = bkdrHash(it),
                         ability_override_name_hash = 1178079449,
                     )
                 },
             )
         } else if (avatar.avatarId == 10000007) {
             val abilities = listOf(
+                "",
                 "Avatar_PlayerGirl_NormalAttack_DamageHandler",
                 "Avatar_Player_FlyingBomber",
                 "Avatar_Player_CamCtrl",
@@ -266,7 +269,7 @@ internal class AvatarProto(
                 ability_embryo_list = abilities.map {
                     AbilityEmbryo(
                         ability_id = abilities.indexOf(it),
-                        ability_name_hash = it.hashCode(),
+                        ability_name_hash = bkdrHash(it),
                         ability_override_name_hash = 1178079449,
                     )
                 },

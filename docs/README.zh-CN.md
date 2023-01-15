@@ -7,7 +7,9 @@
 <p align="center">
 <a href="https://kotlinlang.org"><img 
 src="https://img.shields.io/badge/kotlin-%230095D5.svg?style=for-the-badge&logo=kotlin&logoColor=white" 
-alt="Kotlin"/></a><a 
+alt="Kotlin"/></a><a href="https://www.rust-lang.org/zh-CN/"><img 
+src="https://img.shields.io/badge/rust-%23704b34.svg?style=for-the-badge&logo=rust&logoColor=white" 
+alt="Rust"/></a><a 
 href="https://gradle.org/"><img 
 src="https://img.shields.io/badge/Gradle-02303A.svg?style=for-the-badge&logo=Gradle&logoColor=white" 
 alt="Gradle"/></a><a 
@@ -46,6 +48,7 @@ Sorapointa 可以写成对应的汉字「空想家」，但无论如何，请你
 需要:
 
 - JDK 17
+- Rust 工具链，详情参见：[sorapointa-native/README.md](../sorapointa-native/README.zh-CN.md)
 
 ```shell
 ./gradlew shadowJar
@@ -57,10 +60,10 @@ Sorapointa 可以写成对应的汉字「空想家」，但无论如何，请你
 
 在项目根目录创建 `local.properties` 并编辑。配置使用 Java `.properties` 格式。
 
-| key                    | 描述                     | 可用值                    |
-|------------------------|-------------------------|------------------------|
-| `database.default`     | 为新配置填充的默认数据库    | `SQLITE`, `POSTGRESQL` |
-| `database.driver.list` | 构建将提供的数据库驱动列表  | `SQLITE`, `POSTGRESQL` |
+| key                    | 描述         | 可用值                    |
+|------------------------|------------|------------------------|
+| `database.default`     | 默认配置使用的数据库 | `SQLITE`, `POSTGRESQL` |
+| `database.driver.list` | 编译时打包哪些数据库 | `SQLITE`, `POSTGRESQL` |
 
 示例：
 
@@ -81,8 +84,9 @@ database.driver.list=SQLITE,POSTGRESQL
 
 ### Project
 
-- JVM - The best programming language VM
+- [JVM](https://openjdk.org/) - The best programming language VM
 - [Kotlin](https://github.com/JetBrains/kotlin) - A modern programming language that makes developers happier.
+- [Rust](https://github.com/rust-lang/rust) - A language empowering everyone to build reliable and efficient software.
 - [IDEA](https://www.jetbrains.com/idea/) - Capable and Ergonomic IDE for JVM
 - [Grasscutter](https://github.com/Grasscutters/Grasscutter)
 - [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) - Kotlin multiplatform / multi-format
@@ -99,6 +103,6 @@ database.driver.list=SQLITE,POSTGRESQL
 - [Password4j](https://github.com/Password4j/password4j) - Password4j is a user-friendly cryptographic library that
   supports Argon2 and so on
 - [JLine](https://github.com/jline/jline3) - JLine is a Java library for handling console input.
-- [yamlkt](https://github.com/him188/yamlkt) - Multiplatform YAML parser & serializer for kotlinx.serialization
+- [kaml](https://github.com/charleskorn/kaml) - YAML support for kotlinx.serialization
 - [Protobuf](https://developers.google.com/protocol-buffers) - Protocol buffers are a language-neutral, platform-neutral
   extensible mechanism for serializing structured data

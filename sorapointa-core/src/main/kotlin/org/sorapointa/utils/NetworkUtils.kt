@@ -4,6 +4,7 @@ import io.ktor.utils.io.core.*
 import io.netty.buffer.ByteBuf
 import mu.KotlinLogging
 import org.sorapointa.SorapointaConfig
+import org.sorapointa.dataloader.common.EntityIdType
 import org.sorapointa.proto.*
 import org.sorapointa.utils.encoding.hex
 
@@ -37,19 +38,33 @@ internal fun ByteBuf.readToSoraPacket(
     key: ByteArray,
     block: (SoraPacket) -> Unit,
 ) {
-    if (this.readableBytes() > 12) { // 2+2+2+4+2 at least to be > 12 bytes
+    if (this.readableBytes() > 12) { // 2+2+2+4+2 at least to be > 12 bytes]
         val before = this.toByteArray()
-        val decrypt = before.xor(key).toReadPacket()
-        if (decrypt.copy().readUShort() == START_MAGIC) {
-            block(decrypt.readToSoraPacket())
+        val decrypted = if (logger.isDebugEnabled) {
+            before.copyOf().xor(key)
         } else {
-            logger.debug { "Detected insanity packet, hex: ${before.hex} decrypted: ${decrypt.readBytes().hex}" }
+            before.xor(key)
+        }
+        val readPacket = decrypted.toReadPacket()
+        if (decrypted.readUShort() == START_MAGIC) {
+            block(readPacket.readToSoraPacket())
+        } else {
+            logger.debug {
+                "Detected insanity packet, hex: ${before.hex} " +
+                    "decrypted: ${readPacket.readBytes().hex} key: ${key.hex}"
+            }
         }
     }
 }
 
-internal fun buildMetadata(sequenceId: Int) =
-    PacketHead(
-        client_sequence_id = sequenceId,
-        sent_ms = nowMilliseconds(),
-    )
+internal fun ByteArray.readUShort(): UShort {
+    return (this[0].toUByte().toInt() shl 8 or this[1].toUByte().toInt()).toUShort()
+}
+
+internal fun Int.getNextGuid(uid: Int): Long {
+    return (uid.toLong() shl 32) + this.toLong()
+}
+
+internal fun Int.getNextEntityId(idType: EntityIdType): Int {
+    return (idType.value shl 24) + this
+}

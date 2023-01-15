@@ -14,6 +14,7 @@ import org.sorapointa.proto.bin.*
 import org.sorapointa.proto.bin.AvatarType
 import org.sorapointa.server.network.AvatarDataNotifyPacket
 import org.sorapointa.server.network.OpenStateUpdateNotifyPacket
+import org.sorapointa.utils.buildConcurrencyMap
 import org.sorapointa.utils.nowSeconds
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -24,11 +25,19 @@ class PlayerAvatarComp(
     private val initAvatarCompBin: PlayerAvatarCompBin,
 ) : PlayerModule {
 
-    private val avatarMap = ConcurrentHashMap(
-        initAvatarCompBin.avatar_list.associate {
-            it.guid to AvatarEntityImpl(player, AbstractAvatar.buildAvatarModule(this, it))
-        },
-    )
+    private val avatarMap = buildConcurrencyMap(
+        initCapacity = initAvatarCompBin.avatar_list.size,
+    ) {
+        initAvatarCompBin.avatar_list.forEach {
+            put(
+                it.guid,
+                AvatarEntityImpl(
+                    ownerPlayer = player,
+                    avatar = AbstractAvatar.buildAvatarFromBin(this@PlayerAvatarComp, it),
+                ),
+            )
+        }
+    }
 
     val curAvatarGuid
         get() = _curAvatarGuid.value
@@ -93,8 +102,8 @@ class PlayerAvatarComp(
             player.scene.addEntity(initAvatar)
         }
         player.registerEventBlockListener<PlayerLoginEvent> {
-            player.sendPacket(AvatarDataNotifyPacket(player))
-            player.sendPacket(OpenStateUpdateNotifyPacket(player))
+            sendPacketSync(AvatarDataNotifyPacket(player))
+            sendPacketSync(OpenStateUpdateNotifyPacket(player))
         }
     }
 
@@ -216,7 +225,7 @@ abstract class AbstractAvatar(
 ) {
     companion object {
 
-        internal fun buildAvatarModule(
+        internal fun buildAvatarFromBin(
             playerAvatarComp: PlayerAvatarComp,
             avatarBin: AvatarBin,
         ): AbstractAvatar {
@@ -472,7 +481,7 @@ class PlayerAvatarTeam(
     }
 
     internal fun getAvatarTeamMapProto() =
-        teamMap.mapValues { (teamId, avatarTeamBin) ->
+        teamMap.mapValues { (_, avatarTeamBin) ->
             AvatarTeam(
                 avatar_guid_list = avatarTeamBin.avatar_guid_list,
                 team_name = avatarTeamBin.team_name,
@@ -510,11 +519,18 @@ class PlayerAvatarSkillDepotComp(
 
     private val _selectedDepotId = atomic(selectedDepotId)
 
-    private val skillDepotMap = ConcurrentHashMap(
-        skillDepotMap.map { (depotId, depotBin) ->
-            depotId to PlayerAvatarSkillDepot(this, depotId, depotBin)
-        }.toMap(),
-    )
+    private val skillDepotMap = buildConcurrencyMap(skillDepotMap.size) {
+        skillDepotMap.forEach { (depotId, depotBin) ->
+            put(
+                depotId,
+                PlayerAvatarSkillDepot(
+                    skillDepotComp = this@PlayerAvatarSkillDepotComp,
+                    skillDepotId = depotId,
+                    skillDepotBin = depotBin,
+                ),
+            )
+        }
+    }
 
     fun getSelectedDepot() =
         getDepot(selectedDepotId)
@@ -570,6 +586,19 @@ class PlayerAvatarSkillDepot(
     private val skillLevelMap = ConcurrentHashMap(skillDepotBin.skill_level_map)
 
     private val _coreProudSkillLevel = atomic(skillDepotBin.core_proud_skill_level)
+
+    init {
+        // init default skill level
+        if (normalAttackLevel == 0) {
+            skillLevelMap[normalAttack?.id] = 1
+        }
+        if (elementSkillLevel == 0) {
+            skillLevelMap[elementSkill?.id] = 1
+        }
+        if (energySkillLevel == 0) {
+            skillLevelMap[energySkill?.id] = 1
+        }
+    }
 
     // TODO: Cache Optimize
     val inherentProudSkillList

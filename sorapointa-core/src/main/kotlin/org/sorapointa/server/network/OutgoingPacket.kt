@@ -183,7 +183,7 @@ internal class PlayerDataNotifyPacket(
             server_time = nowMilliseconds(),
             is_first_login_today = basicComp.isFirstLoginToday,
             region_id = 1, // TODO: Hardcode
-            prop_map = impl().playerProto.protoPropMap,
+            prop_map = playerProto.propMap,
         )
 
     override val adapter: ProtoAdapter<PlayerDataNotify>
@@ -192,7 +192,7 @@ internal class PlayerDataNotifyPacket(
 
 internal class PlayerPropNotifyPacket(
     override val player: Player,
-    val propMap: Map<Int, PropValue> = player.impl().playerProto.protoPropMap,
+    val propMap: Map<Int, PropValue> = player.playerProto.propMap,
 ) : PlayerOutgoingPacket<PlayerPropNotify>(
     PacketId.PLAYER_PROP_NOTIFY,
 ) {
@@ -358,7 +358,7 @@ internal abstract class GetPlayerSocialDetailRspPacket(
     ) : GetPlayerSocialDetailRspPacket(player) {
 
         override fun Player.buildProto(): GetPlayerSocialDetailRsp {
-            val onlinePlayer = Sorapointa.findOrNullPlayerById(targetUid)
+            val onlinePlayer = Sorapointa.findPlayerByIdOrNull(targetUid)
             val isMpModeAvailable = onlinePlayer?.isMpModeAvailable ?: false
             val onlineState = if (onlinePlayer != null) {
                 FriendOnlineState.FRIEND_ONLINE_STATE_ONLINE

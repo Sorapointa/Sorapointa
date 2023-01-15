@@ -9,7 +9,8 @@
 - Star import is allowed
 - We require **all PRs to pass the `ktlint` check** before they merge into the active branch
 - We recommended you to format your code using `Ktlint` before committing.
-  You can install [Ktlint](https://ktlint.github.io/) first then run `format.sh` in project root path.
+- You can run Gradle task `spotlessCheck` via `./gradlew spotlessCheck` command.
+- About Rust code style, see: [sorapointa-native/README.md](../sorapointa-native/README.md)
 
 ## Git
 
@@ -40,17 +41,17 @@
 
 - Please **don't** pull any upstream updates when you open a new branch (or fork),
   but if these updates are necessary for you, please follow this process.
-  - Create a new branch `xxx_update` from the current latest upstream branch to the local
-  - Merge your commits into the `xxx_update` branch
+  - Create a new branch `xxx-update` from the current latest upstream branch to the local
+  - Merge your commits into the `xxx-update` branch
     through `rebase`(if there are no conflicts) or `cherrypick`
   - Resolve all conflicts and fix all compatibility errors
-  - Submit PR to make `xxx_update` merge into active branch
+  - Submit PR to make `xxx-update` merge into active branch
 - When you have made any incompatibility changes,
-  please follow the same process as above and make a new branch, like `xxx_premerge`,
+  please follow the same process as above and make a new branch, like `xxx-premerge`,
   with all incompatibility issues fixed
   - Note: If there are other PRs or branches that are also affected by your incompatible update,
-    set the merge target of the other PRs to `xxx_premerge`, which is equivalent to a staging branch
-  - When all affected PRs or branches have been merged into `xxx_premerge`
+    set the merge target of the other PRs to `xxx-premerge`, which is equivalent to a staging branch
+  - When all affected PRs or branches have been merged into `xxx-premerge`
     and all compatibility issues have been fixed,
     submit a PR to make it merge into the active branch
 

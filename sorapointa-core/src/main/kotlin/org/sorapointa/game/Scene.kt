@@ -3,6 +3,7 @@ package org.sorapointa.game
 import org.sorapointa.dataloader.common.ClimateType
 import org.sorapointa.dataloader.def.SceneData
 import org.sorapointa.dataloader.def.findSceneData
+import org.sorapointa.event.EventPriority
 import org.sorapointa.events.PlayerLoginEvent
 import org.sorapointa.game.data.DEFAULT_PEER_ID
 import org.sorapointa.server.network.PlayerEnterSceneNotifyPacket
@@ -24,6 +25,8 @@ interface Scene {
     val beginTime: Long
     var time: Int
     var climate: ClimateType
+
+    fun init()
 
     fun addEntity(sceneEntity: SceneEntity)
 }
@@ -52,12 +55,12 @@ class SceneImpl(
         set(value) { field = value % (24 * 60) }
     override var climate: ClimateType = ClimateType.CLIMATE_SUNNY
 
-    internal fun init() {
+    override fun init() {
         if (owner.avatarComp.curAvatarGuid != 0L) {
             addEntity(owner.avatarComp.getCurAvatar())
         }
-        owner.registerEventBlockListener<PlayerLoginEvent> {
-            owner.impl().sendPacket(PlayerEnterSceneNotifyPacket.Login(owner))
+        owner.registerEventBlockListener<PlayerLoginEvent>(EventPriority.LOWEST) {
+            sendPacketSync(PlayerEnterSceneNotifyPacket.Login(owner))
         }
     }
 

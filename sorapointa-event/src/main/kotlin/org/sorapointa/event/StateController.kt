@@ -59,9 +59,9 @@ interface WithState<out T : Enum<*>> {
 /**
  * A simple state controller
  *
- * Generic [TState] is an enum included all states of this controller,
- * [TInterfaceWithState] is your custom implementation of [WithState] interface,
- * [TClassWithState] is your parent state that would
+ * Generic [S] is an enum included all states of this controller,
+ * [I] is your custom implementation of [WithState] interface,
+ * [C] is your parent state that would
  * be a receiver in state observer, and interceptor lambda.
  *
  * You should call [StateController.init] to make sure
@@ -142,16 +142,16 @@ interface WithState<out T : Enum<*>> {
  * be a receiver in state observer, and interceptor lambda
  * @see WithState
  */
-open class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState> (
+open class StateController<S : Enum<*>, I : WithState<S>, C> (
     protected var scope: ModuleScope,
-    protected var parentStateClass: TClassWithState,
-    firstState: TInterfaceWithState,
+    protected var parentStateClass: C,
+    firstState: I,
 ) {
 
     protected val currentState = atomic(firstState)
 
-    private var observers = ConcurrentHashMap<suspend TClassWithState.(TState, TState) -> Unit, ListenerState>()
-    private var interceptors = ConcurrentHashMap<suspend TClassWithState.(TState, TState) -> Boolean, ListenerState>()
+    private var observers = ConcurrentHashMap<suspend C.(S, S) -> Unit, ListenerState>()
+    private var interceptors = ConcurrentHashMap<suspend C.(S, S) -> Boolean, ListenerState>()
 
     /**
      * Init state controller, to call the first state [WithState.startState]
@@ -163,13 +163,13 @@ open class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TSt
     /**
      * Get current enum state
      */
-    fun getCurrentState(): TState =
+    fun getCurrentState(): S =
         currentState.value.state
 
     /**
      * Get current instance state
      */
-    fun getStateInstance(): TInterfaceWithState {
+    fun getStateInstance(): I {
         return currentState.value
     }
 
@@ -183,9 +183,9 @@ open class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TSt
      * @see ListenerState
      * @see observeStateChange
      * @see interceptStateChange
-     * @param after transfer to this state, instance type [TInterfaceWithState]
+     * @param after transfer to this state, instance type [I]
      */
-    suspend fun setState(after: TInterfaceWithState): TInterfaceWithState {
+    suspend fun setState(after: I): I {
         val before = currentState.value
         val beforeState = before.state
         val afterState = after.state
@@ -198,10 +198,10 @@ open class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TSt
     }
 
     private suspend fun invokeChange(
-        beforeState: TState,
-        afterState: TState,
+        beforeState: S,
+        afterState: S,
         listenerState: ListenerState,
-        listenerCaller: TClassWithState,
+        listenerCaller: C,
     ): Boolean {
         var isIntercepted by atomic(false)
         observers
@@ -231,13 +231,13 @@ open class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TSt
      * [observer] will be called in parallel
      *
      * @param listenerState a [ListenerState] to indicate invocation priority
-     * @param observer observation lambda block with [TClassWithState] context
+     * @param observer observation lambda block with [C] context
      * @see observe
      * @see setState
      */
     fun observeStateChange(
         listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-        observer: suspend TClassWithState.(TState, TState) -> Unit,
+        observer: suspend C.(S, S) -> Unit,
     ) {
         observers[observer] = listenerState
     }
@@ -248,14 +248,14 @@ open class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TSt
      * [interceptor] will be called in serial
      *
      * @param listenerState a [ListenerState] to indicate invocation priority
-     * @param interceptor interception lambda block with [TClassWithState] context
+     * @param interceptor interception lambda block with [C] context
      * @see block
      * @see intercept
      * @see setState
      */
     fun interceptStateChange(
         listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-        interceptor: suspend TClassWithState.(TState, TState) -> Boolean,
+        interceptor: suspend C.(S, S) -> Boolean,
     ) {
         interceptors[interceptor] = listenerState
     }
@@ -284,13 +284,14 @@ open class StateController<TState : Enum<*>, TInterfaceWithState : WithState<TSt
 }
 
 /**
+ * [S] is state enum, [I] is state interface, [C] is the class with state
  * @param stateInstances all instances of your different state classes
  */
-class InitStateController<TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState> (
+class InitStateController<S : Enum<*>, I : WithState<S>, C> (
     scope: ModuleScope,
-    parentStateClass: TClassWithState,
-    vararg stateInstances: TInterfaceWithState,
-) : StateController<TState, TInterfaceWithState, TClassWithState>(scope, parentStateClass, stateInstances.first()) {
+    parentStateClass: C,
+    vararg stateInstances: I,
+) : StateController<S, I, C>(scope, parentStateClass, stateInstances.first()) {
 
     private val states = listOf(*stateInstances)
 
@@ -304,58 +305,61 @@ class InitStateController<TState : Enum<*>, TInterfaceWithState : WithState<TSta
      * @see ListenerState
      * @see observeStateChange
      * @see interceptStateChange
-     * @param afterState transfer to this state, enum type [TState]
+     * @param afterState transfer to this state, enum type [S]
      */
-    suspend fun setState(afterState: TState): TInterfaceWithState =
+    suspend fun setState(afterState: S): I =
         setState(states.first { it.state == afterState })
 }
 
 /**
  * Quick way of [StateController.observeStateChange]
+ * [S] is state enum, [I] is state interface, [C] is the class with state
  *
  * @param listenerState a [ListenerState] to indicate invocation priority
- * @param observer observation lambda block with [TClassWithState] context,
+ * @param observer observation lambda block with [C] context,
  * and without any input parameter
  * @see StateController.observeStateChange
  * @see StateController.setState
  */
 @Suppress("NOTHING_TO_INLINE")
-inline fun <TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState>
-    StateController<TState, TInterfaceWithState, TClassWithState>.observe(
-        listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-        noinline observer: suspend TClassWithState.() -> Unit,
-    ) = observeStateChange(listenerState) { _, _ -> this.observer() }
+inline fun <S : Enum<*>, I : WithState<S>, C>
+StateController<S, I, C>.observe(
+    listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
+    noinline observer: suspend C.() -> Unit,
+) = observeStateChange(listenerState) { _, _ -> this.observer() }
 
 /**
  * Quick way of [StateController.interceptStateChange]
+ * [S] is state enum, [I] is state interface, [C] is the class with state
  *
  * @param listenerState a [ListenerState] to indicate invocation priority
- * @param interceptor interception lambda block with [TClassWithState] context
+ * @param interceptor interception lambda block with [C] context
  * and without any input parameter
  * @see StateController.interceptStateChange
  * @see StateController.setState
  */
 @Suppress("NOTHING_TO_INLINE")
-inline fun <TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState>
-    StateController<TState, TInterfaceWithState, TClassWithState>.intercept(
-        listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-        noinline interceptor: suspend TClassWithState.() -> Boolean,
-    ) = interceptStateChange(listenerState) { _, _ -> this.interceptor() }
+inline fun <S : Enum<*>, I : WithState<S>, C>
+StateController<S, I, C>.intercept(
+    listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
+    noinline interceptor: suspend C.() -> Boolean,
+) = interceptStateChange(listenerState) { _, _ -> this.interceptor() }
 
 /**
  * Quick way of [StateController.interceptStateChange]
+ * [S] is state enum, [I] is state interface, [C] is the class with state
  *
  * Observe changes and call [block] in serial
  *
  * @param listenerState a [ListenerState] to indicate invocation priority
- * @param block lambda block with [TClassWithState] context
+ * @param block lambda block with [C] context
  * and without any input parameter, and final return
  * @see StateController.interceptStateChange
  * @see StateController.setState
  */
 @Suppress("NOTHING_TO_INLINE")
-inline fun <TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState>
-    StateController<TState, TInterfaceWithState, TClassWithState>.block(
-        listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-        noinline block: suspend TClassWithState.() -> Unit,
-    ) = interceptStateChange(listenerState) { _, _ -> this.block(); false }
+inline fun <S : Enum<*>, I : WithState<S>, C>
+StateController<S, I, C>.block(
+    listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
+    noinline block: suspend C.() -> Unit,
+) = interceptStateChange(listenerState) { _, _ -> this.block(); false }

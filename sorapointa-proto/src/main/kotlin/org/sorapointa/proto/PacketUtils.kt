@@ -7,6 +7,7 @@ import com.squareup.wire.ProtoAdapter
 import com.squareup.wire.WireJsonAdapterFactory
 import io.ktor.utils.io.core.*
 import org.sorapointa.utils.SorapointaInternal
+import org.sorapointa.utils.uncheckedCast
 
 /**
  * Sorapointa Datapacket
@@ -32,7 +33,7 @@ val moshi: Moshi = Moshi.Builder()
 
 @SorapointaInternal
 fun <T : Message<*, *>> T.toJson(): String {
-    val adapter = moshi.adapter(adapter.type?.java) as JsonAdapter<T>
+    val adapter = moshi.adapter(adapter.type?.java).uncheckedCast<JsonAdapter<T>>()
     return adapter.toJson(this)
 }
 

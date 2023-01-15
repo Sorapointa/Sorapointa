@@ -16,6 +16,7 @@ import org.sorapointa.proto.SceneWeaponInfo
 import org.sorapointa.proto.bin.*
 import org.sorapointa.server.network.PlayerStoreNotifyPacket
 import org.sorapointa.server.network.StoreWeightLimitNotifyPacket
+import org.sorapointa.utils.buildConcurrencyMap
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import org.sorapointa.proto.Furniture as FurnitureProto
@@ -41,8 +42,8 @@ class PlayerItemComp(
     internal fun init() {
         val player = player.impl()
         player.registerEventBlockListener<PlayerLoginEvent> {
-            player.sendPacket(StoreWeightLimitNotifyPacket())
-            player.sendPacket(PlayerStoreNotifyPacket(player))
+            sendPacketSync(StoreWeightLimitNotifyPacket())
+            sendPacketSync(PlayerStoreNotifyPacket(player))
         }
     }
 
@@ -74,9 +75,14 @@ class PlayerStore(
     private val initStoreBin: ItemStoreBin,
 ) {
 
-    private val itemList = initStoreBin.item_list
-        .associate { it.guid to AbstractItem.buildItemModule(it) }
-        .toMutableMap()
+    private val itemList = buildConcurrencyMap(
+        initCapacity = initStoreBin.item_list.size,
+    ) {
+        initStoreBin.item_list.forEach {
+            put(it.guid, AbstractItem.buildItemModule(it))
+        }
+    }
+
     val isMaterialItemNumAlarmed = initStoreBin.is_material_item_num_alarmed // unk
 
     private val basicModule = playerItemCompModule.player.basicComp
@@ -226,7 +232,7 @@ interface CountableItem {
 }
 
 abstract class AbstractItem(
-    val itemType: ItemType,
+    private val itemType: ItemType,
     val itemId: Int,
     val guid: Long,
 //    protected val initItemBin: ItemBin
