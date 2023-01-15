@@ -12,7 +12,7 @@ impl<'a> JNIEnvExt<'a> for JNIEnv<'a> {
         T: Desc<'a, JClass<'c>>,
     {
         if let Err(err) = self.throw_new(class, msg) {
-            eprintln!("Faild to throw exception, {}\n  caused by {:?}", msg, err)
+            eprintln!("Failed to throw exception, {}\n  caused by {:?}", msg, err)
         };
     }
 }
