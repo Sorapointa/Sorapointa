@@ -15,11 +15,12 @@ class ListPlayer(private val sender: CommandSender) : Command(sender, ListPlayer
     )
 
     override suspend fun run() {
+        val list = Sorapointa.getPlayerList()
         sender.sendMessage(
             CoreBundle.message(
                 "sora.cmd.list.player.msg",
-                Sorapointa.playerList.size,
-                Sorapointa.playerList.joinToString { "${it.account.userName} (${it.uid})" },
+                list.size,
+                list.joinToString { "${it.account.userName} (${it.basicComp.nickname}, UID:${it.uid})" },
                 locale = sender.locale,
             ),
         )

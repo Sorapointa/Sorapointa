@@ -31,9 +31,9 @@ class WorldImpl(
         get() = sceneList
             .fold(mutableMapOf()) { acc, i -> acc.putAll(i.playerMap); acc }
 
-    private var peerId = DEFAULT_PEER_ID
+    private var peerId = atomic(DEFAULT_PEER_ID)
 
-    fun getNextPeerId() = ++peerId
+    fun getNextPeerId() = peerId.getAndIncrement()
 
     private val nextEntityId = atomic(0)
 

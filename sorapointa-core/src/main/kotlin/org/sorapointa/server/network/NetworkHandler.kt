@@ -11,6 +11,7 @@ import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.sorapointa.Sorapointa
 import org.sorapointa.SorapointaConfig
+import org.sorapointa.dispatch.data.Account
 import org.sorapointa.dispatch.data.DispatchKeyData
 import org.sorapointa.event.StateController
 import org.sorapointa.event.WithState
@@ -19,7 +20,6 @@ import org.sorapointa.events.SendPacketEvent
 import org.sorapointa.game.Player
 import org.sorapointa.game.PlayerImpl
 import org.sorapointa.game.data.PlayerData
-import org.sorapointa.game.impl
 import org.sorapointa.proto.PacketHead
 import org.sorapointa.proto.SoraPacket
 import org.sorapointa.proto.toJson
@@ -166,11 +166,10 @@ internal open class NetworkHandler(
             } else {
                 if (!setting.allowlist.contains(cmdName)) return
             }
-            val direction = if (isOutgoing) "Send" else "Recv"
+            val direction = if (isOutgoing) "@{bold,fg:magenta Send}" else "@{bold,fg:cyan Recv}"
             logger.debug(
-                "SEQ: ${metadata?.client_sequence_id ?: 0} " +
-                    "$direction: $cmdName " +
-                    (proto?.toJson()?.let { "Body: $it" } ?: ""),
+                "@{fg:yellow SEQ: }@{bold,fg:yellow ${metadata?.client_sequence_id ?: 0}} ".color() +
+                    "$direction: @{bold,fg:yellow $cmdName} ${proto?.toJson()?.let { "Body: $it" } ?: ""}".color(),
             )
         }
     }
@@ -213,11 +212,11 @@ internal open class NetworkHandler(
             }
         }
 
-        suspend fun updateKeyAndBindPlayer(uid: Int, seed: ULong) {
-            val playerData = PlayerData.findById(uid)
+        suspend fun updateKeyAndBindPlayer(account: Account, seed: ULong) {
+            val playerData = PlayerData.findById(account.id.value)
             val gameKey = MT19937.generateKey(seed)
 
-            updateSessionState = Login(uid, playerData, gameKey, networkHandler)
+            updateSessionState = Login(account, playerData, gameKey, networkHandler)
         }
 
         override suspend fun handlePacket(packet: SoraPacket) {
@@ -229,7 +228,7 @@ internal open class NetworkHandler(
     }
 
     inner class Login(
-        val uid: Int,
+        val account: Account,
         val playerData: PlayerData?,
         override val gameKey: ByteArray,
         override val networkHandler: NetworkHandler,
@@ -240,20 +239,21 @@ internal open class NetworkHandler(
 
         suspend fun createPlayer(playerData: PlayerData): Player {
             val player = PlayerImpl(
-                uid = uid,
+                account = account,
                 data = playerData,
                 networkHandler = networkHandler,
                 parentCoroutineContext = networkHandler.scope.coroutineContext,
+                initDataBin = playerData.getPlayerDataBin(),
             )
             Sorapointa.addPlayer(player)
             return player
         }
 
-        suspend fun setToOK(player: Player) {
+        suspend fun setToOK(player: Player, metadata: PacketHead?) {
             this@NetworkHandler.state.setState(OK(gameKey, player, networkHandler))
-            val state = player.impl().state.getStateInstance()
+            val state = player.state.getStateInstance()
             if (state is PlayerImpl.Login) {
-                state.onLogin()
+                state.onLogin(metadata)
             }
         }
     }

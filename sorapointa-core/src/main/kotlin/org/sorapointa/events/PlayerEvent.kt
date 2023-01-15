@@ -17,18 +17,32 @@ abstract class PlayerEvent : AbstractEvent() {
 
 // Login order: Init -> (FirstCreate) -> Login -> Disconnect
 
+abstract class RecvPacketTriggerEvent : PlayerEvent() {
+    abstract val metadata: PacketHead?
+
+    fun sendPacket(packet: OutgoingPacket<*>) {
+        player.sendPacket(packet, metadata)
+    }
+
+    suspend fun sendPacketSync(packet: OutgoingPacket<*>) {
+        player.sendPacketSync(packet, metadata)
+    }
+}
+
 class PlayerInitEvent(
     override val player: Player,
 ) : PlayerEvent()
 
 class PlayerFirstCreateEvent(
     override val player: Player,
+    override val metadata: PacketHead?,
     val pickAvatarId: Int,
-) : PlayerEvent()
+) : RecvPacketTriggerEvent()
 
 class PlayerLoginEvent(
     override val player: Player,
-) : PlayerEvent()
+    override val metadata: PacketHead? = null, // metadata from PlayerLoginReq
+) : RecvPacketTriggerEvent()
 
 class PlayerDisconnectEvent(
     override val player: Player,

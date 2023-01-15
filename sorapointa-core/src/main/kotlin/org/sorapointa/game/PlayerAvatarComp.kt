@@ -101,9 +101,9 @@ class PlayerAvatarComp(
             val initAvatar = createFirstData(pickAvatarId)
             player.scene.addEntity(initAvatar)
         }
-        player.registerEventListener<PlayerLoginEvent> {
-            player.sendPacket(AvatarDataNotifyPacket(player))
-            player.sendPacket(OpenStateUpdateNotifyPacket(player))
+        player.registerEventBlockListener<PlayerLoginEvent> {
+            sendPacketSync(AvatarDataNotifyPacket(player))
+            sendPacketSync(OpenStateUpdateNotifyPacket(player))
         }
     }
 

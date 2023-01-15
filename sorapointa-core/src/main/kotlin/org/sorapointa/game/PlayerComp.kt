@@ -88,8 +88,8 @@ class PlayerBasicComp(
     private var _guidSeqId = atomic(initPlayerBasicCompBin.guid_seq_id)
 
     internal fun init() {
-        player.registerEventListener<PlayerLoginEvent> {
-            player.impl().sendPacket(PlayerDataNotifyPacket(player))
+        player.registerEventBlockListener<PlayerLoginEvent> {
+            sendPacketSync(PlayerDataNotifyPacket(player))
         }
     }
 
@@ -184,6 +184,9 @@ class PlayerWorldData(
         }
     }
 
+    internal fun init() {
+    }
+
     private val sceneMap = ConcurrentHashMap(initWorldBin.scene_map)
     val level = initWorldBin.level
     val lastAdjustTime = initWorldBin.last_adjust_time
@@ -217,8 +220,6 @@ class PlayerSocialComp(
     }
 
     internal fun init() {
-//        player.registerEventListener<PlayerLoginEvent> {
-//        }
     }
 
     private val unlockNameCardList = ConcurrentLinkedQueue(initPlayerSocialBin.unlock_name_card_list)

@@ -9,17 +9,16 @@ import org.sorapointa.dispatch.DispatchServer
 import org.sorapointa.dispatch.plugins.getCurrentRegionHttpRsp
 import org.sorapointa.dispatch.plugins.saveCache
 import org.sorapointa.game.Player
-import org.sorapointa.game.impl
 import org.sorapointa.server.ServerNetwork
 import org.sorapointa.utils.ModuleScope
-import java.util.concurrent.ConcurrentLinkedDeque
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 object Sorapointa {
     private var scope = ModuleScope("Sorapointa")
 
-    val playerList = ConcurrentLinkedDeque<Player>()
+    private val playerMap = ConcurrentHashMap<Int, Player>()
 
     internal fun init(
         serverScope: CoroutineScope,
@@ -43,13 +42,21 @@ object Sorapointa {
     }
 
     suspend fun addPlayer(player: Player) {
-        player.impl().init()
-        playerList.add(player)
+        player.init()
+        playerMap[player.uid] = player
+    }
+
+    fun removePlayer(uid: Int) {
+        playerMap.remove(uid)
+    }
+
+    fun getPlayerList(): List<Player> {
+        return playerMap.values.toList()
     }
 
     fun findPlayerById(id: Int) =
-        playerList.first { it.uid == id }
+        playerMap[id] ?: error("Cannot find player with uid $id")
 
-    fun findOrNullPlayerById(id: Int) =
-        playerList.firstOrNull { it.uid == id }
+    fun findPlayerByIdOrNull(id: Int) =
+        playerMap[id]
 }

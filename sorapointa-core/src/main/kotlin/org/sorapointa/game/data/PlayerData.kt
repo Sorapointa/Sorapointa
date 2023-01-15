@@ -45,7 +45,6 @@ class PlayerData(id: EntityID<Int>) : Entity<Int>(id) {
                     it[nickname] = nickName
                     it[createTime] = now()
                     it[lastSaveTime] = now()
-//                    PlayerDataBin.ADAPTER.encode(stream, defaultBinData(id, nickName, pickInitAvatarId))
                     it[binData] = PlayerDataBin.ADAPTER.encode(defaultBinData(id, nickName, pickInitAvatarId))
                 },
             )?.apply {
@@ -68,16 +67,6 @@ class PlayerData(id: EntityID<Int>) : Entity<Int>(id) {
                 social_bin = socialCompBin,
             )
         }
-
-//        private fun encodeBinDataToStream(binData: PlayerDataBin): Buffer {
-//            val stream = Buffer()
-//            PlayerDataBin.ADAPTER.encode(stream, binData)
-//            return stream
-//        }
-//
-//        private fun decodeBinDataToStream(stream: InputStream): PlayerDataBin {
-//            return PlayerDataBin.ADAPTER.decode(stream)
-//        }
     }
 
     var locale: Locale? by PlayerDataTable.locale.transform(
