@@ -65,6 +65,7 @@ class ConsoleUser(val sender: ConsoleCommandSender) : ConsoleCommand(
                 )
                 ConsoleUsers.save()
             }
+
             Operation.ADD -> {
                 if (ConsoleUsers.data.users.contains(username)) {
                     sender.sendMessage(
@@ -78,11 +79,16 @@ class ConsoleUser(val sender: ConsoleCommandSender) : ConsoleCommand(
                 )
                 ConsoleUsers.save()
             }
+
             Operation.DELETE -> {
                 val removed = ConsoleUsers.data.users.remove(username) != null
                 if (removed) {
                     sender.sendMessage(
-                        CoreBundle.message("sora.cmd.console.user.msg.success.remove", username, locale = sender.locale),
+                        CoreBundle.message(
+                            "sora.cmd.console.user.msg.success.remove",
+                            username,
+                            locale = sender.locale,
+                        ),
                     )
                 } else {
                     sender.sendMessage(
@@ -90,6 +96,7 @@ class ConsoleUser(val sender: ConsoleCommandSender) : ConsoleCommand(
                     )
                 }
             }
+
             Operation.LIST -> {
                 val usrs = ConsoleUsers.data.users.keys
                 sender.sendMessage(

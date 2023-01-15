@@ -77,7 +77,9 @@ internal abstract class IncomingPacketHandlerWithResponse<TPacketReq : Message<*
     }
 }
 
-internal abstract class IncomingPreLoginPacketHandler<TPacketReq : Message<*, *>, TPacketRsp : OutgoingPacket<*>, TState : NetworkHandlerStateInterface>(
+internal abstract class IncomingPreLoginPacketHandler<
+    TPacketReq : Message<*, *>, TPacketRsp : OutgoingPacket<*>, TState : NetworkHandlerStateInterface,
+    >(
     cmdId: UShort,
 ) : IncomingSessionPacketHandler<TPacketReq, TState>(cmdId) {
 

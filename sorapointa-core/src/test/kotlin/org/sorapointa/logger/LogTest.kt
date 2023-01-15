@@ -22,7 +22,9 @@ class LogTest {
         logger.warn(OutOfMemoryError()) { "Cras a ex id ipsum sagittis porttitor." }
         logger.info(IndexOutOfBoundsException()) { "Curabitur at diam eu nibh hendrerit mollis." }
         logger.debug(IllegalStateException()) { "Aenean quis libero aliquet metus viverra hendrerit." }
-        logger.trace(IllegalArgumentException()) { "Donec dignissim sem non ipsum suscipit, sit amet fermentum nunc iaculis." }
+        logger.trace(IllegalArgumentException()) {
+            "Donec dignissim sem non ipsum suscipit, sit amet fermentum nunc iaculis."
+        }
     }
 }
 /* ktlint-enable max-line-length */

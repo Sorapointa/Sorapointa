@@ -9,7 +9,7 @@ interface PropEnum {
 }
 
 inline fun <reified T> acceptEnum(jsonPrimitive: JsonPrimitive, defaultEnum: T): T
-where T : PropEnum, T : Enum<T> {
+    where T : PropEnum, T : Enum<T> {
     val content = jsonPrimitive.content
 
     val tryName = getPropEnumByNameOrNull<T>(content)
@@ -23,13 +23,13 @@ inline fun <reified T> getPropEnumByValue(value: Int): T
     where T : PropEnum, T : Enum<T> = enumValues<T>().first { it.value == value }
 
 inline fun <reified T> getPropEnumByValueOrNull(value: Int): T?
-where T : PropEnum, T : Enum<T> = enumValues<T>().firstOrNull { it.value == value }
+    where T : PropEnum, T : Enum<T> = enumValues<T>().firstOrNull { it.value == value }
 
 inline fun <reified T> getPropEnumByName(name: String): T
     where T : PropEnum, T : Enum<T> = enumValues<T>().first { it.name == name }
 
 inline fun <reified T> getPropEnumByNameOrNull(name: String): T?
-where T : PropEnum, T : Enum<T> = enumValues<T>().firstOrNull { it.name == name }
+    where T : PropEnum, T : Enum<T> = enumValues<T>().firstOrNull { it.name == name }
 
 enum class SceneType(override val value: Int) : PropEnum {
     SCENE_NONE(0),
@@ -74,7 +74,6 @@ enum class EntityIdType(override val value: Int) : PropEnum {
     WEAPON(6),
     TEAM(9),
     MPLEVEL(11),
-    ;
 }
 
 enum class ClimateType(override val value: Int) : PropEnum {

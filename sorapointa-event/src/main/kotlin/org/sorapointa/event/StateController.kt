@@ -321,10 +321,10 @@ class InitStateController<TState : Enum<*>, TInterfaceWithState : WithState<TSta
  */
 @Suppress("NOTHING_TO_INLINE")
 inline fun <TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState>
-StateController<TState, TInterfaceWithState, TClassWithState>.observe(
-    listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-    noinline observer: suspend TClassWithState.() -> Unit,
-) = observeStateChange(listenerState) { _, _ -> this.observer() }
+    StateController<TState, TInterfaceWithState, TClassWithState>.observe(
+        listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
+        noinline observer: suspend TClassWithState.() -> Unit,
+    ) = observeStateChange(listenerState) { _, _ -> this.observer() }
 
 /**
  * Quick way of [StateController.interceptStateChange]
@@ -337,10 +337,10 @@ StateController<TState, TInterfaceWithState, TClassWithState>.observe(
  */
 @Suppress("NOTHING_TO_INLINE")
 inline fun <TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState>
-StateController<TState, TInterfaceWithState, TClassWithState>.intercept(
-    listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-    noinline interceptor: suspend TClassWithState.() -> Boolean,
-) = interceptStateChange(listenerState) { _, _ -> this.interceptor() }
+    StateController<TState, TInterfaceWithState, TClassWithState>.intercept(
+        listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
+        noinline interceptor: suspend TClassWithState.() -> Boolean,
+    ) = interceptStateChange(listenerState) { _, _ -> this.interceptor() }
 
 /**
  * Quick way of [StateController.interceptStateChange]
@@ -355,7 +355,7 @@ StateController<TState, TInterfaceWithState, TClassWithState>.intercept(
  */
 @Suppress("NOTHING_TO_INLINE")
 inline fun <TState : Enum<*>, TInterfaceWithState : WithState<TState>, TClassWithState>
-StateController<TState, TInterfaceWithState, TClassWithState>.block(
-    listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-    noinline block: suspend TClassWithState.() -> Unit,
-) = interceptStateChange(listenerState) { _, _ -> this.block(); false }
+    StateController<TState, TInterfaceWithState, TClassWithState>.block(
+        listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
+        noinline block: suspend TClassWithState.() -> Unit,
+    ) = interceptStateChange(listenerState) { _, _ -> this.block(); false }

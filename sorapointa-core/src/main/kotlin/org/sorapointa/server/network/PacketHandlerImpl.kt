@@ -38,7 +38,9 @@ internal object PingReqHandler : IncomingPreLoginPacketHandler<PingReq, PingRspP
     }
 }
 
-internal object PlayerSetPauseReqHandler : IncomingPreLoginPacketHandler<PlayerSetPauseReq, PlayerSetPauseRspPacket, NetworkHandlerStateInterface>(
+internal object PlayerSetPauseReqHandler : IncomingPreLoginPacketHandler<
+    PlayerSetPauseReq, PlayerSetPauseRspPacket, NetworkHandlerStateInterface,
+    >(
     PacketId.PLAYER_SET_PAUSE_REQ,
 ) {
     override val adapter: ProtoAdapter<PlayerSetPauseReq> = PlayerSetPauseReq.ADAPTER
@@ -50,7 +52,9 @@ internal object PlayerSetPauseReqHandler : IncomingPreLoginPacketHandler<PlayerS
     }
 }
 
-internal object GetPlayerTokenReqHandler : IncomingPreLoginPacketHandler<GetPlayerTokenReq, GetPlayerTokenRspPacket, NetworkHandler.WaitToken>(
+internal object GetPlayerTokenReqHandler : IncomingPreLoginPacketHandler<
+    GetPlayerTokenReq, GetPlayerTokenRspPacket, NetworkHandler.WaitToken,
+    >(
     PacketId.GET_PLAYER_TOKEN_REQ,
 ) {
     override val adapter: ProtoAdapter<GetPlayerTokenReq> = GetPlayerTokenReq.ADAPTER
@@ -102,7 +106,9 @@ internal object GetPlayerTokenReqHandler : IncomingPreLoginPacketHandler<GetPlay
     }
 }
 
-internal object PlayerLoginReqHandler : IncomingPreLoginPacketHandler<PlayerLoginReq, PlayerLoginRspPacket, NetworkHandler.Login>(
+internal object PlayerLoginReqHandler : IncomingPreLoginPacketHandler<
+    PlayerLoginReq, PlayerLoginRspPacket, NetworkHandler.Login,
+    >(
     PacketId.PLAYER_LOGIN_REQ,
 ) {
     override val adapter: ProtoAdapter<PlayerLoginReq> = PlayerLoginReq.ADAPTER
@@ -131,7 +137,9 @@ internal object PlayerLoginReqHandler : IncomingPreLoginPacketHandler<PlayerLogi
     }
 }
 
-internal object SetPlayerBornDataReqHandler : IncomingPreLoginPacketHandler<SetPlayerBornDataReq, SetPlayerBornDataRspPacket, NetworkHandler.Login>(
+internal object SetPlayerBornDataReqHandler : IncomingPreLoginPacketHandler<
+    SetPlayerBornDataReq, SetPlayerBornDataRspPacket, NetworkHandler.Login,
+    >(
     PacketId.SET_PLAYER_BORN_DATA_REQ,
 ) {
 
@@ -152,7 +160,9 @@ internal object SetPlayerBornDataReqHandler : IncomingPreLoginPacketHandler<SetP
     }
 }
 
-internal object GetPlayerSocialDetailReqHandler : IncomingPacketHandlerWithResponse<GetPlayerSocialDetailReq, GetPlayerSocialDetailRspPacket>(
+internal object GetPlayerSocialDetailReqHandler : IncomingPacketHandlerWithResponse<
+    GetPlayerSocialDetailReq, GetPlayerSocialDetailRspPacket,
+    >(
     PacketId.GET_PLAYER_SOCIAL_DETAIL_REQ,
 ) {
 
@@ -177,7 +187,9 @@ internal object GetPlayerSocialDetailReqHandler : IncomingPacketHandlerWithRespo
     }
 }
 
-internal object EnterSceneReadyReqHandler : IncomingPacketHandlerWithResponse<EnterSceneReadyReq, EnterSceneReadyRspPacket>(
+internal object EnterSceneReadyReqHandler : IncomingPacketHandlerWithResponse<
+    EnterSceneReadyReq, EnterSceneReadyRspPacket,
+    >(
     PacketId.ENTER_SCENE_READY_REQ,
 ) {
 
@@ -195,7 +207,9 @@ internal object EnterSceneReadyReqHandler : IncomingPacketHandlerWithResponse<En
     }
 }
 
-internal object EnterSceneDoneReqHandler : IncomingPacketHandlerWithResponse<EnterSceneDoneReq, EnterSceneDoneRspPacket>(
+internal object EnterSceneDoneReqHandler : IncomingPacketHandlerWithResponse<
+    EnterSceneDoneReq, EnterSceneDoneRspPacket,
+    >(
     PacketId.ENTER_SCENE_DONE_REQ,
 ) {
 
@@ -213,7 +227,9 @@ internal object EnterSceneDoneReqHandler : IncomingPacketHandlerWithResponse<Ent
     }
 }
 
-internal object SceneInitFinishReqHandler : IncomingPacketHandlerWithResponse<SceneInitFinishReq, SceneInitFinishRspPacket>(
+internal object SceneInitFinishReqHandler : IncomingPacketHandlerWithResponse<
+    SceneInitFinishReq, SceneInitFinishRspPacket,
+    >(
     PacketId.SCENE_INIT_FINISH_REQ,
 ) {
 
@@ -233,7 +249,9 @@ internal object SceneInitFinishReqHandler : IncomingPacketHandlerWithResponse<Sc
     }
 }
 
-internal object PostEnterSceneReqHandler : IncomingPacketHandlerWithResponse<PostEnterSceneReq, PostEnterSceneRspPacket>(
+internal object PostEnterSceneReqHandler : IncomingPacketHandlerWithResponse<
+    PostEnterSceneReq, PostEnterSceneRspPacket,
+    >(
     PacketId.POST_ENTER_SCENE_REQ,
 ) {
 
