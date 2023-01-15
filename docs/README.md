@@ -102,6 +102,6 @@ database.driver.list=SQLITE,POSTGRESQL
 - [Password4j](https://github.com/Password4j/password4j) - Password4j is a user-friendly cryptographic library that
   supports Argon2 and so on
 - [JLine](https://github.com/jline/jline3) - JLine is a Java library for handling console input.
-- [yamlkt](https://github.com/him188/yamlkt) - Multiplatform YAML parser & serializer for kotlinx.serialization
+- [kaml](https://github.com/charleskorn/kaml) - YAML support for kotlinx.serialization
 - [Protobuf](https://developers.google.com/protocol-buffers) - Protocol buffers are a language-neutral, platform-neutral
   extensible mechanism for serializing structured data
