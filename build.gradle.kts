@@ -8,14 +8,12 @@ plugins {
     // https://plugins.jetbrains.com/plugin/18949-gradle-libs-error-suppressor
     alias(libs.plugins.spotless)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.ktlint)
     alias(libs.plugins.abi.validator)
     alias(libs.plugins.wire) apply false
     alias(libs.plugins.rust.wrapper) apply false
 }
 
 subprojects {
-    apply(plugin = "org.jlleitschuh.gradle.ktlint")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
     afterEvaluate {
         configureLogbackCopy()
@@ -48,20 +46,21 @@ spotless {
         "ij_kotlin_allow_trailing_comma_on_call_site" to "true",
         "trailing-comma-on-declaration-site" to "true",
         "trailing-comma-on-call-site" to "true",
-        "ktlint_disabled_rules" to "no-wildcard-imports, import-ordering, filename",
+        "ktlint_standard_no-wildcard-imports" to "disabled",
+        "ktlint_disabled_import-ordering" to "disabled",
     )
 
     kotlin {
         target("**/*.kt")
         excludes()
         common()
-        ktlint("0.47.1").editorConfigOverride(ktlintConfig)
+        ktlint(libs.versions.ktlint.get()).editorConfigOverride(ktlintConfig)
     }
 
     kotlinGradle {
         target("**/*.gradle.kts")
         excludes()
         common()
-        ktlint("0.47.1").editorConfigOverride(ktlintConfig)
+        ktlint(libs.versions.ktlint.get()).editorConfigOverride(ktlintConfig)
     }
 }
