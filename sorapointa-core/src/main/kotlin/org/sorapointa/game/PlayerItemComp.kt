@@ -41,7 +41,7 @@ class PlayerItemComp(
 
     internal fun init() {
         val player = player.impl()
-        player.registerEventBlockListener<PlayerLoginEvent> {
+        player.registerEventListener<PlayerLoginEvent> {
             player.sendPacket(StoreWeightLimitNotifyPacket())
             player.sendPacket(PlayerStoreNotifyPacket(player))
         }

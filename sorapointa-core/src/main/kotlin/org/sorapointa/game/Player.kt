@@ -8,7 +8,6 @@ import org.sorapointa.Sorapointa
 import org.sorapointa.command.CommandSender
 import org.sorapointa.dataloader.common.EntityIdType
 import org.sorapointa.dataloader.common.PlayerProp
-import org.sorapointa.dispatch.data.Account
 import org.sorapointa.event.*
 import org.sorapointa.events.PlayerDisconnectEvent
 import org.sorapointa.events.PlayerEvent
@@ -35,9 +34,7 @@ interface Player : CommandSender {
 
     override var locale: Locale?
 
-    val account: Account
-
-//    val data: PlayerData
+    val state: StateController<PlayerStateInterface.State, PlayerStateInterface, Player>
 
     val uid: Int
 
@@ -50,11 +47,6 @@ interface Player : CommandSender {
     val itemComp: PlayerItemComp
     val sceneComp: PlayerSceneComp
     val socialComp: PlayerSocialComp
-
-//
-//    val allAvatar: List<Avatar>
-//
-//    val inventory: Inventory
 
     val guidEntityMap: MutableMap<Long, Int> // Guid -> EntityId
 
@@ -71,38 +63,20 @@ interface Player : CommandSender {
     fun getNextEntityId(idType: EntityIdType): Int
 
     fun getOrNextEntityId(idType: EntityIdType, guid: Long): Int
-}
 
-abstract class AbstractPlayer : Player {
-
-    internal abstract val state:
-        StateController<PlayerStateInterface.State, PlayerStateInterface, Player>
-
-    internal abstract val sceneState:
-        InitStateController<PlayerSceneStateInterface.State, PlayerSceneStateInterface, Player>
-
-    internal abstract val playerProto: PlayerProto
-
-    internal abstract fun <T : Message<*, *>> sendPacketAsync(
+    fun <T : Message<*, *>> sendPacket(
         packet: OutgoingPacket<T>,
         metadata: PacketHead? = null,
     ): Job
 
-    // TODO: 长包 / 合并包 流优化
-    internal abstract suspend fun <T : Message<*, *>> sendPacket(
+    suspend fun <T : Message<*, *>> sendPacketSync(
         packet: OutgoingPacket<T>,
         metadata: PacketHead? = null,
     )
 
-    internal abstract fun forwardHandlePacket(
-        packet: SoraPacket,
-    ): Job
+    fun forwardHandlePacket(packet: SoraPacket): Job
 
-    internal abstract suspend fun close()
-
-    internal abstract suspend fun init()
-
-    internal abstract suspend fun saveData()
+    suspend fun saveData()
 }
 
 interface PlayerStateInterface : WithState<PlayerStateInterface.State> {
@@ -113,23 +87,12 @@ interface PlayerStateInterface : WithState<PlayerStateInterface.State> {
     }
 }
 
-interface PlayerSceneStateInterface : WithState<PlayerSceneStateInterface.State> {
-
-    enum class State {
-        LOADING,
-        INIT,
-        LOADED,
-    }
-}
-
 class PlayerImpl internal constructor(
-    override val account: Account,
+    override val uid: Int,
     private val data: PlayerData,
-    private val networkHandler: NetworkHandler,
+    internal val networkHandler: NetworkHandler,
     parentCoroutineContext: CoroutineContext = EmptyCoroutineContext,
-) : AbstractPlayer() {
-
-    override val uid = account.id.value
+) : Player {
 
     override var locale: Locale? = data.locale
 
@@ -140,16 +103,6 @@ class PlayerImpl internal constructor(
             scope = scope,
             parentStateClass = this,
             Login(this),
-        )
-    }
-
-    override val sceneState by lazy {
-        InitStateController<PlayerSceneStateInterface.State, PlayerSceneStateInterface, Player>(
-            scope = scope,
-            parentStateClass = this,
-            SceneLoading(),
-            SceneInit(),
-            SceneLoaded(),
         )
     }
 
@@ -186,7 +139,7 @@ class PlayerImpl internal constructor(
         WorldImpl(this, scene)
     }
 
-    override val playerProto by lazy {
+    internal val playerProto by lazy {
         PlayerProtoImpl(this)
     }
 
@@ -225,17 +178,17 @@ class PlayerImpl internal constructor(
             guidEntityMap[guid] = entityId
         }
 
-    override suspend fun close() {
+    internal suspend fun close() {
         networkHandler.close()
         state.setState(Closed(this))
         scope.dispose()
     }
 
-    override suspend fun init() {
+    internal suspend fun init() {
         logger.info { toString() + " has joined to the server" }
         dataBin = data.getPlayerDataBin()
         state.init()
-        networkHandler.networkStateController.observeStateChange { _, state ->
+        networkHandler.state.observeStateChange { _, state ->
             if (state == NetworkHandlerStateI.State.CLOSED) {
                 close()
             }
@@ -253,19 +206,19 @@ class PlayerImpl internal constructor(
     override suspend fun sendMessage(msg: String) {
     }
 
-    override fun <T : Message<*, *>> sendPacketAsync(
+    override fun <T : Message<*, *>> sendPacket(
         packet: OutgoingPacket<T>,
         metadata: PacketHead?,
-    ): Job = networkHandler.sendPacketAsync(packet)
+    ): Job = networkHandler.sendPacket(packet, metadata)
 
-    override suspend fun <T : Message<*, *>> sendPacket(
+    override suspend fun <T : Message<*, *>> sendPacketSync(
         packet: OutgoingPacket<T>,
         metadata: PacketHead?,
-    ) = networkHandler.sendPacket(packet)
+    ) = networkHandler.sendPacketSync(packet, metadata)
 
     override fun forwardHandlePacket(
         packet: SoraPacket,
-    ) = networkHandler.handlePacket(packet)
+    ): Job = networkHandler.handlePacket(packet)
 
     override suspend fun saveData() {
         data.save()
@@ -278,7 +231,6 @@ class PlayerImpl internal constructor(
         internal suspend fun onLogin() {
             PlayerLoginEvent(player).broadcast()
             basicComp.updateLastLoginTime()
-            sceneState.setState(PlayerSceneStateInterface.State.LOADING)
         }
     }
 
@@ -299,21 +251,6 @@ class PlayerImpl internal constructor(
             Sorapointa.playerList.remove(player)
             basicComp.updateLastLoginTime()
         }
-    }
-
-    inner class SceneLoading : PlayerSceneStateInterface {
-
-        override val state: PlayerSceneStateInterface.State = PlayerSceneStateInterface.State.LOADING
-    }
-
-    inner class SceneInit : PlayerSceneStateInterface {
-
-        override val state: PlayerSceneStateInterface.State = PlayerSceneStateInterface.State.INIT
-    }
-
-    inner class SceneLoaded : PlayerSceneStateInterface {
-
-        override val state: PlayerSceneStateInterface.State = PlayerSceneStateInterface.State.LOADED
     }
 
     override fun toString(): String =
@@ -360,10 +297,10 @@ class PlayerProtoImpl(
 }
 
 @Suppress("NOTHING_TO_INLINE")
-internal inline fun Player.impl(): AbstractPlayer {
-    contract { returns() implies (this@impl is AbstractPlayer) }
-    check(this is AbstractPlayer) {
-        "A Player instance is not instance of AbstractPlayer. Your instance: ${this::class.qualifiedOrSimple}"
+internal inline fun Player.impl(): PlayerImpl {
+    contract { returns() implies (this@impl is PlayerImpl) }
+    check(this is PlayerImpl) {
+        "A Player instance is not instance of PlayerImpl. Your instance: ${this::class.qualifiedOrSimple}"
     }
     return this
 }

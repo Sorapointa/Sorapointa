@@ -56,7 +56,7 @@ class SceneImpl(
         if (owner.avatarComp.curAvatarGuid != 0L) {
             addEntity(owner.avatarComp.getCurAvatar())
         }
-        owner.registerEventBlockListener<PlayerLoginEvent> {
+        owner.registerEventListener<PlayerLoginEvent> {
             owner.impl().sendPacket(PlayerEnterSceneNotifyPacket.Login(owner))
         }
     }

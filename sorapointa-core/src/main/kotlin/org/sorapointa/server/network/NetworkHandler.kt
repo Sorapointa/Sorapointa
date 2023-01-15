@@ -11,12 +11,11 @@ import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.sorapointa.Sorapointa
 import org.sorapointa.SorapointaConfig
-import org.sorapointa.dispatch.data.Account
 import org.sorapointa.dispatch.data.DispatchKeyData
 import org.sorapointa.event.StateController
 import org.sorapointa.event.WithState
 import org.sorapointa.event.broadcastEvent
-import org.sorapointa.events.SendOutgoingPacketEvent
+import org.sorapointa.events.SendPacketEvent
 import org.sorapointa.game.Player
 import org.sorapointa.game.PlayerImpl
 import org.sorapointa.game.data.PlayerData
@@ -24,7 +23,7 @@ import org.sorapointa.game.impl
 import org.sorapointa.proto.PacketHead
 import org.sorapointa.proto.SoraPacket
 import org.sorapointa.proto.toJson
-import org.sorapointa.server.network.IncomingPacketFactory.tryHandle
+import org.sorapointa.server.network.IncomingPacketFactory.handle
 import org.sorapointa.utils.*
 import org.sorapointa.utils.crypto.MT19937
 import java.util.concurrent.ConcurrentHashMap
@@ -54,7 +53,7 @@ internal open class NetworkHandler(
 
     val host: String = connection.user().remoteAddress.address.hostAddress
 
-    val networkStateController by lazy {
+    val state by lazy {
         StateController<_, NetworkHandlerStateI, _>(
             scope = scope,
             parentStateClass = this,
@@ -72,7 +71,7 @@ internal open class NetworkHandler(
     private var lastPingTime = now()
 
     internal suspend fun init() {
-        networkStateController.init()
+        state.init()
         scope.launch {
             while (isActive) {
                 delay(1000)
@@ -85,16 +84,16 @@ internal open class NetworkHandler(
     }
 
     internal suspend fun close() {
-        sendPacket(ServerDisconnectClientNotifyPacket())
+        sendPacketSync(ServerDisconnectClientNotifyPacket())
         if (connection.isActive) {
             connection.close()
         }
-        networkStateController.setState(Closed(this))
+        state.setState(Closed(this))
         scope.dispose()
     }
 
     suspend fun getKey(): ByteArray? =
-        when (val state = networkStateController.getStateInstance()) {
+        when (val state = state.getStateInstance()) {
             is WaitToken -> state.dispatchKey.await()
             is UpdatedKeyState -> state.gameKey
             else -> null
@@ -105,19 +104,19 @@ internal open class NetworkHandler(
         lastPingTime = now()
     }
 
-    open fun <T : Message<*, *>> sendPacketAsync(
+    open fun <T : Message<*, *>> sendPacket(
         packet: OutgoingPacket<T>,
         metadata: PacketHead? = null,
     ): Job = scope.launch {
-        sendPacket(packet, metadata)
+        sendPacketSync(packet, metadata)
     }
 
-    open suspend fun <T : Message<*, *>> sendPacket(
+    open suspend fun <T : Message<*, *>> sendPacketSync(
         packet: OutgoingPacket<T>,
         metadata: PacketHead? = null,
     ) {
-        if (networkStateController.getCurrentState() == NetworkHandlerStateI.State.CLOSED) return
-        SendOutgoingPacketEvent(this, packet).broadcastEvent {
+        if (state.getCurrentState() == NetworkHandlerStateI.State.CLOSED) return
+        SendPacketEvent(this, packet).broadcastEvent {
             if (metadata != null) {
                 packet.metadata = metadata
             }
@@ -142,7 +141,14 @@ internal open class NetworkHandler(
                     proto = IncomingPacketFactory.parseToProto(packet),
                 )
             }
-            networkStateController.getStateInstance().handlePacket(packet)
+            runCatching {
+                state.getStateInstance().handlePacket(packet)
+            }.getOrElse {
+                throw IllegalStateException(
+                    "Error while handling packet: ${findCommonNameFromCmdId(packet.cmdId)}",
+                    it,
+                )
+            }
         }
 
     private fun logPacket(
@@ -173,26 +179,23 @@ internal open class NetworkHandler(
         abstract val gameKey: ByteArray
     }
 
-    abstract inner class SessionHandlePacketState : UpdatedKeyState() {
+    abstract inner class PreLogin : UpdatedKeyState() {
 
         override suspend fun handlePacket(packet: SoraPacket) {
             newSuspendedTransaction {
-                runCatching {
-                    tryHandle(packet)?.also {
-                        sendPacket(it)
-                    }
-                }.getOrElse {
-                    throw IllegalStateException(
-                        "Error while handling packet: ${findCommonNameFromCmdId(packet.cmdId)}",
-                        it,
-                    )
-                }
+                handle(PacketHandlerContext(this@PreLogin, packet.metadata), packet)
             }
         }
     }
 
-    abstract inner class PlayerHandlePacketState : SessionHandlePacketState() {
-        abstract val bindPlayer: Player
+    abstract inner class Logged : PreLogin() {
+        abstract val player: Player
+
+        override suspend fun handlePacket(packet: SoraPacket) {
+            newSuspendedTransaction {
+                handle(PlayerPacketHandlerContext(player, packet.metadata), packet)
+            }
+        }
     }
 
     inner class WaitToken(
@@ -210,35 +213,34 @@ internal open class NetworkHandler(
             }
         }
 
-        suspend fun updateKeyAndBindPlayer(account: Account, seed: ULong) {
-            val playerData = PlayerData.findById(account.id.value)
+        suspend fun updateKeyAndBindPlayer(uid: Int, seed: ULong) {
+            val playerData = PlayerData.findById(uid)
             val gameKey = MT19937.generateKey(seed)
 
-            updateSessionState = Login(account, playerData, gameKey, networkHandler)
+            updateSessionState = Login(uid, playerData, gameKey, networkHandler)
         }
 
         override suspend fun handlePacket(packet: SoraPacket) {
             newSuspendedTransaction {
-                val outgoingPacket = tryHandle(packet) ?: return@newSuspendedTransaction
-                sendPacket(outgoingPacket) // Wait for sending, cuz we need to update key
-                updateSessionState?.let { networkStateController.setState(it) }
+                handle(PacketHandlerContext(this@WaitToken, packet.metadata), packet)
+                updateSessionState?.let { this@NetworkHandler.state.setState(it) }
             }
         }
     }
 
     inner class Login(
-        val account: Account,
+        val uid: Int,
         val playerData: PlayerData?,
         override val gameKey: ByteArray,
         override val networkHandler: NetworkHandler,
-    ) : SessionHandlePacketState() {
+    ) : PreLogin() {
 
         override val state: NetworkHandlerStateI.State =
             NetworkHandlerStateI.State.LOGIN
 
         suspend fun createPlayer(playerData: PlayerData): Player {
             val player = PlayerImpl(
-                account = account,
+                uid = uid,
                 data = playerData,
                 networkHandler = networkHandler,
                 parentCoroutineContext = networkHandler.scope.coroutineContext,
@@ -248,7 +250,7 @@ internal open class NetworkHandler(
         }
 
         suspend fun setToOK(player: Player) {
-            networkStateController.setState(OK(gameKey, player, networkHandler))
+            this@NetworkHandler.state.setState(OK(gameKey, player, networkHandler))
             val state = player.impl().state.getStateInstance()
             if (state is PlayerImpl.Login) {
                 state.onLogin()
@@ -258,9 +260,9 @@ internal open class NetworkHandler(
 
     inner class OK(
         override val gameKey: ByteArray,
-        override val bindPlayer: Player,
+        override val player: Player,
         override val networkHandler: NetworkHandler,
-    ) : PlayerHandlePacketState() {
+    ) : Logged() {
 
         override val state: NetworkHandlerStateI.State =
             NetworkHandlerStateI.State.OK
@@ -299,10 +301,8 @@ internal class ConnectionListener(
     override fun handleReceive(byteBuf: ByteBuf, ukcp: Ukcp) {
         runBlocking {
             val handler = connectionMap[ukcp]
-            if (handler?.getKey() == null) {
-                return@runBlocking
-            }
-            byteBuf.readToSoraPacket(handler.getKey()!!) {
+            val key = handler?.getKey() ?: return@runBlocking
+            byteBuf.readToSoraPacket(key) {
                 handler.handlePacket(it)
             }
         }
