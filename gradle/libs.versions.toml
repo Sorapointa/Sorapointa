@@ -10,6 +10,7 @@ abi-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", v
 wire = { id = "com.squareup.wire", version = "4.4.3" }
 rust-wrapper = { id = "fr.stardustenterprises.rust.wrapper", version = "3.2.5" }
 spotless = { id = "com.diffplug.spotless", version = "6.12.1" }
+licensee = { id = "app.cash.licensee", version = "1.6.0" }
 
 [libraries]
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

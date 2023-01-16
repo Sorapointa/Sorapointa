@@ -7,6 +7,7 @@ plugins {
     // You can install a plugin to suppress it:
     // https://plugins.jetbrains.com/plugin/18949-gradle-libs-error-suppressor
     alias(libs.plugins.spotless)
+    alias(libs.plugins.licensee)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.abi.validator)
@@ -15,7 +16,10 @@ plugins {
 }
 
 subprojects {
-    apply(plugin = "org.jlleitschuh.gradle.ktlint")
+    if (!arrayOf("sorapointa-native", "sorapointa-utils").contains(project.name)) {
+        apply(plugin = "app.cash.licensee")
+        configureLicensee()
+    }
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
     afterEvaluate {
         configureLogbackCopy()
@@ -63,5 +67,22 @@ spotless {
         excludes()
         common()
         ktlint("0.47.1").editorConfigOverride(ktlintConfig)
+    }
+}
+
+fun Project.configureLicensee() = this.configure<app.cash.licensee.LicenseeExtension>() {
+    val allowedLicenses = arrayOf(
+        "Apache-2.0",
+        "MIT",
+        "ISC",
+        "BSD-2-Clause",
+        "BSD-3-Clause",
+        "CC0-1.0",
+        "EPL-1.0",
+        "GPL-2.0-with-classpath-exception",
+    )
+    allowedLicenses.forEach { allow(it) }
+    ignoreDependencies("org.postgresql", "postgresql") {
+        because("BSD-2-Clause, but typo in license URL")
     }
 }
