@@ -142,7 +142,7 @@ interface WithState<out T : Enum<*>> {
  * be a receiver in state observer, and interceptor lambda
  * @see WithState
  */
-open class StateController<S : Enum<*>, I : WithState<S>, C> (
+open class StateController<S : Enum<*>, I : WithState<S>, C>(
     protected var scope: ModuleScope,
     protected var parentStateClass: C,
     firstState: I,
@@ -260,11 +260,13 @@ open class StateController<S : Enum<*>, I : WithState<S>, C> (
         interceptors[interceptor] = listenerState
     }
 
-    @SorapointaInternal fun cleanAllObserver() {
+    @SorapointaInternal
+    fun cleanAllObserver() {
         observers.clear()
     }
 
-    @SorapointaInternal fun cleanAllInterceptor() {
+    @SorapointaInternal
+    fun cleanAllInterceptor() {
         interceptors.clear()
     }
 
@@ -287,7 +289,7 @@ open class StateController<S : Enum<*>, I : WithState<S>, C> (
  * [S] is state enum, [I] is state interface, [C] is the class with state
  * @param stateInstances all instances of your different state classes
  */
-class InitStateController<S : Enum<*>, I : WithState<S>, C> (
+class InitStateController<S : Enum<*>, I : WithState<S>, C>(
     scope: ModuleScope,
     parentStateClass: C,
     vararg stateInstances: I,
@@ -323,10 +325,10 @@ class InitStateController<S : Enum<*>, I : WithState<S>, C> (
  */
 @Suppress("NOTHING_TO_INLINE")
 inline fun <S : Enum<*>, I : WithState<S>, C>
-StateController<S, I, C>.observe(
-    listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-    noinline observer: suspend C.() -> Unit,
-) = observeStateChange(listenerState) { _, _ -> this.observer() }
+    StateController<S, I, C>.observe(
+        listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
+        noinline observer: suspend C.() -> Unit,
+    ) = observeStateChange(listenerState) { _, _ -> this.observer() }
 
 /**
  * Quick way of [StateController.interceptStateChange]
@@ -340,10 +342,10 @@ StateController<S, I, C>.observe(
  */
 @Suppress("NOTHING_TO_INLINE")
 inline fun <S : Enum<*>, I : WithState<S>, C>
-StateController<S, I, C>.intercept(
-    listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-    noinline interceptor: suspend C.() -> Boolean,
-) = interceptStateChange(listenerState) { _, _ -> this.interceptor() }
+    StateController<S, I, C>.intercept(
+        listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
+        noinline interceptor: suspend C.() -> Boolean,
+    ) = interceptStateChange(listenerState) { _, _ -> this.interceptor() }
 
 /**
  * Quick way of [StateController.interceptStateChange]
@@ -359,7 +361,7 @@ StateController<S, I, C>.intercept(
  */
 @Suppress("NOTHING_TO_INLINE")
 inline fun <S : Enum<*>, I : WithState<S>, C>
-StateController<S, I, C>.block(
-    listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
-    noinline block: suspend C.() -> Unit,
-) = interceptStateChange(listenerState) { _, _ -> this.block(); false }
+    StateController<S, I, C>.block(
+        listenerState: ListenerState = ListenerState.BEFORE_UPDATE,
+        noinline block: suspend C.() -> Unit,
+    ) = interceptStateChange(listenerState) { _, _ -> this.block(); false }

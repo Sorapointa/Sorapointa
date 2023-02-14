@@ -3,10 +3,7 @@ package org.sorapointa.command.defaults.console
 import moe.sdl.yac.core.PrintMessage
 import moe.sdl.yac.parameters.options.default
 import moe.sdl.yac.parameters.options.option
-import org.sorapointa.CoreBundle
-import org.sorapointa.command.CommandLocalization
-import org.sorapointa.command.ConsoleCommand
-import org.sorapointa.command.ConsoleCommandSender
+import org.sorapointa.command.*
 import org.sorapointa.command.utils.switchSet
 import org.sorapointa.console.ConsoleUsers
 
@@ -23,12 +20,12 @@ class ConsoleUser(val sender: ConsoleCommandSender) : ConsoleCommand(
 
     private val username by option(
         names = arrayOf("--username", "-u"),
-        help = CoreBundle.message("sora.cmd.console.user.opt.user", locale = sender.locale),
+        help = sender.localed("sora.cmd.console.user.opt.user"),
     )
 
     private val password by option(
         names = arrayOf("--password", "--pwd", "-p"),
-        help = CoreBundle.message("sora.cmd.console.user.opt.pwd", locale = sender.locale),
+        help = sender.localed("sora.cmd.console.user.opt.pwd"),
     )
 
     enum class Operation {
@@ -36,7 +33,7 @@ class ConsoleUser(val sender: ConsoleCommandSender) : ConsoleCommand(
     }
 
     private val operation by option(
-        help = CoreBundle.message("sora.cmd.console.user.opt.operation", locale = sender.locale),
+        help = sender.localed("sora.cmd.console.user.opt.operation"),
     ).switchSet(
         setOf("--add", "-a") to Operation.ADD,
         setOf("--update", "--upd", "-U") to Operation.UPDATE,
@@ -50,7 +47,7 @@ class ConsoleUser(val sender: ConsoleCommandSender) : ConsoleCommand(
         ConsoleUsers.addOrUpdate(
             username,
             password ?: run {
-                sender.sendMessage(CoreBundle.message("sora.cmd.console.user.msg.empty.pwd", locale = sender.locale))
+                sender.sendLocaled("sora.cmd.console.user.msg.empty.pwd")
                 ""
             },
         )
@@ -60,45 +57,35 @@ class ConsoleUser(val sender: ConsoleCommandSender) : ConsoleCommand(
         when (operation) {
             Operation.UPDATE -> {
                 addOrUpdate(username)
-                sender.sendMessage(
-                    CoreBundle.message("sora.cmd.console.user.msg.success.update", username, locale = sender.locale),
-                )
+                sender.sendLocaled("sora.cmd.console.user.msg.success.update", username)
                 ConsoleUsers.save()
             }
+
             Operation.ADD -> {
                 if (ConsoleUsers.data.users.contains(username)) {
-                    sender.sendMessage(
-                        CoreBundle.message("sora.cmd.console.user.msg.duplicate", username, locale = sender.locale),
-                    )
+                    sender.sendLocaled("sora.cmd.console.user.msg.duplicate", username)
                     return
                 }
                 addOrUpdate(username)
-                sender.sendMessage(
-                    CoreBundle.message("sora.cmd.console.user.msg.success.add", username, locale = sender.locale),
-                )
+                sender.sendLocaled("sora.cmd.console.user.msg.success.add", username)
                 ConsoleUsers.save()
             }
+
             Operation.DELETE -> {
                 val removed = ConsoleUsers.data.users.remove(username) != null
                 if (removed) {
-                    sender.sendMessage(
-                        CoreBundle.message("sora.cmd.console.user.msg.success.remove", username, locale = sender.locale),
-                    )
+                    sender.sendLocaled("sora.cmd.console.user.msg.success.remove", username)
                 } else {
-                    sender.sendMessage(
-                        CoreBundle.message("sora.cmd.console.user.msg.nosuch", username, locale = sender.locale),
-                    )
+                    sender.sendLocaled("sora.cmd.console.user.msg.nosuch", username)
                 }
             }
+
             Operation.LIST -> {
                 val usrs = ConsoleUsers.data.users.keys
-                sender.sendMessage(
-                    CoreBundle.message(
-                        "sora.cmd.console.user.msg.list",
-                        usrs.size,
-                        usrs.joinToString(),
-                        locale = sender.locale,
-                    ),
+                sender.sendLocaled(
+                    "sora.cmd.console.user.msg.list",
+                    usrs.size,
+                    usrs.joinToString(),
                 )
             }
         }
