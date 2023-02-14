@@ -105,7 +105,7 @@ internal object IncomingPacketFactory {
     )
 
     suspend inline fun <reified S, reified C> handle(context: C, packet: SoraPacket)
-        where S : NetworkHandlerStateI, C : PacketHandlerContext<S> {
+    where S : NetworkHandlerStateI, C : PacketHandlerContext<S> {
         val handler = incomingPacketHandlers
             .firstOrNull { it.cmdId == packet.cmdId }
             ?: return

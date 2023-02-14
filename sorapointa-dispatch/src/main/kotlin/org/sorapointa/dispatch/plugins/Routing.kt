@@ -127,11 +127,15 @@ internal fun Application.configureThirdPartyAuth() {
 internal fun Application.configureHardCodeRouting() {
     routing {
         post("/account/risky/api/check") {
-            call.respondText { """{"retcode":0,"message":"OK","data":{"id":"none","action":"ACTION_NONE","geetest":null}}""" }
+            call.respondText {
+                """{"retcode":0,"message":"OK","data":{"id":"none","action":"ACTION_NONE","geetest":null}}"""
+            }
         }
 
         post("/data_abtest_api/config/experiment/list") { // AB Test ?? Not sure now
-            call.respondText { """{"retcode":0,"success":true,"message":"","data":[{"code":1000,"type":2,"config_id":"14","period_id":"6036_99","version":"1","configs":{"cardType":"old"}}]}""" }
+            call.respondText {
+                """{"retcode":0,"success":true,"message":"","data":[{"code":1000,"type":2,"config_id":"14","period_id":"6036_99","version":"1","configs":{"cardType":"old"}}]}"""
+            }
         }
 
         getAndPost("/log/sdk/upload") {
