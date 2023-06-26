@@ -3,7 +3,7 @@ package org.sorapointa.event
 import kotlinx.atomicfu.atomic
 
 /**
- * Event Interface, if you want to realize your own events,
+ * Event Interface, if you want to implement your own events,
  * please inherit `AbstractEvent` or `AbstractCancellableEvent`,
  * **DON'T implement** this interface, it's sealed interface.
  *
