@@ -44,7 +44,7 @@ exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datet
 
 hikaricp = "com.zaxxer:HikariCP:5.0.1"
 
-sqlite = "org.xerial:sqlite-jdbc:3.40.0.0"
+sqlite = "org.xerial:sqlite-jdbc:3.43.0.0"
 postgresql = "org.postgresql:postgresql:42.5.1"
 
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
