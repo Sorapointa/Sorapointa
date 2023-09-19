@@ -68,7 +68,7 @@ ktor-server-tests = { module = "io.ktor:ktor-server-tests-jvm", version.ref = "k
 
 ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
 
-cron-utils = "com.cronutils:cron-utils:9.2.0"
+cron-utils = "com.cronutils:cron-utils:9.2.1"
 wire-runtime = "com.squareup.wire:wire-runtime:4.4.3"
 okio = "com.squareup.okio:okio:3.3.0"
 
