@@ -13,4 +13,4 @@ crate_type = ["cdylib"]
 jni = "0.20.0"
 anyhow = "1.0"
 log = "0.4.17"
-once_cell = "1.17.0"
+once_cell = "1.19.0"
