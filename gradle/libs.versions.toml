@@ -30,7 +30,7 @@ microutils-logging = "io.github.microutils:kotlin-logging-jvm:3.0.4"
 logback = "ch.qos.logback:logback-classic:1.4.5"
 
 atomicfu = "org.jetbrains.kotlinx:atomicfu:0.18.3"
-netty = "io.netty:netty-handler:4.1.86.Final"
+netty = "io.netty:netty-handler:4.1.107.Final"
 kcp = "moe.sdl.kcp:grasskcpper:2.0.0"
 yac = "moe.sdl.yac:core:1.0.1"
 jline = "org.jline:jline:3.22.0"
