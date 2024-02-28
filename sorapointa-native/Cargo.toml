@@ -12,5 +12,5 @@ crate_type = ["cdylib"]
 [dependencies]
 jni = "0.20.0"
 anyhow = "1.0"
-log = "0.4.17"
+log = "0.4.21"
 once_cell = "1.17.0"
