@@ -27,7 +27,7 @@ kotlinx-coroutines-core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
 kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
 
 microutils-logging = "io.github.microutils:kotlin-logging-jvm:3.0.4"
-logback = "ch.qos.logback:logback-classic:1.4.5"
+logback = "ch.qos.logback:logback-classic:1.5.3"
 
 atomicfu = "org.jetbrains.kotlinx:atomicfu:0.18.3"
 netty = "io.netty:netty-handler:4.1.86.Final"
